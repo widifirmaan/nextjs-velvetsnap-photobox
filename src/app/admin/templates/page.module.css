@@ -1,0 +1,472 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+/* Form */
+.formCard {
+  padding: 32px;
+  margin-bottom: 32px;
+  animation: slideDown 0.3s ease;
+}
+
+.formCard h2 {
+  margin-bottom: 24px;
+}
+
+.formLayout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 32px;
+}
+
+.formFields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.formRow {
+  display: flex;
+  gap: 16px;
+}
+
+.formRow > div {
+  flex: 1;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 16px;
+  transition: border-color var(--transition-fast);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Image Upload */
+.imagePreviewArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.imagePreview {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  border: 2px dashed var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.imagePreview:hover {
+  border-color: var(--accent-color);
+}
+
+.imagePreviewPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.imagePreview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.imageUploadBtn {
+  width: 100%;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* Table */
+.tableContainer {
+  padding: 24px;
+  overflow-x: auto;
+  animation: fadeInUp 0.4s ease backwards;
+  animation-delay: 0.15s;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  text-align: left;
+  padding: 16px 12px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.table th {
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.table tbody tr:hover {
+  background: rgba(0, 122, 255, 0.04);
+}
+
+/* Template Preview Thumbnail */
+.templateThumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.templateThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.templateThumbPlaceholder {
+  color: var(--text-secondary);
+}
+
+/* Status Toggle */
+.statusToggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggleSwitch {
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all var(--transition-fast);
+  padding: 0;
+}
+
+.toggleSwitch.active {
+  background: #34c759;
+}
+
+.toggleSwitch.inactive {
+  background: rgba(118, 118, 128, 0.24);
+}
+
+.toggleKnob {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2px;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggleSwitch.active .toggleKnob {
+  left: 22px;
+}
+
+.toggleSwitch.inactive .toggleKnob {
+  left: 2px;
+}
+
+.statusLabel {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.statusLabel.active {
+  color: #34c759;
+}
+
+.statusLabel.inactive {
+  color: var(--text-secondary);
+}
+
+/* Color swatch */
+.colorSwatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid var(--glass-border);
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Actions */
+.actionBtns {
+  display: flex;
+  gap: 4px;
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: inline-flex;
+  transition: all var(--transition-fast);
+}
+
+.iconBtn:hover {
+  background: rgba(0, 122, 255, 0.08);
+}
+
+.iconBtn.danger:hover {
+  background: rgba(255, 59, 48, 0.1);
+}
+
+/* Loading */
+.loader {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+:global(.spin) {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .formLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Interactive Canvas/Image Workspace */
+.workspaceWrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.canvasContainer {
+  position: relative;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  cursor: crosshair;
+  user-select: none;
+}
+
+.canvasContainer img {
+  width: 100%;
+  display: block;
+  pointer-events: none;
+  height: auto;
+}
+
+.drawingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.slotHighlight {
+  position: absolute;
+  border: 2px solid var(--accent-color);
+  background: rgba(0, 122, 255, 0.1);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(0, 122, 255, 0.2);
+  transition: background var(--transition-fast);
+}
+
+.slotHighlight:hover {
+  background: rgba(0, 122, 255, 0.25);
+  border-color: #34c759;
+}
+
+.slotBadge {
+  background: var(--accent-color);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.slotDeleteBtn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease;
+  z-index: 10;
+}
+
+.slotDeleteBtn:hover {
+  transform: scale(1.15);
+}
+
+.resizeHandle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border: 2px solid var(--accent-color);
+  border-radius: 2px;
+  z-index: 10;
+}
+
+.resizeHandle[data-resize-handle="nw"] { top: -5px; left: -5px; cursor: nwse-resize; }
+.resizeHandle[data-resize-handle="n"]  { top: -5px; left: 50%; margin-left: -5px; cursor: ns-resize; }
+.resizeHandle[data-resize-handle="ne"] { top: -5px; right: -5px; cursor: nesw-resize; }
+.resizeHandle[data-resize-handle="e"]  { top: 50%; right: -5px; margin-top: -5px; cursor: ew-resize; }
+.resizeHandle[data-resize-handle="se"] { bottom: -5px; right: -5px; cursor: nwse-resize; }
+.resizeHandle[data-resize-handle="s"]  { bottom: -5px; left: 50%; margin-left: -5px; cursor: ns-resize; }
+.resizeHandle[data-resize-handle="sw"] { bottom: -5px; left: -5px; cursor: nesw-resize; }
+.resizeHandle[data-resize-handle="w"]  { top: 50%; left: -5px; margin-top: -5px; cursor: ew-resize; }
+
+.activeSelection {
+  position: absolute;
+  border: 2px dashed #34c759;
+  background: rgba(52, 199, 89, 0.15);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.processingOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.workspaceToolbar {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.workspaceToolbar button {
+  flex: 1;
+  font-size: 12px;
+  padding: 8px 12px;
+}
+
