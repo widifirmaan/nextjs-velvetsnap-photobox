@@ -35,14 +35,16 @@ function removeGreenScreen(base64: string): Promise<string> {
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
+      const MAX_W = 1000;
+      const scale = MAX_W / (img.naturalWidth || img.width);
+      canvas.width = MAX_W;
+      canvas.height = Math.round((img.naturalHeight || img.height) * scale);
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         resolve(base64);
         return;
       }
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       let imgData;
       try {
         imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -83,21 +85,26 @@ export default function ResultPage() {
   const [captures, setCaptures] = useState<string[]>([]);
   const [template, setTemplate] = useState('t1');
   const [filter, setFilter] = useState('none');
+  const [photoAdjust, setPhotoAdjust] = useState<{ scale: number; x: number; y: number }[]>([]);
   const printRef = useRef<HTMLDivElement>(null);
 
   const [dbTemplate, setDbTemplate] = useState<TemplateData | null>(null);
   const [keyedFrameImage, setKeyedFrameImage] = useState<string>('');
+  const [frameRatio, setFrameRatio] = useState<number>(2 / 3);
   const [loading, setLoading] = useState(true);
+  const [imagesReady, setImagesReady] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedCaptures = sessionStorage.getItem('photobooth_captures');
       const storedTemplate = sessionStorage.getItem('photobooth_template');
       const storedFilter = sessionStorage.getItem('photobooth_filter');
+      const storedAdjust = sessionStorage.getItem('photobooth_adjust');
 
       if (storedCaptures) setCaptures(JSON.parse(storedCaptures));
       if (storedTemplate) setTemplate(storedTemplate);
       if (storedFilter) setFilter(storedFilter);
+      if (storedAdjust) setPhotoAdjust(JSON.parse(storedAdjust));
     }
   }, []);
 
@@ -105,6 +112,7 @@ export default function ResultPage() {
     if (!template) return;
     setLoading(true);
     setKeyedFrameImage('');
+    setImagesReady(false);
     fetch('/api/templates')
       .then((res) => res.json())
       .then((data) => {
@@ -115,6 +123,9 @@ export default function ResultPage() {
             if (matched.frameImage) {
               return removeGreenScreen(matched.frameImage).then((keyed) => {
                 setKeyedFrameImage(keyed);
+                const img = new window.Image();
+                img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+                img.src = keyed;
               });
             }
           }
@@ -124,10 +135,32 @@ export default function ResultPage() {
       .finally(() => setLoading(false));
   }, [template]);
 
+  useEffect(() => {
+    if (loading || captures.length === 0) return;
+    setImagesReady(false);
+    const images = [...captures];
+    if (keyedFrameImage) images.push(keyedFrameImage);
+    if (images.length === 0) { setImagesReady(true); return; }
+    Promise.all(
+      images.map(
+        (src) =>
+          new Promise<void>((resolve) => {
+            const img = new window.Image();
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+            img.src = src;
+          })
+      )
+    ).then(() => setImagesReady(true));
+  }, [captures, keyedFrameImage, loading]);
+
   const handleDownload = async () => {
     if (!printRef.current) return;
     try {
-      const dataUrl = await htmlToImage.toJpeg(printRef.current, { quality: 0.95 });
+      const dataUrl = await htmlToImage.toJpeg(printRef.current, {
+        quality: 0.95,
+        pixelRatio: 3,
+      });
       const link = document.createElement('a');
       link.download = `photobooth-${Date.now()}.jpg`;
       link.href = dataUrl;
@@ -137,8 +170,43 @@ export default function ResultPage() {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handlePrint = async () => {
+    if (!printRef.current) return;
+    try {
+      const dataUrl = await htmlToImage.toJpeg(printRef.current, { quality: 0.95, pixelRatio: 3 });
+      const win = window.open('', '_blank');
+      if (!win) return;
+      win.document.write(`<!DOCTYPE html>
+<html>
+<head><style>
+  @page { margin: 0; size: auto; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #000;
+  }
+  img {
+    display: block;
+    max-width: 100vw;
+    max-height: 100vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+  @media print {
+    @page { margin: 0; }
+    body { background: none; }
+    img { max-width: 100%; max-height: 100%; }
+  }
+</style></head>
+<body><img src="${dataUrl}" onload="window.print()" /></body></html>`);
+      win.document.close();
+    } catch (err) {
+      console.error('Error printing:', err);
+    }
   };
 
   const handleHome = () => {
@@ -151,31 +219,30 @@ export default function ResultPage() {
 
   return (
     <div className="page-container" style={{ alignItems: 'center' }}>
-      <h1 className="title">Your Photos are Ready!</h1>
-      <p className="subtitle">Download or print your masterpiece</p>
+      {loading || !imagesReady ? (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <Loader2 className="spin" size={32} />
+        </div>
+      ) : (
+        <>
+          <h1 className="title">Your Photos are Ready!</h1>
+          <p className="subtitle">Download or print your masterpiece</p>
 
       <div className={styles.workspace}>
-        {/* The Frame to be downloaded */}
-        {loading ? (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '300px', height: '450px' }}>
-            <Loader2 className="spin" size={32} />
-          </div>
-        ) : dbTemplate && dbTemplate.frameImage && dbTemplate.slotsLayout ? (
-          <div 
-            className={`${styles.dynamicPrintArea} dynamicPrintArea`}
-            ref={printRef}
-            style={{
-              position: 'relative',
-              width: '320px',
-              aspectRatio: '2/3',
-              backgroundColor: dbTemplate.color || '#ffffff',
-              overflow: 'hidden',
-              borderRadius: '8px',
-              boxShadow: '0 16px 40px rgba(0,0,0,0.15)',
-              transform: 'translateZ(0)' // GPU acceleration for HTML-to-Image
-            }}
-          >
-            {/* Captured webcam photos rendered in the background absolute positions */}
+        {dbTemplate && dbTemplate.frameImage && dbTemplate.slotsLayout ? (
+          <div className={styles.printWrap}>
+            <div 
+              className={`${styles.dynamicPrintArea} dynamicPrintArea`}
+              ref={printRef}
+              style={{
+                position: 'relative',
+                width: '100%',
+                aspectRatio: frameRatio,
+                backgroundColor: dbTemplate.color || '#ffffff',
+                overflow: 'hidden',
+                '--ar': frameRatio,
+              } as React.CSSProperties}
+            >
             {(dbTemplate.slotsLayout || []).map((slot, idx) => {
               const src = captures[idx];
               if (!src) return null;
@@ -192,7 +259,6 @@ export default function ResultPage() {
                     zIndex: 1
                   }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={src}
                     className={styles[filter]}
@@ -200,32 +266,31 @@ export default function ResultPage() {
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover'
+                      objectFit: 'cover',
+                      transform: `scale(${photoAdjust[idx]?.scale || 1}) translate(${photoAdjust[idx]?.x || 0}%, ${photoAdjust[idx]?.y || 0}%)`,
+                      transformOrigin: 'center',
                     }}
                   />
                 </div>
               );
             })}
 
-            {/* Template PNG overlay frame with transparent cutouts */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={keyedFrameImage || dbTemplate.frameImage}
               alt="Frame Overlay"
               style={{
                 position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
+                top: 0, left: 0,
+                width: '100%', height: '100%',
                 zIndex: 2,
                 pointerEvents: 'none'
               }}
             />
           </div>
+          </div>
         ) : (
           /* Fallback static render for default classic grids */
+          <div className={styles.printWrap}>
           <div className={styles.printArea} ref={printRef}>
             <div className={`${styles.frameLayout} ${styles[template]}`}>
               <div className={styles.frameHeader}>
@@ -246,6 +311,7 @@ export default function ResultPage() {
               </div>
             </div>
           </div>
+          </div>
         )}
 
         <div className={`glass-panel ${styles.actions}`}>
@@ -264,6 +330,8 @@ export default function ResultPage() {
           </div>
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }

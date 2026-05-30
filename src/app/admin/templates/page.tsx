@@ -42,11 +42,13 @@ function removeChromaKey(dataUrl: string): Promise<string> {
     img.onload = () => {
       try {
         const canvas = document.createElement('canvas');
-        canvas.width = img.naturalWidth || img.width;
-        canvas.height = img.naturalHeight || img.height;
+        const MAX_W = 1000;
+        const scale = MAX_W / (img.naturalWidth || img.width);
+        canvas.width = MAX_W;
+        canvas.height = Math.round((img.naturalHeight || img.height) * scale);
         const ctx = canvas.getContext('2d');
         if (!ctx) { resolve(dataUrl); return; }
-        ctx.drawImage(img, 0, 0);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         const d = imgData.data;
         const targetR = 0, targetG = 191, targetB = 99;
@@ -122,7 +124,7 @@ function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
   
   const visited = new Uint8Array(w * h);
   const rects: ISlot[] = [];
-  const step = 2; // Step size to balance speed & precision
+  const step = 1;
   
   for (let y = 0; y < h; y += step) {
     for (let x = 0; x < w; x += step) {
@@ -171,8 +173,8 @@ function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
         const scaleX = origW / w;
         const scaleY = origH / h;
         if (rw * scaleX >= minSlotPx && rh * scaleY >= minSlotPx) {
-          const padX = rw * 0.02;
-          const padY = rh * 0.02;
+          const padX = Math.max(w * 0.05, 16);
+          const padY = Math.max(h * 0.05, 16);
           const px = Math.max(0, minX - padX);
           const py = Math.max(0, minY - padY);
           const pw = Math.min(w - px, rw + padX * 2);
