@@ -204,52 +204,47 @@
   justify-content: center;
 }
 
+.strips {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 100%;
+  padding-bottom: 4px;
+}
+
 .strip {
   position: relative;
-  width: 55%;
-  max-width: 140px;
+  width: 0;
+  flex: 1;
+  max-width: 100px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 8px 10px;
+  padding: 6px 6px 8px;
   background: #fff;
-  border-radius: 14px;
+  border-radius: 12px;
   box-shadow:
     10px 14px 28px rgba(0,0,0,0.12),
     -4px -4px 12px rgba(255,255,255,0.6),
     inset 2px -2px 4px rgba(0,0,0,0.04),
     inset -2px 2px 4px rgba(255,255,255,0.9);
-  transform: rotate(-3deg) translateY(20%);
-  transform-origin: top center;
   animation: stripSway 4s ease-in-out infinite;
   z-index: 1;
+  transform-origin: bottom center;
 }
 
-@keyframes stripSway {
-  0%, 100% { transform: rotate(-3deg) translateY(20%); }
-  50% { transform: rotate(1deg) translateY(18%); }
-}
+.strip:nth-child(1) { transform: rotate(-5deg) translateY(10%); }
+.strip:nth-child(2) { transform: rotate(0deg) translateY(0%); }
+.strip:nth-child(3) { transform: rotate(4deg) translateY(15%); }
 
-.stripPhoto {
+.stripImage {
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 2 / 3;
   border-radius: 8px;
   background-size: cover;
   background-position: center;
-  animation: galleryPop 6s ease-in-out infinite;
   box-shadow:
     inset 1px -1px 3px rgba(0,0,0,0.06),
     inset -1px 1px 3px rgba(255,255,255,0.5);
-}
-
-.stripPhoto:nth-child(1) { animation-delay: 0s; }
-.stripPhoto:nth-child(2) { animation-delay: 0.3s; }
-.stripPhoto:nth-child(3) { animation-delay: 0.6s; }
-
-@keyframes galleryPop {
-  0%, 100% { transform: scale(1); filter: saturate(1); }
-  25% { transform: scale(1.04); filter: saturate(1.15); }
-  50% { transform: scale(1); filter: saturate(1); }
 }
 
 /* ── Testimonial ── */
@@ -441,10 +436,14 @@
     grid-column: span 2;
     min-height: 160px;
   }
-  .strip {
-    transform: rotate(-2deg) translateY(10%);
-    width: 45%;
+  .strips {
+    gap: 4px;
   }
+  .strip {
+    max-width: 80px;
+  }
+  .strip:nth-child(1) { transform: rotate(-4deg) translateY(8%); }
+  .strip:nth-child(3) { transform: rotate(3deg) translateY(10%); }
   .testi {
     grid-column: span 2;
   }
@@ -480,10 +479,14 @@
     grid-column: 1;
     min-height: 120px;
   }
-  .strip {
-    width: 35%;
-    transform: rotate(-2deg) translateY(8%);
+  .strips {
+    gap: 3px;
   }
+  .strip {
+    max-width: 60px;
+  }
+  .strip:nth-child(1) { transform: rotate(-3deg) translateY(6%); }
+  .strip:nth-child(3) { transform: rotate(2deg) translateY(8%); }
   .testi {
     grid-column: 1;
   }

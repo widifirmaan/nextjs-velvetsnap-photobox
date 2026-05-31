@@ -85,11 +85,13 @@ export default function Home() {
           </div>
         </button>
 
-        {/* ── Gallery: 3 transaksi terakhir ── */}
+        {/* ── Gallery: 3 strip terakhir ── */}
         <button className={`${styles.tile} ${styles.gallery}`} onClick={() => router.push('/admin/history')}>
-          <div className={styles.strip}>
+          <div className={styles.strips}>
             {stripImages.map((src, i) => (
-              <div key={i} className={styles.stripPhoto} style={{ backgroundImage: `url(${src})` }} />
+              <div key={i} className={styles.strip}>
+                <div className={styles.stripImage} style={{ backgroundImage: `url(${src})` }} />
+              </div>
             ))}
           </div>
         </button>
