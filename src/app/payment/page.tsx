@@ -10,23 +10,50 @@ export default function PaymentPage() {
   const [price, setPrice] = useState(35000);
   const [paid, setPaid] = useState(false);
 
+  useEffect(() => {
+    const templateId = sessionStorage.getItem('photobooth_template');
+    if (templateId) {
+      fetch('/api/templates')
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.success) {
+            const t = d.data.find((t: any) => t.templateId === templateId);
+            if (t?.price) setPrice(t.price);
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
+
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+
   const handleSimulatePayment = async () => {
     setPaid(true);
+    setErrMsg(null);
     
     try {
       const templateId = sessionStorage.getItem('photobooth_template') || 't1';
-      await fetch('/api/transactions', {
+      const capturesStr = sessionStorage.getItem('photobooth_captures');
+      const captures = capturesStr ? JSON.parse(capturesStr) : [];
+      const finalImage = sessionStorage.getItem('photobooth_composited') || '';
+      const res = await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId, price, status: 'PAID' })
+        body: JSON.stringify({ templateId, price, status: 'PAID', captures, finalImage })
       });
-    } catch (err) {
-      console.error(err);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setErrMsg(data.error || 'Unknown error');
+        setPaid(false);
+        return;
+      }
+      setTimeout(() => {
+        router.push('/result');
+      }, 1500);
+    } catch (err: any) {
+      setErrMsg(err.message || String(err));
+      setPaid(false);
     }
-
-    setTimeout(() => {
-      router.push('/result');
-    }, 2000);
   };
 
   return (
@@ -50,6 +77,12 @@ export default function PaymentPage() {
             <div className={styles.priceTag}>
               Rp {price.toLocaleString('id-ID')}
             </div>
+
+            {errMsg && (
+              <p style={{ color: 'var(--danger-color)', fontSize: '13px', marginTop: '12px', textAlign: 'center' }}>
+                {errMsg}
+              </p>
+            )}
             
             <button className="mac-button" onClick={handleSimulatePayment} style={{ width: '100%', marginTop: '24px' }}>
               Simulate Successful Payment

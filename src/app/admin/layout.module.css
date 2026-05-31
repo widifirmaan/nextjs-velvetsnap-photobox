@@ -7,15 +7,16 @@
 .sidebar {
   width: 280px;
   border-radius: 0;
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
   display: flex;
   flex-direction: column;
   padding: 32px 24px;
   position: sticky;
   top: 0;
   height: 100vh;
+  background: #fff;
+  box-shadow:
+    2px 0 12px rgba(0,0,0,0.04),
+    inset -2px 0 4px rgba(255,255,255,0.8);
 }
 
 .brand {
@@ -44,13 +45,13 @@
 }
 
 .navLink:hover {
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(225, 63, 124, 0.08);
   color: var(--accent-color);
 }
 
 .navDivider {
   height: 1px;
-  background: var(--glass-border);
+  background: rgba(61, 44, 44, 0.1);
   margin: 8px 0;
 }
 
@@ -74,6 +75,6 @@
     position: static;
     padding: 20px;
     border-right: none;
-    border-bottom: 1px solid var(--glass-border);
+    border-bottom: 1px solid rgba(61, 44, 44, 0.08);
   }
 }

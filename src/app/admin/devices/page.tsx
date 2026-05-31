@@ -1,88 +1,204 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Camera, CheckCircle, Save } from 'lucide-react';
+import { Camera, Save, Monitor, Printer, RefreshCw, CheckCircle } from 'lucide-react';
+import styles from './page.module.css';
 
-export default function DevicesAdmin() {
+interface DeviceSettings {
+  camera: string;
+  captureWidth: number;
+  captureQuality: number;
+  printCopies: number;
+  printOrientation: 'portrait' | 'landscape';
+  printDpi: number;
+}
+
+const LS_KEY = 'photobooth_device_settings';
+
+const DEFAULT_SETTINGS: DeviceSettings = {
+  camera: '',
+  captureWidth: 1920,
+  captureQuality: 85,
+  printCopies: 1,
+  printOrientation: 'portrait',
+  printDpi: 300,
+};
+
+function loadSettings(): DeviceSettings {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+  } catch {}
+  return { ...DEFAULT_SETTINGS };
+}
+
+function saveSettings(s: DeviceSettings) {
+  localStorage.setItem(LS_KEY, JSON.stringify(s));
+}
+
+export default function DevicesPage() {
+  const [settings, setSettings] = useState<DeviceSettings>(DEFAULT_SETTINGS);
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
-  const [selectedDevice, setSelectedDevice] = useState<string>('');
   const [saved, setSaved] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    const getDevices = async () => {
-      try {
-        // Minta izin kamera agar label kamera terbaca
-        await navigator.mediaDevices.getUserMedia({ video: true });
-        const devices = await navigator.mediaDevices.enumerateDevices();
-        const videoDevices = devices.filter(d => d.kind === 'videoinput');
-        setCameras(videoDevices);
-        
-        const stored = localStorage.getItem('preferred_camera');
-        if (stored && videoDevices.find(d => d.deviceId === stored)) {
-          setSelectedDevice(stored);
-        } else if (videoDevices.length > 0) {
-          setSelectedDevice(videoDevices[0].deviceId);
-        }
-      } catch (err) {
-        console.error("Error accessing media devices", err);
-      }
-    };
-    
-    getDevices();
+    setSettings(loadSettings());
+    setInitialized(true);
   }, []);
 
+  useEffect(() => {
+    if (!initialized) return;
+    (async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter((d) => d.kind === 'videoinput');
+        setCameras(videoDevices);
+      } catch {}
+    })();
+  }, [initialized]);
+
+  const update = <K extends keyof DeviceSettings>(key: K, value: DeviceSettings[K]) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
   const handleSave = () => {
-    localStorage.setItem('preferred_camera', selectedDevice);
+    saveSettings(settings);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
   return (
     <div>
-      <div style={{ marginBottom: '32px' }}>
-        <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>Camera Setup</h1>
-        <p className="subtitle" style={{ textAlign: 'left', marginBottom: 0 }}>Pilih hardware kamera yang akan digunakan di aplikasi Photobooth ini.</p>
+      <div className={styles.header}>
+        <div>
+          <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>Device Settings</h1>
+          <p className="subtitle" style={{ textAlign: 'left', marginBottom: 0 }}>
+            Semua pengaturan disimpan di browser (localStorage) — setiap perangkat punya pengaturannya sendiri.
+          </p>
+        </div>
       </div>
 
-      <div className={`glass-panel`} style={{ padding: '32px', maxWidth: '600px' }}>
-        <h2 style={{ marginBottom: '24px' }}>Kamera Terdeteksi</h2>
-        
-        {cameras.length === 0 ? (
-          <p>Mencari kamera atau izin kamera belum diberikan...</p>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {cameras.map((cam) => (
-              <div 
-                key={cam.deviceId} 
-                onClick={() => setSelectedDevice(cam.deviceId)}
-                style={{
-                  padding: '16px',
-                  borderRadius: '12px',
-                  border: `2px solid ${selectedDevice === cam.deviceId ? 'var(--accent-color)' : 'var(--glass-border)'}`,
-                  background: selectedDevice === cam.deviceId ? 'rgba(0, 122, 255, 0.05)' : 'var(--bg-secondary)',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '16px',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Camera color={selectedDevice === cam.deviceId ? 'var(--accent-color)' : 'var(--text-secondary)'} />
-                <div style={{ flex: 1, fontWeight: 500 }}>
-                  {cam.label || `Camera ${cam.deviceId.substring(0, 5)}...`}
-                </div>
-                {selectedDevice === cam.deviceId && <CheckCircle color="var(--accent-color)" />}
-              </div>
-            ))}
+      <div className={styles.sections}>
+        {/* Camera */}
+        <div className={`glass-panel ${styles.section}`}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}><Camera size={20} /></span>
+            <h2>Camera</h2>
           </div>
-        )}
-
-        <div style={{ marginTop: '32px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <button className="mac-button" onClick={handleSave} disabled={cameras.length === 0}>
-            <Save size={20} /> Simpan Pengaturan
-          </button>
-          {saved && <span style={{ color: '#34c759', fontWeight: 500 }}>Kamera aktif tersimpan!</span>}
+          {cameras.length === 0 ? (
+            <p className={styles.emptyText}>Mencari kamera atau izin belum diberikan...</p>
+          ) : (
+            <div className={styles.cameraList}>
+              {cameras.map((cam) => (
+                <label
+                  key={cam.deviceId}
+                  className={`${styles.radioCard} ${settings.camera === cam.deviceId ? styles.radioCardActive : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="camera"
+                    value={cam.deviceId}
+                    checked={settings.camera === cam.deviceId}
+                    onChange={() => update('camera', cam.deviceId)}
+                  />
+                  <Monitor size={18} />
+                  <span>{cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}</span>
+                  {settings.camera === cam.deviceId && <CheckCircle size={16} className={styles.checked} />}
+                </label>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* Capture */}
+        <div className={`glass-panel ${styles.section}`}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}><Camera size={20} /></span>
+            <h2>Capture</h2>
+          </div>
+          <div className={styles.fieldGroup}>
+            <div className={styles.field}>
+              <label>Resolution (width)</label>
+              <select
+                value={settings.captureWidth}
+                onChange={(e) => update('captureWidth', Number(e.target.value))}
+              >
+                <option value="1280">1280 px</option>
+                <option value="1920">1920 px</option>
+                <option value="2560">2560 px</option>
+                <option value="3840">3840 px</option>
+              </select>
+            </div>
+            <div className={styles.field}>
+              <label>JPEG Quality</label>
+              <div className={styles.rangeRow}>
+                <input
+                  type="range"
+                  min="50"
+                  max="100"
+                  value={settings.captureQuality}
+                  onChange={(e) => update('captureQuality', Number(e.target.value))}
+                />
+                <span className={styles.rangeVal}>{settings.captureQuality}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Print */}
+        <div className={`glass-panel ${styles.section}`}>
+          <div className={styles.sectionHeader}>
+            <span className={styles.sectionIcon}><Printer size={20} /></span>
+            <h2>Print</h2>
+          </div>
+          <div className={styles.fieldGroup}>
+            <div className={styles.field}>
+              <label>Copies</label>
+              <input
+                type="number"
+                min="1"
+                max="99"
+                value={settings.printCopies}
+                onChange={(e) => update('printCopies', Math.max(1, Math.min(99, Number(e.target.value))))}
+              />
+            </div>
+            <div className={styles.field}>
+              <label>Orientation</label>
+              <select
+                value={settings.printOrientation}
+                onChange={(e) => update('printOrientation', e.target.value as 'portrait' | 'landscape')}
+              >
+                <option value="portrait">Portrait</option>
+                <option value="landscape">Landscape</option>
+              </select>
+            </div>
+            <div className={styles.field}>
+              <label>DPI</label>
+              <select
+                value={settings.printDpi}
+                onChange={(e) => update('printDpi', Number(e.target.value))}
+              >
+                <option value="150">150 DPI</option>
+                <option value="300">300 DPI</option>
+                <option value="600">600 DPI</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.saveBar}>
+        <button className="mac-button" onClick={handleSave}>
+          <Save size={18} /> Simpan Pengaturan
+        </button>
+        {saved && (
+          <span className={styles.savedMsg}>
+            <CheckCircle size={16} /> Pengaturan tersimpan!
+          </span>
+        )}
+        <span className={styles.storageBadge}>localStorage &mdash; perangkat ini saja</span>
       </div>
     </div>
   );

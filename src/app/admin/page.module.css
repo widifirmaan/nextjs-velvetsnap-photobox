@@ -21,7 +21,9 @@
 
 .statCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    12px 14px 28px rgba(0,0,0,0.10),
+    -4px -4px 12px rgba(255,255,255,0.6);
 }
 
 .statIcon {
@@ -34,7 +36,7 @@
   margin: 0 auto 16px;
 }
 
-.statIcon.blue { background: rgba(0, 122, 255, 0.12); color: #007aff; }
+.statIcon.blue { background: rgba(225, 63, 124, 0.1); color: #E13F7C; }
 .statIcon.green { background: rgba(52, 199, 89, 0.12); color: #34c759; }
 .statIcon.orange { background: rgba(255, 149, 0, 0.12); color: #ff9500; }
 .statIcon.purple { background: rgba(175, 82, 222, 0.12); color: #af52de; }
@@ -94,7 +96,7 @@
   gap: 12px;
   height: 200px;
   padding-top: 20px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid rgba(61, 44, 44, 0.1);
 }
 
 .barGroup {
@@ -111,7 +113,7 @@
   width: 100%;
   max-width: 48px;
   border-radius: 8px 8px 0 0;
-  background: linear-gradient(180deg, var(--accent-color), rgba(0, 122, 255, 0.6));
+  background: linear-gradient(180deg, #E13F7C, rgba(225, 63, 124, 0.4));
   min-height: 4px;
   transition: all var(--transition-normal);
   animation: barGrow 0.8s ease-out backwards;
@@ -168,7 +170,9 @@
 
 .quickLink:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    10px 12px 24px rgba(0,0,0,0.08),
+    -3px -3px 10px rgba(255,255,255,0.6);
 }
 
 .quickLinkIcon {
@@ -181,7 +185,7 @@
   flex-shrink: 0;
 }
 
-.quickLinkIcon.blue { background: rgba(0, 122, 255, 0.12); color: #007aff; }
+.quickLinkIcon.blue { background: rgba(225, 63, 124, 0.1); color: #E13F7C; }
 .quickLinkIcon.green { background: rgba(52, 199, 89, 0.12); color: #34c759; }
 .quickLinkIcon.orange { background: rgba(255, 149, 0, 0.12); color: #ff9500; }
 .quickLinkIcon.purple { background: rgba(175, 82, 222, 0.12); color: #af52de; }
@@ -227,7 +231,7 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid rgba(61, 44, 44, 0.1);
 }
 
 .sectionHeader h2 {
@@ -271,13 +275,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(0, 122, 255, 0.04);
-}
-
-@media (prefers-color-scheme: dark) {
-  .table th, .table td {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  }
+  background: rgba(225, 63, 124, 0.04);
 }
 
 .badge {

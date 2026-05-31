@@ -1,43 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* macOS Light Theme Colors */
-  --bg-primary: #f5f5f7;
-  --bg-secondary: #ffffff;
-  --text-primary: #1d1d1f;
-  --text-secondary: #86868b;
-  --accent-color: #007aff;
-  --accent-hover: #005bb5;
-  --danger-color: #ff3b30;
-  
-  /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.7);
-  --glass-border: rgba(255, 255, 255, 0.5);
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-  --glass-blur: blur(20px);
-  --glass-radius: 16px;
-  
-  /* Utilities */
+  --bg-primary: #FFEF9F;
+  --bg-secondary: #FFF5D6;
+  --text-primary: #3d2c2c;
+  --text-secondary: rgba(61,44,44,0.55);
+  --accent-color: #E13F7C;
+  --accent-hover: #c72e68;
+  --danger-color: #E13F7C;
+
+  --clay-bg: #fff;
+  --clay-shadow-outer: 8px 10px 20px rgba(0,0,0,0.08), -3px -3px 10px rgba(255,255,255,0.7);
+  --clay-shadow-inner: inset 3px -3px 5px rgba(0,0,0,0.04), inset -3px 3px 5px rgba(255,255,255,0.9);
+  --clay-shadow: var(--clay-shadow-outer), var(--clay-shadow-inner);
+  --clay-radius: 20px;
+
   --transition-fast: 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   --transition-normal: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* macOS Dark Theme Colors */
-    --bg-primary: #000000;
-    --bg-secondary: #1c1c1e;
-    --text-primary: #f5f5f7;
-    --text-secondary: #86868b;
-    --accent-color: #0a84ff;
-    --accent-hover: #0060d1;
-    --danger-color: #ff453a;
-    
-    /* Glassmorphism */
-    --glass-bg: rgba(28, 28, 30, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  }
 }
 
 * {
@@ -55,63 +34,59 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-image: radial-gradient(circle at 50% -20%, rgba(10, 132, 255, 0.15), transparent 40%),
-                    radial-gradient(circle at -20% 80%, rgba(255, 59, 48, 0.1), transparent 40%),
-                    radial-gradient(circle at 120% 80%, rgba(48, 209, 88, 0.1), transparent 40%);
-  background-attachment: fixed;
 }
 
-/* Base Utility Classes */
 .glass-panel {
-  background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--glass-radius);
-  box-shadow: var(--glass-shadow);
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow);
 }
 
 .mac-button {
-  background-color: var(--accent-color);
-  color: white;
+  background: var(--accent-color);
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 14px;
   padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  box-shadow:
+    4px 4px 8px rgba(0,0,0,0.10),
+    inset 2px -2px 4px rgba(0,0,0,0.08),
+    inset -2px 2px 4px rgba(255,255,255,0.3);
 }
 
 .mac-button:hover {
-  background-color: var(--accent-hover);
-  transform: scale(0.98);
+  background: var(--accent-hover);
+  transform: scale(0.97);
 }
 
 .mac-button:active {
-  transform: scale(0.95);
+  transform: scale(0.94);
+  box-shadow:
+    2px 2px 4px rgba(0,0,0,0.10),
+    inset 2px -2px 4px rgba(0,0,0,0.10),
+    inset -2px 2px 4px rgba(255,255,255,0.2);
 }
 
 .mac-button.secondary {
-  background-color: rgba(118, 118, 128, 0.12);
+  background: #fff;
   color: var(--text-primary);
+  box-shadow:
+    4px 4px 8px rgba(0,0,0,0.06),
+    -2px -2px 6px rgba(255,255,255,0.6),
+    inset 2px -2px 3px rgba(0,0,0,0.04),
+    inset -2px 2px 3px rgba(255,255,255,0.8);
 }
 
 .mac-button.secondary:hover {
-  background-color: rgba(118, 118, 128, 0.24);
-}
-
-@media (prefers-color-scheme: dark) {
-  .mac-button.secondary {
-    background-color: rgba(118, 118, 128, 0.24);
-  }
-  .mac-button.secondary:hover {
-    background-color: rgba(118, 118, 128, 0.32);
-  }
+  background: #fafafa;
 }
 
 .page-container {

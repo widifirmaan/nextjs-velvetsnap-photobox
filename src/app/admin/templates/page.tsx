@@ -502,6 +502,21 @@ export default function TemplatesAdmin() {
     }
   };
 
+  const handleConvertTemplate = async (t: TemplateData) => {
+    if (!t.frameImage || !confirm(`Convert "${t.name}" frame to 1000px width?`)) return;
+    try {
+      const processed = await removeChromaKey(t.frameImage);
+      await fetch(`/api/templates/${t._id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ frameImage: processed }),
+      });
+      fetchTemplates();
+    } catch (err) {
+      console.error('Convert failed:', err);
+    }
+  };
+
   return (
     <div>
       <div className={styles.header}>
@@ -805,12 +820,19 @@ export default function TemplatesAdmin() {
                         <Edit2 size={18} color="var(--accent-color)" />
                       </button>
                       <button
-                        className={`${styles.iconBtn} ${styles.danger}`}
-                        onClick={() => handleDelete(t._id)}
-                        title="Delete template"
-                      >
-                        <Trash2 size={18} color="var(--danger-color)" />
-                      </button>
+                         className={`${styles.iconBtn} ${styles.danger}`}
+                         onClick={() => handleDelete(t._id)}
+                         title="Delete template"
+                       >
+                         <Trash2 size={18} color="var(--danger-color)" />
+                       </button>
+                       <button
+                         className={styles.iconBtn}
+                         onClick={() => handleConvertTemplate(t)}
+                         title="Convert to 1000px width"
+                       >
+                         <RefreshCw size={18} color="var(--accent-color)" />
+                       </button>
                     </div>
                   </td>
                 </tr>

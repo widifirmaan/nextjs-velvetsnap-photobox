@@ -24,6 +24,94 @@ interface TemplateData {
   slotsLayout?: ISlot[];
 }
 
+async function composeFrameImage(
+  frameImageBase64: string,
+  slots: ISlot[],
+  captures: string[],
+  adjust: { scale: number; x: number; y: number }[],
+  color: string,
+  width: number = 960,
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const frameImg = new window.Image();
+    frameImg.crossOrigin = 'anonymous';
+    frameImg.onload = async () => {
+      try {
+        const ar = frameImg.naturalWidth / frameImg.naturalHeight;
+        const cw = width;
+        const ch = Math.round(width / ar);
+        const canvas = document.createElement('canvas');
+        canvas.width = cw;
+        canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('No context')); return; }
+
+        ctx.fillStyle = color || '#ffffff';
+        ctx.fillRect(0, 0, cw, ch);
+
+        for (let idx = 0; idx < slots.length; idx++) {
+          const slot = slots[idx];
+          const src = captures[idx];
+          if (!src) continue;
+
+          const sx = (slot.x / 100) * cw;
+          const sy = (slot.y / 100) * ch;
+          const sw = (slot.w / 100) * cw;
+          const sh = (slot.h / 100) * ch;
+
+          const photo = await new Promise<HTMLImageElement>((res, rej) => {
+            const img = new window.Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => res(img);
+            img.onerror = () => rej(new Error('Photo load failed'));
+            img.src = src;
+          });
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(sx, sy, sw, sh);
+          ctx.clip();
+
+          const adj = adjust[idx] || { scale: 1, x: 0, y: 0 };
+          const ia = photo.naturalWidth / photo.naturalHeight;
+          const sa = sw / sh;
+          let dw = sw, dh = sh, dx = sx, dy = sy;
+          if (ia > sa) {
+            dh = sh;
+            dw = sh * ia;
+            dx = sx - (dw - sw) / 2;
+            dy = sy;
+          } else {
+            dw = sw;
+            dh = sw / ia;
+            dx = sx;
+            dy = sy - (dh - sh) / 2;
+          }
+
+          const sc = adj.scale || 1;
+          const cx2 = dx + dw / 2;
+          const cy2 = dy + dh / 2;
+          dw *= sc; dh *= sc;
+          dx = cx2 - dw / 2;
+          dy = cy2 - dh / 2;
+          dx += (adj.x || 0) / 100 * sw;
+          dy += (adj.y || 0) / 100 * sh;
+
+          ctx.drawImage(photo, dx, dy, dw, dh);
+          ctx.restore();
+        }
+
+        ctx.drawImage(frameImg, 0, 0, cw, ch);
+        resolve(canvas.toDataURL('image/jpeg', 0.95));
+      } catch (err) {
+        reject(err);
+      }
+    };
+    frameImg.onerror = () => reject(new Error('Failed to load frame'));
+    frameImg.src = frameImageBase64;
+  });
+}
+
 function removeGreenScreen(base64: string): Promise<string> {
   return new Promise((resolve) => {
     if (!base64) { resolve(''); return; }
@@ -201,7 +289,22 @@ function BoothContent() {
       sessionStorage.setItem('photobooth_filter', selectedFilter);
       sessionStorage.setItem('photobooth_adjust', JSON.stringify(photoAdjust));
     }
-    router.push('/payment');
+    // Generate composited image via Canvas (reliable, no DOM issues)
+    const frameSrc = keyedFrameImage || dbTemplate?.frameImage || '';
+    if (frameSrc && dbTemplate?.slotsLayout && dbTemplate?.slotsLayout.length > 0) {
+      composeFrameImage(
+        frameSrc,
+        dbTemplate.slotsLayout,
+        captures,
+        photoAdjust,
+        dbTemplate.color || '#ffffff',
+      ).then((dataUrl) => {
+        sessionStorage.setItem('photobooth_composited', dataUrl);
+        router.push('/payment');
+      }).catch(() => router.push('/payment'));
+    } else {
+      router.push('/payment');
+    }
   };
 
   if (step === 'editor') {

@@ -29,7 +29,9 @@
 
 .summaryCard:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    12px 14px 28px rgba(0,0,0,0.10),
+    -4px -4px 12px rgba(255,255,255,0.6);
 }
 
 .summaryIcon {
@@ -42,7 +44,7 @@
   margin: 0 auto 14px;
 }
 
-.summaryIcon.blue { background: rgba(0, 122, 255, 0.12); color: #007aff; }
+.summaryIcon.blue { background: rgba(225, 63, 124, 0.1); color: #E13F7C; }
 .summaryIcon.green { background: rgba(52, 199, 89, 0.12); color: #34c759; }
 .summaryIcon.orange { background: rgba(255, 149, 0, 0.12); color: #ff9500; }
 .summaryIcon.purple { background: rgba(175, 82, 222, 0.12); color: #af52de; }
@@ -101,7 +103,7 @@
   gap: 12px;
   height: 220px;
   padding-top: 20px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid rgba(61, 44, 44, 0.1);
 }
 
 .barGroup {
@@ -118,7 +120,7 @@
   width: 100%;
   max-width: 56px;
   border-radius: 8px 8px 0 0;
-  background: linear-gradient(180deg, var(--accent-color), rgba(0, 122, 255, 0.6));
+  background: linear-gradient(180deg, #E13F7C, rgba(225, 63, 124, 0.4));
   min-height: 4px;
   transition: all var(--transition-normal);
   animation: barGrow 0.8s ease-out backwards;
@@ -171,7 +173,7 @@
   font-weight: 600;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--glass-border);
+  border-bottom: 1px solid rgba(61, 44, 44, 0.1);
 }
 
 .breakdownList {
@@ -190,7 +192,7 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(225, 63, 124, 0.1);
   color: var(--accent-color);
   display: flex;
   align-items: center;
@@ -212,14 +214,14 @@
 
 .breakdownBar {
   height: 6px;
-  background: rgba(0, 122, 255, 0.1);
+  background: rgba(225, 63, 124, 0.1);
   border-radius: 3px;
   overflow: hidden;
 }
 
 .breakdownBarFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-color), rgba(0, 122, 255, 0.7));
+  background: linear-gradient(90deg, #E13F7C, rgba(225, 63, 124, 0.5));
   border-radius: 3px;
   transition: width 1s ease;
 }

@@ -20,6 +20,12 @@
   background: white;
 }
 
+.resultImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .frameLayout {
   background-color: #fff;
   width: 300px;
