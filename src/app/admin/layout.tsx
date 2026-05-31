@@ -6,7 +6,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className={styles.adminLayout}>
       <div className={`glass-panel ${styles.sidebar}`}>
-        <div className={styles.brand}>Admin Panel</div>
+        <div className={styles.brand}>VelvetSnap</div>
         <nav className={styles.nav}>
           <Link href="/admin" className={styles.navLink}>
             <LayoutDashboard size={20} /> Overview

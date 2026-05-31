@@ -67,8 +67,9 @@ export default function Home() {
             <div className={styles.heroOverlay} />
             <div className={styles.heroContent}>
               <Camera size={56} className={styles.heroIcon} />
-              <span className={styles.heroTitle}>Photo Booth</span>
-              <span className={styles.heroSub}>Abadikan momen spesialmu</span>
+              <span className={styles.heroTitle}>VelvetSnap</span>
+              <span className={styles.heroSub}>Co.</span>
+              <span className={styles.heroTagline}>Abadikan momen spesialmu</span>
               <span className={styles.heroCta}>Mulai →</span>
             </div>
           </div>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'macOS Photobooth',
+  title: 'VelvetSnap Co.',
   description: 'Aesthetic photobooth web application',
   manifest: '/manifest.json', // for PWA later
 };

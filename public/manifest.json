@@ -1,11 +1,11 @@
 {
-  "name": "macOS Photobooth",
-  "short_name": "Photobooth",
-  "description": "Capture your best moments with vintage aesthetics",
+  "name": "VelvetSnap Co.",
+  "short_name": "VelvetSnap",
+  "description": "Abadikan momen spesialmu dengan VelvetSnap",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#ff3b30",
+  "background_color": "#FFEF9F",
+  "theme_color": "#E13F7C",
   "icons": [
     {
       "src": "/favicon.ico",

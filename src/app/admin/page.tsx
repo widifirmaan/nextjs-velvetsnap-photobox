@@ -68,9 +68,9 @@ export default async function AdminDashboard() {
   return (
     <div className="page-container">
       <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>Dashboard</h1>
-      <p className="subtitle" style={{ textAlign: 'left', marginBottom: '32px' }}>
-        Welcome back — here&apos;s what&apos;s happening today.
-      </p>
+          <p className="subtitle" style={{ textAlign: 'left', marginBottom: '32px' }}>
+            VelvetSnap Co. — Admin Dashboard
+          </p>
 
       {/* Stat Cards */}
       <div className={styles.statsGrid}>
