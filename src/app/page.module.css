@@ -459,3 +459,57 @@
     margin: 0 12px;
   }
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px;
+  }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .hero {
+    grid-column: 1;
+    min-height: 160px;
+  }
+  .promo {
+    grid-column: 1;
+    min-height: 60px;
+  }
+  .gallery {
+    grid-column: 1;
+    min-height: 120px;
+  }
+  .strip {
+    width: 35%;
+    transform: rotate(-2deg) translateY(8%);
+  }
+  .testi {
+    grid-column: 1;
+  }
+  .stat {
+    grid-column: 1;
+  }
+  .bottom {
+    grid-column: 1;
+    min-height: 48px;
+  }
+  .bottomContent {
+    padding: 8px 12px;
+    gap: 0;
+  }
+  .bottomDivider {
+    margin: 0 8px;
+    height: 18px;
+  }
+  .bottomItem {
+    gap: 4px;
+  }
+  .bottomText {
+    font-size: 10px;
+  }
+  .bottomIcon {
+    width: 14px;
+    height: 14px;
+  }
+}
