@@ -207,16 +207,17 @@
 .strips {
   display: flex;
   align-items: flex-end;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   height: 100%;
+  width: 100%;
   padding-bottom: 4px;
 }
 
 .strip {
   position: relative;
-  width: 0;
-  flex: 1;
-  max-width: 100px;
+  flex: 0 0 auto;
+  width: 80px;
   display: flex;
   flex-direction: column;
   padding: 6px 6px 8px;
@@ -238,6 +239,7 @@
 
 .stripImage {
   width: 100%;
+  min-height: 80px;
   aspect-ratio: 2 / 3;
   border-radius: 8px;
   background-size: cover;
@@ -437,10 +439,10 @@
     min-height: 160px;
   }
   .strips {
-    gap: 4px;
+    gap: 5px;
   }
   .strip {
-    max-width: 80px;
+    width: 60px;
   }
   .strip:nth-child(1) { transform: rotate(-4deg) translateY(8%); }
   .strip:nth-child(3) { transform: rotate(3deg) translateY(10%); }
@@ -480,10 +482,10 @@
     min-height: 120px;
   }
   .strips {
-    gap: 3px;
+    gap: 4px;
   }
   .strip {
-    max-width: 60px;
+    width: 48px;
   }
   .strip:nth-child(1) { transform: rotate(-3deg) translateY(6%); }
   .strip:nth-child(3) { transform: rotate(2deg) translateY(8%); }
