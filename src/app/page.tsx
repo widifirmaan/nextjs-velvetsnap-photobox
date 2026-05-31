@@ -13,10 +13,26 @@ const SAMPLE_IMAGES = [
   'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&q=80',
 ];
 
+interface Transaction {
+  _id: string;
+  sessionId: string;
+  finalImage: string;
+}
+
 export default function Home() {
   const router = useRouter();
   const [slideIdx, setSlideIdx] = useState(0);
+  const [recentTx, setRecentTx] = useState<Transaction[]>([]);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    fetch('/api/transactions?limit=3')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) setRecentTx(d.data || []);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
@@ -26,6 +42,10 @@ export default function Home() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
+
+  const stripImages = recentTx.length === 3
+    ? recentTx.map((t) => t.finalImage)
+    : SAMPLE_IMAGES.slice(0, 3);
 
   return (
     <div className={styles.container}>
@@ -64,11 +84,11 @@ export default function Home() {
           </div>
         </button>
 
-        {/* ── Gallery ── */}
-        <button className={`${styles.tile} ${styles.gallery}`} onClick={() => router.push('/templates')}>
-          <div className={styles.galleryGrid}>
-            {SAMPLE_IMAGES.slice(0, 4).map((src, i) => (
-              <div key={i} className={styles.galleryThumb} style={{ backgroundImage: `url(${src})`, animationDelay: `${i * 1.5}s` }} />
+        {/* ── Gallery: 3 transaksi terakhir ── */}
+        <button className={`${styles.tile} ${styles.gallery}`} onClick={() => router.push('/admin/history')}>
+          <div className={styles.strip}>
+            {stripImages.map((src, i) => (
+              <div key={i} className={styles.stripPhoto} style={{ backgroundImage: `url(${src})` }} />
             ))}
           </div>
         </button>
