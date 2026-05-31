@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Camera, Save, Monitor, Printer, RefreshCw, CheckCircle } from 'lucide-react';
+import { Camera, Save, Monitor, Printer, RefreshCw, CheckCircle, Usb } from 'lucide-react';
 import styles from './page.module.css';
 
 interface DeviceSettings {
+  cameraType: 'webcam' | 'dslr';
   camera: string;
   captureWidth: number;
   captureQuality: number;
@@ -13,9 +14,10 @@ interface DeviceSettings {
   printDpi: number;
 }
 
-const LS_KEY = 'photobooth_device_settings';
+const LS_KEY = 'velvetsnap_device_settings';
 
 const DEFAULT_SETTINGS: DeviceSettings = {
+  cameraType: 'webcam',
   camera: '',
   captureWidth: 1920,
   captureQuality: 85,
@@ -41,6 +43,8 @@ export default function DevicesPage() {
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([]);
   const [saved, setSaved] = useState(false);
   const [initialized, setInitialized] = useState(false);
+  const [dslrTesting, setDslrTesting] = useState(false);
+  const [dslrStatus, setDslrStatus] = useState<string | null>(null);
 
   useEffect(() => {
     setSettings(loadSettings());
@@ -54,7 +58,27 @@ export default function DevicesPage() {
         await navigator.mediaDevices.getUserMedia({ video: true });
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter((d) => d.kind === 'videoinput');
-        setCameras(videoDevices);
+        const sorted = [...videoDevices].sort((a, b) => {
+          const score = (label: string) => {
+            const l = label.toLowerCase();
+            if (l.includes('front') || l.includes('facetime') || l.includes('built-in')) return 0;
+            if (l.includes('back') || l.includes('rear') || l.includes('external')) return 1;
+            return 2;
+          };
+          return score(a.label) - score(b.label);
+        });
+        setCameras(sorted);
+        if (sorted.length > 0) {
+          setSettings((prev) => {
+            const matches = prev.camera && sorted.some((d) => d.deviceId === prev.camera);
+            if (!matches) {
+              const next = { ...prev, camera: sorted[0].deviceId };
+              saveSettings(next);
+              return next;
+            }
+            return prev;
+          });
+        }
       } catch {}
     })();
   }, [initialized]);
@@ -69,6 +93,24 @@ export default function DevicesPage() {
     setTimeout(() => setSaved(false), 2000);
   };
 
+  const testDslr = async () => {
+    setDslrTesting(true);
+    setDslrStatus(null);
+    try {
+      const res = await fetch('/api/camera/list');
+      const data = await res.json();
+      if (data.cameras?.length > 0) {
+        setDslrStatus(`✅ Terdeteksi: ${data.cameras.map((c: any) => c.name).join(', ')}`);
+      } else {
+        setDslrStatus('❌ Tidak ada kamera USB terdeteksi. Pastikan driver (gphoto2 / DigiCamControl) terinstall.');
+      }
+    } catch {
+      setDslrStatus('❌ Gagal menghubungi server.');
+    } finally {
+      setDslrTesting(false);
+    }
+  };
+
   return (
     <div>
       <div className={styles.header}>
@@ -81,33 +123,58 @@ export default function DevicesPage() {
       </div>
 
       <div className={styles.sections}>
-        {/* Camera */}
+        {/* Camera Type */}
         <div className={`glass-panel ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}><Camera size={20} /></span>
-            <h2>Camera</h2>
+            <h2>Camera Type</h2>
           </div>
-          {cameras.length === 0 ? (
-            <p className={styles.emptyText}>Mencari kamera atau izin belum diberikan...</p>
-          ) : (
-            <div className={styles.cameraList}>
-              {cameras.map((cam) => (
-                <label
-                  key={cam.deviceId}
-                  className={`${styles.radioCard} ${settings.camera === cam.deviceId ? styles.radioCardActive : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name="camera"
-                    value={cam.deviceId}
-                    checked={settings.camera === cam.deviceId}
-                    onChange={() => update('camera', cam.deviceId)}
-                  />
-                  <Monitor size={18} />
-                  <span>{cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}</span>
-                  {settings.camera === cam.deviceId && <CheckCircle size={16} className={styles.checked} />}
-                </label>
-              ))}
+          <div className={styles.cameraTypeRow}>
+            <label className={`${styles.typeCard} ${settings.cameraType === 'webcam' ? styles.typeCardActive : ''}`}>
+              <input type="radio" name="cameraType" value="webcam" checked={settings.cameraType === 'webcam'} onChange={() => update('cameraType', 'webcam')} />
+              <Monitor size={22} />
+              <span className={styles.typeLabel}>Webcam</span>
+              <span className={styles.typeDesc}>Browser built-in camera</span>
+            </label>
+            <label className={`${styles.typeCard} ${settings.cameraType === 'dslr' ? styles.typeCardActive : ''}`}>
+              <input type="radio" name="cameraType" value="dslr" checked={settings.cameraType === 'dslr'} onChange={() => update('cameraType', 'dslr')} />
+              <Usb size={22} />
+              <span className={styles.typeLabel}>DSLR / Mirrorless</span>
+              <span className={styles.typeDesc}>Canon, Sony, Nikon via USB</span>
+            </label>
+          </div>
+
+          {settings.cameraType === 'webcam' && (
+            <div style={{ marginTop: '20px' }}>
+              {cameras.length === 0 ? (
+                <p className={styles.emptyText}>Mencari kamera atau izin belum diberikan...</p>
+              ) : (
+                <div className={styles.cameraList}>
+                  {cameras.map((cam) => (
+                    <label
+                      key={cam.deviceId}
+                      className={`${styles.radioCard} ${settings.camera === cam.deviceId ? styles.radioCardActive : ''}`}
+                    >
+                      <input type="radio" name="camera" value={cam.deviceId} checked={settings.camera === cam.deviceId} onChange={() => update('camera', cam.deviceId)} />
+                      <Monitor size={18} />
+                      <span>{cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}</span>
+                      {settings.camera === cam.deviceId && <CheckCircle size={16} className={styles.checked} />}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {settings.cameraType === 'dslr' && (
+            <div style={{ marginTop: '20px' }}>
+              <p className={styles.emptyText} style={{ marginBottom: '12px' }}>
+                Gunakan kamera DSLR/mirrorless yang terhubung via USB. Membutuhkan <strong>gphoto2</strong> (Linux/macOS) atau <strong>DigiCamControl</strong> (Windows) di server.
+              </p>
+              <button className="mac-button secondary" onClick={testDslr} disabled={dslrTesting} style={{ padding: '10px 20px', fontSize: '13px' }}>
+                <RefreshCw size={16} className={dslrTesting ? 'spin' : ''} /> {dslrTesting ? 'Memeriksa...' : 'Deteksi Kamera USB'}
+              </button>
+              {dslrStatus && <p className={styles.dslrStatus}>{dslrStatus}</p>}
             </div>
           )}
         </div>
@@ -121,10 +188,7 @@ export default function DevicesPage() {
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
               <label>Resolution (width)</label>
-              <select
-                value={settings.captureWidth}
-                onChange={(e) => update('captureWidth', Number(e.target.value))}
-              >
+              <select value={settings.captureWidth} onChange={(e) => update('captureWidth', Number(e.target.value))}>
                 <option value="1280">1280 px</option>
                 <option value="1920">1920 px</option>
                 <option value="2560">2560 px</option>
@@ -134,13 +198,7 @@ export default function DevicesPage() {
             <div className={styles.field}>
               <label>JPEG Quality</label>
               <div className={styles.rangeRow}>
-                <input
-                  type="range"
-                  min="50"
-                  max="100"
-                  value={settings.captureQuality}
-                  onChange={(e) => update('captureQuality', Number(e.target.value))}
-                />
+                <input type="range" min="50" max="100" value={settings.captureQuality} onChange={(e) => update('captureQuality', Number(e.target.value))} />
                 <span className={styles.rangeVal}>{settings.captureQuality}%</span>
               </div>
             </div>
@@ -156,30 +214,18 @@ export default function DevicesPage() {
           <div className={styles.fieldGroup}>
             <div className={styles.field}>
               <label>Copies</label>
-              <input
-                type="number"
-                min="1"
-                max="99"
-                value={settings.printCopies}
-                onChange={(e) => update('printCopies', Math.max(1, Math.min(99, Number(e.target.value))))}
-              />
+              <input type="number" min="1" max="99" value={settings.printCopies} onChange={(e) => update('printCopies', Math.max(1, Math.min(99, Number(e.target.value))))} />
             </div>
             <div className={styles.field}>
               <label>Orientation</label>
-              <select
-                value={settings.printOrientation}
-                onChange={(e) => update('printOrientation', e.target.value as 'portrait' | 'landscape')}
-              >
+              <select value={settings.printOrientation} onChange={(e) => update('printOrientation', e.target.value as 'portrait' | 'landscape')}>
                 <option value="portrait">Portrait</option>
                 <option value="landscape">Landscape</option>
               </select>
             </div>
             <div className={styles.field}>
               <label>DPI</label>
-              <select
-                value={settings.printDpi}
-                onChange={(e) => update('printDpi', Number(e.target.value))}
-              >
+              <select value={settings.printDpi} onChange={(e) => update('printDpi', Number(e.target.value))}>
                 <option value="150">150 DPI</option>
                 <option value="300">300 DPI</option>
                 <option value="600">600 DPI</option>
@@ -193,11 +239,7 @@ export default function DevicesPage() {
         <button className="mac-button" onClick={handleSave}>
           <Save size={18} /> Simpan Pengaturan
         </button>
-        {saved && (
-          <span className={styles.savedMsg}>
-            <CheckCircle size={16} /> Pengaturan tersimpan!
-          </span>
-        )}
+        {saved && <span className={styles.savedMsg}><CheckCircle size={16} /> Pengaturan tersimpan!</span>}
         <span className={styles.storageBadge}>localStorage &mdash; perangkat ini saja</span>
       </div>
     </div>

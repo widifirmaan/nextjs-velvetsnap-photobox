@@ -166,6 +166,7 @@ function BoothContent() {
   const [panSlot, setPanSlot] = useState<number | null>(null);
   const [panStart, setPanStart] = useState<{ mx: number; my: number; ox: number; oy: number } | null>(null);
   const [deviceId, setDeviceId] = useState<string | undefined>(undefined);
+  const [cameraType, setCameraType] = useState<'webcam' | 'dslr'>('webcam');
 
   const [slotsCount, setSlotsCount] = useState<number>(3);
   const [templateName, setTemplateName] = useState<string>('Classic Strips');
@@ -174,10 +175,14 @@ function BoothContent() {
   const [frameRatio, setFrameRatio] = useState<number>(2 / 3);
 
   useEffect(() => {
-    const stored = localStorage.getItem('preferred_camera');
-    if (stored) {
-      setDeviceId(stored);
-    }
+    try {
+      const raw = localStorage.getItem('velvetsnap_device_settings');
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s.cameraType === 'dslr') setCameraType('dslr');
+        if (s.camera) setDeviceId(s.camera);
+      }
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -239,12 +244,31 @@ function BoothContent() {
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
   }, [panSlot, panStart]);
 
-  const capture = useCallback(() => {
-    const imageSrc = webcamRef.current?.getScreenshot();
-    if (imageSrc) {
-      setCaptures(prev => [...prev, imageSrc]);
+  const [dslrCapturing, setDslrCapturing] = useState(false);
+
+  const capture = useCallback(async () => {
+    if (cameraType === 'dslr') {
+      setDslrCapturing(true);
+      try {
+        const res = await fetch('/api/camera/capture', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          setCaptures(prev => [...prev, data.dataUrl]);
+        } else {
+          alert('Gagal mengambil foto: ' + (data.error || 'Unknown error'));
+        }
+      } catch (err: any) {
+        alert('Gagal terhubung ke kamera: ' + err.message);
+      } finally {
+        setDslrCapturing(false);
+      }
+    } else {
+      const imageSrc = webcamRef.current?.getScreenshot();
+      if (imageSrc) {
+        setCaptures(prev => [...prev, imageSrc]);
+      }
     }
-  }, [webcamRef]);
+  }, [webcamRef, cameraType]);
 
   const startSession = () => {
     if (taking) return;
@@ -451,32 +475,53 @@ function BoothContent() {
       <h1 className="title" style={{ marginBottom: '8px' }}>Get Ready</h1>
       <p className="subtitle">
         {templateName} • {captures.length} / {slotsCount} shots
+        {cameraType === 'dslr' && ' • DSLR Mode'}
       </p>
 
-      <div className={styles.cameraWrapper}>
-        <Webcam
-          audio={false}
-          ref={webcamRef}
-          screenshotFormat="image/jpeg"
-          videoConstraints={{ 
-            facingMode: "user",
-            deviceId: deviceId ? { exact: deviceId } : undefined
-          }}
-          className={styles.webcam}
-        />
-        
-        {countdown !== null && (
-          <div className={styles.countdownOverlay}>
-            {countdown}
-          </div>
-        )}
-      </div>
+      {cameraType === 'dslr' ? (
+        <div className={styles.cameraWrapper} style={{ 
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#2d2d2d', minHeight: '300px', flexDirection: 'column', gap: '16px'
+        }}>
+          <CameraIcon size={64} style={{ opacity: 0.5 }} />
+          <p style={{ color: '#fff', opacity: 0.6, fontSize: '14px' }}>
+            Kamera DSLR terhubung via USB — klik Capture untuk mengambil foto
+          </p>
+          {countdown !== null && (
+            <div className={styles.countdownOverlay}>{countdown}</div>
+          )}
+          {dslrCapturing && (
+            <div className={styles.countdownOverlay}>
+              <Loader2 className="spin" size={48} />
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={styles.cameraWrapper}>
+          <Webcam
+            audio={false}
+            ref={webcamRef}
+            screenshotFormat="image/jpeg"
+            videoConstraints={{ 
+              facingMode: "user",
+              deviceId: deviceId ? { exact: deviceId } : undefined
+            }}
+            className={styles.webcam}
+          />
+          
+          {countdown !== null && (
+            <div className={styles.countdownOverlay}>
+              {countdown}
+            </div>
+          )}
+        </div>
+      )}
 
       <div style={{ marginTop: '32px' }}>
-        {!taking && (
+        {!taking && !dslrCapturing && (
           <button className="mac-button" onClick={startSession} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
             <CameraIcon size={24} />
-            Capture
+            {cameraType === 'dslr' ? 'Shoot (Camera Shutter)' : 'Capture'}
           </button>
         )}
       </div>
