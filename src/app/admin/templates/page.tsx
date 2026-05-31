@@ -174,7 +174,7 @@ function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
         const scaleY = origH / h;
         if (rw * scaleX >= minSlotPx && rh * scaleY >= minSlotPx) {
           const padX = Math.max(w * 0.05, 16);
-          const padY = Math.max(h * 0.05, 16);
+          const padY = Math.max(h * 0, 16);
           const px = Math.max(0, minX - padX);
           const py = Math.max(0, minY - padY);
           const pw = Math.min(w - px, rw + padX * 2);
