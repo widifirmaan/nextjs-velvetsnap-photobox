@@ -11,7 +11,6 @@ const TOOLS: { type: IStripElement['type']; label: string; icon: string }[] = [
   { type: 'text', label: 'Text', icon: 'Aa' },
   { type: 'sticker', label: 'Sticker', icon: '✨' },
   { type: 'shape', label: 'Shape', icon: '◇' },
-  { type: 'background', label: 'Background', icon: '🎨' },
 ];
 
 export default function ElementToolbar({ onAdd }: ElementToolbarProps) {

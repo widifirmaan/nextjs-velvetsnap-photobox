@@ -10,7 +10,6 @@ interface PropertiesPanelProps {
   onBringForward: () => void;
   onSendBackward: () => void;
   onBrowseStickers?: () => void;
-  onBrowseBackgrounds?: () => void;
 }
 
 const SHAPES = ['rectangle', 'rounded', 'circle', 'heart', 'star', 'diamond', 'polaroid', 'hexagon'] as const;
@@ -24,7 +23,6 @@ export default function PropertiesPanel({
   onBringForward,
   onSendBackward,
   onBrowseStickers,
-  onBrowseBackgrounds,
 }: PropertiesPanelProps) {
   if (!selected) {
     return (
@@ -190,24 +188,7 @@ export default function PropertiesPanel({
         </Section>
       )}
 
-      {selected.type === 'background' && (
-        <Section label="Background">
-          <FieldRow>
-            <ColorField label="Color" value={p.backgroundColor || '#F6F0D7'} onChange={(v) => set('backgroundColor', v)} />
-          </FieldRow>
-          <FieldRow>
-            <NumberField label="Opacity" value={p.opacity ?? 1} onChange={(v) => set('opacity', v)} min={0} max={1} step={0.05} />
-          </FieldRow>
-          <FieldRow>
-            <button
-              onClick={onBrowseBackgrounds}
-              style={{ width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--accent-color)', background: 'var(--accent-bg)', color: 'var(--accent-color)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
-            >
-              🎨 Browse Presets
-            </button>
-          </FieldRow>
-        </Section>
-      )}
+
 
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
         <button onClick={onBringForward} style={{ ...btnStyle }}>

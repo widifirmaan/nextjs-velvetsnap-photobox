@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
 import EditorCanvas from './components/EditorCanvas';
+import type { EditorCanvasHandle } from './components/EditorCanvas';
 import ElementToolbar from './components/ElementToolbar';
+import LayerPanel from './components/LayerPanel';
 import PropertiesPanel from './components/PropertiesPanel';
 import AssetSearch from './components/AssetSearch';
 import styles from './page.module.css';
@@ -21,8 +23,8 @@ export default function StripsStudioPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  const editorRef = useRef<EditorCanvasHandle>(null);
   const [stickerTargetId, setStickerTargetId] = useState<string | null>(null);
-  const [assetMode, setAssetMode] = useState<'sticker' | 'background'>('sticker');
 
   const selected = elements.find((el) => el.id === selectedId) || null;
 
@@ -31,12 +33,12 @@ export default function StripsStudioPage() {
     const base: IStripElement = {
       id,
       type,
-      x: type === 'background' ? 0 : 20,
-      y: type === 'background' ? 0 : 20,
+      x: 20,
+      y: 20,
       width: type === 'photo-slot' ? 120 : type === 'shape' ? 100 : 150,
       height: type === 'photo-slot' ? 160 : type === 'shape' ? 100 : 40,
       rotation: 0,
-      zIndex: type === 'background' ? -1 : elements.length,
+      zIndex: elements.length,
       visible: true,
       props: {},
     };
@@ -48,24 +50,15 @@ export default function StripsStudioPage() {
       base.props = { stickerUrl: '', opacity: 1 };
     } else if (type === 'shape') {
       base.props = { shapeType: 'rect', fillColor: '#C5D89D', strokeColor: '#9CAB84', strokeWidth: 2, opacity: 1 };
-    } else if (type === 'background') {
-      base.props = { backgroundColor: '#F6F0D7', opacity: 1 };
     }
     setElements((prev) => [...prev, base]);
     setSelectedId(id);
     if (type === 'sticker') {
-      setAssetMode('sticker');
       setStickerTargetId(id);
     }
   }, [elements.length]);
 
   const openStickerGallery = (elementId: string) => {
-    setAssetMode('sticker');
-    setStickerTargetId(elementId);
-  };
-
-  const openBackgroundPicker = (elementId: string) => {
-    setAssetMode('background');
     setStickerTargetId(elementId);
   };
 
@@ -74,7 +67,7 @@ export default function StripsStudioPage() {
     setElements((prev) =>
       prev.map((el) =>
         el.id === stickerTargetId
-          ? { ...el, props: { ...el.props, ...(assetMode === 'background' ? { backgroundColor: url } : { stickerUrl: url }) } }
+          ? { ...el, props: { ...el.props, stickerUrl: url } }
           : el
       )
     );
@@ -94,6 +87,10 @@ export default function StripsStudioPage() {
   const deleteElement = (id: string) => {
     setElements((prev) => prev.filter((el) => el.id !== id));
     if (selectedId === id) setSelectedId(null);
+  };
+
+  const toggleVisibility = (id: string) => {
+    setElements((prev) => prev.map((el) => el.id === id ? { ...el, visible: !el.visible } : el));
   };
 
   const bringForward = (id: string) => {
@@ -127,6 +124,7 @@ export default function StripsStudioPage() {
     setSaving(true);
     setSaved(false);
     try {
+      const thumbnail = editorRef.current?.getThumbnail() || '';
       const body = {
         templateId: templateId || `strip-${Date.now()}`,
         name: templateName,
@@ -138,6 +136,7 @@ export default function StripsStudioPage() {
         type: 'strip' as const,
         canvasWidth: canvasSize.w,
         canvasHeight: canvasSize.h,
+        thumbnail,
         elements: elements.map((el) => ({
           ...el,
           props: { ...el.props },
@@ -185,10 +184,22 @@ export default function StripsStudioPage() {
       </header>
 
       <div className={styles.editorLayout}>
-        <ElementToolbar onAdd={addElement} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <ElementToolbar onAdd={addElement} />
+          <LayerPanel
+            elements={elements}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onToggleVisibility={toggleVisibility}
+            onBringForward={bringForward}
+            onSendBackward={sendBackward}
+            onDelete={deleteElement}
+          />
+        </div>
 
         <div className={styles.canvasArea}>
           <EditorCanvas
+            ref={editorRef}
             elements={elements}
             selectedId={selectedId}
             onSelect={setSelectedId}
@@ -205,13 +216,11 @@ export default function StripsStudioPage() {
           onBringForward={() => selected && bringForward(selected.id)}
           onSendBackward={() => selected && sendBackward(selected.id)}
           onBrowseStickers={() => selected && openStickerGallery(selected.id)}
-          onBrowseBackgrounds={() => selected && openBackgroundPicker(selected.id)}
         />
       </div>
 
       {stickerTargetId && (
         <AssetSearch
-          mode={assetMode}
           onSelect={handleAssetSelect}
           onClose={() => setStickerTargetId(null)}
         />

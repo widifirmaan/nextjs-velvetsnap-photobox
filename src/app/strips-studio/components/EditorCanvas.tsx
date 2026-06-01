@@ -1,10 +1,23 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Stage, Layer, Transformer, Rect, Circle, Text, Group, Image as KonvaImage, Ellipse, Star, Line, Path } from 'react-konva';
 import type Konva from 'konva';
 import type { IStripElement } from '@/models/Template';
 import { useImage } from './useImage';
+
+const SNAP_THRESHOLD = 6;
+const GUIDE_COLOR = '#C5D89D';
+const GUIDE_WIDTH = 1;
+
+interface GuideLine {
+  x1: number; y1: number; x2: number; y2: number;
+}
+
+interface Bounds {
+  left: number; right: number; centerX: number;
+  top: number; bottom: number; centerY: number;
+}
 
 interface EditorCanvasProps {
   elements: IStripElement[];
@@ -14,10 +27,103 @@ interface EditorCanvasProps {
   canvasSize: { w: number; h: number };
 }
 
-export default function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize }: EditorCanvasProps) {
+function getBounds(el: IStripElement): Bounds {
+  return {
+    left: el.x,
+    right: el.x + el.width,
+    centerX: el.x + el.width / 2,
+    top: el.y,
+    bottom: el.y + el.height,
+    centerY: el.y + el.height / 2,
+  };
+}
+
+interface SnapResult {
+  guides: GuideLine[];
+  snapX: number | null;
+  snapY: number | null;
+}
+
+function computeGuides(
+  b: Bounds,
+  others: IStripElement[],
+  cw: number, ch: number,
+  elW: number, elH: number
+): SnapResult {
+  const guides: GuideLine[] = [];
+  let snapX: number | null = null;
+  let snapY: number | null = null;
+  let bestDistX = SNAP_THRESHOLD;
+  let bestDistY = SNAP_THRESHOLD;
+
+
+  const canvasTargets: Bounds[] = [
+    { left: 0, right: cw, centerX: cw / 2, top: 0, bottom: ch, centerY: ch / 2 },
+  ];
+
+  const elemTargets = others.filter(e => e.visible).map(getBounds);
+  const targets = [...canvasTargets, ...elemTargets];
+
+  for (const t of targets) {
+    const checks: { bPos: number; tPos: number; offset: number; kind: 'x' | 'y' }[] = [
+      { bPos: b.left, tPos: t.left, offset: 0, kind: 'x' },
+      { bPos: b.left, tPos: t.right, offset: 0, kind: 'x' },
+      { bPos: b.left, tPos: t.centerX, offset: 0, kind: 'x' },
+      { bPos: b.right, tPos: t.left, offset: -elW, kind: 'x' },
+      { bPos: b.right, tPos: t.right, offset: -elW, kind: 'x' },
+      { bPos: b.right, tPos: t.centerX, offset: -elW, kind: 'x' },
+      { bPos: b.centerX, tPos: t.left, offset: -elW / 2, kind: 'x' },
+      { bPos: b.centerX, tPos: t.right, offset: -elW / 2, kind: 'x' },
+      { bPos: b.centerX, tPos: t.centerX, offset: -elW / 2, kind: 'x' },
+      { bPos: b.top, tPos: t.top, offset: 0, kind: 'y' },
+      { bPos: b.top, tPos: t.bottom, offset: 0, kind: 'y' },
+      { bPos: b.top, tPos: t.centerY, offset: 0, kind: 'y' },
+      { bPos: b.bottom, tPos: t.top, offset: -elH, kind: 'y' },
+      { bPos: b.bottom, tPos: t.bottom, offset: -elH, kind: 'y' },
+      { bPos: b.bottom, tPos: t.centerY, offset: -elH, kind: 'y' },
+      { bPos: b.centerY, tPos: t.top, offset: -elH / 2, kind: 'y' },
+      { bPos: b.centerY, tPos: t.bottom, offset: -elH / 2, kind: 'y' },
+      { bPos: b.centerY, tPos: t.centerY, offset: -elH / 2, kind: 'y' },
+    ];
+
+    for (const c of checks) {
+      const dist = Math.abs(c.bPos - c.tPos);
+      if (c.kind === 'x' && dist < bestDistX) {
+        bestDistX = dist;
+        snapX = c.tPos + c.offset;
+        const y1 = Math.min(b.top, t.top);
+        const y2 = Math.max(b.bottom, t.bottom);
+        guides.push({ x1: c.tPos, y1, x2: c.tPos, y2 });
+      }
+      if (c.kind === 'y' && dist < bestDistY) {
+        bestDistY = dist;
+        snapY = c.tPos + c.offset;
+        const x1 = Math.min(b.left, t.left);
+        const x2 = Math.max(b.right, t.right);
+        guides.push({ x1, y1: c.tPos, x2, y2: c.tPos });
+      }
+    }
+  }
+
+  return { guides, snapX, snapY };
+}
+
+export interface EditorCanvasHandle {
+  getThumbnail: () => string;
+}
+
+const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize }, ref) {
   const stageRef = useRef<Konva.Stage>(null);
   const layerRef = useRef<Konva.Layer>(null);
+  const guideLayerRef = useRef<Konva.Layer>(null);
   const trRef = useRef<Konva.Transformer>(null);
+  const [guides, setGuides] = useState<GuideLine[]>([]);
+
+  useImperativeHandle(ref, () => ({
+    getThumbnail: () => {
+      return stageRef.current?.toDataURL({ mimeType: 'image/png', pixelRatio: 0.3 }) || '';
+    },
+  }), []);
 
   useEffect(() => {
     if (!trRef.current || !layerRef.current) return;
@@ -31,16 +137,63 @@ export default function EditorCanvas({ elements, selectedId, onSelect, onUpdate,
     }
   }, [selectedId, elements]);
 
-  const sorted = [...elements]
+  const sorted = elements
     .filter((el) => el.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
 
-  const handleDragEnd = (id: string, e: Konva.KonvaEventObject<DragEvent>) => {
+  const others = elements.filter(el => el.id !== selectedId);
+
+  const handleDragEnd = useCallback((id: string, e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target;
     onUpdate(id, { x: node.x(), y: node.y() });
-  };
+    setGuides([]);
+    guideLayerRef.current?.batchDraw();
+  }, [onUpdate]);
 
-  const handleTransformEnd = (id: string, e: Konva.KonvaEventObject<Event>) => {
+  const handleDragMove = useCallback((id: string, e: Konva.KonvaEventObject<DragEvent>) => {
+    const node = e.target;
+    const el = elements.find(el => el.id === id);
+    if (!el) return;
+
+    const b: Bounds = {
+      left: node.x(),
+      right: node.x() + el.width,
+      centerX: node.x() + el.width / 2,
+      top: node.y(),
+      bottom: node.y() + el.height,
+      centerY: node.y() + el.height / 2,
+    };
+
+    const { guides: g, snapX, snapY } = computeGuides(b, others, canvasSize.w, canvasSize.h, el.width, el.height);
+    if (snapX !== null) node.x(snapX);
+    if (snapY !== null) node.y(snapY);
+    setGuides(g);
+    guideLayerRef.current?.batchDraw();
+  }, [elements, others, canvasSize]);
+
+  const handleTransformMove = useCallback((e: Konva.KonvaEventObject<Event>) => {
+    if (!selectedId) return;
+    const node = trRef.current?.nodes()?.[0];
+    if (!node) return;
+    const el = elements.find(el => el.id === selectedId);
+    if (!el) return;
+
+    const bx = node.x();
+    const by = node.y();
+    const bw = node.width() * node.scaleX();
+    const bh = node.height() * node.scaleY();
+
+    const b: Bounds = {
+      left: bx, right: bx + bw, centerX: bx + bw / 2,
+      top: by, bottom: by + bh, centerY: by + bh / 2,
+    };
+
+    const { guides: g } = computeGuides(b, others, canvasSize.w, canvasSize.h, bw, bh);
+    setGuides(g);
+    guideLayerRef.current?.batchDraw();
+  }, [selectedId, elements, others, canvasSize]);
+
+  const handleTransformEnd = useCallback((id: string, e: Konva.KonvaEventObject<Event>) => {
     const node = e.target;
     const scaleX = node.scaleX();
     const scaleY = node.scaleY();
@@ -53,7 +206,9 @@ export default function EditorCanvas({ elements, selectedId, onSelect, onUpdate,
       height: Math.max(10, node.height() * scaleY),
       rotation: node.rotation(),
     });
-  };
+    setGuides([]);
+    guideLayerRef.current?.batchDraw();
+  }, [onUpdate]);
 
   return (
     <Stage
@@ -66,7 +221,7 @@ export default function EditorCanvas({ elements, selectedId, onSelect, onUpdate,
         boxShadow: '0 8px 24px rgba(0,0,0,0.10)',
       }}
       onClick={(e) => {
-        if (e.target === e.target.getStage()) onSelect(null);
+        if (e.target === e.target.getStage()) { onSelect(null); setGuides([]); }
       }}
     >
       <Layer ref={layerRef}>
@@ -77,6 +232,7 @@ export default function EditorCanvas({ elements, selectedId, onSelect, onUpdate,
             isSelected={el.id === selectedId}
             onSelect={() => onSelect(el.id)}
             onDragEnd={(e) => handleDragEnd(el.id, e)}
+            onDragMove={(e) => handleDragMove(el.id, e)}
             onTransformEnd={(e) => handleTransformEnd(el.id, e)}
           />
         ))}
@@ -94,23 +250,41 @@ export default function EditorCanvas({ elements, selectedId, onSelect, onUpdate,
           anchorStroke="#C5D89D"
           anchorSize={10}
           rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
+          onTransform={handleTransformMove}
         />
+      </Layer>
+      <Layer ref={guideLayerRef} listening={false}>
+        {guides.map((g, i) => (
+          <Line
+            key={i}
+            x={0}
+            y={0}
+            points={[g.x1, g.y1, g.x2, g.y2]}
+            stroke={GUIDE_COLOR}
+            strokeWidth={GUIDE_WIDTH}
+            dash={[4, 3]}
+          />
+        ))}
       </Layer>
     </Stage>
   );
-}
+});
+
+export default EditorCanvas;
 
 function CanvasElement({
   element,
   isSelected,
   onSelect,
   onDragEnd,
+  onDragMove,
   onTransformEnd,
 }: {
   element: IStripElement;
   isSelected: boolean;
   onSelect: () => void;
   onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
+  onDragMove: (e: Konva.KonvaEventObject<DragEvent>) => void;
   onTransformEnd: (e: Konva.KonvaEventObject<Event>) => void;
 }) {
   const p = element.props;
@@ -125,6 +299,7 @@ function CanvasElement({
     onClick: onSelect,
     onTap: onSelect,
     onDragEnd,
+    onDragMove,
     onTransformEnd,
     opacity: p.opacity ?? 1,
   };
@@ -132,7 +307,6 @@ function CanvasElement({
   switch (element.type) {
     case 'photo-slot':
       return <PhotoSlotShape el={element} common={common} />;
-
     case 'text':
       return (
         <Text
@@ -146,24 +320,8 @@ function CanvasElement({
           verticalAlign="middle"
         />
       );
-
     case 'sticker':
       return <StickerElement el={element} common={common} />;
-
-    case 'background':
-      return (
-        <Rect
-          {...common}
-          x={0}
-          y={0}
-          width={element.width}
-          height={element.height}
-          fill={p.backgroundColor || '#F6F0D7'}
-          draggable={false}
-          listening={false}
-        />
-      );
-
     case 'shape': {
       const shape = p.shapeType || 'rect';
       const fill = p.fillColor || '#C5D89D';
@@ -184,7 +342,6 @@ function CanvasElement({
       }
       return <Rect {...common} fill={fill} stroke={stroke} strokeWidth={sw} cornerRadius={4} />;
     }
-
     default:
       return <Rect {...common} fill="#ccc" />;
   }
@@ -196,7 +353,7 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
   const bw = p.borderWidth ?? 2;
   const bc = p.borderColor || '#ffffff';
   const br = p.borderRadius ?? 8;
-  const fill = 'rgba(0,0,0,0.06)';
+  const fill = '#00bf63';
 
   switch (shape) {
     case 'circle': {
@@ -204,7 +361,6 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
       return (
         <Group {...common} x={el.x + el.width / 2} y={el.y + el.height / 2}>
           <Circle radius={r} fill={fill} stroke={bc} strokeWidth={bw} />
-          <Circle radius={r - 6} stroke="rgba(255,255,255,0.3)" strokeWidth={1} dash={[4, 4]} />
         </Group>
       );
     }
@@ -238,7 +394,6 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
       return (
         <Group {...common}>
           <Rect x={0} y={0} width={el.width} height={el.height} fill={fill} stroke={bc} strokeWidth={bw} cornerRadius={2} />
-          <Rect x={4} y={4} width={el.width - 8} height={el.height - 20} fill="rgba(255,255,255,0.2)" cornerRadius={1} />
           <Rect x={el.width * 0.2} y={el.height - 14} width={el.width * 0.6} height={8} fill={bc} cornerRadius={1} />
         </Group>
       );
@@ -248,7 +403,6 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
       return (
         <Group {...common}>
           <Rect x={0} y={0} width={el.width} height={el.height} fill={fill} stroke={bc} strokeWidth={bw} cornerRadius={br} />
-          <Rect x={4} y={4} width={el.width - 8} height={el.height - 8} fill="rgba(255,255,255,0.1)" cornerRadius={Math.max(2, br - 2)} />
         </Group>
       );
   }

@@ -7,30 +7,14 @@ import { STICKER_CATEGORIES, renderEmojiToDataUrl } from '../data/stickers';
 interface AssetSearchProps {
   onSelect: (url: string) => void;
   onClose: () => void;
-  mode?: 'sticker' | 'background';
 }
 
 const GIPHY_API_KEY = process.env.NEXT_PUBLIC_GIPHY_API_KEY || '';
 
-const FREE_BG_URLS = [
-  { name: 'Solid Beige', value: '#F6F0D7' },
-  { name: 'Solid Sage', value: '#C5D89D' },
-  { name: 'Solid Blush', value: '#E8C4C4' },
-  { name: 'Solid Lavender', value: '#D4C5E8' },
-  { name: 'Solid Sky', value: '#C4D9E8' },
-  { name: 'Gradient Warm', value: 'linear-gradient(135deg, #F6F0D7, #E8C4C4)' },
-  { name: 'Gradient Cool', value: 'linear-gradient(135deg, #C5D89D, #D4C5E8)' },
-  { name: 'Gradient Peach', value: 'linear-gradient(135deg, #FFD6D6, #FFE8D6)' },
-  { name: 'Gradient Mint', value: 'linear-gradient(135deg, #C5D89D, #D4E8C5)' },
-  { name: 'Solid Cream', value: '#FFF8E7' },
-  { name: 'Solid Dusty Rose', value: '#D4A5A5' },
-  { name: 'Solid Taupe', value: '#B8A99A' },
-];
 
-export default function AssetSearch({ onSelect, onClose, mode = 'sticker' }: AssetSearchProps) {
-  const [tab, setTab] = useState<'emoji' | 'giphy' | 'backgrounds'>(
-    mode === 'background' ? 'backgrounds' : 'emoji'
-  );
+
+export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
+  const [tab, setTab] = useState<'emoji' | 'giphy'>('emoji');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<string>(STICKER_CATEGORIES[0]?.name || '');
   const [giphyResults, setGiphyResults] = useState<any[]>([]);
@@ -95,21 +79,16 @@ export default function AssetSearch({ onSelect, onClose, mode = 'sticker' }: Ass
     ? STICKER_CATEGORIES.flatMap(c => c.emojis).filter(e => e.includes(search))
     : currentCategory?.emojis || [];
 
-  const tabs = mode === 'background'
-    ? [{ id: 'backgrounds' as const, label: 'Backgrounds' }]
-    : [
-        { id: 'emoji' as const, label: 'Emoji' },
-        ...(GIPHY_API_KEY ? [{ id: 'giphy' as const, label: 'Online' }] : []),
-        { id: 'backgrounds' as const, label: 'Background' },
-      ];
+  const tabs = [
+    { id: 'emoji' as const, label: 'Emoji' },
+    ...(GIPHY_API_KEY ? [{ id: 'giphy' as const, label: 'Online' }] : []),
+  ];
 
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h3 style={{ margin: 0 }}>
-            {mode === 'background' ? 'Backgrounds' : 'Sticker Gallery'}
-          </h3>
+          <h3 style={{ margin: 0 }}>Sticker Gallery</h3>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
@@ -219,30 +198,7 @@ export default function AssetSearch({ onSelect, onClose, mode = 'sticker' }: Ass
           </div>
         )}
 
-        {tab === 'backgrounds' && (
-          <div>
-            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
-              Click a background to apply it. Gradients work as CSS backgrounds.
-            </p>
-            <div className={styles.bgGrid}>
-              {FREE_BG_URLS.map((bg, i) => (
-                <button
-                  key={i}
-                  className={styles.bgItem}
-                  onClick={() => onSelect(bg.value)}
-                >
-                  <div
-                    className={styles.bgPreview}
-                    style={{ background: bg.value }}
-                  />
-                  <span className={styles.bgLabel}>{bg.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {recentStickers.length > 0 && tab !== 'backgrounds' && (
+        {recentStickers.length > 0 && (
           <div style={{ marginTop: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>Recent</p>
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
