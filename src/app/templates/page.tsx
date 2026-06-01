@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { LayoutTemplate, Film, Newspaper, Loader2 } from 'lucide-react';
+import { LayoutTemplate, Film, Newspaper, Loader2, ArrowLeft } from 'lucide-react';
 import styles from './page.module.css';
 import { useState, useEffect } from 'react';
 
@@ -98,9 +98,9 @@ export default function TemplatesPage() {
         </div>
       )}
       
-      <div style={{ marginTop: '40px', display: 'flex', justifyContent: 'center' }}>
-        <button className="mac-button secondary" onClick={() => router.back()}>
-          Back
+      <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center' }}>
+        <button className="mac-button secondary" onClick={() => router.back()} style={{ padding: '10px 20px', fontSize: '14px' }}>
+          <ArrowLeft size={16} /> Back
         </button>
       </div>
     </div>

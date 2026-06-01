@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { QrCode, CheckCircle } from 'lucide-react';
+import { QrCode, CheckCircle, ArrowLeft } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function PaymentPage() {
@@ -59,6 +59,11 @@ export default function PaymentPage() {
   return (
     <div className="page-container" style={{ alignItems: 'center', justifyContent: 'center' }}>
       <div className={`glass-panel ${styles.paymentCard}`}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+          <button className="mac-button secondary" onClick={() => router.back()} style={{ padding: '10px 20px', fontSize: '14px' }}>
+            <ArrowLeft size={16} /> Back
+          </button>
+        </div>
         <h2 className="title" style={{ fontSize: '32px' }}>Payment</h2>
         <p className="subtitle" style={{ marginBottom: '24px' }}>Scan the QRIS code to pay</p>
         

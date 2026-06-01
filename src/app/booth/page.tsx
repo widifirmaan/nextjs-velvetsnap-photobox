@@ -3,7 +3,7 @@
 import { Suspense, useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, Monitor } from 'lucide-react';
+import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, Monitor, RotateCcw } from 'lucide-react';
 import styles from './page.module.css';
 
 interface ISlot {
@@ -178,6 +178,7 @@ function BoothContent() {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [taking, setTaking] = useState(false);
   const [mirrored, setMirrored] = useState(true);
+  const [captureMode, setCaptureMode] = useState<'auto' | 'manual'>('manual');
   
   const [step, setStep] = useState<'camera' | 'editor'>('camera');
   const [selectedFilter, setSelectedFilter] = useState('none');
@@ -344,6 +345,29 @@ function BoothContent() {
     if (taking) return;
     setTaking(true);
     takePhoto(slotsCount);
+  };
+
+  const handleManualCapture = async () => {
+    if (captures.length >= slotsCount) return;
+    const prevLen = captures.length;
+    let timer = 3;
+    setCountdown(timer);
+    await new Promise<void>((resolve) => {
+      const iv = setInterval(() => {
+        timer--;
+        if (timer > 0) {
+          setCountdown(timer);
+        } else {
+          clearInterval(iv);
+          setCountdown(null);
+          resolve();
+        }
+      }, 1000);
+    });
+    await capture();
+    if (prevLen + 1 >= slotsCount) {
+      setStep('editor');
+    }
   };
 
   const takePhoto = (remaining: number) => {
@@ -514,6 +538,9 @@ function BoothContent() {
           )}
           
           <div className={`glass-panel ${styles.sidebar}`}>
+            <button className="mac-button secondary" onClick={() => router.push('/templates')} style={{ padding: '10px 20px', fontSize: '14px', marginBottom: '16px', alignSelf: 'flex-start' }}>
+              <ArrowLeft size={16} /> Back
+            </button>
             <h3 style={{ marginBottom: '16px' }}>Filters</h3>
             <div className={styles.filterOptions}>
               <button className={`mac-button ${selectedFilter === 'none' ? '' : 'secondary'}`} onClick={() => setSelectedFilter('none')}>Normal</button>
@@ -523,7 +550,7 @@ function BoothContent() {
             
             {captures.length > 0 && (
               <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                Drag photo to reposition, drag corner handles to resize
+                Drag photo to reposition
               </p>
             )}
             <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -548,45 +575,83 @@ function BoothContent() {
         {cameraType === 'dslr' && ' • DSLR Mode'}
       </p>
 
-      {cameraType === 'dslr' ? (
-        <div className={styles.cameraWrapper} style={{ 
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: '#2d2d2d', minHeight: '300px', flexDirection: 'column', gap: '16px'
-        }}>
-          <CameraIcon size={64} style={{ opacity: 0.5 }} />
-          <p style={{ color: '#fff', opacity: 0.6, fontSize: '14px' }}>
-            Kamera DSLR terhubung via USB — klik Capture untuk mengambil foto
-          </p>
-          {countdown !== null && (
-            <div className={styles.countdownOverlay}>{countdown}</div>
-          )}
-          {dslrCapturing && (
-            <div className={styles.countdownOverlay}>
-              <Loader2 className="spin" size={48} />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className={styles.cameraWrapper}>
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/jpeg"
-            videoConstraints={{ 
-              facingMode: "user",
-              deviceId: deviceId ? { exact: deviceId } : undefined
-            }}
-            className={styles.webcam}
-            style={{ transform: mirrored ? 'scaleX(-1)' : 'none' }}
-          />
-          
-          {countdown !== null && (
-            <div className={styles.countdownOverlay}>
-              {countdown}
-            </div>
-          )}
-        </div>
-      )}
+      <div className={styles.viewfinderRow}>
+        {cameraType === 'dslr' ? (
+          <div className={styles.cameraWrapper} style={{ 
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: '#2d2d2d', minHeight: '300px', flexDirection: 'column', gap: '16px'
+          }}>
+            <CameraIcon size={64} style={{ opacity: 0.5 }} />
+            <p style={{ color: '#fff', opacity: 0.6, fontSize: '14px' }}>
+              Kamera DSLR terhubung via USB — klik Capture untuk mengambil foto
+            </p>
+            {countdown !== null && (
+              <div className={styles.countdownOverlay}>{countdown}</div>
+            )}
+            {dslrCapturing && (
+              <div className={styles.countdownOverlay}>
+                <Loader2 className="spin" size={48} />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className={styles.cameraWrapper}>
+            <Webcam
+              audio={false}
+              ref={webcamRef}
+              screenshotFormat="image/jpeg"
+              videoConstraints={{ 
+                facingMode: "user",
+                deviceId: deviceId ? { exact: deviceId } : undefined
+              }}
+              className={styles.webcam}
+              style={{ transform: mirrored ? 'scaleX(-1)' : 'none' }}
+            />
+            
+            {countdown !== null && (
+              <div className={styles.countdownOverlay}>
+                {countdown}
+              </div>
+            )}
+          </div>
+        )}
+
+        {dbTemplate && dbTemplate.frameImage && dbTemplate.slotsLayout && (
+          <div className={styles.liveStrip} style={{ aspectRatio: frameRatio }}>
+            {(dbTemplate.slotsLayout || []).map((slot, idx) => {
+              const src = captures[idx];
+              return (
+                <div
+                  key={idx}
+                  style={{
+                    position: 'absolute',
+                    left: `${slot.x}%`,
+                    top: `${slot.y}%`,
+                    width: `${slot.w}%`,
+                    height: `${slot.h}%`,
+                    overflow: 'hidden',
+                    background: src ? 'none' : 'rgba(0,0,0,0.06)',
+                    borderRadius: '2px',
+                  }}
+                >
+                  {src && (
+                    <img
+                      src={src}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  )}
+                </div>
+              );
+            })}
+            <img
+              src={keyedFrameImage || dbTemplate.frameImage}
+              alt=""
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+            />
+          </div>
+        )}
+      </div>
 
       <div className={styles.captureBtnWrap}>
         {!taking && !dslrCapturing && (
@@ -594,10 +659,32 @@ function BoothContent() {
             <button className="mac-button secondary" onClick={() => router.push('/templates')} style={{ padding: '10px 20px', fontSize: '14px' }}>
               <ArrowLeft size={16} /> Back
             </button>
-            <button className="mac-button" onClick={startSession} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
-              <CameraIcon size={24} />
-              {cameraType === 'dslr' ? 'Shoot (Camera Shutter)' : 'Capture'}
-            </button>
+            {captureMode === 'manual' ? (
+              <button className="mac-button" onClick={handleManualCapture} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
+                <CameraIcon size={24} />
+                Capture ({captures.length}/{slotsCount})
+              </button>
+            ) : (
+              <button className="mac-button" onClick={startSession} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
+                <CameraIcon size={24} />
+                {cameraType === 'dslr' ? 'Shoot (Camera Shutter)' : 'Capture'}
+              </button>
+            )}
+            <div className={styles.modeToggle} title={captureMode === 'auto' ? 'Auto' : 'Manual'}>
+              <button
+                className={`${styles.modeToggleBtn} ${captureMode === 'manual' ? styles.modeToggleActive : ''}`}
+                onClick={() => setCaptureMode('manual')}
+              >
+                M
+              </button>
+              <button
+                className={`${styles.modeToggleBtn} ${captureMode === 'auto' ? styles.modeToggleActive : ''}`}
+                onClick={() => setCaptureMode('auto')}
+              >
+                A
+              </button>
+              <span className={styles.modeToggleSlider} style={{ left: captureMode === 'manual' ? '2px' : '50%' }} />
+            </div>
             {cameraType === 'webcam' && (
               <>
                 <div ref={camMenuRef} style={{ position: 'relative' }}>
@@ -605,9 +692,9 @@ function BoothContent() {
                     className="mac-button secondary"
                     onClick={() => setShowCamMenu((v) => !v)}
                     style={{ padding: '10px 14px', fontSize: '14px' }}
-                    title="Switch camera"
+                    title="Ganti kamera"
                   >
-                    <Monitor size={18} />
+                    <RotateCcw size={18} />
                   </button>
                   {showCamMenu && (
                     <div className={styles.camDropdown}>

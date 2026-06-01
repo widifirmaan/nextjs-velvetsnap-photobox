@@ -76,6 +76,84 @@
   opacity: 0.4;
 }
 
+.modeToggle {
+  position: relative;
+  display: flex;
+  background: rgba(61,44,44,0.08);
+  border-radius: 100px;
+  padding: 2px;
+  width: 72px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.modeToggleBtn {
+  all: unset;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  position: relative;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+  transition: color var(--transition-fast);
+}
+
+.modeToggleActive {
+  color: var(--accent-color);
+}
+
+.modeToggleSlider {
+  position: absolute;
+  top: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  background: #fff;
+  border-radius: 100px;
+  transition: left var(--transition-fast);
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.viewfinderRow {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+  align-items: flex-start;
+}
+
+.liveStrip {
+  flex: 0 0 auto;
+  width: 120px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow:
+    8px 10px 20px rgba(0,0,0,0.08),
+    -3px -3px 10px rgba(255,255,255,0.7),
+    inset 3px -3px 5px rgba(0,0,0,0.04),
+    inset -3px 3px 5px rgba(255,255,255,0.9);
+}
+
+.liveStrip img {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .viewfinderRow {
+    flex-direction: column;
+    align-items: center;
+  }
+  .liveStrip {
+    width: 80px;
+  }
+}
+
 @media (max-width: 480px) {
   .captureBtnWrap {
     margin-top: 12px;
