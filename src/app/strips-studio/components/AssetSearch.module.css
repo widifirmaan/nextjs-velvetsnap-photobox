@@ -1,0 +1,185 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 90%;
+  max-width: 480px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.2);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.closeBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.06);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  background: rgba(0,0,0,0.04);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.tabActive {
+  background: #fff;
+  color: var(--text-primary);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.08);
+  font-size: 14px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+}
+
+.searchBtn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent-color);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.searchBtn:disabled {
+  opacity: 0.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.stickerItem {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: rgba(0,0,0,0.02);
+  cursor: pointer;
+  transition: all 0.15s;
+  overflow: hidden;
+  padding: 0;
+}
+
+.stickerItem:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-color);
+  transform: scale(1.05);
+}
+
+.categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.catBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+
+.catBtn:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-color);
+}
+
+.catActive {
+  background: var(--accent-bg);
+  border-color: var(--accent-color);
+}
+
+.bgGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.bgItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 12px;
+  background: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.15s;
+}
+
+.bgItem:hover {
+  border-color: var(--accent-color);
+  transform: scale(1.02);
+}
+
+.bgPreview {
+  height: 60px;
+  border-radius: 12px 12px 0 0;
+}
+
+.bgLabel {
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+}

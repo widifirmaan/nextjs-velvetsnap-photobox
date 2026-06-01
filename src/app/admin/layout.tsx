@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LayoutDashboard, Layers, Server, Clock, DollarSign } from 'lucide-react';
+import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image } from 'lucide-react';
 import styles from './layout.module.css';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -16,6 +16,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </Link>
           <Link href="/admin/devices" className={styles.navLink}>
             <Server size={20} /> Devices
+          </Link>
+          <Link href="/strips-studio" className={styles.navLink}>
+            <Image size={20} /> Strips Studio
           </Link>
 
           <div className={styles.navDivider} />

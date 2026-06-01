@@ -1,0 +1,63 @@
+.page {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nameField input {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(61,44,44,0.12);
+  background: #fff;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 15px;
+  min-width: 240px;
+  box-shadow: inset 2px -2px 4px rgba(0,0,0,0.04), inset -2px 2px 4px rgba(255,255,255,0.8);
+}
+
+.nameField input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.editorLayout {
+  display: grid;
+  grid-template-columns: 200px 1fr 280px;
+  gap: 20px;
+  min-height: 600px;
+}
+
+.canvasArea {
+  background: #e8e4d8;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 600px;
+  overflow: auto;
+  box-shadow: inset 3px -3px 6px rgba(0,0,0,0.04), inset -3px 3px 6px rgba(255,255,255,0.8);
+}
+
+@media (max-width: 1024px) {
+  .editorLayout {
+    grid-template-columns: 1fr;
+  }
+}
+

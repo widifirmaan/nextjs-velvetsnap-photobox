@@ -78,17 +78,17 @@ export default function Home() {
         </button>
 
         {/* ── Promo ── */}
-        <button className={`${styles.tile} ${styles.promo}`} onClick={() => router.push('/templates')}>
+        <div className={`${styles.tile} ${styles.promo}`}>
           <div className={styles.floatWrap}>
             <Sparkles size={28} className={styles.floatIcon} />
             <span className={styles.promoLabel}>Promo</span>
             <span className={styles.promoValue}>2nd Print</span>
             <span className={styles.promoValue}>FREE</span>
           </div>
-        </button>
+        </div>
 
         {/* ── Gallery: 3 strip terakhir ── */}
-        <button className={`${styles.tile} ${styles.gallery}`} onClick={() => router.push('/admin/history')}>
+        <div className={`${styles.tile} ${styles.gallery}`}>
           {stripImages ? (
             <div className={styles.strips}>
               {stripImages.map((src, i) => (
@@ -102,28 +102,28 @@ export default function Home() {
               {txLoaded && <span>Belum ada transaksi</span>}
             </div>
           )}
-        </button>
+        </div>
 
         {/* ── Testimonial ── */}
-        <button className={`${styles.tile} ${styles.testi}`} onClick={() => router.push('/templates')}>
+        <div className={`${styles.tile} ${styles.testi}`}>
           <div className={styles.pulseWrap}>
             <Heart size={24} className={styles.pulseIcon} />
             <span className={styles.testiText}>"Hasilnya keren banget!"</span>
             <span className={styles.testiAuthor}>— Andi & Rina</span>
           </div>
-        </button>
+        </div>
 
         {/* ── Stat ── */}
-        <button className={`${styles.tile} ${styles.stat}`} onClick={() => router.push('/admin/history')}>
+        <div className={`${styles.tile} ${styles.stat}`}>
           <div className={styles.shimmerWrap}>
             <Star size={24} className={styles.shimmerIcon} />
             <span className={styles.statNumber}>10K+</span>
             <span className={styles.statLabel}>Foto Tercetak</span>
           </div>
-        </button>
+        </div>
 
         {/* ── Bottom strip ── */}
-        <button className={`${styles.tile} ${styles.bottom}`} onClick={() => router.push('/templates')}>
+        <div className={`${styles.tile} ${styles.bottom}`}>
           <div className={styles.bottomContent}>
             <div className={styles.bottomItem}>
               <Zap size={20} className={styles.bottomIcon} />
@@ -140,7 +140,7 @@ export default function Home() {
               <span className={styles.bottomText}>Banyak template</span>
             </div>
           </div>
-        </button>
+        </div>
       </div>
     </div>
   );
