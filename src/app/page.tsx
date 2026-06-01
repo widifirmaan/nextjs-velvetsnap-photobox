@@ -23,6 +23,7 @@ export default function Home() {
   const router = useRouter();
   const [slideIdx, setSlideIdx] = useState(0);
   const [recentTx, setRecentTx] = useState<Transaction[]>([]);
+  const [txLoaded, setTxLoaded] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -31,7 +32,8 @@ export default function Home() {
       .then((d) => {
         if (d.success) setRecentTx(d.data || []);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setTxLoaded(true));
   }, []);
 
   useEffect(() => {
@@ -43,9 +45,9 @@ export default function Home() {
     };
   }, []);
 
-  const stripImages = recentTx.length === 3
+  const stripImages = txLoaded && recentTx.length === 3
     ? recentTx.map((t) => t.finalImage)
-    : SAMPLE_IMAGES.slice(0, 3);
+    : null;
 
   return (
     <div className={styles.container}>
@@ -87,13 +89,19 @@ export default function Home() {
 
         {/* ── Gallery: 3 strip terakhir ── */}
         <button className={`${styles.tile} ${styles.gallery}`} onClick={() => router.push('/admin/history')}>
-          <div className={styles.strips}>
-            {stripImages.map((src, i) => (
-              <div key={i} className={styles.strip}>
-                <div className={styles.stripImage} style={{ backgroundImage: `url(${src})` }} />
-              </div>
-            ))}
-          </div>
+          {stripImages ? (
+            <div className={styles.strips}>
+              {stripImages.map((src, i) => (
+                <div key={i} className={styles.strip}>
+                  <div className={styles.stripImage} style={{ backgroundImage: `url(${src})` }} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={styles.stripsEmpty}>
+              {txLoaded && <span>Belum ada transaksi</span>}
+            </div>
+          )}
         </button>
 
         {/* ── Testimonial ── */}

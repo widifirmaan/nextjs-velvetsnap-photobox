@@ -66,7 +66,7 @@
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,239,159,0.5) 0%, rgba(255,233,125,0.15) 50%, rgba(225,63,124,0.3) 100%);
+  background: linear-gradient(135deg, rgba(255,239,159,0.7) 0%, rgba(255,239,159,0.4) 50%, rgba(225,63,124,0.35) 100%);
   z-index: 2;
 }
 
@@ -80,11 +80,14 @@
   justify-content: center;
   color: #3d2c2c;
   gap: 4px;
+  text-shadow: 0 2px 12px rgba(255,239,159,0.6);
+  padding: 24px;
 }
 
 .heroIcon {
   animation: heroFloat 3s ease-in-out infinite;
   color: #E13F7C;
+  filter: drop-shadow(0 2px 8px rgba(225,63,124,0.3));
 }
 
 .heroTitle {
@@ -93,24 +96,27 @@
   letter-spacing: -0.03em;
   margin-top: 12px;
   color: #3d2c2c;
+  text-shadow: 0 2px 16px rgba(255,239,159,0.8), 0 0 40px rgba(255,239,159,0.3);
 }
 
 .heroSub {
   font-size: clamp(14px, 1.8vw, 24px);
-  opacity: 0.8;
+  opacity: 0.9;
   font-weight: 500;
   letter-spacing: 0.08em;
   margin-top: 0;
   color: #3d2c2c;
+  text-shadow: 0 1px 10px rgba(255,239,159,0.7);
 }
 
 .heroTagline {
   font-size: clamp(12px, 1.2vw, 16px);
-  opacity: 0.6;
+  opacity: 0.8;
   font-weight: 400;
   letter-spacing: 0.04em;
   margin-top: 4px;
   color: #3d2c2c;
+  text-shadow: 0 1px 8px rgba(255,239,159,0.6);
 }
 
 .heroCta {
@@ -209,6 +215,17 @@
   height: 100%;
   width: 100%;
   padding-bottom: 4px;
+}
+
+.stripsEmpty {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--text-secondary);
+  opacity: 0.5;
 }
 
 .strip {

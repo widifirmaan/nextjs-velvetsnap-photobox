@@ -517,7 +517,7 @@ function BoothContent() {
         </div>
       )}
 
-      <div style={{ marginTop: '32px' }}>
+      <div className={styles.captureBtnWrap}>
         {!taking && !dslrCapturing && (
           <button className="mac-button" onClick={startSession} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
             <CameraIcon size={24} />

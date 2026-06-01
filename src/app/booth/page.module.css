@@ -19,6 +19,16 @@
   transform: scaleX(-1);
 }
 
+.captureBtnWrap {
+  margin-top: 32px;
+}
+
+@media (max-width: 480px) {
+  .captureBtnWrap {
+    margin-top: 12px;
+  }
+}
+
 .countdownOverlay {
   position: absolute;
   top: 0;
@@ -197,5 +207,28 @@
   .sidebar {
     width: 100%;
     min-height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  :global(.page-container) {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  :global(.subtitle) {
+    margin-bottom: 16px;
+  }
+  .cameraWrapper {
+    border-radius: 16px;
+    max-width: 100%;
+    padding-top: 40px;
+    padding-bottom: 24px;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin-bottom: 8px;
+  }
+  .captureBtnWrap {
+    padding-top: 8px;
+    padding-bottom: 16px;
   }
 }
