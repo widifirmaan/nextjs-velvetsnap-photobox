@@ -3,7 +3,7 @@
 import { Suspense, useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Camera as CameraIcon, RefreshCcw, Check, Loader2 } from 'lucide-react';
+import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, Monitor } from 'lucide-react';
 import styles from './page.module.css';
 
 interface ISlot {
@@ -22,6 +22,24 @@ interface TemplateData {
   color: string;
   frameImage?: string;
   slotsLayout?: ISlot[];
+}
+
+function flipImage(dataUrl: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { resolve(dataUrl); return; }
+      ctx.scale(-1, 1);
+      ctx.drawImage(img, -canvas.width, 0);
+      resolve(canvas.toDataURL('image/jpeg'));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
 }
 
 async function composeFrameImage(
@@ -159,6 +177,7 @@ function BoothContent() {
   const [captures, setCaptures] = useState<string[]>([]);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [taking, setTaking] = useState(false);
+  const [mirrored, setMirrored] = useState(true);
   
   const [step, setStep] = useState<'camera' | 'editor'>('camera');
   const [selectedFilter, setSelectedFilter] = useState('none');
@@ -167,6 +186,9 @@ function BoothContent() {
   const [panStart, setPanStart] = useState<{ mx: number; my: number; ox: number; oy: number } | null>(null);
   const [deviceId, setDeviceId] = useState<string | undefined>(undefined);
   const [cameraType, setCameraType] = useState<'webcam' | 'dslr'>('webcam');
+  const [availableCams, setAvailableCams] = useState<MediaDeviceInfo[]>([]);
+  const [showCamMenu, setShowCamMenu] = useState(false);
+  const camMenuRef = useRef<HTMLDivElement>(null);
 
   const [slotsCount, setSlotsCount] = useState<number>(3);
   const [templateName, setTemplateName] = useState<string>('Classic Strips');
@@ -184,6 +206,48 @@ function BoothContent() {
       }
     } catch {}
   }, []);
+
+  useEffect(() => {
+    if (cameraType !== 'webcam') return;
+    (async () => {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true });
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const cams = devices.filter((d) => d.kind === 'videoinput');
+        const sorted = [...cams].sort((a, b) => {
+          const score = (l: string) => {
+            const lower = l.toLowerCase();
+            if (lower.includes('front') || lower.includes('facetime') || lower.includes('built-in')) return 0;
+            if (lower.includes('back') || lower.includes('rear')) return 1;
+            return 2;
+          };
+          return score(a.label) - score(b.label);
+        });
+        setAvailableCams(sorted);
+      } catch {}
+    })();
+  }, [cameraType]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (camMenuRef.current && !camMenuRef.current.contains(e.target as Node)) {
+        setShowCamMenu(false);
+      }
+    };
+    if (showCamMenu) document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showCamMenu]);
+
+  const handleSwitchCamera = (camId: string) => {
+    setDeviceId(camId);
+    setShowCamMenu(false);
+    try {
+      const raw = localStorage.getItem('velvetsnap_device_settings');
+      const s = raw ? JSON.parse(raw) : {};
+      s.camera = camId;
+      localStorage.setItem('velvetsnap_device_settings', JSON.stringify(s));
+    } catch {}
+  };
 
   useEffect(() => {
     fetch('/api/templates')
@@ -265,10 +329,16 @@ function BoothContent() {
     } else {
       const imageSrc = webcamRef.current?.getScreenshot();
       if (imageSrc) {
-        setCaptures(prev => [...prev, imageSrc]);
+        if (mirrored) {
+          flipImage(imageSrc).then((flipped) => {
+            setCaptures(prev => [...prev, flipped]);
+          });
+        } else {
+          setCaptures(prev => [...prev, imageSrc]);
+        }
       }
     }
-  }, [webcamRef, cameraType]);
+  }, [webcamRef, cameraType, mirrored]);
 
   const startSession = () => {
     if (taking) return;
@@ -507,6 +577,7 @@ function BoothContent() {
               deviceId: deviceId ? { exact: deviceId } : undefined
             }}
             className={styles.webcam}
+            style={{ transform: mirrored ? 'scaleX(-1)' : 'none' }}
           />
           
           {countdown !== null && (
@@ -519,10 +590,50 @@ function BoothContent() {
 
       <div className={styles.captureBtnWrap}>
         {!taking && !dslrCapturing && (
-          <button className="mac-button" onClick={startSession} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
-            <CameraIcon size={24} />
-            {cameraType === 'dslr' ? 'Shoot (Camera Shutter)' : 'Capture'}
-          </button>
+          <div className={styles.btnRow}>
+            <button className="mac-button secondary" onClick={() => router.push('/templates')} style={{ padding: '10px 20px', fontSize: '14px' }}>
+              <ArrowLeft size={16} /> Back
+            </button>
+            <button className="mac-button" onClick={startSession} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
+              <CameraIcon size={24} />
+              {cameraType === 'dslr' ? 'Shoot (Camera Shutter)' : 'Capture'}
+            </button>
+            {cameraType === 'webcam' && (
+              <>
+                <div ref={camMenuRef} style={{ position: 'relative' }}>
+                  <button
+                    className="mac-button secondary"
+                    onClick={() => setShowCamMenu((v) => !v)}
+                    style={{ padding: '10px 14px', fontSize: '14px' }}
+                    title="Switch camera"
+                  >
+                    <Monitor size={18} />
+                  </button>
+                  {showCamMenu && (
+                    <div className={styles.camDropdown}>
+                      {availableCams.map((cam) => (
+                        <button
+                          key={cam.deviceId}
+                          className={`${styles.camOption} ${cam.deviceId === deviceId ? styles.camOptionActive : ''}`}
+                          onClick={() => handleSwitchCamera(cam.deviceId)}
+                        >
+                          {cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  className={`mac-button secondary ${mirrored ? '' : styles.mirrorOff}`}
+                  onClick={() => setMirrored((v) => !v)}
+                  style={{ padding: '10px 14px', fontSize: '14px' }}
+                  title={mirrored ? 'Mirror: ON' : 'Mirror: OFF'}
+                >
+                  <span style={{ fontSize: '16px', fontWeight: 700, lineHeight: 1 }}>⇔</span>
+                </button>
+              </>
+            )}
+          </div>
         )}
       </div>
     </div>
