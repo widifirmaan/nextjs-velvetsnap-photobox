@@ -63,11 +63,11 @@
 }
 
 .camOption:hover {
-  background: rgba(225,63,124,0.08);
+  background: rgba(197,216,157,0.12);
 }
 
 .camOptionActive {
-  background: rgba(225,63,124,0.12);
+  background: rgba(197,216,157,0.18);
   color: var(--accent-color);
   font-weight: 600;
 }
@@ -341,13 +341,6 @@
 }
 
 @media (max-width: 480px) {
-  :global(.page-container) {
-    padding-top: 24px;
-    padding-bottom: 24px;
-  }
-  :global(.subtitle) {
-    margin-bottom: 16px;
-  }
   .cameraWrapper {
     border-radius: 16px;
     max-width: 100%;

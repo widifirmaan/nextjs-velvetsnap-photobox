@@ -581,7 +581,7 @@ export default function TemplatesAdmin() {
                       max="10"
                       readOnly
                       value={formData.slots}
-                      style={{ background: 'var(--bg-tertiary, #1c1c1e)', cursor: 'not-allowed' }}
+                      style={{ background: '#f0f0f0', color: '#999', cursor: 'not-allowed' }}
                       placeholder="Upload image and configure slots"
                     />
                   </div>
@@ -602,6 +602,7 @@ export default function TemplatesAdmin() {
                       type="color"
                       value={formData.color}
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                      style={{ width: 48, height: 48, padding: 0, border: '2px solid rgba(61,44,44,0.12)', borderRadius: 12, cursor: 'pointer', background: 'none' }}
                     />
                   </div>
                   <div className={styles.formGroup}>
@@ -819,20 +820,13 @@ export default function TemplatesAdmin() {
                       >
                         <Edit2 size={18} color="var(--accent-color)" />
                       </button>
-                      <button
-                         className={`${styles.iconBtn} ${styles.danger}`}
-                         onClick={() => handleDelete(t._id)}
-                         title="Delete template"
-                       >
-                         <Trash2 size={18} color="var(--danger-color)" />
-                       </button>
                        <button
-                         className={styles.iconBtn}
-                         onClick={() => handleConvertTemplate(t)}
-                         title="Convert to 1000px width"
-                       >
-                         <RefreshCw size={18} color="var(--accent-color)" />
-                       </button>
+                          className={`${styles.iconBtn} ${styles.danger}`}
+                          onClick={() => handleDelete(t._id)}
+                          title="Delete template"
+                        >
+                          <Trash2 size={18} color="var(--danger-color)" />
+                        </button>
                     </div>
                   </td>
                 </tr>

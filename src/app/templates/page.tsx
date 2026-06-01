@@ -31,7 +31,7 @@ export default function TemplatesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/templates')
+    fetch('/api/templates/thumbnails')
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
@@ -75,7 +75,7 @@ export default function TemplatesPage() {
               {t.frameImage ? (
                 <div className={styles.thumbnailWrapper}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={t.frameImage} alt={t.name} className={styles.cardImage} />
+                  <img src={t.frameImage} alt={t.name} className={styles.cardImage} loading="lazy" decoding="async" />
                 </div>
               ) : (
                 <div className={styles.iconContainer} style={{ color: t.color }}>

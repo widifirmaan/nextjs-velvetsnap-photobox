@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS: DeviceSettings = {
   cameraType: 'webcam',
   camera: '',
   captureWidth: 1920,
-  captureQuality: 85,
+  captureQuality: 100,
   printCopies: 1,
   printOrientation: 'portrait',
   printDpi: 300,

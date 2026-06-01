@@ -1,5 +1,5 @@
 /* ── Claymorphism palette ── */
-/* #FFE97D #FFEF9F #E13F7C #FF537B */
+/* #F6F0D7 #C5D89D #9CAB84 #89986D */
 
 .container {
   width: 100vw;
@@ -9,7 +9,7 @@
   justify-content: center;
   padding: 20px;
   overflow: hidden;
-  background: #FFEF9F;
+  background: #F6F0D7;
 }
 
 .grid {
@@ -66,7 +66,7 @@
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,239,159,0.7) 0%, rgba(255,239,159,0.4) 50%, rgba(225,63,124,0.35) 100%);
+  background: linear-gradient(135deg, rgba(246,240,215,0.7) 0%, rgba(246,240,215,0.4) 50%, rgba(197,216,157,0.35) 100%);
   z-index: 2;
 }
 
@@ -80,14 +80,14 @@
   justify-content: center;
   color: #3d2c2c;
   gap: 4px;
-  text-shadow: 0 2px 12px rgba(255,239,159,0.6);
+  text-shadow: 0 2px 12px rgba(246,240,215,0.6);
   padding: 24px;
 }
 
 .heroIcon {
   animation: heroFloat 3s ease-in-out infinite;
-  color: #E13F7C;
-  filter: drop-shadow(0 2px 8px rgba(225,63,124,0.3));
+  color: #C5D89D;
+  filter: drop-shadow(0 2px 8px rgba(197,216,157,0.3));
 }
 
 .heroTitle {
@@ -96,7 +96,7 @@
   letter-spacing: -0.03em;
   margin-top: 12px;
   color: #3d2c2c;
-  text-shadow: 0 2px 16px rgba(255,239,159,0.8), 0 0 40px rgba(255,239,159,0.3);
+  text-shadow: 0 2px 16px rgba(246,240,215,0.8), 0 0 40px rgba(246,240,215,0.3);
 }
 
 .heroSub {
@@ -106,7 +106,7 @@
   letter-spacing: 0.08em;
   margin-top: 0;
   color: #3d2c2c;
-  text-shadow: 0 1px 10px rgba(255,239,159,0.7);
+  text-shadow: 0 1px 10px rgba(246,240,215,0.7);
 }
 
 .heroTagline {
@@ -116,15 +116,15 @@
   letter-spacing: 0.04em;
   margin-top: 4px;
   color: #3d2c2c;
-  text-shadow: 0 1px 8px rgba(255,239,159,0.6);
+  text-shadow: 0 1px 8px rgba(246,240,215,0.6);
 }
 
 .heroCta {
   margin-top: 20px;
   padding: 10px 32px;
   border-radius: 100px;
-  background: #E13F7C;
-  color: #fff;
+  background: #C5D89D;
+  color: #3d2c2c;
   font-size: clamp(13px, 1.2vw, 16px);
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -142,12 +142,12 @@
 
 @keyframes ctaPulse {
   0%, 100% { box-shadow: 4px 4px 8px rgba(0,0,0,0.10), inset 2px -2px 4px rgba(0,0,0,0.08), inset -2px 2px 4px rgba(255,255,255,0.3); }
-  50% { box-shadow: 4px 4px 8px rgba(0,0,0,0.10), inset 2px -2px 4px rgba(0,0,0,0.08), inset -2px 2px 4px rgba(255,255,255,0.3), 0 0 0 10px rgba(225,63,124,0.2); }
+   50% { box-shadow: 4px 4px 8px rgba(0,0,0,0.10), inset 2px -2px 4px rgba(0,0,0,0.08), inset -2px 2px 4px rgba(255,255,255,0.3), 0 0 0 10px rgba(197,216,157,0.2); }
 }
 
 /* ── Promo ── */
 .promo {
-  background: #FFE97D;
+  background: #F6F0D7;
   box-shadow:
     8px 10px 20px rgba(0,0,0,0.08),
     -3px -3px 10px rgba(255,255,255,0.7),
@@ -176,7 +176,7 @@
 
 .floatIcon {
   animation: iconSpin 6s linear infinite;
-  color: #E13F7C;
+  color: #C5D89D;
 }
 
 @keyframes iconSpin {
@@ -262,7 +262,7 @@
 
 /* ── Testimonial ── */
 .testi {
-  background: #FF537B;
+  background: #C5D89D;
   box-shadow:
     8px 10px 20px rgba(0,0,0,0.10),
     -3px -3px 10px rgba(255,255,255,0.4),
@@ -313,7 +313,7 @@
 
 /* ── Stat ── */
 .stat {
-  background: #E13F7C;
+  background: #C5D89D;
   box-shadow:
     8px 10px 20px rgba(0,0,0,0.12),
     -3px -3px 10px rgba(255,255,255,0.3),
@@ -372,7 +372,7 @@
 /* ── Bottom strip ── */
 .bottom {
   grid-column: 1 / -1;
-  background: #FFE97D;
+  background: #F6F0D7;
   min-height: 64px;
   border-radius: 24px;
   box-shadow:
@@ -409,7 +409,7 @@
 }
 
 .bottomIcon {
-  color: #E13F7C;
+  color: #C5D89D;
 }
 
 .bottomText {

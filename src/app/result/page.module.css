@@ -141,7 +141,7 @@
     size: auto;
   }
 
-  :global(body *) {
+  .workspace > :not(.printWrap) {
     visibility: hidden;
   }
 

@@ -36,10 +36,10 @@
   margin: 0 auto 16px;
 }
 
-.statIcon.blue { background: rgba(225, 63, 124, 0.1); color: #E13F7C; }
-.statIcon.green { background: rgba(52, 199, 89, 0.12); color: #34c759; }
-.statIcon.orange { background: rgba(255, 149, 0, 0.12); color: #ff9500; }
-.statIcon.purple { background: rgba(175, 82, 222, 0.12); color: #af52de; }
+.statIcon.blue { background: rgba(197, 216, 157, 0.12); color: #C5D89D; }
+.statIcon.green { background: rgba(154, 171, 132, 0.12); color: #9CAB84; }
+.statIcon.orange { background: rgba(137, 144, 109, 0.12); color: #89986D; }
+.statIcon.purple { background: rgba(197, 216, 157, 0.12); color: #C5D89D; }
 
 .statLabel {
   font-size: 13px;
@@ -113,7 +113,7 @@
   width: 100%;
   max-width: 48px;
   border-radius: 8px 8px 0 0;
-  background: linear-gradient(180deg, #E13F7C, rgba(225, 63, 124, 0.4));
+  background: linear-gradient(180deg, #C5D89D, rgba(197, 216, 157, 0.4));
   min-height: 4px;
   transition: all var(--transition-normal);
   animation: barGrow 0.8s ease-out backwards;
@@ -185,10 +185,10 @@
   flex-shrink: 0;
 }
 
-.quickLinkIcon.blue { background: rgba(225, 63, 124, 0.1); color: #E13F7C; }
-.quickLinkIcon.green { background: rgba(52, 199, 89, 0.12); color: #34c759; }
-.quickLinkIcon.orange { background: rgba(255, 149, 0, 0.12); color: #ff9500; }
-.quickLinkIcon.purple { background: rgba(175, 82, 222, 0.12); color: #af52de; }
+.quickLinkIcon.blue { background: rgba(197, 216, 157, 0.12); color: #C5D89D; }
+.quickLinkIcon.green { background: rgba(154, 171, 132, 0.12); color: #9CAB84; }
+.quickLinkIcon.orange { background: rgba(137, 144, 109, 0.12); color: #89986D; }
+.quickLinkIcon.purple { background: rgba(197, 216, 157, 0.12); color: #C5D89D; }
 
 .quickLinkText {
   font-weight: 600;
@@ -275,7 +275,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(225, 63, 124, 0.04);
+  background: rgba(197, 216, 157, 0.08);
 }
 
 .badge {
@@ -287,9 +287,9 @@
   letter-spacing: 0.03em;
 }
 
-.paid { background: rgba(52, 199, 89, 0.15); color: #34c759; }
-.pending { background: rgba(255, 149, 0, 0.15); color: #ff9500; }
-.completed { background: rgba(0, 122, 255, 0.15); color: #007aff; }
+.paid { background: rgba(154, 171, 132, 0.15); color: #9CAB84; }
+.pending { background: rgba(137, 144, 109, 0.15); color: #89986D; }
+.completed { background: rgba(197, 216, 157, 0.15); color: #C5D89D; }
 
 .emptyState {
   text-align: center;

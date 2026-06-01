@@ -27,7 +27,7 @@ export default function Home() {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    fetch('/api/transactions?limit=3')
+    fetch('/api/transactions/strips')
       .then((r) => r.json())
       .then((d) => {
         if (d.success) setRecentTx(d.data || []);

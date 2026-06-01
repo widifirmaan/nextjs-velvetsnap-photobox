@@ -83,7 +83,7 @@
   outline: none;
   border-color: var(--accent-color);
   box-shadow:
-    0 0 0 2px rgba(225, 63, 124, 0.15),
+    0 0 0 2px rgba(197, 216, 157, 0.25),
     inset 2px -2px 4px rgba(0,0,0,0.04),
     inset -2px 2px 4px rgba(255,255,255,0.8);
 }
@@ -179,7 +179,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(225, 63, 124, 0.04);
+  background: rgba(197, 216, 157, 0.08);
 }
 
 /* Template Preview Thumbnail */
@@ -224,7 +224,7 @@
 }
 
 .toggleSwitch.active {
-  background: #34c759;
+  background: #9CAB84;
 }
 
 .toggleSwitch.inactive {
@@ -257,7 +257,7 @@
 }
 
 .statusLabel.active {
-  color: #34c759;
+  color: #9CAB84;
 }
 
 .statusLabel.inactive {
@@ -291,11 +291,11 @@
 }
 
 .iconBtn:hover {
-  background: rgba(225, 63, 124, 0.08);
+  background: rgba(197, 216, 157, 0.15);
 }
 
 .iconBtn.danger:hover {
-  background: rgba(225, 63, 124, 0.1);
+  background: rgba(137, 144, 109, 0.15);
 }
 
 /* Loading */
@@ -314,15 +314,6 @@
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-:global(.spin) {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 @media (max-width: 768px) {
@@ -435,18 +426,18 @@
 .slotHighlight {
   position: absolute;
   border: 2px solid var(--accent-color);
-  background: rgba(225, 63, 124, 0.1);
+  background: rgba(197, 216, 157, 0.15);
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 10px rgba(225, 63, 124, 0.2);
+  box-shadow: 0 0 10px rgba(197, 216, 157, 0.3);
   transition: background var(--transition-fast);
 }
 
 .slotHighlight:hover {
-  background: rgba(225, 63, 124, 0.25);
-  border-color: #34c759;
+  background: rgba(197, 216, 157, 0.3);
+  border-color: #9CAB84;
 }
 
 .slotBadge {
@@ -504,8 +495,8 @@
 
 .activeSelection {
   position: absolute;
-  border: 2px dashed #34c759;
-  background: rgba(52, 199, 89, 0.15);
+  border: 2px dashed #9CAB84;
+  background: rgba(154, 171, 132, 0.15);
   border-radius: 4px;
   pointer-events: none;
 }

@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node node_modules/.bin/next dev --webpack",
+    "build": "node node_modules/.bin/next build",
+    "start": "node node_modules/.bin/next start",
     "lint": "eslint"
   },
   "dependencies": {
     "html-to-image": "^1.11.13",
+    "jimp": "^1.6.1",
     "lucide-react": "^1.17.0",
     "mongoose": "^9.6.3",
     "next": "16.2.6",
@@ -24,5 +25,9 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "sharp@0.34.5": true,
+    "unrs-resolver@1.12.2": true
   }
 }

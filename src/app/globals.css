@@ -1,13 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-primary: #FFEF9F;
-  --bg-secondary: #FFF5D6;
+  --bg-primary: #F6F0D7;
+  --bg-secondary: #F6F0D7;
   --text-primary: #3d2c2c;
-  --text-secondary: rgba(61,44,44,0.55);
-  --accent-color: #E13F7C;
-  --accent-hover: #c72e68;
-  --danger-color: #E13F7C;
+  --text-secondary: #9CAB84;
+  --accent-color: #C5D89D;
+  --accent-hover: #9CAB84;
+  --danger-color: #89986D;
 
   --clay-bg: #fff;
   --clay-shadow-outer: 8px 10px 20px rgba(0,0,0,0.08), -3px -3px 10px rgba(255,255,255,0.7);
@@ -44,7 +44,7 @@ body {
 
 .mac-button {
   background: var(--accent-color);
-  color: #fff;
+  color: #3d2c2c;
   border: none;
   border-radius: 14px;
   padding: 12px 24px;
@@ -121,4 +121,14 @@ body {
 
 .spin {
   animation: spin 1s linear infinite;
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .subtitle {
+    margin-bottom: 16px;
+  }
 }

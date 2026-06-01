@@ -45,7 +45,7 @@
 }
 
 .navLink:hover {
-  background: rgba(225, 63, 124, 0.08);
+  background: rgba(197, 216, 157, 0.15);
   color: var(--accent-color);
 }
 
