@@ -7,6 +7,44 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 0;
+}
+
+/* ── Carousel Track (CoverFlow) ── */
+.carouselTrack {
+  width: 100%;
+  max-width: 820px;
+  flex: 1;
+  min-height: 200px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  display: flex;
+  align-items: center;
+  padding: 0 38%;
+  perspective: 800px;
+  perspective-origin: center center;
+}
+
+.carouselTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.carouselSlide {
+  height: 85%;
+  width: auto;
+  flex-shrink: 0;
+  cursor: pointer;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  margin-left: -32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ── Stepper ── */
@@ -106,44 +144,12 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
 
-/* ── Filter ── */
-.filterRow {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.filterTab {
-  all: unset;
-  padding: 12px 28px;
-  border-radius: 24px;
-  border: 2px solid #e0e0e0;
-  font-size: 15px;
-  font-weight: 600;
-  color: #888;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-height: 48px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.filterTab:active {
-  transform: scale(0.96);
-}
-
-.filterTabActive {
-  background: #262626;
-  color: #fff;
-  border-color: #262626;
-}
 
 /* ── Carousel Track (CoverFlow) ── */
 .carouselTrack {
   width: 100%;
   max-width: 820px;
-  height: 460px;
+  height: 560px;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -160,7 +166,7 @@
 }
 
 .carouselSlide {
-  height: 80%;
+  height: 88%;
   width: auto;
   flex-shrink: 0;
   cursor: pointer;
@@ -345,26 +351,21 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .page {
-    padding: 24px 16px 32px;
+    padding: 20px 12px 24px;
   }
   .heading {
     font-size: 28px;
   }
   .carouselTrack {
-    height: 340px;
-    padding: 0 20%;
+    min-height: 260px;
+    padding: 0 12%;
   }
   .carouselSlide {
-    height: 70%;
-    margin-left: -20px;
+    height: 75%;
+    margin-left: -16px;
   }
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 14px;
-  }
-  .filterTab {
-    padding: 10px 20px;
-    font-size: 14px;
-    min-height: 44px;
   }
 }

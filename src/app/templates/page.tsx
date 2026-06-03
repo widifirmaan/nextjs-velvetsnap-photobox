@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { LayoutTemplate, Film, Newspaper, Loader2, ArrowLeft, Camera as CameraIcon, Check, Columns, Layout } from 'lucide-react';
+import { LayoutTemplate, Loader2, ArrowLeft, Camera as CameraIcon, Check, Columns, Layout } from 'lucide-react';
 import styles from './page.module.css';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
@@ -15,17 +15,6 @@ interface TemplateData {
   color: string;
   isActive: boolean;
   frameImage?: string;
-}
-
-const CATEGORIES = ['All', 'Classic', 'Modern', 'Playful'];
-
-function getCategory(templateId: string): string {
-  switch (templateId) {
-    case 't1': return 'Classic';
-    case 't2': return 'Modern';
-    case 't3': return 'Playful';
-    default:   return 'Classic';
-  }
 }
 
 function SlotDots({ count }: { count: number }) {
@@ -42,7 +31,6 @@ export default function TemplatesPage() {
   const router = useRouter();
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCat, setActiveCat] = useState('All');
   const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
 
   const trackRef = useRef<HTMLDivElement>(null);
@@ -66,13 +54,9 @@ export default function TemplatesPage() {
     router.push(`/booth?template=${id}`);
   }, [router]);
 
-  const filtered = activeCat === 'All'
-    ? templates
-    : templates.filter((t) => getCategory(t.templateId) === activeCat);
-
   const tripled = useMemo(
-    () => [...filtered, ...filtered, ...filtered],
-    [filtered]
+    () => [...templates, ...templates, ...templates],
+    [templates]
   );
 
   const updateTransforms = useCallback(() => {
@@ -107,14 +91,14 @@ export default function TemplatesPage() {
   }, []);
 
   useEffect(() => {
-    if (viewMode !== 'carousel' || !filtered.length) return;
-    slideRefs.current = filtered.map(() => null);
-  }, [filtered, viewMode]);
+    if (viewMode !== 'carousel' || !templates.length) return;
+    slideRefs.current = templates.map(() => null);
+  }, [templates, viewMode]);
 
   useEffect(() => {
     if (viewMode !== 'carousel') return;
     const c = trackRef.current;
-    if (!c || !filtered.length) return;
+    if (!c || !templates.length) return;
     requestAnimationFrame(() => {
       if (c.scrollWidth > c.clientWidth) {
         c.scrollLeft = c.scrollWidth / 3;
@@ -124,10 +108,10 @@ export default function TemplatesPage() {
       updateTransforms();
       return () => c.removeEventListener('scroll', onScroll);
     });
-  }, [updateTransforms, filtered.length, viewMode]);
+  }, [updateTransforms, templates.length, viewMode]);
 
   useEffect(() => {
-    if (viewMode !== 'carousel' || !filtered.length) return;
+    if (viewMode !== 'carousel' || !templates.length) return;
     const c = trackRef.current;
     if (!c || c.scrollWidth <= c.clientWidth) return;
     let running = true;
@@ -141,7 +125,7 @@ export default function TemplatesPage() {
     };
     autoRef.current = requestAnimationFrame(step);
     return () => { running = false; cancelAnimationFrame(autoRef.current); };
-  }, [filtered.length, viewMode]);
+  }, [templates.length, viewMode]);
 
   const stopAuto = useCallback(() => {
     cancelAnimationFrame(autoRef.current);
@@ -208,25 +192,12 @@ export default function TemplatesPage() {
         </button>
       </div>
 
-      {/* ── Filter ── */}
-      <div className={styles.filterRow}>
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            className={`${styles.filterTab} ${activeCat === cat ? styles.filterTabActive : ''}`}
-            onClick={() => setActiveCat(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
       {loading ? (
         <div className={styles.loadingWrap}>
           <Loader2 className="spin" size={40} color="#262626" />
         </div>
-      ) : filtered.length === 0 ? (
-        <p className={styles.empty}>Tidak ada template di kategori ini.</p>
+      ) : templates.length === 0 ? (
+        <p className={styles.empty}>Tidak ada template.</p>
       ) : viewMode === 'carousel' ? (
         /* ── Carousel / CoverFlow View ── */
         <div
@@ -260,7 +231,7 @@ export default function TemplatesPage() {
       ) : (
         /* ── Grid View ── */
         <div className={styles.grid}>
-          {filtered.map((t) => (
+          {templates.map((t) => (
             <button key={t._id} className={styles.card} onClick={() => handleSelect(t.templateId)}>
               <div className={styles.cardThumb}>
                 {t.frameImage ? (
