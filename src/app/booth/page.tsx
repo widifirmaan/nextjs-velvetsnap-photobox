@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, useRef, useCallback, useEffect } from 'react';
+import { Suspense, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import Webcam from 'react-webcam';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, Monitor, RotateCcw, X } from 'lucide-react';
@@ -197,6 +197,8 @@ function BoothContent() {
   const [keyedFrameImage, setKeyedFrameImage] = useState<string>('');
   const [frameRatio, setFrameRatio] = useState<number>(2 / 3);
 
+  const filledCount = useMemo(() => captures.filter((c) => c !== '').length, [captures]);
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem('velvetsnap_device_settings');
@@ -289,7 +291,7 @@ function BoothContent() {
 
   useEffect(() => {
     setPhotoAdjust(captures.map(() => ({ scale: 1, x: 0, y: 0 })));
-  }, [captures.length]);
+  }, [captures]);
 
   useEffect(() => {
     if (panSlot === null) return;
@@ -311,6 +313,18 @@ function BoothContent() {
 
   const [dslrCapturing, setDslrCapturing] = useState(false);
 
+  const addCapture = useCallback((url: string) => {
+    setCaptures((prev) => {
+      const idx = prev.findIndex((c) => c === '');
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = url;
+        return next;
+      }
+      return [...prev, url];
+    });
+  }, []);
+
   const capture = useCallback(async () => {
     if (cameraType === 'dslr') {
       setDslrCapturing(true);
@@ -318,7 +332,7 @@ function BoothContent() {
         const res = await fetch('/api/camera/capture', { method: 'POST' });
         const data = await res.json();
         if (data.success) {
-          setCaptures(prev => [...prev, data.dataUrl]);
+          addCapture(data.dataUrl);
         } else {
           alert('Gagal mengambil foto: ' + (data.error || 'Unknown error'));
         }
@@ -332,23 +346,23 @@ function BoothContent() {
       if (imageSrc) {
         if (mirrored) {
           flipImage(imageSrc).then((flipped) => {
-            setCaptures(prev => [...prev, flipped]);
+            addCapture(flipped);
           });
         } else {
-          setCaptures(prev => [...prev, imageSrc]);
+          addCapture(imageSrc);
         }
       }
     }
-  }, [webcamRef, cameraType, mirrored]);
+  }, [webcamRef, cameraType, mirrored, addCapture]);
 
   const startSession = () => {
     if (taking) return;
     setTaking(true);
-    takePhoto(slotsCount);
+    takePhoto(slotsCount - filledCount);
   };
 
   const handleManualCapture = async () => {
-    if (captures.length >= slotsCount) return;
+    if (filledCount >= slotsCount) return;
     const prevLen = captures.length;
     let timer = 3;
     setCountdown(timer);
@@ -368,7 +382,11 @@ function BoothContent() {
   };
 
   const handleDeleteCapture = (idx: number) => {
-    setCaptures((prev) => prev.filter((_, i) => i !== idx));
+    setCaptures((prev) => {
+      const next = [...prev];
+      next[idx] = '';
+      return next;
+    });
   };
 
   const takePhoto = (remaining: number) => {
@@ -588,7 +606,7 @@ function BoothContent() {
       </div>
 
       <p className="subtitle" style={{ marginTop: 0 }}>
-        {templateName} • {captures.length} / {slotsCount} shots
+        {templateName} • {filledCount} / {slotsCount} shots
         {cameraType === 'dslr' && ' • DSLR Mode'}
       </p>
 
@@ -677,7 +695,7 @@ function BoothContent() {
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
             />
           </div>
-          {captures.length === slotsCount && (
+          {filledCount === slotsCount && (
             <button className="mac-button" onClick={() => setStep('editor')} style={{ marginTop: '8px', padding: '10px 24px', fontSize: '14px', width: '100%' }}>
               <Check size={16} /> Proses & Lanjut ke Edit
             </button>
@@ -695,7 +713,7 @@ function BoothContent() {
             {captureMode === 'manual' ? (
               <button className="mac-button" onClick={handleManualCapture} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
                 <CameraIcon size={24} />
-                Capture ({captures.length}/{slotsCount})
+                Capture ({filledCount}/{slotsCount})
               </button>
             ) : (
               <button className="mac-button" onClick={startSession} style={{ padding: '16px 32px', fontSize: '20px', borderRadius: '32px' }}>
