@@ -180,7 +180,12 @@ export default function TemplatesPage() {
       </div>
 
       <div className={styles.headerRow}>
-        <h1 className={styles.heading}>Pilih Frame</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button className={styles.backBtn} onClick={() => router.back()}>
+            <ArrowLeft size={18} />
+          </button>
+          <h1 className={styles.heading}>Pilih Frame</h1>
+        </div>
         <div className={styles.toggleRow}>
           <button
             className={`${styles.toggleBtn} ${viewMode === 'carousel' ? styles.toggleActive : ''}`}
@@ -256,12 +261,6 @@ export default function TemplatesPage() {
           ))}
         </div>
       )}
-
-      <div className={styles.backWrap}>
-        <button className={styles.backBtn} onClick={() => router.back()}>
-          <ArrowLeft size={20} /> Kembali
-        </button>
-      </div>
     </div>
   );
 }
