@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Template from '@/models/Template';
-import { getOptimizedUrl } from '@/lib/cloudinary';
 
 export async function GET() {
   try {
@@ -10,9 +9,6 @@ export async function GET() {
 
     const data = templates.map((t) => {
       const obj = t.toObject();
-      if (obj.frameImage) {
-        obj.frameImage = getOptimizedUrl(obj.frameImage, 280);
-      }
       return {
         _id: obj._id,
         templateId: obj.templateId,
