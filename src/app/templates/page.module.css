@@ -114,6 +114,26 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
+/* ── Back ── */
+.backBtn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #262626;
+  cursor: pointer;
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  flex-shrink: 0;
+}
+
+.backBtn:active {
+  background: #f0f0f0;
+}
+
 /* ── Carousel Track (CoverFlow) ── */
 .carouselTrack {
   width: 100vw;
@@ -131,8 +151,8 @@
 
 @media (min-width: 769px) {
   .carouselTrack {
-    height: calc(100dvh - 130px);
-    min-height: 520px;
+    height: calc(100dvh - 150px);
+    min-height: 460px;
   }
   .carouselSlide {
     height: 95%;
@@ -153,10 +173,6 @@
   -webkit-backface-visibility: hidden;
   margin-left: -60px;
   -webkit-tap-highlight-color: transparent;
-}
-
-.carouselSlide:first-child {
-  margin-left: 0;
 }
 
 .carouselSlide:first-child {
@@ -209,6 +225,9 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
   width: 100%;
+  flex: 1;
+  align-content: start;
+  padding-bottom: 16px;
 }
 
 .card {
@@ -226,8 +245,6 @@
 
 .card:active {
   transform: scale(0.97);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  border-color: #262626;
 }
 
 .cardThumb {
@@ -284,62 +301,74 @@
 
 /* ── Loading ── */
 .loadingWrap {
+  flex: 1;
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 80px;
 }
 
 .empty {
-  text-align: center;
-  color: #888;
-  font-size: 15px;
-  padding: 40px;
-}
-
-/* ── Back (in header) ── */
-.backBtn {
-  all: unset;
-  display: inline-flex;
+  flex: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  color: #262626;
-  cursor: pointer;
-  transition: background 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  flex-shrink: 0;
-}
-
-.backBtn:active {
-  background: #f0f0f0;
+  color: #888;
+  font-size: 15px;
 }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .page {
-    padding: 10px 12px 12px;
+    padding: 16px 12px 8px;
   }
-  .heading {
-    font-size: 18px;
-  }
-  .carouselTrack {
-    min-height: 260px;
-    padding: 0 10%;
-  }
-  .carouselSlide {
-    height: 85%;
-    margin-left: -32px;
-  }
-  .grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 14px;
+  .stepper {
+    margin-bottom: 10px;
   }
   .stepLabel {
     display: none;
   }
   .stepLine {
     width: 16px;
+    margin: 0 6px;
+  }
+  .headerRow {
+    margin-bottom: 6px;
+  }
+  .heading {
+    font-size: 17px;
+  }
+  .toggleBtn {
+    padding: 6px 12px;
+    font-size: 12px;
+    min-height: 32px;
+  }
+  .carouselTrack {
+    padding: 0 10%;
+  }
+  .carouselSlide {
+    height: 88%;
+    margin-left: -40px;
+  }
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    padding-bottom: 8px;
+  }
+  .backBtn {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 12px 8px 6px;
+  }
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .carouselTrack {
+    padding: 0 6%;
   }
 }
