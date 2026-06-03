@@ -1,8 +1,8 @@
 /* ── Page Layout ── */
 .page {
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 24px 24px;
+  padding: 16px 24px 16px;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -10,71 +10,36 @@
   min-height: 0;
 }
 
-/* ── Carousel Track (CoverFlow) ── */
-.carouselTrack {
-  width: 100%;
-  max-width: 820px;
-  flex: 1;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  display: flex;
-  align-items: center;
-  padding: 0 20%;
-  perspective: 800px;
-  perspective-origin: center center;
-}
-
-.carouselTrack::-webkit-scrollbar {
-  display: none;
-}
-
-.carouselSlide {
-  height: 100%;
-  width: auto;
-  flex-shrink: 0;
-  cursor: pointer;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  margin-left: -32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  -webkit-tap-highlight-color: transparent;
-}
-
 /* ── Stepper ── */
 .stepper {
   display: flex;
   align-items: center;
   gap: 0;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .stepItem {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .stepNum {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 600;
+  font-size: 12px;
   background: #e8e8e8;
   color: #999;
   transition: all 0.25s;
 }
 
 .stepLabel {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   color: #999;
   transition: color 0.25s;
@@ -91,10 +56,10 @@
 }
 
 .stepLine {
-  width: 40px;
+  width: 28px;
   height: 2px;
   background: #ddd;
-  margin: 0 12px;
+  margin: 0 8px;
   transition: background 0.25s;
 }
 
@@ -102,18 +67,17 @@
   background: #262626;
 }
 
-/* ── Header Row (heading + toggle side by side) ── */
+/* ── Header Row ── */
 .headerRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 820px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .heading {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: -0.02em;
   margin: 0;
@@ -150,20 +114,20 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-
 /* ── Carousel Track (CoverFlow) ── */
 .carouselTrack {
-  width: 100%;
-  max-width: 820px;
-  height: 560px;
+  width: 100vw;
+  max-width: 1200px;
+  flex: 1;
+  min-height: 400px;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   display: flex;
   align-items: center;
-  padding: 0 38%;
-  perspective: 800px;
+  padding: 0 18%;
+  perspective: 1000px;
   perspective-origin: center center;
 }
 
@@ -172,18 +136,18 @@
 }
 
 .carouselSlide {
-  height: 88%;
+  height: 92%;
   width: auto;
   flex-shrink: 0;
   cursor: pointer;
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  margin-left: -32px;
+  margin-left: -40px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -194,9 +158,9 @@
 .carouselSlideInner {
   height: 100%;
   aspect-ratio: 2 / 3;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -240,7 +204,6 @@
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
   width: 100%;
-  max-width: 820px;
 }
 
 .card {
@@ -330,7 +293,7 @@
 
 /* ── Back ── */
 .backWrap {
-  margin-top: 8px;
+  margin-top: 6px;
 }
 
 .backBtn {
@@ -338,14 +301,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 18px;
+  padding: 6px 16px;
   border-radius: 12px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #888;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
-  min-height: 36px;
+  min-height: 32px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -357,19 +320,27 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .page {
-    padding: 12px 12px 16px;
+    padding: 10px 12px 12px;
   }
   .heading {
-    font-size: 20px;
+    font-size: 18px;
   }
   .carouselTrack {
-    padding: 0 8%;
+    min-height: 260px;
+    padding: 0 10%;
   }
   .carouselSlide {
-    margin-left: -16px;
+    height: 85%;
+    margin-left: -20px;
   }
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 14px;
+  }
+  .stepLabel {
+    display: none;
+  }
+  .stepLine {
+    width: 16px;
   }
 }
