@@ -3,7 +3,7 @@
 import { Suspense, useState, useRef, useCallback, useEffect } from 'react';
 import Webcam from 'react-webcam';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, Monitor, RotateCcw } from 'lucide-react';
+import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, Monitor, RotateCcw, X } from 'lucide-react';
 import styles from './page.module.css';
 
 interface ISlot {
@@ -365,15 +365,15 @@ function BoothContent() {
       }, 1000);
     });
     await capture();
-    if (prevLen + 1 >= slotsCount) {
-      setStep('editor');
-    }
+  };
+
+  const handleDeleteCapture = (idx: number) => {
+    setCaptures((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const takePhoto = (remaining: number) => {
     if (remaining === 0) {
       setTaking(false);
-      setStep('editor');
       return;
     }
     
@@ -652,11 +652,20 @@ function BoothContent() {
                   }}
                 >
                   {src && (
-                    <img
-                      src={src}
-                      alt=""
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                    />
+                    <>
+                      <img
+                        src={src}
+                        alt=""
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                      />
+                      <button
+                        className={styles.deleteSlot}
+                        onClick={() => handleDeleteCapture(idx)}
+                        aria-label="Hapus foto"
+                      >
+                        <X size={14} />
+                      </button>
+                    </>
                   )}
                 </div>
               );
@@ -738,6 +747,11 @@ function BoothContent() {
               </>
             )}
           </div>
+        )}
+        {captures.length === slotsCount && (
+          <button className="mac-button" onClick={() => setStep('editor')} style={{ marginTop: '12px', padding: '14px 40px', fontSize: '16px', width: '100%', maxWidth: '320px' }}>
+            <Check size={18} /> Proses & Lanjut ke Edit
+          </button>
         )}
       </div>
     </div>

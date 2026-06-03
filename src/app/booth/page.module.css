@@ -225,6 +225,37 @@
   transition: background 0.25s;
 }
 
+/* ── Delete slot button ── */
+.deleteSlot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 2;
+  padding: 0;
+}
+
+.liveStrip > [style*="position: absolute"]:hover .deleteSlot {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .deleteSlot {
+    opacity: 1;
+  }
+}
+
 .stepLineDone {
   background: #262626;
 }
