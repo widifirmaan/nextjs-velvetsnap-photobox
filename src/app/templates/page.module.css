@@ -32,7 +32,7 @@
 }
 
 .carouselSlide {
-  height: 96%;
+  height: calc(100dvh - 200px);
   width: auto;
   flex-shrink: 0;
   cursor: pointer;
@@ -368,7 +368,7 @@
     padding: 0 12%;
   }
   .carouselSlide {
-    height: 75%;
+    height: calc(100dvh - 180px);
     margin-left: -16px;
   }
   .grid {
