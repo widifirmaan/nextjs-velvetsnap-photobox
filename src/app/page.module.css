@@ -518,6 +518,17 @@
   margin-left: 0;
 }
 
+/* ── Mobile: flat slider (no CoverFlow) ── */
+@media (max-width: 768px) {
+  .fanTrack {
+    padding: 0 0;
+  }
+  .fanSlide {
+    margin-left: 0;
+    height: 95%;
+  }
+}
+
 /* ── Footer ── */
 .footer {
   width: 100%;

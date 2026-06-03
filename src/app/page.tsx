@@ -26,6 +26,8 @@ export default function Home() {
   const [dataReady, setDataReady] = useState(false);
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
+  const [smallViewport, setSmallViewport] = useState(false);
+  const smallVpRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLImageElement | null)[]>([]);
@@ -33,6 +35,17 @@ export default function Home() {
   const tripled = [...strips.slice(0, 4), ...strips.slice(0, 4), ...strips.slice(0, 4)];
 
   const ready = imagesReady && dataReady;
+
+  useEffect(() => {
+    const check = () => {
+      const v = window.innerWidth < 768;
+      setSmallViewport(v);
+      smallVpRef.current = v;
+    };
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   useEffect(() => {
     let pending = 3;
@@ -80,6 +93,18 @@ export default function Home() {
   const updateTransforms = useCallback(() => {
     const c = trackRef.current;
     if (!c) return;
+
+    if (smallVpRef.current) {
+      // Mobile: flat slider — no CoverFlow transforms
+      slideRefs.current.forEach((el) => {
+        if (!el) return;
+        el.style.transform = '';
+        el.style.zIndex = '';
+        el.style.opacity = '1';
+      });
+      return;
+    }
+
     const cx = c.scrollLeft + c.clientWidth / 2;
 
     slideRefs.current.forEach((el) => {
