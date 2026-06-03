@@ -22,19 +22,33 @@ export default function Home() {
   const [slideIdx, setSlideIdx] = useState(0);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [strips, setStrips] = useState<StripResult[]>([]);
+  const [imagesReady, setImagesReady] = useState(false);
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLImageElement | null)[]>([]);
-  const stripWidthRef = useRef(0);
 
   const tripled = [...strips, ...strips, ...strips];
 
   useEffect(() => {
     fetch('/api/transactions/strips')
       .then((r) => r.json())
-      .then((res) => { if (res.success) setStrips(res.data); })
+      .then((res) => {
+        if (res.success) {
+          setStrips(res.data);
+          // Preload images before enabling marquee
+          const imgs = res.data.map((s: StripResult) => {
+            return new Promise<void>((resolve) => {
+              const img = new window.Image();
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+              img.src = s.finalImage;
+            });
+          });
+          Promise.all(imgs).then(() => setImagesReady(true));
+        }
+      })
       .catch(() => {});
     fetch('/api/transactions')
       .then((r) => r.json())
@@ -91,65 +105,40 @@ export default function Home() {
 
   useEffect(() => {
     const c = trackRef.current;
-    if (!c || !strips.length) return;
+    if (!c || !strips.length || !imagesReady) return;
 
-    // Wait for images to load before initializing scroll
-    let attempts = 0;
-    const tryInit = () => {
+    let cleanup: (() => void) | null = null;
+
+    // Initialize scroll to middle set (works now because images are loaded)
+    requestAnimationFrame(() => {
       if (c.scrollWidth > c.clientWidth) {
-        const oneSet = c.scrollWidth / 3;
-        c.scrollLeft = oneSet;
-        const onScroll = () => requestAnimationFrame(updateTransforms);
-        c.addEventListener('scroll', onScroll, { passive: true });
-        requestAnimationFrame(updateTransforms);
-        // Store cleanup
-        (c as any).__scrollCleanup = () => c.removeEventListener('scroll', onScroll);
-      } else if (attempts < 30) {
-        attempts++;
-        requestAnimationFrame(tryInit);
-      }
-    };
-    tryInit();
-
-    // Also watch for resize/content changes
-    const ro = new ResizeObserver(() => {
-      if (c.scrollWidth > c.clientWidth && !c.scrollLeft) {
         c.scrollLeft = c.scrollWidth / 3;
-        requestAnimationFrame(updateTransforms);
       }
+      const onScroll = () => requestAnimationFrame(updateTransforms);
+      c.addEventListener('scroll', onScroll, { passive: true });
+      cleanup = () => c.removeEventListener('scroll', onScroll);
+      updateTransforms();
     });
-    ro.observe(c);
 
     return () => {
-      ro.disconnect();
-      if ((c as any).__scrollCleanup) (c as any).__scrollCleanup();
+      if (cleanup) cleanup();
     };
-  }, [updateTransforms, strips.length]);
+  }, [updateTransforms, strips.length, imagesReady]);
 
   const autoRef = useRef<number>(0);
   const resumeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const startAutoScroll = useCallback(() => {
     const c = trackRef.current;
-    if (!c) return;
-
-    let retries = 0;
-    const tryStart = () => {
-      if (c.scrollWidth > c.clientWidth) {
-        const step = () => {
-          const oneSet = c.scrollWidth / 3;
-          c.scrollLeft += 0.8;
-          if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
-          else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
-          autoRef.current = requestAnimationFrame(step);
-        };
-        autoRef.current = requestAnimationFrame(step);
-      } else if (retries < 30) {
-        retries++;
-        requestAnimationFrame(tryStart);
-      }
+    if (!c || c.scrollWidth <= c.clientWidth) return;
+    const step = () => {
+      const oneSet = c.scrollWidth / 3;
+      c.scrollLeft += 0.8;
+      if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
+      else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+      autoRef.current = requestAnimationFrame(step);
     };
-    requestAnimationFrame(tryStart);
+    autoRef.current = requestAnimationFrame(step);
   }, []);
 
   const stopAutoScroll = useCallback(() => {
@@ -167,9 +156,10 @@ export default function Home() {
   }, [startAutoScroll]);
 
   useEffect(() => {
+    if (!imagesReady || !strips.length) return;
     startAutoScroll();
     return () => { cancelAnimationFrame(autoRef.current); clearTimeout(resumeTimer.current); };
-  }, [startAutoScroll]);
+  }, [startAutoScroll, imagesReady, strips.length]);
 
   return (
     <div className={styles.page}>
