@@ -92,12 +92,38 @@ export default function Home() {
   useEffect(() => {
     const c = trackRef.current;
     if (!c || !strips.length) return;
-    const oneSet = c.scrollWidth / 3;
-    c.scrollLeft = oneSet;
-    const onScroll = () => requestAnimationFrame(updateTransforms);
-    c.addEventListener('scroll', onScroll, { passive: true });
-    requestAnimationFrame(updateTransforms);
-    return () => c.removeEventListener('scroll', onScroll);
+
+    // Wait for images to load before initializing scroll
+    let attempts = 0;
+    const tryInit = () => {
+      if (c.scrollWidth > c.clientWidth) {
+        const oneSet = c.scrollWidth / 3;
+        c.scrollLeft = oneSet;
+        const onScroll = () => requestAnimationFrame(updateTransforms);
+        c.addEventListener('scroll', onScroll, { passive: true });
+        requestAnimationFrame(updateTransforms);
+        // Store cleanup
+        (c as any).__scrollCleanup = () => c.removeEventListener('scroll', onScroll);
+      } else if (attempts < 30) {
+        attempts++;
+        requestAnimationFrame(tryInit);
+      }
+    };
+    tryInit();
+
+    // Also watch for resize/content changes
+    const ro = new ResizeObserver(() => {
+      if (c.scrollWidth > c.clientWidth && !c.scrollLeft) {
+        c.scrollLeft = c.scrollWidth / 3;
+        requestAnimationFrame(updateTransforms);
+      }
+    });
+    ro.observe(c);
+
+    return () => {
+      ro.disconnect();
+      if ((c as any).__scrollCleanup) (c as any).__scrollCleanup();
+    };
   }, [updateTransforms, strips.length]);
 
   const autoRef = useRef<number>(0);
@@ -106,14 +132,24 @@ export default function Home() {
   const startAutoScroll = useCallback(() => {
     const c = trackRef.current;
     if (!c) return;
-    const step = () => {
-      const oneSet = c.scrollWidth / 3;
-      c.scrollLeft += 0.8;
-      if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
-      else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
-      autoRef.current = requestAnimationFrame(step);
+
+    let retries = 0;
+    const tryStart = () => {
+      if (c.scrollWidth > c.clientWidth) {
+        const step = () => {
+          const oneSet = c.scrollWidth / 3;
+          c.scrollLeft += 0.8;
+          if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
+          else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+          autoRef.current = requestAnimationFrame(step);
+        };
+        autoRef.current = requestAnimationFrame(step);
+      } else if (retries < 30) {
+        retries++;
+        requestAnimationFrame(tryStart);
+      }
     };
-    autoRef.current = requestAnimationFrame(step);
+    requestAnimationFrame(tryStart);
   }, []);
 
   const stopAutoScroll = useCallback(() => {
