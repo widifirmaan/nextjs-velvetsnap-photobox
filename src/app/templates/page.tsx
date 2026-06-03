@@ -221,10 +221,6 @@ export default function TemplatesPage() {
                   <LayoutTemplate size={40} style={{ color: t.color }} />
                 )}
               </div>
-              <div className={styles.carouselSlideLabel}>
-                <span className={styles.carouselSlideName}>{t.name}</span>
-                <span className={styles.carouselSlidePrice}>Rp{(t.price || 0).toLocaleString('id-ID')}</span>
-              </div>
             </div>
           ))}
         </div>

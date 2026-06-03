@@ -151,12 +151,12 @@
   will-change: transform, opacity;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
-  margin-left: -40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  margin-left: -60px;
   -webkit-tap-highlight-color: transparent;
+}
+
+.carouselSlide:first-child {
+  margin-left: 0;
 }
 
 .carouselSlide:first-child {
@@ -339,7 +339,7 @@
   }
   .carouselSlide {
     height: 85%;
-    margin-left: -20px;
+    margin-left: -32px;
   }
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
