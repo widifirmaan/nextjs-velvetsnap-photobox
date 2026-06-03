@@ -677,6 +677,11 @@ function BoothContent() {
             />
           </div>
         )}
+        {captures.length === slotsCount && (
+          <button className="mac-button" onClick={() => setStep('editor')} style={{ marginTop: '8px', padding: '14px 40px', fontSize: '16px', width: '100%', maxWidth: '320px' }}>
+            <Check size={18} /> Proses & Lanjut ke Edit
+          </button>
+        )}
       </div>
 
       <div className={styles.captureBtnWrap}>
@@ -747,11 +752,6 @@ function BoothContent() {
               </>
             )}
           </div>
-        )}
-        {captures.length === slotsCount && (
-          <button className="mac-button" onClick={() => setStep('editor')} style={{ marginTop: '12px', padding: '14px 40px', fontSize: '16px', width: '100%', maxWidth: '320px' }}>
-            <Check size={18} /> Proses & Lanjut ke Edit
-          </button>
         )}
       </div>
     </div>
