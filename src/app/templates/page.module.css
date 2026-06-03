@@ -118,8 +118,6 @@
 .carouselTrack {
   width: 100vw;
   max-width: 1200px;
-  flex: 1;
-  min-height: 400px;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -129,6 +127,16 @@
   padding: 0 18%;
   perspective: 1000px;
   perspective-origin: center center;
+}
+
+@media (min-width: 769px) {
+  .carouselTrack {
+    height: calc(100dvh - 130px);
+    min-height: 520px;
+  }
+  .carouselSlide {
+    height: 95%;
+  }
 }
 
 .carouselTrack::-webkit-scrollbar {
