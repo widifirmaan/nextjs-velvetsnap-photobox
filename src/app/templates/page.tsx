@@ -174,22 +174,22 @@ export default function TemplatesPage() {
         </div>
       </div>
 
-      <h1 className={styles.heading}>Pilih Frame</h1>
-
-      {/* ── View Toggle ── */}
-      <div className={styles.toggleRow}>
-        <button
-          className={`${styles.toggleBtn} ${viewMode === 'carousel' ? styles.toggleActive : ''}`}
-          onClick={() => setViewMode('carousel')}
-        >
-          <Layout size={18} /> Carousel
-        </button>
-        <button
-          className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.toggleActive : ''}`}
-          onClick={() => setViewMode('grid')}
-        >
-          <Columns size={18} /> Grid
-        </button>
+      <div className={styles.headerRow}>
+        <h1 className={styles.heading}>Pilih Frame</h1>
+        <div className={styles.toggleRow}>
+          <button
+            className={`${styles.toggleBtn} ${viewMode === 'carousel' ? styles.toggleActive : ''}`}
+            onClick={() => setViewMode('carousel')}
+          >
+            <Layout size={16} /> Carousel
+          </button>
+          <button
+            className={`${styles.toggleBtn} ${viewMode === 'grid' ? styles.toggleActive : ''}`}
+            onClick={() => setViewMode('grid')}
+          >
+            <Columns size={16} /> Grid
+          </button>
+        </div>
       </div>
 
       {loading ? (
