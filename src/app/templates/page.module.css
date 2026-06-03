@@ -7,7 +7,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 0;
+  overflow: hidden;
 }
 
 /* ── Stepper ── */
@@ -228,6 +228,7 @@
   flex: 1;
   align-content: start;
   padding-bottom: 16px;
+  overflow-y: auto;
 }
 
 .card {
