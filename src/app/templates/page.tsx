@@ -77,8 +77,8 @@ export default function TemplatesPage() {
       } else if (abs < 1) {
         const t = (abs - 0.5) / 0.5;
         rotY = sign * 5;
-        scale = 0.88 - t * 0.15;
-        zIdx = 40 - t * 15;
+        scale = 0.94 - t * 0.21;
+        zIdx = 50 - t * 35;
       } else {
         rotY = sign * 5;
         scale = 0.73;
