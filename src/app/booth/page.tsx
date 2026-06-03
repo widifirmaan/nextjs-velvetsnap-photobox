@@ -634,7 +634,8 @@ function BoothContent() {
         )}
 
         {dbTemplate && dbTemplate.frameImage && dbTemplate.slotsLayout && (
-          <div className={styles.liveStrip} style={{ aspectRatio: frameRatio }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
+            <div className={styles.liveStrip} style={{ aspectRatio: frameRatio }}>
             {(dbTemplate.slotsLayout || []).map((slot, idx) => {
               const src = captures[idx];
               return (
@@ -676,12 +677,13 @@ function BoothContent() {
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
             />
           </div>
-        )}
-        {captures.length === slotsCount && (
-          <button className="mac-button" onClick={() => setStep('editor')} style={{ marginTop: '8px', padding: '14px 40px', fontSize: '16px', width: '100%', maxWidth: '320px' }}>
-            <Check size={18} /> Proses & Lanjut ke Edit
-          </button>
-        )}
+          {captures.length === slotsCount && (
+            <button className="mac-button" onClick={() => setStep('editor')} style={{ marginTop: '8px', padding: '10px 24px', fontSize: '14px', width: '100%' }}>
+              <Check size={16} /> Proses & Lanjut ke Edit
+            </button>
+          )}
+        </div>
+      )}
       </div>
 
       <div className={styles.captureBtnWrap}>
