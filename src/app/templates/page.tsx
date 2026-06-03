@@ -62,7 +62,7 @@ export default function TemplatesPage() {
   return (
     <div className="page-container">
       {/* ── Stepper ── */}
-      <div className={styles.stepper}>
+      <div className={styles.stepper} style={{ justifyContent: 'center', alignSelf: 'center' }}>
         <div className={`${styles.stepItem} ${styles.stepActive}`}>
           <span className={styles.stepNum}><LayoutTemplate size={14} /></span>
           <span className={styles.stepLabel}>Template</span>
