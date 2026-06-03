@@ -23,21 +23,26 @@ export default function Home() {
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [strips, setStrips] = useState<StripResult[]>([]);
   const [imagesReady, setImagesReady] = useState(false);
+  const [dataReady, setDataReady] = useState(false);
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLImageElement | null)[]>([]);
 
-  const tripled = [...strips, ...strips, ...strips];
+  const tripled = [...strips.slice(0, 4), ...strips.slice(0, 4), ...strips.slice(0, 4)];
+
+  const ready = imagesReady && dataReady;
 
   useEffect(() => {
+    let pending = 3;
+    const done = () => { pending--; if (pending <= 0) setDataReady(true); };
+
     fetch('/api/transactions/strips')
       .then((r) => r.json())
       .then((res) => {
         if (res.success) {
           setStrips(res.data);
-          // Preload images before enabling marquee
           const imgs = res.data.map((s: StripResult) => {
             return new Promise<void>((resolve) => {
               const img = new window.Image();
@@ -49,15 +54,18 @@ export default function Home() {
           Promise.all(imgs).then(() => setImagesReady(true));
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(done);
     fetch('/api/transactions')
       .then((r) => r.json())
       .then((res) => { if (res.success) setTxCount(res.pagination.total); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(done);
     fetch('/api/templates')
       .then((r) => r.json())
       .then((res) => { if (res.success) setTmplCount(res.data.length); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(done);
   }, []);
 
   useEffect(() => {
@@ -162,7 +170,26 @@ export default function Home() {
   }, [startAutoScroll, imagesReady, strips.length]);
 
   return (
-    <div className={styles.page}>
+    <>
+      {/* ── Fullscreen Preloader ── */}
+      <div className={`${styles.preloader} ${ready ? styles.preloaderHide : ''}`}>
+        <div className={styles.preloaderInner}>
+          <svg width="64" height="64" viewBox="0 0 56 56" fill="none" className={styles.preloaderLogo}>
+            <rect x="4" y="12" width="48" height="34" rx="8" fill="#262626" />
+            <circle cx="28" cy="29" r="11" fill="#fff" />
+            <circle cx="28" cy="29" r="7" fill="#262626" />
+            <rect x="39" y="8" width="12" height="4" rx="2" fill="#262626" />
+            <path d="M48 18l4-2" stroke="#262626" strokeWidth="2" strokeLinecap="round" />
+            <path d="M18 8l-3 4" stroke="#262626" strokeWidth="2.5" strokeLinecap="round" />
+            <circle cx="18" cy="6" r="1.5" fill="#262626" />
+          </svg>
+          <span className={styles.preloaderTitle}>VelvetSnap</span>
+          <span className={styles.preloaderSub}>Photo Booth Jakarta</span>
+          <div className={styles.preloaderSpinner} />
+        </div>
+      </div>
+
+      <div className={styles.page}>
       {/* ── Header / Navigation ── */}
       <header className={styles.header}>
         <div
@@ -331,5 +358,6 @@ export default function Home() {
         </p>
       </footer>
     </div>
+    </>
   );
 }
