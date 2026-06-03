@@ -151,20 +151,82 @@
 
 .countdownOverlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; right: 0; bottom: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 160px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 96px;
   font-weight: 700;
-  color: white;
-  text-shadow: 0 4px 24px rgba(0,0,0,0.5);
-  background: rgba(0,0,0,0.2);
-  backdrop-filter: blur(2px);
-  animation: pulse 1s infinite;
+  z-index: 10;
+}
+
+/* ── Stepper ── */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepNum {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  background: #e8e8e8;
+  color: #999;
+  transition: all 0.25s;
+}
+
+.stepLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #999;
+  letter-spacing: 0.02em;
+  transition: color 0.25s;
+}
+
+.stepActive .stepNum {
+  background: #262626;
+  color: #fff;
+}
+
+.stepActive .stepLabel {
+  color: #262626;
+  font-weight: 600;
+}
+
+.stepDone .stepNum {
+  background: #262626;
+  color: #fff;
+}
+
+.stepDone .stepLabel {
+  color: #555;
+}
+
+.stepLine {
+  width: 32px;
+  height: 1.5px;
+  background: #ddd;
+  margin: 0 10px;
+  transition: background 0.25s;
+}
+
+.stepLineDone {
+  background: #262626;
 }
 
 @keyframes pulse {

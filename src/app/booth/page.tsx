@@ -569,8 +569,25 @@ function BoothContent() {
 
   return (
     <div className="page-container" style={{ alignItems: 'center' }}>
-      <h1 className="title" style={{ marginBottom: '8px' }}>Get Ready</h1>
-      <p className="subtitle">
+      {/* ── Stepper ── */}
+      <div className={styles.stepper}>
+        <div className={`${styles.stepItem} ${step === 'camera' ? styles.stepActive : styles.stepDone}`}>
+          <span className={styles.stepNum}><CameraIcon size={14} /></span>
+          <span className={styles.stepLabel}>Photo</span>
+        </div>
+        <div className={`${styles.stepLine} ${step !== 'camera' ? styles.stepLineDone : ''}`} />
+        <div className={`${styles.stepItem} ${step === 'camera' ? '' : styles.stepActive}`}>
+          <span className={styles.stepNum}><Check size={14} /></span>
+          <span className={styles.stepLabel}>Edit</span>
+        </div>
+        <div className={styles.stepLine} />
+        <div className={styles.stepItem}>
+          <span className={styles.stepNum}><CameraIcon size={14} /></span>
+          <span className={styles.stepLabel}>Pay</span>
+        </div>
+      </div>
+
+      <p className="subtitle" style={{ marginTop: 0 }}>
         {templateName} • {captures.length} / {slotsCount} shots
         {cameraType === 'dslr' && ' • DSLR Mode'}
       </p>
