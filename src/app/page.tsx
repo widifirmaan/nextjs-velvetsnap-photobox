@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Camera, Sparkles, Heart, MapPin, ExternalLink, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Camera, Sparkles, Heart, MapPin, ExternalLink, MessageCircle } from 'lucide-react';
 import styles from './page.module.css';
 
 const SAMPLE_IMAGES = [
@@ -69,41 +69,25 @@ export default function Home() {
 
       let rotY, scale, zIdx;
       if (abs < 0.5) {
-        rotY = sign * abs * 50;
-        scale = 1 - abs * 0.18;
+        rotY = sign * abs * 10;
+        scale = 1 - abs * 0.12;
         zIdx = 50;
       } else if (abs < 1) {
         const t = (abs - 0.5) / 0.5;
-        rotY = sign * (25 + t * 35);
-        scale = 0.82 - t * 0.2;
-        zIdx = 40 - t * 20;
+        rotY = sign * 5;
+        scale = 0.88 - t * 0.15;
+        zIdx = 40 - t * 15;
       } else {
-        rotY = sign * 60;
-        scale = 0.62;
-        zIdx = 10;
+        rotY = sign * 5;
+        scale = 0.73;
+        zIdx = 15;
       }
 
       el.style.transform = `perspective(700px) rotateY(${rotY}deg) scale(${scale})`;
       el.style.zIndex = Math.round(zIdx).toString();
       el.style.opacity = String(Math.max(0.1, 1 - abs * 0.55));
     });
-
-    if (strips.length) {
-      const oneSet = c.scrollWidth / 3;
-      if (c.scrollLeft < oneSet * 0.3) {
-        c.scrollLeft = c.scrollLeft + oneSet;
-      } else if (c.scrollLeft > oneSet * 2.7) {
-        c.scrollLeft = c.scrollLeft - oneSet;
-      }
-    }
-  }, [strips.length]);
-
-  const navSlide = useCallback((dir: number) => {
-    const c = trackRef.current;
-    if (!c || !strips.length) return;
-    const sw = c.scrollWidth / (strips.length * 3);
-    c.scrollBy({ left: dir * sw, behavior: 'smooth' });
-  }, [strips.length]);
+  }, []);
 
   useEffect(() => {
     const c = trackRef.current;
@@ -115,6 +99,41 @@ export default function Home() {
     requestAnimationFrame(updateTransforms);
     return () => c.removeEventListener('scroll', onScroll);
   }, [updateTransforms, strips.length]);
+
+  const autoRef = useRef<number>(0);
+  const resumeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  const startAutoScroll = useCallback(() => {
+    const c = trackRef.current;
+    if (!c) return;
+    const step = () => {
+      const oneSet = c.scrollWidth / 3;
+      c.scrollLeft += 0.8;
+      if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
+      else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+      autoRef.current = requestAnimationFrame(step);
+    };
+    autoRef.current = requestAnimationFrame(step);
+  }, []);
+
+  const stopAutoScroll = useCallback(() => {
+    cancelAnimationFrame(autoRef.current);
+    clearTimeout(resumeTimer.current);
+  }, []);
+
+  const handleUserInteract = useCallback(() => {
+    stopAutoScroll();
+  }, [stopAutoScroll]);
+
+  const scheduleResume = useCallback(() => {
+    clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(startAutoScroll, 3000);
+  }, [startAutoScroll]);
+
+  useEffect(() => {
+    startAutoScroll();
+    return () => { cancelAnimationFrame(autoRef.current); clearTimeout(resumeTimer.current); };
+  }, [startAutoScroll]);
 
   return (
     <div className={styles.page}>
@@ -235,11 +254,13 @@ export default function Home() {
         {/* Right column — Strips scroll */}
         <div className={styles.colRight}>
           {strips.length > 0 ? (
-            <div className={styles.fanWrap}>
-              <button className={styles.fanArrow} onClick={() => navSlide(-1)} aria-label="Previous">
-                <ChevronLeft size={22} />
-              </button>
-              <div ref={trackRef} className={styles.fanTrack}>
+            <div
+              ref={trackRef}
+              className={styles.fanTrack}
+              onPointerDown={() => handleUserInteract()}
+              onPointerUp={() => scheduleResume()}
+              onPointerLeave={() => scheduleResume()}
+            >
                 {tripled.map((s, i) => (
                   <img
                     key={`${s._id}-${i}`}
@@ -251,10 +272,6 @@ export default function Home() {
                   />
                 ))}
               </div>
-              <button className={styles.fanArrow} onClick={() => navSlide(1)} aria-label="Next">
-                <ChevronRight size={22} />
-              </button>
-            </div>
           ) : (
             <div className={styles.rightEmpty}>
               <Camera size={32} />

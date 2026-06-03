@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import mongoose from 'mongoose';
+import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/cloudinary';
 
 export async function GET(req: Request) {
   try {
@@ -105,6 +106,21 @@ export async function POST(req: Request) {
       captures: captures || [],
       finalImage: finalImage || '',
     });
+
+    // Upload images to Cloudinary (async, non-blocking)
+    if (finalImage && isBase64(finalImage)) {
+      uploadBase64(finalImage, 'velvetsnap/final').then((url) => {
+        Transaction.updateOne({ _id: tx._id }, { $set: { finalImage: url } }).catch(() => {});
+      }).catch(() => {});
+    }
+    if (captures?.length) {
+      const b64Captures = captures.filter(isBase64);
+      if (b64Captures.length) {
+        uploadBase64Array(b64Captures, 'velvetsnap/captures').then((urls) => {
+          Transaction.updateOne({ _id: tx._id }, { $set: { captures: urls } }).catch(() => {});
+        }).catch(() => {});
+      }
+    }
 
     return NextResponse.json({ success: true, transaction: tx });
   } catch (error: any) {

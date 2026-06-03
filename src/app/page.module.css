@@ -414,21 +414,12 @@
 }
 
 /* ── Fan Strips Layout ── */
-.fanWrap {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  width: 100%;
-  height: 100%;
-}
-
 .fanTrack {
   flex: 1;
   height: 90%;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x mandatory;
   scrollbar-width: none;
   display: flex;
   align-items: center;
@@ -449,7 +440,6 @@
   object-fit: contain;
   border-radius: 8px;
   flex-shrink: 0;
-  scroll-snap-align: center;
   will-change: transform, opacity;
   filter: drop-shadow(0 6px 20px rgba(0,0,0,0.12));
   user-select: none;
@@ -461,31 +451,6 @@
 
 .fanSlide:first-child {
   margin-left: 0;
-}
-
-.fanArrow {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--mn-border);
-  background: var(--mn-card);
-  color: var(--mn-text);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  z-index: 10;
-}
-
-.fanArrow:hover {
-  background: var(--mn-hover);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
-
-.fanArrow:active {
-  transform: scale(0.95);
 }
 
 /* ── Footer ── */
