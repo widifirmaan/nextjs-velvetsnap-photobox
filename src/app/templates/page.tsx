@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { LayoutTemplate, Film, Newspaper, Loader2, ArrowLeft } from 'lucide-react';
+import { LayoutTemplate, Film, Newspaper, Loader2, ArrowLeft, Camera as CameraIcon, Check } from 'lucide-react';
 import styles from './page.module.css';
 import { useState, useEffect } from 'react';
 
@@ -61,7 +61,30 @@ export default function TemplatesPage() {
 
   return (
     <div className="page-container">
-      <h1 className="title" style={{ marginTop: '20px' }}>Choose a Template</h1>
+      {/* ── Stepper ── */}
+      <div className={styles.stepper}>
+        <div className={`${styles.stepItem} ${styles.stepActive}`}>
+          <span className={styles.stepNum}><LayoutTemplate size={14} /></span>
+          <span className={styles.stepLabel}>Template</span>
+        </div>
+        <div className={styles.stepLine} />
+        <div className={styles.stepItem}>
+          <span className={styles.stepNum}><CameraIcon size={14} /></span>
+          <span className={styles.stepLabel}>Photo</span>
+        </div>
+        <div className={styles.stepLine} />
+        <div className={styles.stepItem}>
+          <span className={styles.stepNum}><Check size={14} /></span>
+          <span className={styles.stepLabel}>Edit</span>
+        </div>
+        <div className={styles.stepLine} />
+        <div className={styles.stepItem}>
+          <span className={styles.stepNum}><CameraIcon size={14} /></span>
+          <span className={styles.stepLabel}>Pay</span>
+        </div>
+      </div>
+
+      <h1 className="title" style={{ marginTop: '4px' }}>Choose a Template</h1>
       <p className="subtitle">Select your aesthetic frame style</p>
       
       {loading ? (

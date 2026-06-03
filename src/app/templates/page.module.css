@@ -141,3 +141,70 @@
   }
 }
 
+/* ── Stepper ── */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 24px;
+}
+
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepNum {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  background: #e8e8e8;
+  color: #999;
+  transition: all 0.25s;
+}
+
+.stepLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #999;
+  letter-spacing: 0.02em;
+  transition: color 0.25s;
+}
+
+.stepActive .stepNum {
+  background: #262626;
+  color: #fff;
+}
+
+.stepActive .stepLabel {
+  color: #262626;
+  font-weight: 600;
+}
+
+.stepDone .stepNum {
+  background: #262626;
+  color: #fff;
+}
+
+.stepDone .stepLabel {
+  color: #555;
+}
+
+.stepLine {
+  width: 32px;
+  height: 1.5px;
+  background: #ddd;
+  margin: 0 10px;
+  transition: background 0.25s;
+}
+
+.stepLineDone {
+  background: #262626;
+}
+
