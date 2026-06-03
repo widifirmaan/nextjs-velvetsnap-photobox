@@ -1,8 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
-import { Camera, Sparkles, Star, Heart, Zap } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Camera, Sparkles, Heart, MapPin, ExternalLink, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './page.module.css';
 
 const SAMPLE_IMAGES = [
@@ -13,27 +12,38 @@ const SAMPLE_IMAGES = [
   'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&q=80',
 ];
 
-interface Transaction {
+interface StripResult {
   _id: string;
   sessionId: string;
   finalImage: string;
 }
 
 export default function Home() {
-  const router = useRouter();
   const [slideIdx, setSlideIdx] = useState(0);
-  const [recentTx, setRecentTx] = useState<Transaction[]>([]);
-  const [txLoaded, setTxLoaded] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [strips, setStrips] = useState<StripResult[]>([]);
+  const [txCount, setTxCount] = useState(0);
+  const [tmplCount, setTmplCount] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const stripWidthRef = useRef(0);
+
+  const tripled = [...strips, ...strips, ...strips];
 
   useEffect(() => {
     fetch('/api/transactions/strips')
       .then((r) => r.json())
-      .then((d) => {
-        if (d.success) setRecentTx(d.data || []);
-      })
-      .catch(() => {})
-      .finally(() => setTxLoaded(true));
+      .then((res) => { if (res.success) setStrips(res.data); })
+      .catch(() => {});
+    fetch('/api/transactions')
+      .then((r) => r.json())
+      .then((res) => { if (res.success) setTxCount(res.pagination.total); })
+      .catch(() => {});
+    fetch('/api/templates')
+      .then((r) => r.json())
+      .then((res) => { if (res.success) setTmplCount(res.data.length); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -45,103 +55,238 @@ export default function Home() {
     };
   }, []);
 
-  const stripImages = txLoaded && recentTx.length === 3
-    ? recentTx.map((t) => t.finalImage)
-    : null;
+  const updateTransforms = useCallback(() => {
+    const c = trackRef.current;
+    if (!c) return;
+    const cx = c.scrollLeft + c.clientWidth / 2;
+
+    slideRefs.current.forEach((el) => {
+      if (!el) return;
+      const ecx = el.offsetLeft + el.offsetWidth / 2;
+      const dist = (ecx - cx) / (c.clientWidth * 0.5);
+      const abs = Math.abs(dist);
+      const sign = Math.sign(dist);
+
+      let rotY, scale, zIdx;
+      if (abs < 0.5) {
+        rotY = sign * abs * 50;
+        scale = 1 - abs * 0.18;
+        zIdx = 50;
+      } else if (abs < 1) {
+        const t = (abs - 0.5) / 0.5;
+        rotY = sign * (25 + t * 35);
+        scale = 0.82 - t * 0.2;
+        zIdx = 40 - t * 20;
+      } else {
+        rotY = sign * 60;
+        scale = 0.62;
+        zIdx = 10;
+      }
+
+      el.style.transform = `perspective(700px) rotateY(${rotY}deg) scale(${scale})`;
+      el.style.zIndex = Math.round(zIdx).toString();
+      el.style.opacity = String(Math.max(0.1, 1 - abs * 0.55));
+    });
+
+    if (strips.length) {
+      const oneSet = c.scrollWidth / 3;
+      if (c.scrollLeft < oneSet * 0.3) {
+        c.scrollLeft = c.scrollLeft + oneSet;
+      } else if (c.scrollLeft > oneSet * 2.7) {
+        c.scrollLeft = c.scrollLeft - oneSet;
+      }
+    }
+  }, [strips.length]);
+
+  const navSlide = useCallback((dir: number) => {
+    const c = trackRef.current;
+    if (!c || !strips.length) return;
+    const sw = c.scrollWidth / (strips.length * 3);
+    c.scrollBy({ left: dir * sw, behavior: 'smooth' });
+  }, [strips.length]);
+
+  useEffect(() => {
+    const c = trackRef.current;
+    if (!c || !strips.length) return;
+    const oneSet = c.scrollWidth / 3;
+    c.scrollLeft = oneSet;
+    const onScroll = () => requestAnimationFrame(updateTransforms);
+    c.addEventListener('scroll', onScroll, { passive: true });
+    requestAnimationFrame(updateTransforms);
+    return () => c.removeEventListener('scroll', onScroll);
+  }, [updateTransforms, strips.length]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.grid}>
-        {/* ── Hero ── */}
-        <button className={`${styles.tile} ${styles.hero}`} onClick={() => router.push('/templates')}>
-          <div className={styles.slideshow}>
-            {SAMPLE_IMAGES.map((src, i) => (
-              <div
-                key={i}
-                className={styles.slide}
-                style={{
-                  backgroundImage: `url(${src})`,
-                  opacity: i === slideIdx ? 1 : 0,
-                  zIndex: i === slideIdx ? 1 : 0,
-                }}
-              />
-            ))}
-            <div className={styles.heroOverlay} />
-            <div className={styles.heroContent}>
-              <Camera size={56} className={styles.heroIcon} />
-              <span className={styles.heroTitle}>VelvetSnap</span>
-              <span className={styles.heroSub}>Co.</span>
-              <span className={styles.heroTagline}>Abadikan momen spesialmu</span>
-              <span className={styles.heroCta}>Mulai →</span>
+    <div className={styles.page}>
+      {/* ── Header / Navigation ── */}
+      <header className={styles.header}>
+        <div
+          className={styles.location}
+          onMouseEnter={() => setTooltipVisible(true)}
+          onMouseLeave={() => setTooltipVisible(false)}
+        >
+          <MapPin size={16} />
+          <span>Jakarta</span>
+          <div className={`${styles.tooltip} ${tooltipVisible ? styles.tooltipVisible : ''}`}>
+            <div className={styles.tooltipImage}>
+              <div className={styles.tooltipPlaceholder}>📍 VelvetSnap Booth</div>
             </div>
-          </div>
-        </button>
-
-        {/* ── Promo ── */}
-        <div className={`${styles.tile} ${styles.promo}`}>
-          <div className={styles.floatWrap}>
-            <Sparkles size={28} className={styles.floatIcon} />
-            <span className={styles.promoLabel}>Promo</span>
-            <span className={styles.promoValue}>2nd Print</span>
-            <span className={styles.promoValue}>FREE</span>
           </div>
         </div>
 
-        {/* ── Gallery: 3 strip terakhir ── */}
-        <div className={`${styles.tile} ${styles.gallery}`}>
-          {stripImages ? (
-            <div className={styles.strips}>
-              {stripImages.map((src, i) => (
-                <div key={i} className={styles.strip}>
-                  <div className={styles.stripImage} style={{ backgroundImage: `url(${src})` }} />
+        <nav className={styles.nav}>
+          <a href="https://instagram.com" target="_blank" rel="noopener" className={styles.navLink}>
+            <Camera size={16} /> Instagram
+          </a>
+          <span className={styles.navSep} />
+          <a href="https://wa.me/628123456789" target="_blank" rel="noopener" className={styles.navLink}>
+            <MessageCircle size={16} /> WhatsApp
+          </a>
+          <span className={styles.navSep} />
+          <a href="/templates" className={styles.navLink}>
+            Templates
+          </a>
+          <span className={styles.navSep} />
+          <a href="/strips-studio" className={styles.navLink}>
+            <Sparkles size={14} /> Studio
+          </a>
+        </nav>
+      </header>
+
+      {/* ── Main content: 3 columns ── */}
+      <main className={styles.main}>
+        {/* Left column — 2 cards stacked */}
+        <div className={styles.colLeft}>
+          <div className={styles.introCard}>
+            <div className={styles.introContent}>
+              <div className={styles.logoWrap}>
+                <svg width="56" height="56" viewBox="0 0 56 56" fill="none" className={styles.logo}>
+                  <rect x="4" y="12" width="48" height="34" rx="8" fill="var(--mn-text)" />
+                  <circle cx="28" cy="29" r="11" fill="var(--mn-card)" />
+                  <circle cx="28" cy="29" r="7" fill="var(--mn-text)" />
+                  <rect x="39" y="8" width="12" height="4" rx="2" fill="var(--mn-text)" />
+                  <path d="M48 18l4-2" stroke="var(--mn-text)" strokeWidth="2" strokeLinecap="round" />
+                  <path d="M18 8l-3 4" stroke="var(--accent-color)" strokeWidth="2.5" strokeLinecap="round" />
+                  <circle cx="18" cy="6" r="1.5" fill="var(--accent-color)" />
+                </svg>
+                <div className={styles.logoText}>
+                  <h1 className={styles.logoTitle}>VelvetSnap</h1>
+                  <span className={styles.logoSub}>Photo Booth Jakarta</span>
                 </div>
+              </div>
+              <p className={styles.introDesc}>
+                Cetak langsung, template kustom, hasil siap dalam hitungan detik.
+              </p>
+              <div className={styles.introStats}>
+                <div className={styles.statItem}>
+                  <span className={styles.statNum}>{txCount || 0}+</span>
+                  <span className={styles.statLabel}>Tercetak</span>
+                </div>
+                <div className={styles.statDivider} />
+                <div className={styles.statItem}>
+                  <span className={styles.statNum}>{tmplCount || 0}+</span>
+                  <span className={styles.statLabel}>Template</span>
+                </div>
+              </div>
+              <a href="/templates" className={styles.introCta}>
+                Mulai Sekarang <ExternalLink size={14} />
+              </a>
+            </div>
+          </div>
+
+          <a href="/strips-studio" className={styles.cardSmall}>
+            <div className={styles.cardSmallIcon}>
+              <Sparkles size={22} />
+            </div>
+            <div className={styles.cardSmallBody}>
+              <span className={styles.cardSmallTag}>Fitur</span>
+              <h3 className={styles.cardSmallTitle}>Kustom Template</h3>
+              <p className={styles.cardSmallDesc}>Desain template fotomu sendiri</p>
+            </div>
+          </a>
+        </div>
+
+        {/* Center column — 2 cards stacked */}
+        <div className={styles.colCenter}>
+          <a href="/templates" className={styles.cardWedding}>
+            <div className={styles.slideshow}>
+              {SAMPLE_IMAGES.map((src, i) => (
+                <div
+                  key={i}
+                  className={styles.slide}
+                  style={{
+                    backgroundImage: `url(${src})`,
+                    opacity: i === slideIdx ? 0.85 : 0,
+                  }}
+                />
               ))}
             </div>
+          </a>
+
+          <div className={styles.cardPromo}>
+            <Heart size={22} />
+            <div className={styles.cardPromoContent}>
+              <span className={styles.promoLabel}>Promo</span>
+              <span className={styles.promoValue}>Cetak ke-2 GRATIS</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right column — Strips scroll */}
+        <div className={styles.colRight}>
+          {strips.length > 0 ? (
+            <div className={styles.fanWrap}>
+              <button className={styles.fanArrow} onClick={() => navSlide(-1)} aria-label="Previous">
+                <ChevronLeft size={22} />
+              </button>
+              <div ref={trackRef} className={styles.fanTrack}>
+                {tripled.map((s, i) => (
+                  <img
+                    key={`${s._id}-${i}`}
+                    ref={(el) => { slideRefs.current[i] = el; }}
+                    src={s.finalImage}
+                    alt=""
+                    className={styles.fanSlide}
+                    draggable={false}
+                  />
+                ))}
+              </div>
+              <button className={styles.fanArrow} onClick={() => navSlide(1)} aria-label="Next">
+                <ChevronRight size={22} />
+              </button>
+            </div>
           ) : (
-            <div className={styles.stripsEmpty}>
-              {txLoaded && <span>Belum ada transaksi</span>}
+            <div className={styles.rightEmpty}>
+              <Camera size={32} />
+              <span>Belum ada hasil strip</span>
             </div>
           )}
         </div>
+      </main>
 
-        {/* ── Testimonial ── */}
-        <div className={`${styles.tile} ${styles.testi}`}>
-          <div className={styles.pulseWrap}>
-            <Heart size={24} className={styles.pulseIcon} />
-            <span className={styles.testiText}>"Hasilnya keren banget!"</span>
-            <span className={styles.testiAuthor}>— Andi & Rina</span>
-          </div>
-        </div>
-
-        {/* ── Stat ── */}
-        <div className={`${styles.tile} ${styles.stat}`}>
-          <div className={styles.shimmerWrap}>
-            <Star size={24} className={styles.shimmerIcon} />
-            <span className={styles.statNumber}>10K+</span>
-            <span className={styles.statLabel}>Foto Tercetak</span>
-          </div>
-        </div>
-
-        {/* ── Bottom strip ── */}
-        <div className={`${styles.tile} ${styles.bottom}`}>
-          <div className={styles.bottomContent}>
-            <div className={styles.bottomItem}>
-              <Zap size={20} className={styles.bottomIcon} />
-              <span className={styles.bottomText}>Mulai Rp 25K</span>
-            </div>
-            <div className={styles.bottomDivider} />
-            <div className={styles.bottomItem}>
-              <Camera size={20} className={styles.bottomIcon} />
-              <span className={styles.bottomText}>Cetak langsung</span>
-            </div>
-            <div className={styles.bottomDivider} />
-            <div className={styles.bottomItem}>
-              <Sparkles size={20} className={styles.bottomIcon} />
-              <span className={styles.bottomText}>Banyak template</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ── Footer ── */}
+      <footer className={styles.footer}>
+        <nav className={styles.nav}>
+          <a href="https://instagram.com" target="_blank" rel="noopener" className={styles.navLink}>
+            <Camera size={16} /> Instagram
+          </a>
+          <span className={styles.navSep} />
+          <a href="https://wa.me/628123456789" target="_blank" rel="noopener" className={styles.navLink}>
+            <MessageCircle size={16} /> WhatsApp
+          </a>
+          <span className={styles.navSep} />
+          <a href="/templates" className={styles.navLink}>
+            Templates
+          </a>
+          <span className={styles.navSep} />
+          <a href="/strips-studio" className={styles.navLink}>
+            <Sparkles size={14} /> Studio
+          </a>
+        </nav>
+        <p className={styles.footerText}>
+          Abadikan momen spesialmu bersama VelvetSnap ✨
+        </p>
+      </footer>
     </div>
   );
 }

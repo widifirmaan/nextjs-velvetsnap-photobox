@@ -35,13 +35,12 @@ export default function LayerPanel({
     <div style={{
       background: '#fff',
       borderRadius: 16,
-      border: '1px solid rgba(61,44,44,0.08)',
+      border: '1px solid var(--mn-border)',
       overflow: 'hidden',
-      boxShadow: '2px -2px 4px rgba(0,0,0,0.03), -2px 2px 4px rgba(255,255,255,0.7)',
     }}>
       <div style={{
         padding: '12px 14px 8px',
-        borderBottom: '1px solid rgba(61,44,44,0.06)',
+        borderBottom: '1px solid var(--mn-border)',
       }}>
         <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', margin: 0 }}>
           Layers

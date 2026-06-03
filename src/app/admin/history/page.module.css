@@ -9,6 +9,9 @@
 
 /* Filters */
 .filters {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow);
   padding: 24px;
   margin-bottom: 24px;
   animation: fadeInUp 0.4s ease backwards;
@@ -40,25 +43,19 @@
 .filterGroup select {
   padding: 10px 14px;
   border-radius: 12px;
-  border: 1px solid rgba(61, 44, 44, 0.12);
+  border: 1px solid var(--mn-border);
   background: #fff;
   color: var(--text-primary);
   font-family: inherit;
   font-size: 14px;
   transition: border-color var(--transition-fast);
-  box-shadow:
-    inset 2px -2px 4px rgba(0,0,0,0.04),
-    inset -2px 2px 4px rgba(255,255,255,0.8);
 }
 
 .filterGroup input:focus,
 .filterGroup select:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow:
-    0 0 0 2px rgba(197, 216, 157, 0.25),
-    inset 2px -2px 4px rgba(0,0,0,0.04),
-    inset -2px 2px 4px rgba(255,255,255,0.8);
+  box-shadow: 0 0 0 3px rgba(197, 216, 157, 0.2);
 }
 
 .filterActions {
@@ -69,6 +66,9 @@
 
 /* Table */
 .tableContainer {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow);
   padding: 0;
   overflow-x: auto;
   margin-bottom: 24px;
@@ -88,7 +88,7 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--text-secondary);
-  border-bottom: 1px solid rgba(61, 44, 44, 0.08);
+  border-bottom: 1px solid var(--mn-border);
   white-space: nowrap;
 }
 
@@ -102,7 +102,7 @@
 }
 
 .table tbody tr + tr {
-  border-top: 1px solid rgba(61, 44, 44, 0.08);
+  border-top: 1px solid var(--mn-border);
 }
 
 .table tbody td {
@@ -179,11 +179,8 @@
   max-width: 380px;
   width: 100%;
   text-align: center;
-  box-shadow:
-    12px 14px 28px rgba(0,0,0,0.10),
-    -4px -4px 12px rgba(255,255,255,0.6),
-    inset 3px -3px 6px rgba(0,0,0,0.04),
-    inset -3px 3px 6px rgba(255,255,255,0.9);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  border: 1px solid var(--mn-border);
 }
 
 .confirmIcon {
@@ -302,11 +299,8 @@
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow:
-    12px 14px 28px rgba(0,0,0,0.10),
-    -4px -4px 12px rgba(255,255,255,0.6),
-    inset 3px -3px 6px rgba(0,0,0,0.04),
-    inset -3px 3px 6px rgba(255,255,255,0.9);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  border: 1px solid var(--mn-border);
 }
 
 .modalHeader {
@@ -314,7 +308,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid rgba(61, 44, 44, 0.1);
+  border-bottom: 1px solid var(--mn-border);
 }
 
 .modalHeader h2 {
@@ -334,7 +328,7 @@
 }
 
 .modalClose:hover {
-  background: rgba(61, 44, 44, 0.08);
+  background: var(--clay-bg);
 }
 
 .modalBody {
@@ -384,7 +378,7 @@
   aspect-ratio: 3 / 4;
   object-fit: cover;
   border-radius: 12px;
-  border: 1px solid rgba(61, 44, 44, 0.1);
+  border: 1px solid var(--mn-border);
   background: #f0f0f0;
 }
 
@@ -429,7 +423,7 @@
 }
 
 .modalPrintBtn:hover {
-  background: rgba(61, 44, 44, 0.08);
+  background: var(--clay-bg);
 }
 
 @media (max-width: 640px) {

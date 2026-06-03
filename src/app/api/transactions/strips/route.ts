@@ -8,7 +8,7 @@ export async function GET() {
     await connectDB();
     const transactions = await Transaction.find({})
       .sort({ createdAt: -1 })
-      .limit(3)
+      .limit(9)
       .lean();
 
     const data = await Promise.all(transactions.map(async (t) => {

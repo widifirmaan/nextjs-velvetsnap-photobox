@@ -20,10 +20,8 @@
 .statCard:nth-child(4) { animation-delay: 0.2s; }
 
 .statCard:hover {
-  transform: translateY(-4px);
-  box-shadow:
-    12px 14px 28px rgba(0,0,0,0.10),
-    -4px -4px 12px rgba(255,255,255,0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
 }
 
 .statIcon {
@@ -65,6 +63,9 @@
 
 /* Chart Section */
 .chartSection {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow);
   padding: 28px;
   margin-bottom: 32px;
   animation: fadeInUp 0.5s ease backwards;
@@ -96,7 +97,7 @@
   gap: 12px;
   height: 200px;
   padding-top: 20px;
-  border-bottom: 1px solid rgba(61, 44, 44, 0.1);
+  border-bottom: 1px solid var(--mn-border);
 }
 
 .barGroup {
@@ -170,9 +171,7 @@
 
 .quickLink:hover {
   transform: translateY(-2px);
-  box-shadow:
-    10px 12px 24px rgba(0,0,0,0.08),
-    -3px -3px 10px rgba(255,255,255,0.6);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
 }
 
 .quickLinkIcon {
@@ -220,6 +219,9 @@
 }
 
 .section {
+  background: var(--clay-bg);
+  border-radius: var(--clay-radius);
+  box-shadow: var(--clay-shadow);
   padding: 28px;
   animation: fadeInUp 0.5s ease backwards;
   animation-delay: 0.35s;
@@ -231,7 +233,7 @@
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 12px;
-  border-bottom: 1px solid rgba(61, 44, 44, 0.1);
+  border-bottom: 1px solid var(--mn-border);
 }
 
 .sectionHeader h2 {

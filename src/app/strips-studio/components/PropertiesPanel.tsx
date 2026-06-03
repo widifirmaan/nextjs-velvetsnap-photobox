@@ -285,7 +285,7 @@ function SelectField({ label, value, options, onChange }: { label: string; value
 const btnStyle: React.CSSProperties = {
   padding: '8px 12px',
   borderRadius: 10,
-  border: '1px solid rgba(61,44,44,0.10)',
+  border: '1px solid var(--mn-border)',
   background: '#fff',
   cursor: 'pointer',
   fontSize: 13,

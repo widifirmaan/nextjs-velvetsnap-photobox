@@ -28,17 +28,16 @@ export default function ElementToolbar({ onAdd }: ElementToolbarProps) {
               gap: 10,
               padding: '10px 14px',
               borderRadius: 12,
-              border: '1px solid rgba(61,44,44,0.08)',
-              background: '#fff',
+              border: '1px solid var(--mn-border)',
+              background: 'var(--clay-bg)',
               cursor: 'pointer',
               fontSize: 14,
               fontWeight: 600,
               color: 'var(--text-primary)',
               transition: 'all 0.15s',
-              boxShadow: '2px -2px 4px rgba(0,0,0,0.03), -2px 2px 4px rgba(255,255,255,0.7)',
             }}
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-color)'; e.currentTarget.style.background = 'var(--accent-bg)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(61,44,44,0.08)'; e.currentTarget.style.background = '#fff'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--mn-border)'; e.currentTarget.style.background = 'var(--clay-bg)'; }}
           >
             <span style={{
               width: 28,

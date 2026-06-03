@@ -22,18 +22,18 @@
 .nameField input {
   padding: 10px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(61,44,44,0.12);
+  border: 1px solid var(--mn-border);
   background: #fff;
   color: var(--text-primary);
   font-family: inherit;
   font-size: 15px;
   min-width: 240px;
-  box-shadow: inset 2px -2px 4px rgba(0,0,0,0.04), inset -2px 2px 4px rgba(255,255,255,0.8);
 }
 
 .nameField input:focus {
   outline: none;
   border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(197, 216, 157, 0.2);
 }
 
 .editorLayout {
@@ -44,7 +44,7 @@
 }
 
 .canvasArea {
-  background: #e8e4d8;
+  background: #f0f0f0;
   border-radius: 20px;
   padding: 20px;
   display: flex;
@@ -52,7 +52,7 @@
   justify-content: center;
   min-height: 600px;
   overflow: auto;
-  box-shadow: inset 3px -3px 6px rgba(0,0,0,0.04), inset -3px 3px 6px rgba(255,255,255,0.8);
+  border: 1px solid var(--mn-border);
 }
 
 @media (max-width: 1024px) {

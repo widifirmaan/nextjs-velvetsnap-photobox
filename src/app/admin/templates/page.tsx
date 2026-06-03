@@ -602,7 +602,7 @@ export default function TemplatesAdmin() {
                       type="color"
                       value={formData.color}
                       onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      style={{ width: 48, height: 48, padding: 0, border: '2px solid rgba(61,44,44,0.12)', borderRadius: 12, cursor: 'pointer', background: 'none' }}
+                      style={{ width: 48, height: 48, padding: 0, border: '2px solid #ddd', borderRadius: 12, cursor: 'pointer', background: 'none' }}
                     />
                   </div>
                   <div className={styles.formGroup}>
