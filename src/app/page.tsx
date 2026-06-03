@@ -94,6 +94,10 @@ export default function Home() {
     const c = trackRef.current;
     if (!c) return;
 
+    const oneSet = c.scrollWidth / 3;
+    if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
+    else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+
     if (smallVpRef.current) {
       // Mobile: flat slider — no CoverFlow transforms
       slideRefs.current.forEach((el) => {

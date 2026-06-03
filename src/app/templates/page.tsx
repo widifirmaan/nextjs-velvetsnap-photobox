@@ -62,6 +62,11 @@ export default function TemplatesPage() {
   const updateTransforms = useCallback(() => {
     const c = trackRef.current;
     if (!c) return;
+
+    const oneSet = c.scrollWidth / 3;
+    if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
+    else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+
     const cx = c.scrollLeft + c.clientWidth / 2;
     slideRefs.current.forEach((el) => {
       if (!el) return;
