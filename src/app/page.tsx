@@ -797,6 +797,12 @@ function BoothStep({
                 videoConstraints={{ facingMode: "user", deviceId: deviceId ? { exact: deviceId } : undefined }}
                 className={styles.boothWebcam} style={{ transform: mirrored ? 'scaleX(-1)' : 'none' }}
               />
+              <div className={styles.boothViewfinderOverlay}>
+                <div className={styles.viewfinderCornerTL} />
+                <div className={styles.viewfinderCornerTR} />
+                <div className={styles.viewfinderCornerBL} />
+                <div className={styles.viewfinderCornerBR} />
+              </div>
               {countdown !== null && <div className={styles.boothCountdown}>{countdown}</div>}
             </div>
           )}
