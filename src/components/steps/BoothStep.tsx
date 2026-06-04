@@ -1,12 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Camera as CameraIcon, ArrowLeft, Check, RefreshCcw, Loader2, X, FlipHorizontal } from 'lucide-react';
 import styles from '@/app/page.module.css';
 import StepperBar from './StepperBar';
-import { flipImage, type ISlot } from '@/lib/canvas-utils';
+import { flipImage } from '@/lib/canvas-utils';
 import Webcam from 'react-webcam';
 import type { TemplateData } from './types';
+import Viewfinder from './boothstep/Viewfinder';
+import BoothPreview from './boothstep/BoothPreview';
+import BoothControls from './boothstep/BoothControls';
 
 export default function BoothStep({
   templateId, templateName, slotsCount, filledCount, captures,
@@ -165,108 +167,48 @@ export default function BoothStep({
       <p className={styles.boothInfo}>{templateName} • {filledCount} / {slotsCount} shots</p>
       <div className={styles.boothContent}>
         <div className={styles.boothViewfinder}>
-          {cameraType === 'dslr' ? (
-            <div className={styles.boothDslrPlaceholder}>
-              <CameraIcon size={64} style={{ opacity: 0.5 }} />
-              <p>Kamera DSLR terhubung via USB</p>
-              {countdown !== null && <div className={styles.boothCountdown}>{countdown}</div>}
-              {dslrCapturing && <div className={styles.boothCountdown}><Loader2 className="spin" size={48} /></div>}
-              {flash && <div className={styles.boothFlash} />}
-            </div>
-          ) : (
-            <div className={styles.boothWebcamWrap}>
-              <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg"
-                videoConstraints={{ facingMode: "user", deviceId: deviceId ? { exact: deviceId } : undefined }}
-                className={styles.boothWebcam} style={{ transform: mirrored ? 'scaleX(-1)' : 'none' }}
-              />
-              <div className={styles.boothViewfinderOverlay}>
-                <div className={styles.viewfinderCornerTL} />
-                <div className={styles.viewfinderCornerTR} />
-                <div className={styles.viewfinderCornerBL} />
-                <div className={styles.viewfinderCornerBR} />
-              </div>
-              {flash && <div className={styles.boothFlash} />}
-              {countdown !== null && <div className={styles.boothCountdown}>{countdown}</div>}
-            </div>
-          )}
+          <Viewfinder
+            cameraType={cameraType}
+            webcamRef={webcamRef}
+            deviceId={deviceId}
+            mirrored={mirrored}
+            dslrCapturing={dslrCapturing}
+            flash={flash}
+            countdown={countdown}
+          />
         </div>
-
-        {templateData?.slotsLayout && (
-          <div className={styles.boothPreview}>
-            <div className={styles.boothStripPreview} style={{ aspectRatio: frameRatio }}>
-              {templateData.slotsLayout.map((slot: ISlot, idx: number) => {
-                const src = captures[idx];
-                return (
-                  <div key={idx} style={{
-                    position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`,
-                    width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden',
-                    background: src ? 'none' : 'rgba(0,0,0,0.06)', borderRadius: '2px',
-                  }}>
-                    {src && (
-                      <>
-                        <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                        <button className={styles.boothDeleteSlot} onClick={() => onDeleteCapture(idx)}><X size={14} /></button>
-                      </>
-                    )}
-                  </div>
-                );
-              })}
-              <img src={keyedFrameImage || templateData.frameImage || ''} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
-            </div>
-            {filledCount === slotsCount && (
-              <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Edit</button>
-            )}
-          </div>
-        )}
+        <BoothPreview
+          templateData={templateData}
+          keyedFrameImage={keyedFrameImage}
+          frameRatio={frameRatio}
+          captures={captures}
+          filledCount={filledCount}
+          slotsCount={slotsCount}
+          onDeleteCapture={onDeleteCapture}
+          onNext={onNext}
+        />
       </div>
-
-      <div className={styles.boothControls}>
-        {!taking && !dslrCapturing && !busy && (
-          <div className={styles.boothBtnRow}>
-              <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
-              {captureMode === 'manual' ? (
-                <button className={styles.boothBtnPrimary} onClick={handleManualCapture} disabled={filledCount >= slotsCount || busy}>
-                  <CameraIcon size={22} /> {filledCount}/{slotsCount}
-                </button>
-              ) : (
-                <button className={styles.boothBtnPrimary} onClick={() => { setTaking(true); takePhoto(slotsCount - filledCount); }} disabled={filledCount >= slotsCount || busy}>
-                  <CameraIcon size={22} /> {filledCount}/{slotsCount}
-                </button>
-              )}
-              <div className={styles.boothModeToggle}>
-                <button className={`${styles.boothModeBtn} ${captureMode === 'manual' ? styles.boothModeActive : ''}`}
-                  onClick={() => setCaptureMode('manual')}>M</button>
-                <button className={`${styles.boothModeBtn} ${captureMode === 'auto' ? styles.boothModeActive : ''}`}
-                  onClick={() => setCaptureMode('auto')}>A</button>
-                <span className={styles.boothModeSlider} style={{ left: captureMode === 'manual' ? '2px' : '50%' }} />
-              </div>
-              {cameraType === 'webcam' && (
-                <div ref={camMenuRef} className={styles.boothCamSwitcherGroup}>
-                  <div className={`${styles.boothCamDropdown} ${showCamMenu ? styles.boothCamDropdownOpen : ''}`}>
-                    {availableCams.length === 0 ? (
-                      <div className={styles.boothCamOption} style={{ cursor: 'default', opacity: 0.5 }}>No cameras found</div>
-                    ) : (
-                      availableCams.map((cam) => (
-                        <button key={cam.deviceId}
-                          className={`${styles.boothCamOption} ${cam.deviceId === deviceId ? styles.boothCamOptionActive : ''}`}
-                          onClick={() => handleSwitchCamera(cam.deviceId)}>{cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}</button>
-                      ))
-                    )}
-                  </div>
-                  <button className={styles.boothBtnSecondary} onClick={() => setShowCamMenu((v) => !v)} title="Ganti kamera">
-                    <RefreshCcw size={18} />
-                  </button>
-                  {isFrontCamera && (
-                    <button className={`${styles.boothBtnSecondary} ${!mirrored ? styles.boothMirrorOff : ''}`}
-                      onClick={() => setMirrored((v) => !v)} title={mirrored ? 'Mirror: ON' : 'Mirror: OFF'}>
-                      <FlipHorizontal size={18} />
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-      </div>
+      <BoothControls
+        captureMode={captureMode}
+        setCaptureMode={setCaptureMode}
+        filledCount={filledCount}
+        slotsCount={slotsCount}
+        busy={busy}
+        handleManualCapture={handleManualCapture}
+        takePhoto={takePhoto}
+        cameraType={cameraType}
+        camMenuRef={camMenuRef}
+        showCamMenu={showCamMenu}
+        availableCams={availableCams}
+        deviceId={deviceId}
+        handleSwitchCamera={handleSwitchCamera}
+        isFrontCamera={isFrontCamera}
+        mirrored={mirrored}
+        setMirrored={setMirrored}
+        onBack={onBack}
+        taking={taking}
+        dslrCapturing={dslrCapturing}
+      />
     </div>
   );
 }
