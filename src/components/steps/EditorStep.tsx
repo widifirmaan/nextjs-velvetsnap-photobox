@@ -3,10 +3,22 @@
 import { ArrowLeft, Check, RefreshCcw } from 'lucide-react';
 import styles from '@/app/page.module.css';
 import StepperBar from './StepperBar';
-import EditorFrame from './editorstep/EditorFrame';
-import SlotSelector from './editorstep/SlotSelector';
-import AdjustSlider from './editorstep/AdjustSlider';
 import type { TemplateData, PhotoAdjust } from './types';
+
+function AdjustSlider({ label, value, min, max, onChange, display }: {
+  label: string; value: number; min: number; max: number;
+  onChange: (v: number) => void; display?: string;
+}) {
+  return (
+    <div className={styles.editorAdjustRow}>
+      <span className={styles.editorAdjustLabel}>{label}</span>
+      <input type="range" min={min} max={max} step={1}
+        value={value} onChange={(e) => onChange(parseFloat(e.target.value))}
+        className={styles.editorSlider} />
+      <span className={styles.editorAdjustValue}>{display ?? value}</span>
+    </div>
+  );
+}
 
 export default function EditorStep({
   captures, templateData, keyedFrameImage, frameRatio,
@@ -23,6 +35,8 @@ export default function EditorStep({
   onNext: () => void; onBack: () => void;
 }) {
   const handleRetake = () => onBack();
+
+  const hasTemplate = templateData && templateData.frameImage && templateData.slotsLayout && templateData.slotsLayout.length > 0;
 
   const slotSources = (templateData?.slotsLayout || []).map((_, idx) => captures[idx]);
 
@@ -52,25 +66,63 @@ export default function EditorStep({
       <StepperBar current={2} total={5} />
       <div className={styles.editorLayout}>
         <div className={styles.editorPreview}>
-          <EditorFrame
-            templateData={templateData}
-            captures={captures}
-            keyedFrameImage={keyedFrameImage}
-            frameRatio={frameRatio}
-            photoAdjust={photoAdjust}
-            selectedFilter={selectedFilter}
-            slotCssFilter={slotCssFilter}
-          />
+          {hasTemplate ? (
+            <div className={styles.editorFrame} style={{ height: 'min(75vh, 600px)', aspectRatio: frameRatio, backgroundColor: templateData?.color || '#fff' }}>
+              {(templateData?.slotsLayout || []).map((slot, idx) => {
+                const src = captures[idx];
+                if (!src) return null;
+                return (
+                  <div key={idx} style={{
+                    position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`,
+                    width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden', zIndex: 1,
+                  }}>
+                    <div
+                      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
+                    >
+                      <img src={src} alt={`Slot ${idx}`}
+                        className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
+                        style={{
+                          width: '100%', height: '100%', objectFit: 'cover',
+                          transform: `scale(${photoAdjust[idx]?.scale || 1}) translate(${photoAdjust[idx]?.x || 0}%, ${photoAdjust[idx]?.y || 0}%)`,
+                          transformOrigin: 'center', pointerEvents: 'none',
+                          filter: slotCssFilter(idx),
+                        }} />
+                    </div>
+                  </div>
+                );
+              })}
+              <img src={keyedFrameImage || templateData?.frameImage || ''} alt="Frame"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }} />
+            </div>
+          ) : (
+            <div className={styles.editorSimplePreview}>
+              {captures.map((src, i) => (
+                <img key={i} src={src} alt={`shot ${i}`}
+                  className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
+                  style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: slotCssFilter(i) }} />
+              ))}
+            </div>
+          )}
         </div>
         <div className={styles.editorSidebar}>
           <button className={styles.boothBtnSecondary} onClick={handleRetake} style={{ alignSelf: 'flex-start' }}>
             <ArrowLeft size={16} /> Back
           </button>
-          <SlotSelector
-            slotSources={slotSources}
-            selectedSlotIdx={selectedSlotIdx}
-            setSelectedSlotIdx={setSelectedSlotIdx}
-          />
+
+          <div className={styles.editorSlotGrid}>
+            {slotSources.map((src, idx) => (
+              <button key={idx}
+                className={`${styles.editorSlotThumb} ${selectedSlotIdx === idx ? styles.editorSlotThumbActive : ''}`}
+                onClick={() => setSelectedSlotIdx(idx)}>
+                {src ? (
+                  <img src={src} alt={`Slot ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <span>{idx + 1}</span>
+                )}
+              </button>
+            ))}
+          </div>
+
           <div className={styles.editorAdjustSection}>
             <h4>Adjustments</h4>
             <AdjustSlider label="Zoom" value={Math.round(sel.scale * 100)} min={100} max={300}
@@ -89,6 +141,7 @@ export default function EditorStep({
               onChange={(v) => updateSlot(selectedSlotIdx, { sharpen: v })}
               display={`${sel.sharpen > 0 ? 'Sharpen' : sel.sharpen < 0 ? 'Smooth' : 'None'}`} />
           </div>
+
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button className={`${styles.boothBtnSecondary} ${styles.editorRetakeBtn}`} onClick={handleRetake}>
               <RefreshCcw size={18} /> Retake All
