@@ -91,9 +91,6 @@ export default function Home() {
 
   // initial fetch & preload everything
   useEffect(() => {
-    let loaded = 0;
-    const check = () => { loaded++; if (loaded >= 4) setShowPreloader(false); };
-
     fetch('/api/transactions/strips')
       .then((r) => r.json())
       .then((res) => {
@@ -108,18 +105,15 @@ export default function Home() {
           ).then(() => setStrips(res.data));
         }
       })
-      .catch(() => {})
-      .finally(check);
+      .catch(() => {});
     fetch('/api/transactions')
       .then((r) => r.json())
       .then((res) => { if (res.success) setTxCount(res.pagination.total); })
-      .catch(() => {})
-      .finally(check);
+      .catch(() => {});
     fetch('/api/templates')
       .then((r) => r.json())
       .then((res) => { if (res.success) setTmplCount(res.data.length); })
-      .catch(() => {})
-      .finally(check);
+      .catch(() => {});
     fetch('/api/templates/thumbnails')
       .then((r) => r.json())
       .then((res) => {
@@ -131,11 +125,10 @@ export default function Home() {
           });
         }
       })
-      .catch(() => {})
-      .finally(check);
+      .catch(() => {});
 
-    const safety = setTimeout(() => setShowPreloader(false), 5000);
-    return () => clearTimeout(safety);
+    const timer = setTimeout(() => setShowPreloader(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
   if (showPreloader) {
