@@ -106,7 +106,7 @@ function HomePage({ onStart }: { onStart: () => void }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLImageElement | null)[]>([]);
 
-  const tripled = [...strips.slice(0, 4), ...strips.slice(0, 4), ...strips.slice(0, 4)];
+  const tripled = [...strips.slice(0, 10), ...strips.slice(0, 10), ...strips.slice(0, 10)];
 
   useEffect(() => {
     const check = () => {
@@ -199,7 +199,7 @@ function HomePage({ onStart }: { onStart: () => void }) {
     if (!strips.length) return;
     const c = trackRef.current;
     if (!c) return;
-    slideRefs.current = strips.slice(0, 4).map(() => null);
+    slideRefs.current = strips.slice(0, 10).map(() => null);
     requestAnimationFrame(() => {
       if (c.scrollWidth > c.clientWidth) c.scrollLeft = c.scrollWidth / 3;
       const onScroll = () => requestAnimationFrame(updateTransforms);
