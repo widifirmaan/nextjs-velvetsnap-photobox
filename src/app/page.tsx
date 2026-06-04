@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import {
   Camera as CameraIcon, Sparkles, Heart, MapPin, ExternalLink, MessageCircle,
   LayoutTemplate, Loader2, ArrowLeft, Check, RefreshCcw, X, QrCode, CheckCircle,
-  Download, Printer, Home as HomeIcon
+  Download, Printer, Home as HomeIcon, FlipHorizontal
 } from 'lucide-react';
 import styles from './page.module.css';
 import { flipImage, composeFrameImage, removeGreenScreen, type ISlot } from '@/lib/canvas-utils';
@@ -874,7 +874,7 @@ function BoothStep({
                 <span className={styles.boothModeSlider} style={{ left: captureMode === 'manual' ? '2px' : '50%' }} />
               </div>
               {cameraType === 'webcam' && (
-                <div ref={camMenuRef} style={{ position: 'relative', display: 'inline-flex' }}>
+                <div ref={camMenuRef} className={styles.boothCamSwitcherGroup}>
                   <div className={`${styles.boothCamDropdown} ${showCamMenu ? styles.boothCamDropdownOpen : ''}`}>
                     {availableCams.length === 0 ? (
                       <div className={styles.boothCamOption} style={{ cursor: 'default', opacity: 0.5 }}>No cameras found</div>
@@ -891,7 +891,7 @@ function BoothStep({
                   </button>
                   <button className={`${styles.boothBtnSecondary} ${!mirrored ? styles.boothMirrorOff : ''}`}
                     onClick={() => setMirrored((v) => !v)} title={mirrored ? 'Mirror: ON' : 'Mirror: OFF'}>
-                    <span style={{ fontSize: '16px', fontWeight: 700 }}>⇔</span>
+                    <FlipHorizontal size={18} />
                   </button>
                 </div>
               )}

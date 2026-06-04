@@ -1303,6 +1303,18 @@
   opacity: 0.4;
 }
 
+.boothCamSwitcherGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boothCamSwitcherGroup .boothBtnSecondary {
+  min-width: 48px;
+  justify-content: center;
+}
+
 /* ── Step 3: Editor ── */
 
 .stepPageEditor {
