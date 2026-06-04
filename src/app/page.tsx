@@ -89,7 +89,6 @@ export default function Home() {
   const [tmplCount, setTmplCount] = useState(0);
   const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
 
-  // initial fetch & preload everything
   useEffect(() => {
     fetch('/api/transactions/strips')
       .then((r) => r.json())
@@ -467,6 +466,7 @@ function StepperFlow({ step, setStep, allTemplates }: {
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
   const [captures, setCaptures] = useState<string[]>([]);
   const [photoAdjust, setPhotoAdjust] = useState<{ scale: number; x: number; y: number }[]>([]);
+  const [imageAdjust, setImageAdjust] = useState({ brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 });
   const [selectedFilter, setSelectedFilter] = useState('none');
   const [keyedFrameImage, setKeyedFrameImage] = useState('');
   const [frameRatio, setFrameRatio] = useState(2 / 3);
@@ -575,6 +575,8 @@ function StepperFlow({ step, setStep, allTemplates }: {
       frameRatio={frameRatio}
       photoAdjust={photoAdjust}
       setPhotoAdjust={setPhotoAdjust}
+      imageAdjust={imageAdjust}
+      setImageAdjust={setImageAdjust}
       selectedFilter={selectedFilter}
       setSelectedFilter={setSelectedFilter}
       onNext={() => setStep(4)}
@@ -919,18 +921,37 @@ function BoothStep({
   );
 }
 
+function AdjustSlider({ label, value, min, max, onChange, display }: {
+  label: string; value: number; min: number; max: number;
+  onChange: (v: number) => void; display?: string;
+}) {
+  return (
+    <div className={styles.editorAdjustRow}>
+      <span className={styles.editorAdjustLabel}>{label}</span>
+      <input type="range" min={min} max={max} step={1}
+        value={value} onChange={(e) => onChange(parseFloat(e.target.value))}
+        className={styles.editorSlider} />
+      <span className={styles.editorAdjustValue}>{display ?? value}</span>
+    </div>
+  );
+}
+
 /* ════════════════════════════════════════
    STEP 3: EDITOR
    ════════════════════════════════════════ */
 
 function EditorStep({
   captures, templateData, keyedFrameImage, frameRatio,
-  photoAdjust, setPhotoAdjust, selectedFilter, setSelectedFilter,
+  photoAdjust, setPhotoAdjust,
+  imageAdjust, setImageAdjust,
+  selectedFilter, setSelectedFilter,
   onNext, onBack,
 }: {
   captures: string[]; templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
   photoAdjust: { scale: number; x: number; y: number }[];
   setPhotoAdjust: React.Dispatch<React.SetStateAction<{ scale: number; x: number; y: number }[]>>;
+  imageAdjust: { brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number };
+  setImageAdjust: React.Dispatch<React.SetStateAction<{ brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }>>;
   selectedFilter: string; setSelectedFilter: (v: string) => void;
   onNext: () => void; onBack: () => void;
 }) {
@@ -958,6 +979,13 @@ function EditorStep({
   const handleRetake = () => onBack();
 
   const hasTemplate = templateData && templateData.frameImage && templateData.slotsLayout && templateData.slotsLayout.length > 0;
+
+  const cssFilter = useMemo(() => {
+    const t = imageAdjust.temperature;
+    const hueRotate = t * 0.25;
+    const warmSepia = t > 0 ? t * 0.08 : 0;
+    return `brightness(${imageAdjust.brightness}%) contrast(${imageAdjust.contrast}%) saturate(${imageAdjust.saturation}%) hue-rotate(${hueRotate}deg) sepia(${warmSepia}%)`;
+  }, [imageAdjust]);
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageEditor}`}>
@@ -992,6 +1020,7 @@ function EditorStep({
                           width: '100%', height: '100%', objectFit: 'cover',
                           transform: `scale(${photoAdjust[idx]?.scale || 1}) translate(${photoAdjust[idx]?.x || 0}%, ${photoAdjust[idx]?.y || 0}%)`,
                           transformOrigin: 'center', pointerEvents: 'none',
+                          filter: cssFilter,
                         }} />
                     </div>
                   </div>
@@ -999,35 +1028,13 @@ function EditorStep({
               })}
               <img src={keyedFrameImage || templateData?.frameImage || ''} alt="Frame"
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }} />
-              <div className={styles.editorSliderBar}>
-                {(templateData?.slotsLayout || []).map((_slot, idx) => {
-                  const src = captures[idx];
-                  if (!src) return null;
-                  return (
-                    <div key={idx} className={styles.editorSliderGroup}>
-                      <span className={styles.editorSliderLabel}>{idx + 1}</span>
-                      <input data-slider type="range" min="1" max="3" step="0.05"
-                        value={photoAdjust[idx]?.scale || 1}
-                        onChange={(e) => {
-                          const v = parseFloat(e.target.value);
-                          setPhotoAdjust((prev) => {
-                            const next = prev.map((a) => ({ ...a }));
-                            next[idx] = { ...next[idx], scale: v };
-                            return next;
-                          });
-                        }} className={styles.editorSlider} />
-                      <span className={styles.editorSliderValue}>{(photoAdjust[idx]?.scale || 1).toFixed(1)}x</span>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           ) : (
             <div className={styles.editorSimplePreview}>
               {captures.map((src, i) => (
                 <img key={i} src={src} alt={`shot ${i}`}
                   className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
-                  style={{ transform: `scale(${photoAdjust[i]?.scale || 1})` }} />
+                  style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: cssFilter }} />
               ))}
             </div>
           )}
@@ -1045,6 +1052,43 @@ function EditorStep({
                 {f === 'none' ? 'Normal' : f === 'grayscale' ? 'B&W' : 'Vintage'}
               </button>
             ))}
+          </div>
+          <div className={styles.editorAdjustSection}>
+            <h4>Zoom per Slot</h4>
+            {(templateData?.slotsLayout || []).map((_slot, idx) => {
+              const src = captures[idx];
+              if (!src) return null;
+              return (
+                <div key={idx} className={styles.editorAdjustRow}>
+                  <span className={styles.editorAdjustLabel}>Slot {idx + 1}</span>
+                  <input data-slider type="range" min="1" max="3" step="0.05"
+                    value={photoAdjust[idx]?.scale || 1}
+                    onChange={(e) => {
+                      const v = parseFloat(e.target.value);
+                      setPhotoAdjust((prev) => {
+                        const next = prev.map((a) => ({ ...a }));
+                        next[idx] = { ...next[idx], scale: v };
+                        return next;
+                      });
+                    }} className={styles.editorSlider} />
+                  <span className={styles.editorAdjustValue}>{(photoAdjust[idx]?.scale || 1).toFixed(1)}x</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className={styles.editorAdjustSection}>
+            <h4>Adjustments</h4>
+            <AdjustSlider label="Brightness" value={imageAdjust.brightness} min={50} max={150}
+              onChange={(v) => setImageAdjust((p) => ({ ...p, brightness: v }))} />
+            <AdjustSlider label="Contrast" value={imageAdjust.contrast} min={50} max={150}
+              onChange={(v) => setImageAdjust((p) => ({ ...p, contrast: v }))} />
+            <AdjustSlider label="Saturation" value={imageAdjust.saturation} min={0} max={200}
+              onChange={(v) => setImageAdjust((p) => ({ ...p, saturation: v }))} />
+            <AdjustSlider label="Temp" value={imageAdjust.temperature} min={-100} max={100}
+              onChange={(v) => setImageAdjust((p) => ({ ...p, temperature: v }))}
+              display={`${imageAdjust.temperature > 0 ? 'Warm' : imageAdjust.temperature < 0 ? 'Cold' : 'Neutral'}`} />
+            <AdjustSlider label="Sharpen" value={imageAdjust.sharpen} min={0} max={100}
+              onChange={(v) => setImageAdjust((p) => ({ ...p, sharpen: v }))} />
           </div>
           <p style={{ fontSize: '12px', color: '#888', lineHeight: '1.5' }}>Drag photo to reposition</p>
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
