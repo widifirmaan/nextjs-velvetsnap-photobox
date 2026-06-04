@@ -998,7 +998,8 @@ function EditorStep({
     const t = a.temperature;
     const hueRotate = t * 0.25;
     const warmSepia = t > 0 ? t * 0.08 : 0;
-    return `brightness(${a.brightness}%) contrast(${a.contrast}%) saturate(${a.saturation}%) hue-rotate(${hueRotate}deg) sepia(${warmSepia}%)`;
+    const blur = a.sharpen < 0 ? `blur(${Math.abs(a.sharpen) * 0.04}px)` : '';
+    return `brightness(${a.brightness}%) contrast(${a.contrast}%) saturate(${a.saturation}%) hue-rotate(${hueRotate}deg) sepia(${warmSepia}%)${blur}`;
   };
 
   return (
@@ -1072,20 +1073,11 @@ function EditorStep({
             ))}
           </div>
 
-          <div className={styles.editorAdjustSection}>
-            <h4>Zoom & Pan</h4>
-            <div className={styles.editorAdjustRow}>
-              <span className={styles.editorAdjustLabel}>Zoom</span>
-              <input data-slider type="range" min="1" max="3" step="0.05"
-                value={sel.scale}
-                onChange={(e) => updateSlot(selectedSlotIdx, { scale: parseFloat(e.target.value) })}
-                className={styles.editorSlider} />
-              <span className={styles.editorAdjustValue}>{sel.scale.toFixed(1)}x</span>
-            </div>
-          </div>
-
-          <div className={styles.editorAdjustSection}>
+              <div className={styles.editorAdjustSection}>
             <h4>Adjustments</h4>
+            <AdjustSlider label="Zoom" value={Math.round(sel.scale * 100)} min={100} max={300}
+              onChange={(v) => updateSlot(selectedSlotIdx, { scale: v / 100 })}
+              display={`${sel.scale.toFixed(1)}x`} />
             <AdjustSlider label="Brightness" value={sel.brightness} min={50} max={150}
               onChange={(v) => updateSlot(selectedSlotIdx, { brightness: v })} />
             <AdjustSlider label="Contrast" value={sel.contrast} min={50} max={150}
@@ -1095,8 +1087,9 @@ function EditorStep({
             <AdjustSlider label="Temp" value={sel.temperature} min={-100} max={100}
               onChange={(v) => updateSlot(selectedSlotIdx, { temperature: v })}
               display={`${sel.temperature > 0 ? 'Warm' : sel.temperature < 0 ? 'Cold' : 'Neutral'}`} />
-            <AdjustSlider label="Sharpen" value={sel.sharpen} min={0} max={100}
-              onChange={(v) => updateSlot(selectedSlotIdx, { sharpen: v })} />
+            <AdjustSlider label="Smooth" value={sel.sharpen} min={-100} max={100}
+              onChange={(v) => updateSlot(selectedSlotIdx, { sharpen: v })}
+              display={`${sel.sharpen > 0 ? 'Sharpen' : sel.sharpen < 0 ? 'Smooth' : 'None'}`} />
           </div>
 
           <p style={{ fontSize: '12px', color: '#888', lineHeight: '1.5' }}>Drag photo to reposition</p>
