@@ -855,46 +855,52 @@ function BoothStep({
 
       <div className={styles.boothControls}>
         {!taking && !dslrCapturing && !busy && (
-          <div className={styles.boothBtnRow}>
-            <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
-            {captureMode === 'manual' ? (
-              <button className={styles.boothBtnPrimary} onClick={handleManualCapture}>
-                <CameraIcon size={24} /> Capture ({filledCount}/{slotsCount})
-              </button>
-            ) : (
-              <button className={styles.boothBtnPrimary} onClick={() => { setTaking(true); takePhoto(slotsCount - filledCount); }}>
-                <CameraIcon size={24} /> Capture
-              </button>
-            )}
-            <div className={styles.boothModeToggle}>
-              <button className={`${styles.boothModeBtn} ${captureMode === 'manual' ? styles.boothModeActive : ''}`}
-                onClick={() => setCaptureMode('manual')}>M</button>
-              <button className={`${styles.boothModeBtn} ${captureMode === 'auto' ? styles.boothModeActive : ''}`}
-                onClick={() => setCaptureMode('auto')}>A</button>
-              <span className={styles.boothModeSlider} style={{ left: captureMode === 'manual' ? '2px' : '50%' }} />
-            </div>
+          <div className={styles.boothControlsWrap}>
             {cameraType === 'webcam' && (
-              <>
-                <div ref={camMenuRef} style={{ position: 'relative' }}>
+              <div ref={camMenuRef} className={styles.boothCamWrapper}>
+                <div className={`${styles.boothCamDropdown} ${showCamMenu ? styles.boothCamDropdownOpen : ''}`}>
+                  {availableCams.length === 0 ? (
+                    <div className={styles.boothCamOption} style={{ cursor: 'default', opacity: 0.5 }}>No cameras found</div>
+                  ) : (
+                    availableCams.map((cam) => (
+                      <button key={cam.deviceId}
+                        className={`${styles.boothCamOption} ${cam.deviceId === deviceId ? styles.boothCamOptionActive : ''}`}
+                        onClick={() => handleSwitchCamera(cam.deviceId)}>{cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}</button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+            <div className={styles.boothBtnRow}>
+              <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
+              {captureMode === 'manual' ? (
+                <button className={styles.boothBtnPrimary} onClick={handleManualCapture}>
+                  <CameraIcon size={24} /> Capture ({filledCount}/{slotsCount})
+                </button>
+              ) : (
+                <button className={styles.boothBtnPrimary} onClick={() => { setTaking(true); takePhoto(slotsCount - filledCount); }}>
+                  <CameraIcon size={24} /> Capture
+                </button>
+              )}
+              <div className={styles.boothModeToggle}>
+                <button className={`${styles.boothModeBtn} ${captureMode === 'manual' ? styles.boothModeActive : ''}`}
+                  onClick={() => setCaptureMode('manual')}>M</button>
+                <button className={`${styles.boothModeBtn} ${captureMode === 'auto' ? styles.boothModeActive : ''}`}
+                  onClick={() => setCaptureMode('auto')}>A</button>
+                <span className={styles.boothModeSlider} style={{ left: captureMode === 'manual' ? '2px' : '50%' }} />
+              </div>
+              {cameraType === 'webcam' && (
+                <>
                   <button className={styles.boothBtnSecondary} onClick={() => setShowCamMenu((v) => !v)} title="Ganti kamera">
                     <RefreshCcw size={18} />
                   </button>
-                  {showCamMenu && (
-                    <div className={styles.boothCamDropdown}>
-                      {availableCams.map((cam) => (
-                        <button key={cam.deviceId}
-                          className={`${styles.boothCamOption} ${cam.deviceId === deviceId ? styles.boothCamOptionActive : ''}`}
-                          onClick={() => handleSwitchCamera(cam.deviceId)}>{cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}</button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                <button className={`${styles.boothBtnSecondary} ${!mirrored ? styles.boothMirrorOff : ''}`}
-                  onClick={() => setMirrored((v) => !v)} title={mirrored ? 'Mirror: ON' : 'Mirror: OFF'}>
-                  <span style={{ fontSize: '16px', fontWeight: 700 }}>⇔</span>
-                </button>
-              </>
-            )}
+                  <button className={`${styles.boothBtnSecondary} ${!mirrored ? styles.boothMirrorOff : ''}`}
+                    onClick={() => setMirrored((v) => !v)} title={mirrored ? 'Mirror: ON' : 'Mirror: OFF'}>
+                    <span style={{ fontSize: '16px', fontWeight: 700 }}>⇔</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>
