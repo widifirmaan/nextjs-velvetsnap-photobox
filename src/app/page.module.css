@@ -1349,6 +1349,8 @@
   border-radius: 8px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.15);
   overflow: hidden;
+  max-height: 80vh;
+  width: auto;
 }
 
 .editorSimplePreview {
@@ -1393,20 +1395,13 @@
   gap: 6px;
   background: rgba(0,0,0,0.5);
   backdrop-filter: blur(4px);
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 20px;
   z-index: 5;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.editorFrame > *:hover .editorSliderOverlay,
-[style*="position: absolute"]:hover .editorSliderOverlay {
-  opacity: 1;
 }
 
 .editorSlider {
-  width: 60px;
+  width: 120px;
   height: 4px;
   accent-color: #ffffff;
   cursor: pointer;

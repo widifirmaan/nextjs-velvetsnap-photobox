@@ -965,7 +965,7 @@ function EditorStep({
       <div className={styles.editorLayout}>
         <div className={styles.editorPreview}>
           {hasTemplate ? (
-            <div className={styles.editorFrame} style={{ width: '320px', aspectRatio: frameRatio, backgroundColor: templateData?.color || '#fff' }}>
+            <div className={styles.editorFrame} style={{ maxHeight: '75vh', width: 'auto', aspectRatio: frameRatio, backgroundColor: templateData?.color || '#fff' }}>
               {(templateData?.slotsLayout || []).map((slot, idx) => {
                 const src = captures[idx];
                 if (!src) return null;
@@ -994,7 +994,7 @@ function EditorStep({
                           transformOrigin: 'center', pointerEvents: 'none',
                         }} />
                       <div className={styles.editorSliderOverlay}>
-                        <input data-slider type="range" min="0.5" max="3" step="0.05"
+                        <input data-slider type="range" min="1" max="3" step="0.05"
                           value={photoAdjust[idx]?.scale || 1}
                           onChange={(e) => {
                             const v = parseFloat(e.target.value);
