@@ -1440,3 +1440,19 @@
     font-size: 16px;
   }
 }
+
+/* ── Step transition ── */
+.stepTransition {
+  animation: stepFadeIn 0.35s ease-out;
+}
+
+@keyframes stepFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

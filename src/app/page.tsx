@@ -160,9 +160,9 @@ export default function Home() {
   }
 
   return step === 0 ? (
-    <HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={() => setStep(1)} />
+    <div className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={() => setStep(1)} /></div>
   ) : (
-    <StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} />
+    <div className={styles.stepTransition}><StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} /></div>
   );
 }
 
