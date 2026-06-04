@@ -1349,8 +1349,6 @@
   border-radius: 8px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.15);
   overflow: hidden;
-  max-height: 80vh;
-  width: auto;
 }
 
 .editorSimplePreview {
@@ -1385,34 +1383,49 @@
   gap: 8px;
 }
 
-.editorSliderOverlay {
+.editorSliderBar {
   position: absolute;
-  bottom: 8px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.editorSliderGroup {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
-  padding: 4px 12px;
-  border-radius: 20px;
-  z-index: 5;
 }
 
 .editorSlider {
-  width: 120px;
+  width: 80px;
   height: 4px;
   accent-color: #ffffff;
   cursor: pointer;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .editorSliderLabel {
-  color: white;
+  color: rgba(255,255,255,0.7);
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 12px;
+  text-align: center;
+}
+
+.editorSliderValue {
+  color: #fff;
   font-size: 11px;
   font-weight: 600;
-  min-width: 28px;
+  min-width: 32px;
   text-align: center;
 }
 

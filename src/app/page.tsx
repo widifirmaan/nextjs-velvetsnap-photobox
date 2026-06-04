@@ -965,7 +965,7 @@ function EditorStep({
       <div className={styles.editorLayout}>
         <div className={styles.editorPreview}>
           {hasTemplate ? (
-            <div className={styles.editorFrame} style={{ maxHeight: '75vh', width: 'auto', aspectRatio: frameRatio, backgroundColor: templateData?.color || '#fff' }}>
+            <div className={styles.editorFrame} style={{ height: 'min(75vh, 600px)', aspectRatio: frameRatio, backgroundColor: templateData?.color || '#fff' }}>
               {(templateData?.slotsLayout || []).map((slot, idx) => {
                 const src = captures[idx];
                 if (!src) return null;
@@ -993,25 +993,34 @@ function EditorStep({
                           transform: `scale(${photoAdjust[idx]?.scale || 1}) translate(${photoAdjust[idx]?.x || 0}%, ${photoAdjust[idx]?.y || 0}%)`,
                           transformOrigin: 'center', pointerEvents: 'none',
                         }} />
-                      <div className={styles.editorSliderOverlay}>
-                        <input data-slider type="range" min="1" max="3" step="0.05"
-                          value={photoAdjust[idx]?.scale || 1}
-                          onChange={(e) => {
-                            const v = parseFloat(e.target.value);
-                            setPhotoAdjust((prev) => {
-                              const next = prev.map((a) => ({ ...a }));
-                              next[idx] = { ...next[idx], scale: v };
-                              return next;
-                            });
-                          }} className={styles.editorSlider} />
-                        <span className={styles.editorSliderLabel}>{(photoAdjust[idx]?.scale || 1).toFixed(1)}x</span>
-                      </div>
                     </div>
                   </div>
                 );
               })}
               <img src={keyedFrameImage || templateData?.frameImage || ''} alt="Frame"
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }} />
+              <div className={styles.editorSliderBar}>
+                {(templateData?.slotsLayout || []).map((_slot, idx) => {
+                  const src = captures[idx];
+                  if (!src) return null;
+                  return (
+                    <div key={idx} className={styles.editorSliderGroup}>
+                      <span className={styles.editorSliderLabel}>{idx + 1}</span>
+                      <input data-slider type="range" min="1" max="3" step="0.05"
+                        value={photoAdjust[idx]?.scale || 1}
+                        onChange={(e) => {
+                          const v = parseFloat(e.target.value);
+                          setPhotoAdjust((prev) => {
+                            const next = prev.map((a) => ({ ...a }));
+                            next[idx] = { ...next[idx], scale: v };
+                            return next;
+                          });
+                        }} className={styles.editorSlider} />
+                      <span className={styles.editorSliderValue}>{(photoAdjust[idx]?.scale || 1).toFixed(1)}x</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <div className={styles.editorSimplePreview}>
