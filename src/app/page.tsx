@@ -669,6 +669,8 @@ function BoothStep({
   const webcamRef = useRef<Webcam>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [taking, setTaking] = useState(false);
+  const [flash, setFlash] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [mirrored, setMirrored] = useState(true);
   const [captureMode, setCaptureMode] = useState<'auto' | 'manual'>('manual');
   const [deviceId, setDeviceId] = useState<string | undefined>(undefined);
@@ -748,7 +750,8 @@ function BoothStep({
   }, [webcamRef, cameraType, mirrored, onAddCapture]);
 
   const handleManualCapture = async () => {
-    if (filledCount >= slotsCount) return;
+    if (filledCount >= slotsCount || busy) return;
+    setBusy(true);
     let timer = 3;
     setCountdown(timer);
     await new Promise<void>((resolve) => {
@@ -758,11 +761,18 @@ function BoothStep({
         else { clearInterval(iv); setCountdown(null); resolve(); }
       }, 1000);
     });
+    setFlash(true);
+    await new Promise((r) => setTimeout(r, 180));
+    setFlash(false);
+    await new Promise((r) => setTimeout(r, 80));
     await capture();
+    await new Promise((r) => setTimeout(r, 400));
+    setBusy(false);
   };
 
   const takePhoto = (remaining: number) => {
-    if (remaining === 0) { setTaking(false); return; }
+    if (remaining === 0) { setTaking(false); setBusy(false); return; }
+    setBusy(true);
     let timer = 3;
     setCountdown(timer);
     const interval = setInterval(() => {
@@ -770,10 +780,14 @@ function BoothStep({
       if (timer > 0) setCountdown(timer);
       else {
         clearInterval(interval); setCountdown(null);
+        setFlash(true);
         setTimeout(() => {
-          capture();
-          setTimeout(() => takePhoto(remaining - 1), 1000);
-        }, 100);
+          setFlash(false);
+          setTimeout(() => {
+            capture();
+            setTimeout(() => takePhoto(remaining - 1), 1000);
+          }, 80);
+        }, 180);
       }
     }, 1000);
   };
@@ -790,6 +804,7 @@ function BoothStep({
               <p>Kamera DSLR terhubung via USB</p>
               {countdown !== null && <div className={styles.boothCountdown}>{countdown}</div>}
               {dslrCapturing && <div className={styles.boothCountdown}><Loader2 className="spin" size={48} /></div>}
+              {flash && <div className={styles.boothFlash} />}
             </div>
           ) : (
             <div className={styles.boothWebcamWrap}>
@@ -803,6 +818,7 @@ function BoothStep({
                 <div className={styles.viewfinderCornerBL} />
                 <div className={styles.viewfinderCornerBR} />
               </div>
+              {flash && <div className={styles.boothFlash} />}
               {countdown !== null && <div className={styles.boothCountdown}>{countdown}</div>}
             </div>
           )}
@@ -838,7 +854,7 @@ function BoothStep({
       </div>
 
       <div className={styles.boothControls}>
-        {!taking && !dslrCapturing && (
+        {!taking && !dslrCapturing && !busy && (
           <div className={styles.boothBtnRow}>
             <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
             {captureMode === 'manual' ? (
