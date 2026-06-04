@@ -1043,16 +1043,6 @@ function EditorStep({
           <button className={styles.boothBtnSecondary} onClick={handleRetake} style={{ alignSelf: 'flex-start' }}>
             <ArrowLeft size={16} /> Back
           </button>
-          <h3>Filters</h3>
-          <div className={styles.editorFilters}>
-            {['none', 'grayscale', 'sepia'].map((f) => (
-              <button key={f}
-                className={`${styles.boothBtnSecondary} ${selectedFilter === f ? styles.boothBtnPrimary : ''}`}
-                onClick={() => setSelectedFilter(f)}>
-                {f === 'none' ? 'Normal' : f === 'grayscale' ? 'B&W' : 'Vintage'}
-              </button>
-            ))}
-          </div>
           <div className={styles.editorAdjustSection}>
             <h4>Zoom per Slot</h4>
             {(templateData?.slotsLayout || []).map((_slot, idx) => {
