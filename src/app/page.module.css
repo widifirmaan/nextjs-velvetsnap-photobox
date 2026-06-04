@@ -1665,6 +1665,9 @@
     flex-direction: column;
     align-items: center;
   }
+  .resultImage img {
+    max-width: 220px;
+  }
   .resultActions {
     width: 100%;
     flex-direction: row;
