@@ -465,8 +465,8 @@ function StepperFlow({ step, setStep, allTemplates }: {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
   const [captures, setCaptures] = useState<string[]>([]);
-  const [photoAdjust, setPhotoAdjust] = useState<{ scale: number; x: number; y: number }[]>([]);
-  const [imageAdjust, setImageAdjust] = useState({ brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 });
+  const [photoAdjust, setPhotoAdjust] = useState<{ scale: number; x: number; y: number; brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }[]>([]);
+  const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState('none');
   const [keyedFrameImage, setKeyedFrameImage] = useState('');
   const [frameRatio, setFrameRatio] = useState(2 / 3);
@@ -525,7 +525,7 @@ function StepperFlow({ step, setStep, allTemplates }: {
   };
 
   useEffect(() => {
-    setPhotoAdjust(captures.map(() => ({ scale: 1, x: 0, y: 0 })));
+    setPhotoAdjust(captures.map(() => ({ scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 })));
   }, [captures]);
 
   useEffect(() => {
@@ -575,8 +575,8 @@ function StepperFlow({ step, setStep, allTemplates }: {
       frameRatio={frameRatio}
       photoAdjust={photoAdjust}
       setPhotoAdjust={setPhotoAdjust}
-      imageAdjust={imageAdjust}
-      setImageAdjust={setImageAdjust}
+      selectedSlotIdx={selectedSlotIdx}
+      setSelectedSlotIdx={setSelectedSlotIdx}
       selectedFilter={selectedFilter}
       setSelectedFilter={setSelectedFilter}
       onNext={() => setStep(4)}
@@ -943,15 +943,14 @@ function AdjustSlider({ label, value, min, max, onChange, display }: {
 function EditorStep({
   captures, templateData, keyedFrameImage, frameRatio,
   photoAdjust, setPhotoAdjust,
-  imageAdjust, setImageAdjust,
+  selectedSlotIdx, setSelectedSlotIdx,
   selectedFilter, setSelectedFilter,
   onNext, onBack,
 }: {
   captures: string[]; templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
-  photoAdjust: { scale: number; x: number; y: number }[];
-  setPhotoAdjust: React.Dispatch<React.SetStateAction<{ scale: number; x: number; y: number }[]>>;
-  imageAdjust: { brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number };
-  setImageAdjust: React.Dispatch<React.SetStateAction<{ brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }>>;
+  photoAdjust: { scale: number; x: number; y: number; brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }[];
+  setPhotoAdjust: React.Dispatch<React.SetStateAction<{ scale: number; x: number; y: number; brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }[]>>;
+  selectedSlotIdx: number; setSelectedSlotIdx: (v: number) => void;
   selectedFilter: string; setSelectedFilter: (v: string) => void;
   onNext: () => void; onBack: () => void;
 }) {
@@ -966,7 +965,7 @@ function EditorStep({
       const dy = (e.clientY - panStart.my) / 4;
       setPhotoAdjust((prev) => {
         const next = prev.map((a) => ({ ...a }));
-        next[panSlot] = { scale: next[panSlot]?.scale || 1, x: panStart.ox + dx, y: panStart.oy + dy };
+        next[panSlot] = { ...next[panSlot], x: panStart.ox + dx, y: panStart.oy + dy };
         return next;
       });
     };
@@ -980,12 +979,27 @@ function EditorStep({
 
   const hasTemplate = templateData && templateData.frameImage && templateData.slotsLayout && templateData.slotsLayout.length > 0;
 
-  const cssFilter = useMemo(() => {
-    const t = imageAdjust.temperature;
+  const slotSources = (templateData?.slotsLayout || []).map((_, idx) => captures[idx]);
+
+  const sel = photoAdjust[selectedSlotIdx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 };
+
+  const updateSlot = (idx: number, patch: Partial<typeof sel>) => {
+    setPhotoAdjust((prev) => {
+      const next = prev.map((a) => ({ ...a }));
+      if (!next[idx]) next[idx] = { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 };
+      Object.assign(next[idx], patch);
+      return next;
+    });
+  };
+
+  const slotCssFilter = (idx: number) => {
+    const a = photoAdjust[idx];
+    if (!a) return '';
+    const t = a.temperature;
     const hueRotate = t * 0.25;
     const warmSepia = t > 0 ? t * 0.08 : 0;
-    return `brightness(${imageAdjust.brightness}%) contrast(${imageAdjust.contrast}%) saturate(${imageAdjust.saturation}%) hue-rotate(${hueRotate}deg) sepia(${warmSepia}%)`;
-  }, [imageAdjust]);
+    return `brightness(${a.brightness}%) contrast(${a.contrast}%) saturate(${a.saturation}%) hue-rotate(${hueRotate}deg) sepia(${warmSepia}%)`;
+  };
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageEditor}`}>
@@ -1009,7 +1023,7 @@ function EditorStep({
                         const target = e.target as HTMLElement;
                         if (target.closest('[data-slider]')) return;
                         e.preventDefault();
-                        const a = photoAdjust[idx] || { scale: 1, x: 0, y: 0 };
+                        const a = photoAdjust[idx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 };
                         setPanSlot(idx);
                         setPanStart({ mx: e.clientX, my: e.clientY, ox: a.x, oy: a.y });
                       }}
@@ -1020,7 +1034,7 @@ function EditorStep({
                           width: '100%', height: '100%', objectFit: 'cover',
                           transform: `scale(${photoAdjust[idx]?.scale || 1}) translate(${photoAdjust[idx]?.x || 0}%, ${photoAdjust[idx]?.y || 0}%)`,
                           transformOrigin: 'center', pointerEvents: 'none',
-                          filter: cssFilter,
+                          filter: slotCssFilter(idx),
                         }} />
                     </div>
                   </div>
@@ -1034,7 +1048,7 @@ function EditorStep({
               {captures.map((src, i) => (
                 <img key={i} src={src} alt={`shot ${i}`}
                   className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
-                  style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: cssFilter }} />
+                  style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: slotCssFilter(i) }} />
               ))}
             </div>
           )}
@@ -1043,43 +1057,48 @@ function EditorStep({
           <button className={styles.boothBtnSecondary} onClick={handleRetake} style={{ alignSelf: 'flex-start' }}>
             <ArrowLeft size={16} /> Back
           </button>
-          <div className={styles.editorAdjustSection}>
-            <h4>Zoom per Slot</h4>
-            {(templateData?.slotsLayout || []).map((_slot, idx) => {
-              const src = captures[idx];
-              if (!src) return null;
-              return (
-                <div key={idx} className={styles.editorAdjustRow}>
-                  <span className={styles.editorAdjustLabel}>Slot {idx + 1}</span>
-                  <input data-slider type="range" min="1" max="3" step="0.05"
-                    value={photoAdjust[idx]?.scale || 1}
-                    onChange={(e) => {
-                      const v = parseFloat(e.target.value);
-                      setPhotoAdjust((prev) => {
-                        const next = prev.map((a) => ({ ...a }));
-                        next[idx] = { ...next[idx], scale: v };
-                        return next;
-                      });
-                    }} className={styles.editorSlider} />
-                  <span className={styles.editorAdjustValue}>{(photoAdjust[idx]?.scale || 1).toFixed(1)}x</span>
-                </div>
-              );
-            })}
+
+          <div className={styles.editorSlotGrid}>
+            {slotSources.map((src, idx) => (
+              <button key={idx}
+                className={`${styles.editorSlotThumb} ${selectedSlotIdx === idx ? styles.editorSlotThumbActive : ''}`}
+                onClick={() => setSelectedSlotIdx(idx)}>
+                {src ? (
+                  <img src={src} alt={`Slot ${idx + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <span>{idx + 1}</span>
+                )}
+              </button>
+            ))}
           </div>
+
+          <div className={styles.editorAdjustSection}>
+            <h4>Zoom & Pan</h4>
+            <div className={styles.editorAdjustRow}>
+              <span className={styles.editorAdjustLabel}>Zoom</span>
+              <input data-slider type="range" min="1" max="3" step="0.05"
+                value={sel.scale}
+                onChange={(e) => updateSlot(selectedSlotIdx, { scale: parseFloat(e.target.value) })}
+                className={styles.editorSlider} />
+              <span className={styles.editorAdjustValue}>{sel.scale.toFixed(1)}x</span>
+            </div>
+          </div>
+
           <div className={styles.editorAdjustSection}>
             <h4>Adjustments</h4>
-            <AdjustSlider label="Brightness" value={imageAdjust.brightness} min={50} max={150}
-              onChange={(v) => setImageAdjust((p) => ({ ...p, brightness: v }))} />
-            <AdjustSlider label="Contrast" value={imageAdjust.contrast} min={50} max={150}
-              onChange={(v) => setImageAdjust((p) => ({ ...p, contrast: v }))} />
-            <AdjustSlider label="Saturation" value={imageAdjust.saturation} min={0} max={200}
-              onChange={(v) => setImageAdjust((p) => ({ ...p, saturation: v }))} />
-            <AdjustSlider label="Temp" value={imageAdjust.temperature} min={-100} max={100}
-              onChange={(v) => setImageAdjust((p) => ({ ...p, temperature: v }))}
-              display={`${imageAdjust.temperature > 0 ? 'Warm' : imageAdjust.temperature < 0 ? 'Cold' : 'Neutral'}`} />
-            <AdjustSlider label="Sharpen" value={imageAdjust.sharpen} min={0} max={100}
-              onChange={(v) => setImageAdjust((p) => ({ ...p, sharpen: v }))} />
+            <AdjustSlider label="Brightness" value={sel.brightness} min={50} max={150}
+              onChange={(v) => updateSlot(selectedSlotIdx, { brightness: v })} />
+            <AdjustSlider label="Contrast" value={sel.contrast} min={50} max={150}
+              onChange={(v) => updateSlot(selectedSlotIdx, { contrast: v })} />
+            <AdjustSlider label="Saturation" value={sel.saturation} min={0} max={200}
+              onChange={(v) => updateSlot(selectedSlotIdx, { saturation: v })} />
+            <AdjustSlider label="Temp" value={sel.temperature} min={-100} max={100}
+              onChange={(v) => updateSlot(selectedSlotIdx, { temperature: v })}
+              display={`${sel.temperature > 0 ? 'Warm' : sel.temperature < 0 ? 'Cold' : 'Neutral'}`} />
+            <AdjustSlider label="Sharpen" value={sel.sharpen} min={0} max={100}
+              onChange={(v) => updateSlot(selectedSlotIdx, { sharpen: v })} />
           </div>
+
           <p style={{ fontSize: '12px', color: '#888', lineHeight: '1.5' }}>Drag photo to reposition</p>
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button className={`${styles.boothBtnSecondary} ${styles.editorRetakeBtn}`} onClick={handleRetake}>
