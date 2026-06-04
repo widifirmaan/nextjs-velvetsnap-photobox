@@ -1,8 +1,10 @@
 'use client';
 
-import { ArrowLeft, CheckCircle, QrCode } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import styles from '@/app/page.module.css';
 import StepperBar from './StepperBar';
+import PaymentPending from './paymentstep/PaymentPending';
+import PaymentSuccess from './paymentstep/PaymentSuccess';
 
 export default function PaymentStep({
   price, paid, setPaid, errMsg, setErrMsg,
@@ -41,22 +43,7 @@ export default function PaymentStep({
         </div>
         <h2 className={styles.stepHeading}>Payment</h2>
         <p style={{ color: '#888', marginBottom: '24px' }}>Scan the QRIS code to pay</p>
-        {paid ? (
-          <div className={styles.paymentSuccess}>
-            <CheckCircle size={80} color="#262626" />
-            <h3>Payment Successful!</h3>
-            <p>Preparing your photos...</p>
-          </div>
-        ) : (
-          <>
-            <div className={styles.paymentQr}><QrCode size={120} color="#1d1d1f" /></div>
-            <div className={styles.paymentPrice}>Rp {price.toLocaleString('id-ID')}</div>
-            {errMsg && <p style={{ color: 'red', fontSize: '13px', marginTop: '12px', textAlign: 'center' }}>{errMsg}</p>}
-            <button className={styles.boothBtnPrimary} onClick={handlePay} style={{ width: '100%', marginTop: '24px' }}>
-              Simulate Successful Payment
-            </button>
-          </>
-        )}
+        {paid ? <PaymentSuccess /> : <PaymentPending price={price} errMsg={errMsg} onPay={handlePay} />}
       </div>
     </div>
   );
