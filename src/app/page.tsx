@@ -858,12 +858,12 @@ function BoothStep({
           <div className={styles.boothBtnRow}>
               <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
               {captureMode === 'manual' ? (
-                <button className={styles.boothBtnPrimary} onClick={handleManualCapture}>
-                  <CameraIcon size={24} /> Capture ({filledCount}/{slotsCount})
+                <button className={styles.boothBtnPrimary} onClick={handleManualCapture} disabled={filledCount >= slotsCount || busy}>
+                  <CameraIcon size={22} /> {filledCount}/{slotsCount}
                 </button>
               ) : (
-                <button className={styles.boothBtnPrimary} onClick={() => { setTaking(true); takePhoto(slotsCount - filledCount); }}>
-                  <CameraIcon size={24} /> Capture
+                <button className={styles.boothBtnPrimary} onClick={() => { setTaking(true); takePhoto(slotsCount - filledCount); }} disabled={filledCount >= slotsCount || busy}>
+                  <CameraIcon size={22} /> {filledCount}/{slotsCount}
                 </button>
               )}
               <div className={styles.boothModeToggle}>

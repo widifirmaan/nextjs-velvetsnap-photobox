@@ -1171,18 +1171,23 @@
 }
 
 .boothBtnPrimary {
-  padding: 12px 24px;
+  padding: 12px 20px;
   border: none;
   border-radius: 12px;
   background: #262626;
   color: #fff;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: opacity 0.15s;
+}
+
+.boothBtnPrimary:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
 .boothBtnPrimary:active {
@@ -1190,17 +1195,17 @@
 }
 
 .boothBtnSecondary {
-  padding: 10px 20px;
+  padding: 10px 16px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background: #fff;
   color: #262626;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: background 0.15s;
 }
 
