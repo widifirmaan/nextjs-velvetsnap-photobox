@@ -498,9 +498,9 @@
 }
 
 .fanSlide {
-  height: 90%;
+  height: 75%;
   width: auto;
-  max-height: 100%;
+  max-height: 460px;
   display: block;
   object-fit: contain;
   border-radius: 8px;
@@ -682,5 +682,761 @@
   }
   .cardSmallTitle {
     font-size: 14px;
+  }
+}
+
+/* ════════════════════════════════════════
+   STEPPER FLOW (steps 1-5)
+   ════════════════════════════════════════ */
+
+.stepPage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stepHeading {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.backBtn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #262626;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.backBtn:active {
+  background: #f0f0f0;
+}
+
+.stepLoading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 15px;
+}
+
+/* ── Stepper Bar ── */
+
+.boothStepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.boothStepItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boothStepDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e8e8e8;
+  color: #999;
+  transition: all 0.25s;
+}
+
+.boothStepActive .boothStepDot {
+  background: #262626;
+  color: #fff;
+}
+
+.boothStepDone .boothStepDot {
+  background: #262626;
+  color: #fff;
+}
+
+.boothStepLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #999;
+  transition: color 0.25s;
+}
+
+.boothStepLabelActive {
+  color: #262626;
+  font-weight: 600;
+}
+
+.boothStepLabelDone {
+  color: #555;
+}
+
+.boothStepLine {
+  width: 32px;
+  height: 1.5px;
+  background: #ddd;
+  margin: 0 10px;
+  transition: background 0.25s;
+}
+
+.boothStepLineDone {
+  background: #262626;
+}
+
+/* ── Step 1: Template Grid ── */
+
+.stepPageTemplates {
+  align-items: center;
+}
+
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+  align-content: start;
+  padding-bottom: 16px;
+  overflow-y: auto;
+}
+
+.templateCard {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 20px;
+  border: 1.5px solid #eee;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.templateCard:active {
+  transform: scale(0.97);
+}
+
+.templateCardThumb {
+  width: 100%;
+  aspect-ratio: 2 / 3.2;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.templateCardThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.templateCardBody {
+  padding: 14px 16px 16px;
+}
+
+.templateCardName {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.templateCardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.templateCardPrice {
+  font-weight: 700;
+  font-size: 16px;
+  color: #262626;
+}
+
+.slotDots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.slotDot {
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  background: #262626;
+}
+
+/* ── Step 2: Booth ── */
+
+.stepPageBooth {
+  align-items: center;
+}
+
+.boothInfo {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #888;
+}
+
+.boothContent {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+  align-items: flex-start;
+  flex: 1;
+  min-height: 0;
+}
+
+.boothViewfinder {
+  flex: 1;
+}
+
+.boothWebcamWrap {
+  position: relative;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  background: #000;
+}
+
+.boothWebcam {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.boothDslrPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2d2d2d;
+  min-height: 300px;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 24px;
+}
+
+.boothDslrPlaceholder p {
+  color: #fff;
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+.boothCountdown {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 96px;
+  font-weight: 700;
+  z-index: 10;
+  border-radius: 24px;
+}
+
+.boothPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.boothStripPreview {
+  width: 120px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.boothStripPreview img {
+  display: block;
+}
+
+.boothDeleteSlot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 2;
+  padding: 0;
+}
+
+.boothStripPreview > [style*="position: absolute"]:hover .boothDeleteSlot {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .boothDeleteSlot { opacity: 1; }
+}
+
+.boothProceedBtn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: #262626;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: opacity 0.15s;
+}
+
+.boothProceedBtn:active {
+  opacity: 0.8;
+}
+
+.boothControls {
+  margin-top: 20px;
+}
+
+.boothBtnRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.boothBtnPrimary {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  background: #262626;
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.15s;
+}
+
+.boothBtnPrimary:active {
+  opacity: 0.8;
+}
+
+.boothBtnSecondary {
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fff;
+  color: #262626;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.boothBtnSecondary:active {
+  background: #f5f5f5;
+}
+
+.boothModeToggle {
+  position: relative;
+  display: flex;
+  background: rgba(0,0,0,0.06);
+  border-radius: 100px;
+  padding: 2px;
+  width: 72px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.boothModeBtn {
+  all: unset;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  position: relative;
+  color: #888;
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+
+.boothModeActive {
+  color: #262626;
+}
+
+.boothModeSlider {
+  position: absolute;
+  top: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  background: #fff;
+  border-radius: 100px;
+  transition: left 0.15s;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.boothCamDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 200px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 6px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  border: 1px solid #eee;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.boothCamOption {
+  all: unset;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  transition: background 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boothCamOption:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.boothCamOptionActive {
+  background: rgba(0,0,0,0.06);
+  font-weight: 600;
+}
+
+.boothMirrorOff {
+  opacity: 0.4;
+}
+
+/* ── Step 3: Editor ── */
+
+.stepPageEditor {
+  align-items: center;
+}
+
+.editorLayout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 1000px;
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+}
+
+.editorPreview {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.editorFrame {
+  position: relative;
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.editorSimplePreview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.editorSimplePreview img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.editorSidebar {
+  width: 260px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1.5px solid #eee;
+  min-height: 400px;
+}
+
+.editorFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editorSliderOverlay {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  padding: 4px 10px;
+  border-radius: 20px;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.editorFrame > *:hover .editorSliderOverlay,
+[style*="position: absolute"]:hover .editorSliderOverlay {
+  opacity: 1;
+}
+
+.editorSlider {
+  width: 60px;
+  height: 4px;
+  accent-color: #ffffff;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.editorSliderLabel {
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  min-width: 28px;
+  text-align: center;
+}
+
+.editorRetakeBtn {
+  justify-content: center;
+}
+
+.filterGray {
+  filter: grayscale(100%);
+}
+
+.filterSepia {
+  filter: sepia(0.8) contrast(1.2) hue-rotate(-15deg);
+}
+
+/* ── Step 4: Payment ── */
+
+.stepPagePayment {
+  align-items: center;
+  justify-content: center;
+}
+
+.paymentCard {
+  background: #fff;
+  border-radius: 24px;
+  border: 1.5px solid #eee;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.paymentQr {
+  background: #f8f8f8;
+  padding: 24px;
+  border-radius: 20px;
+  margin: 16px 0;
+}
+
+.paymentPrice {
+  font-size: 28px;
+  font-weight: 700;
+  color: #262626;
+}
+
+.paymentSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.paymentSuccess h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.paymentSuccess p {
+  color: #888;
+}
+
+/* ── Step 5: Result ── */
+
+.stepPageResult {
+  align-items: center;
+}
+
+.resultLayout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 700px;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.resultImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.resultImage img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.resultActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 200px;
+  padding-top: 4px;
+}
+
+.resultHomeBtn {
+  margin-top: auto;
+}
+
+/* ── Step Responsive ── */
+
+@media (max-width: 768px) {
+  .stepPage {
+    padding: 24px 16px 16px;
+  }
+  .boothStepLine {
+    width: 16px;
+    margin: 0 6px;
+  }
+  .boothStepLabel {
+    display: none;
+  }
+  .boothContent {
+    flex-direction: column;
+    align-items: center;
+  }
+  .boothStripPreview {
+    width: 80px;
+  }
+  .boothControls {
+    margin-top: 12px;
+  }
+  .editorLayout {
+    flex-direction: column;
+    align-items: center;
+  }
+  .editorSidebar {
+    width: 100%;
+    min-height: auto;
+  }
+  .resultLayout {
+    flex-direction: column;
+    align-items: center;
+  }
+  .resultActions {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .templateGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .boothBtnRow {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .templateGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .boothBtnPrimary {
+    padding: 14px 20px;
+    font-size: 16px;
   }
 }

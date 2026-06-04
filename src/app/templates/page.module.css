@@ -6,8 +6,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
   overflow: hidden;
+  width: 100%;
 }
 
 /* ── Stepper ── */
@@ -16,6 +16,7 @@
   align-items: center;
   gap: 0;
   margin-bottom: 16px;
+  align-self: center;
 }
 
 .stepItem {
@@ -83,37 +84,6 @@
   margin: 0;
 }
 
-/* ── View Toggle ── */
-.toggleRow {
-  display: flex;
-  gap: 3px;
-  padding: 3px;
-  background: #f0f0f0;
-  border-radius: 12px;
-}
-
-.toggleBtn {
-  all: unset;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 7px 16px;
-  border-radius: 9px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #888;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-height: 36px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.toggleActive {
-  background: #fff;
-  color: #262626;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
-
 /* ── Back ── */
 .backBtn {
   all: unset;
@@ -132,91 +102,6 @@
 
 .backBtn:active {
   background: #f0f0f0;
-}
-
-/* ── Carousel Track (CoverFlow) ── */
-.carouselTrack {
-  width: 100vw;
-  max-width: 1200px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  display: flex;
-  align-items: center;
-  padding: 0 18%;
-  perspective: 1000px;
-  perspective-origin: center center;
-}
-
-@media (min-width: 769px) {
-  .carouselTrack {
-    height: calc(100dvh - 150px);
-    min-height: 460px;
-  }
-  .carouselSlide {
-    height: 95%;
-  }
-}
-
-.carouselTrack::-webkit-scrollbar {
-  display: none;
-}
-
-.carouselSlide {
-  height: 92%;
-  width: auto;
-  flex-shrink: 0;
-  cursor: pointer;
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  margin-left: -60px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.carouselSlide:first-child {
-  margin-left: 0;
-}
-
-.carouselSlideInner {
-  height: 100%;
-  aspect-ratio: 2 / 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.carouselSlideInner img {
-  height: 100%;
-  width: 100%;
-  object-fit: contain;
-  display: block;
-  user-select: none;
-  -webkit-user-drag: none;
-}
-
-.carouselSlideLabel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #262626;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.carouselSlideName {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.carouselSlidePrice {
-  font-size: 13px;
-  font-weight: 600;
-  color: #555;
 }
 
 /* ── Grid View ── */
@@ -338,18 +223,6 @@
   .heading {
     font-size: 17px;
   }
-  .toggleBtn {
-    padding: 6px 12px;
-    font-size: 12px;
-    min-height: 32px;
-  }
-  .carouselTrack {
-    padding: 0 10%;
-  }
-  .carouselSlide {
-    height: 88%;
-    margin-left: -40px;
-  }
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 12px;
@@ -368,8 +241,5 @@
   .grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
-  }
-  .carouselTrack {
-    padding: 0 6%;
   }
 }
