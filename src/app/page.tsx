@@ -720,8 +720,23 @@ function BoothStep({
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showCamMenu]);
 
+  const isFrontCamera = useMemo(() => {
+    if (!deviceId || !availableCams.length) return true;
+    const cam = availableCams.find((c) => c.deviceId === deviceId);
+    if (!cam) return true;
+    const label = cam.label.toLowerCase();
+    return label.includes('front') || label.includes('facetime') || label.includes('built-in');
+  }, [deviceId, availableCams]);
+
+  useEffect(() => {
+    if (!isFrontCamera) setMirrored(false);
+  }, [isFrontCamera]);
+
   const handleSwitchCamera = (camId: string) => {
     setDeviceId(camId); setShowCamMenu(false);
+    const cam = availableCams.find((c) => c.deviceId === camId);
+    const front = cam ? (cam.label.toLowerCase().includes('front') || cam.label.toLowerCase().includes('facetime') || cam.label.toLowerCase().includes('built-in')) : true;
+    if (!front) setMirrored(false);
     try {
       const raw = localStorage.getItem('velvetsnap_device_settings');
       const s = raw ? JSON.parse(raw) : {};
@@ -889,10 +904,12 @@ function BoothStep({
                   <button className={styles.boothBtnSecondary} onClick={() => setShowCamMenu((v) => !v)} title="Ganti kamera">
                     <RefreshCcw size={18} />
                   </button>
-                  <button className={`${styles.boothBtnSecondary} ${!mirrored ? styles.boothMirrorOff : ''}`}
-                    onClick={() => setMirrored((v) => !v)} title={mirrored ? 'Mirror: ON' : 'Mirror: OFF'}>
-                    <FlipHorizontal size={18} />
-                  </button>
+                  {isFrontCamera && (
+                    <button className={`${styles.boothBtnSecondary} ${!mirrored ? styles.boothMirrorOff : ''}`}
+                      onClick={() => setMirrored((v) => !v)} title={mirrored ? 'Mirror: ON' : 'Mirror: OFF'}>
+                      <FlipHorizontal size={18} />
+                    </button>
+                  )}
                 </div>
               )}
             </div>
