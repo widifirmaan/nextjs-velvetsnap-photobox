@@ -847,7 +847,7 @@ function BoothStep({
               <img src={keyedFrameImage || templateData.frameImage || ''} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
             </div>
             {filledCount === slotsCount && (
-              <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Proses & Lanjut ke Edit</button>
+              <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Edit</button>
             )}
           </div>
         )}

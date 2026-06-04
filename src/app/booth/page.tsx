@@ -702,7 +702,7 @@ function BoothContent() {
           </div>
           {filledCount === slotsCount && (
             <button className="mac-button" onClick={() => setStep('editor')} style={{ marginTop: '8px', padding: '10px 24px', fontSize: '14px', width: '100%' }}>
-              <Check size={16} /> Proses & Lanjut ke Edit
+              <Check size={16} /> Edit
             </button>
           )}
         </div>
