@@ -954,27 +954,6 @@ function EditorStep({
   selectedFilter: string; setSelectedFilter: (v: string) => void;
   onNext: () => void; onBack: () => void;
 }) {
-  const [panSlot, setPanSlot] = useState<number | null>(null);
-  const [panStart, setPanStart] = useState<{ mx: number; my: number; ox: number; oy: number } | null>(null);
-
-  useEffect(() => {
-    if (panSlot === null) return;
-    const onMove = (e: MouseEvent) => {
-      if (panSlot === null || !panStart) return;
-      const dx = (e.clientX - panStart.mx) / 4;
-      const dy = (e.clientY - panStart.my) / 4;
-      setPhotoAdjust((prev) => {
-        const next = prev.map((a) => ({ ...a }));
-        next[panSlot] = { ...next[panSlot], x: panStart.ox + dx, y: panStart.oy + dy };
-        return next;
-      });
-    };
-    const onUp = () => { setPanSlot(null); setPanStart(null); };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onUp);
-    return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
-  }, [panSlot, panStart, setPhotoAdjust]);
-
   const handleRetake = () => onBack();
 
   const hasTemplate = templateData && templateData.frameImage && templateData.slotsLayout && templateData.slotsLayout.length > 0;
@@ -1018,16 +997,7 @@ function EditorStep({
                     width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden', zIndex: 1,
                   }}>
                     <div
-                      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', cursor: 'grab' }}
-                      onMouseDown={(e) => {
-                        if (e.button !== 0) return;
-                        const target = e.target as HTMLElement;
-                        if (target.closest('[data-slider]')) return;
-                        e.preventDefault();
-                        const a = photoAdjust[idx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 };
-                        setPanSlot(idx);
-                        setPanStart({ mx: e.clientX, my: e.clientY, ox: a.x, oy: a.y });
-                      }}
+                      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
                     >
                       <img src={src} alt={`Slot ${idx}`}
                         className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
@@ -1092,7 +1062,6 @@ function EditorStep({
               display={`${sel.sharpen > 0 ? 'Sharpen' : sel.sharpen < 0 ? 'Smooth' : 'None'}`} />
           </div>
 
-          <p style={{ fontSize: '12px', color: '#888', lineHeight: '1.5' }}>Drag photo to reposition</p>
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button className={`${styles.boothBtnSecondary} ${styles.editorRetakeBtn}`} onClick={handleRetake}>
               <RefreshCcw size={18} /> Retake All
