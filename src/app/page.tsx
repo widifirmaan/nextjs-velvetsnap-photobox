@@ -248,7 +248,8 @@ function HomePage({ onStart }: { onStart: () => void }) {
 
   useEffect(() => {
     if (!strips.length) return;
-    return () => { cancelAnimationFrame(autoRef.current); clearTimeout(resumeTimer.current); };
+    const t = setTimeout(startAutoScroll, 100);
+    return () => { clearTimeout(t); cancelAnimationFrame(autoRef.current); clearTimeout(resumeTimer.current); };
   }, [startAutoScroll, strips.length]);
 
   return (
