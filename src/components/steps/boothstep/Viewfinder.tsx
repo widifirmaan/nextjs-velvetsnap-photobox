@@ -7,7 +7,7 @@ import Webcam from 'react-webcam';
 export default function Viewfinder({
   cameraType, webcamRef, deviceId, mirrored, dslrCapturing, flash, countdown,
 }: {
-  cameraType: string; webcamRef: React.RefObject<Webcam>; deviceId: string | undefined;
+  cameraType: string; webcamRef: React.RefObject<Webcam | null>; deviceId: string | undefined;
   mirrored: boolean; dslrCapturing: boolean; flash: boolean; countdown: number | null;
 }) {
   if (cameraType === 'dslr') {
