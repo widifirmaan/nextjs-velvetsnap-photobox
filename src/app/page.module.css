@@ -1443,13 +1443,13 @@
 
 /* ── Step transition ── */
 .stepTransition {
-  animation: stepFadeIn 0.35s ease-out;
+  animation: stepSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes stepFadeIn {
+@keyframes stepSlideIn {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(32px);
   }
   to {
     opacity: 1;
