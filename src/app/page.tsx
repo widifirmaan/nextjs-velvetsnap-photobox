@@ -673,7 +673,7 @@ function BoothStep({
   const [taking, setTaking] = useState(false);
   const [flash, setFlash] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [mirrored, setMirrored] = useState(true);
+  const [mirrored, setMirrored] = useState(false);
   const [captureMode, setCaptureMode] = useState<'auto' | 'manual'>('manual');
   const [deviceId, setDeviceId] = useState<string | undefined>(undefined);
   const [cameraType, setCameraType] = useState<'webcam' | 'dslr'>('webcam');
@@ -731,14 +731,14 @@ function BoothStep({
   }, [deviceId, availableCams]);
 
   useEffect(() => {
-    if (!isFrontCamera) setMirrored(false);
+    setMirrored(isFrontCamera);
   }, [isFrontCamera]);
 
   const handleSwitchCamera = (camId: string) => {
     setDeviceId(camId); setShowCamMenu(false);
     const cam = availableCams.find((c) => c.deviceId === camId);
     const front = cam ? (cam.label.toLowerCase().includes('front') || cam.label.toLowerCase().includes('facetime') || cam.label.toLowerCase().includes('built-in')) : true;
-    if (!front) setMirrored(false);
+    setMirrored(front);
     try {
       const raw = localStorage.getItem('velvetsnap_device_settings');
       const s = raw ? JSON.parse(raw) : {};
