@@ -1658,8 +1658,41 @@
   }
   .editorSidebar {
     width: 200px;
-    padding: 16px;
+    padding: 14px;
     min-height: auto;
+    gap: 12px;
+    overflow-y: auto;
+  }
+  .editorSidebar .editorAdjustSection {
+    padding: 8px 0;
+    gap: 6px;
+  }
+  .editorSidebar .editorAdjustRow {
+    min-height: 32px;
+    gap: 8px;
+  }
+  .editorSidebar .editorAdjustLabel {
+    font-size: 11px;
+    min-width: 40px;
+  }
+  .editorSidebar .editorAdjustValue {
+    font-size: 11px;
+    min-width: 32px;
+  }
+  .editorSidebar .editorSlider {
+    height: 20px;
+  }
+  .editorSidebar .editorSlider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  .editorSidebar .editorSlider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  .editorSidebar .editorSlotThumb {
+    width: 48px;
+    height: 48px;
   }
   .resultLayout {
     flex-direction: column;
