@@ -1,4 +1,4 @@
-const CACHE = 'velvetsnap-v1';
+const CACHE = 'velvetsnap-v2';
 
 const PRECACHE_URLS = [
   '/',
