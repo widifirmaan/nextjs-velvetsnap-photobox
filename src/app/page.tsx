@@ -543,10 +543,11 @@ function StepperFlow({ step, setStep, allTemplates }: {
   const startOver = () => { setStep(0); setCaptures([]); setTemplateId(null); setTemplateData(null); setCompositedImage(null); setPaid(false); setErrMsg(null); };
 
   /* ── Render: Template Picker (Step 1) ── */
-  if (step === 1) return <TemplateStep templates={allTemplates} onSelect={handleSelectTemplate} onBack={() => setStep(0)} />;
+  if (step === 1) return <div className={styles.stepTransition}><TemplateStep templates={allTemplates} onSelect={handleSelectTemplate} onBack={() => setStep(0)} /></div>;
 
   /* ── Render: Booth (Step 2) ── */
   if (step === 2) return (
+    <div className={styles.stepTransition}>
     <BoothStep
       templateId={templateId || 't1'}
       templateName={templateData?.name || TEMPLATE_CONFIGS[templateId || '']?.name || ''}
@@ -561,10 +562,12 @@ function StepperFlow({ step, setStep, allTemplates }: {
       onNext={() => setStep(3)}
       onBack={() => { setStep(1); setCaptures([]); }}
     />
+    </div>
   );
 
   /* ── Render: Editor (Step 3) ── */
   if (step === 3) return (
+    <div className={styles.stepTransition}>
     <EditorStep
       captures={captures}
       templateData={templateData}
@@ -577,10 +580,12 @@ function StepperFlow({ step, setStep, allTemplates }: {
       onNext={() => setStep(4)}
       onBack={() => setStep(2)}
     />
+    </div>
   );
 
   /* ── Render: Payment (Step 4) ── */
   if (step === 4) return (
+    <div className={styles.stepTransition}>
     <PaymentStep
       price={price}
       paid={paid}
@@ -593,14 +598,17 @@ function StepperFlow({ step, setStep, allTemplates }: {
       onSuccess={(id) => { setTxId(id); setStep(5); }}
       onBack={() => setStep(3)}
     />
+    </div>
   );
 
   /* ── Render: Result (Step 5) ── */
   if (step === 5) return (
-    <ResultStep
-      compositedImage={compositedImage}
-      onHome={startOver}
-    />
+    <div className={styles.stepTransition}>
+      <ResultStep
+        compositedImage={compositedImage}
+        onHome={startOver}
+      />
+    </div>
   );
 
   return null;
@@ -615,7 +623,7 @@ function TemplateStep({ templates, onSelect, onBack }: {
 }) {
   return (
     <div className={`${styles.stepPage} ${styles.stepPageTemplates}`}>
-      <StepperBar current={1} total={5} />
+      <StepperBar current={0} total={5} />
       <div className={styles.stepHeader}>
         <button className={styles.backBtn} onClick={onBack}><ArrowLeft size={18} /></button>
         <h1 className={styles.stepHeading}>Pilih Frame</h1>
@@ -772,7 +780,7 @@ function BoothStep({
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageBooth}`}>
-      <StepperBar current={2} total={5} />
+      <StepperBar current={1} total={5} />
       <p className={styles.boothInfo}>{templateName} • {filledCount} / {slotsCount} shots</p>
       <div className={styles.boothContent}>
         <div className={styles.boothViewfinder}>
@@ -914,7 +922,7 @@ function EditorStep({
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageEditor}`}>
-      <StepperBar current={3} total={5} />
+      <StepperBar current={2} total={5} />
       <div className={styles.editorLayout}>
         <div className={styles.editorPreview}>
           {hasTemplate ? (
@@ -1039,7 +1047,7 @@ function PaymentStep({
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPagePayment}`}>
-      <StepperBar current={4} total={5} />
+      <StepperBar current={3} total={5} />
       <div className={styles.paymentCard}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
           <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
@@ -1103,7 +1111,7 @@ function ResultStep({ compositedImage, onHome }: { compositedImage: string | nul
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageResult}`}>
-      <StepperBar current={5} total={5} />
+      <StepperBar current={4} total={5} />
       <h2 className={styles.stepHeading} style={{ margin: '24px 0 8px' }}>Your Photos are Ready!</h2>
       <p style={{ color: '#888', marginBottom: '20px' }}>Download or print your photo strip.</p>
       <div className={styles.resultLayout}>
