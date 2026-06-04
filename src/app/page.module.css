@@ -70,8 +70,7 @@
   height: 100dvh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-  overflow-y: visible;
+  overflow: hidden;
   padding: 20px 24px 16px;
   gap: 12px;
 }
@@ -518,17 +517,6 @@
   margin-left: 0;
 }
 
-/* ── Mobile: flat slider (no CoverFlow) ── */
-@media (max-width: 768px) {
-  .fanTrack {
-    padding: 0 0;
-  }
-  .fanSlide {
-    margin-left: 0;
-    height: 95%;
-  }
-}
-
 /* ── Footer ── */
 .footer {
   width: 100%;
@@ -596,43 +584,92 @@
 
 @media (max-width: 768px) {
   .page {
-    padding: 12px 14px 8px;
-    gap: 8px;
+    padding: 8px 8px 4px;
+    gap: 4px;
   }
   .header {
-    min-height: 40px;
+    min-height: 32px;
   }
-  .location {
-    font-size: 12px;
+  .nav {
+    gap: 0;
   }
   .navLink {
-    padding: 6px 12px;
-    font-size: 12px;
+    display: none;
+  }
+  .navSep {
+    display: none;
   }
   .main {
     grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    grid-template-rows: auto 1fr;
   }
   .colLeft {
-    grid-row: auto;
+    grid-row: 1;
   }
   .colCenter {
-    grid-column: 1;
-    grid-row: auto;
+    display: none;
   }
   .colRight {
     grid-column: 1;
-    grid-row: auto;
+    grid-row: 2;
+  }
+  .introContent {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+  .logoWrap {
+    gap: 8px;
+  }
+  .logo {
+    width: 32px;
+    height: 32px;
   }
   .logoTitle {
-    font-size: 16px;
+    font-size: 14px;
+  }
+  .logoSub {
+    font-size: 9px;
   }
   .introDesc {
-    font-size: 13px;
+    display: none;
   }
-  .tooltipImage {
-    width: 140px;
-    height: 78px;
+  .introStats {
+    padding: 4px 6px;
+    gap: 6px;
+    flex: 1;
+    min-width: 120px;
+  }
+  .statNum {
+    font-size: 12px;
+  }
+  .statLabel {
+    font-size: 8px;
+  }
+  .introCta {
+    min-height: 36px;
+    font-size: 12px;
+    padding: 8px 14px;
+    flex: 0;
+    margin-top: 0;
+  }
+  .cardSmall {
+    display: none;
+  }
+  .footerText {
+    font-size: 8px;
+    padding-bottom: 0;
+  }
+  .fanTrack {
+    padding: 0 0;
+    height: 100%;
+  }
+  .fanSlide {
+    margin-left: 0;
+    height: 92%;
+    max-height: none;
   }
 }
 
@@ -1443,6 +1480,9 @@
 
 /* ── Step transition ── */
 .stepTransition {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
   animation: stepSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
