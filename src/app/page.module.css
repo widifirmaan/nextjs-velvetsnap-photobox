@@ -1407,14 +1407,21 @@
 
 .editorSlider {
   flex: 1;
-  height: 8px;
+  height: 24px;
   -webkit-appearance: none;
   appearance: none;
-  background: #e8e8e8;
-  border-radius: 4px;
+  background: transparent;
   outline: none;
   cursor: pointer;
   min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.editorSlider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: #e8e8e8;
 }
 
 .editorSlider::-webkit-slider-thumb {
@@ -1427,6 +1434,13 @@
   cursor: pointer;
   border: 2px solid #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  margin-top: -8px;
+}
+
+.editorSlider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: #e8e8e8;
 }
 
 .editorSlider::-moz-range-thumb {
@@ -1437,11 +1451,6 @@
   cursor: pointer;
   border: 2px solid #fff;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-}
-
-.editorSlider::-webkit-slider-runnable-track {
-  height: 8px;
-  border-radius: 4px;
 }
 
 .editorAdjustSection {
