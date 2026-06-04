@@ -83,10 +83,86 @@ function StepperBar({ current, total }: { current: number; total: number }) {
 
 export default function Home() {
   const [step, setStep] = useState(0);
+  const [showPreloader, setShowPreloader] = useState(true);
+  const [strips, setStrips] = useState<StripResult[]>([]);
+  const [txCount, setTxCount] = useState(0);
+  const [tmplCount, setTmplCount] = useState(0);
+  const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
+
+  // initial fetch & preload everything
+  useEffect(() => {
+    let loaded = 0;
+    const check = () => { loaded++; if (loaded >= 4) setShowPreloader(false); };
+
+    fetch('/api/transactions/strips')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data?.length) {
+          Promise.all(
+            res.data.map((s: StripResult) => new Promise<void>((resolve) => {
+              const img = new window.Image();
+              img.onload = () => resolve();
+              img.onerror = () => resolve();
+              img.src = s.finalImage;
+            }))
+          ).then(() => setStrips(res.data));
+        }
+      })
+      .catch(() => {})
+      .finally(check);
+    fetch('/api/transactions')
+      .then((r) => r.json())
+      .then((res) => { if (res.success) setTxCount(res.pagination.total); })
+      .catch(() => {})
+      .finally(check);
+    fetch('/api/templates')
+      .then((r) => r.json())
+      .then((res) => { if (res.success) setTmplCount(res.data.length); })
+      .catch(() => {})
+      .finally(check);
+    fetch('/api/templates/thumbnails')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data?.length) {
+          const active = res.data.filter((t: TemplateData) => t.isActive !== false);
+          setAllTemplates(active);
+          active.forEach((t: TemplateData) => {
+            if (t.frameImage) { const img = new window.Image(); img.src = t.frameImage; }
+          });
+        }
+      })
+      .catch(() => {})
+      .finally(check);
+
+    const safety = setTimeout(() => setShowPreloader(false), 5000);
+    return () => clearTimeout(safety);
+  }, []);
+
+  if (showPreloader) {
+    return (
+      <div className={styles.preloader}>
+        <div className={styles.preloaderInner}>
+          <svg width="64" height="64" viewBox="0 0 56 56" fill="none" className={styles.preloaderLogo}>
+            <rect x="4" y="12" width="48" height="34" rx="8" fill="#262626" />
+            <circle cx="28" cy="29" r="11" fill="#fff" />
+            <circle cx="28" cy="29" r="7" fill="#262626" />
+            <rect x="39" y="8" width="12" height="4" rx="2" fill="#262626" />
+            <path d="M48 18l4-2" stroke="#262626" strokeWidth="2" strokeLinecap="round" />
+            <path d="M18 8l-3 4" stroke="#262626" strokeWidth="2.5" strokeLinecap="round" />
+            <circle cx="18" cy="6" r="1.5" fill="#262626" />
+          </svg>
+          <span className={styles.preloaderTitle}>VelvetSnap</span>
+          <span className={styles.preloaderSub}>Photo Booth Jakarta</span>
+          <div className={styles.preloaderSpinner} />
+        </div>
+      </div>
+    );
+  }
+
   return step === 0 ? (
-    <HomePage onStart={() => setStep(1)} />
+    <HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={() => setStep(1)} />
   ) : (
-    <StepperFlow step={step} setStep={setStep} />
+    <StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} />
   );
 }
 
@@ -94,12 +170,11 @@ export default function Home() {
    HOME PAGE (step 0)
    ════════════════════════════════════════ */
 
-function HomePage({ onStart }: { onStart: () => void }) {
+function HomePage({ strips, txCount, tmplCount, onStart }: {
+  strips: StripResult[]; txCount: number; tmplCount: number; onStart: () => void;
+}) {
   const [slideIdx, setSlideIdx] = useState(0);
   const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [strips, setStrips] = useState<StripResult[]>([]);
-  const [txCount, setTxCount] = useState(0);
-  const [tmplCount, setTmplCount] = useState(0);
   const [smallViewport, setSmallViewport] = useState(false);
   const smallVpRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -117,32 +192,6 @@ function HomePage({ onStart }: { onStart: () => void }) {
     check();
     window.addEventListener('resize', check);
     return () => window.removeEventListener('resize', check);
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/transactions/strips')
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.success && res.data?.length) {
-          Promise.all(
-            res.data.map((s: StripResult) => new Promise<void>((resolve) => {
-              const img = new window.Image();
-              img.onload = () => resolve();
-              img.onerror = () => resolve();
-              img.src = s.finalImage;
-            }))
-          ).then(() => setStrips(res.data));
-        }
-      })
-      .catch(() => {});
-    fetch('/api/transactions')
-      .then((r) => r.json())
-      .then((res) => { if (res.success) setTxCount(res.pagination.total); })
-      .catch(() => {});
-    fetch('/api/templates')
-      .then((r) => r.json())
-      .then((res) => { if (res.success) setTmplCount(res.data.length); })
-      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -418,7 +467,9 @@ function HomePage({ onStart }: { onStart: () => void }) {
    STEPPER FLOW (steps 1-5)
    ════════════════════════════════════════ */
 
-function StepperFlow({ step, setStep }: { step: number; setStep: (s: number) => void }) {
+function StepperFlow({ step, setStep, allTemplates }: {
+  step: number; setStep: (s: number) => void; allTemplates: TemplateData[];
+}) {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
   const [captures, setCaptures] = useState<string[]>([]);
@@ -499,7 +550,7 @@ function StepperFlow({ step, setStep }: { step: number; setStep: (s: number) => 
   const startOver = () => { setStep(0); setCaptures([]); setTemplateId(null); setTemplateData(null); setCompositedImage(null); setPaid(false); setErrMsg(null); };
 
   /* ── Render: Template Picker (Step 1) ── */
-  if (step === 1) return <TemplateStep onSelect={handleSelectTemplate} onBack={() => setStep(0)} />;
+  if (step === 1) return <TemplateStep templates={allTemplates} onSelect={handleSelectTemplate} onBack={() => setStep(0)} />;
 
   /* ── Render: Booth (Step 2) ── */
   if (step === 2) return (
@@ -566,20 +617,9 @@ function StepperFlow({ step, setStep }: { step: number; setStep: (s: number) => 
    STEP 1: TEMPLATE PICKER
    ════════════════════════════════════════ */
 
-function TemplateStep({ onSelect, onBack }: { onSelect: (id: string) => void; onBack: () => void }) {
-  const [templates, setTemplates] = useState<TemplateData[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/templates/thumbnails')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success) setTemplates(data.data.filter((t: TemplateData) => t.isActive !== false) || []);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
+function TemplateStep({ templates, onSelect, onBack }: {
+  templates: TemplateData[]; onSelect: (id: string) => void; onBack: () => void;
+}) {
   return (
     <div className={`${styles.stepPage} ${styles.stepPageTemplates}`}>
       <StepperBar current={1} total={5} />
@@ -587,9 +627,7 @@ function TemplateStep({ onSelect, onBack }: { onSelect: (id: string) => void; on
         <button className={styles.backBtn} onClick={onBack}><ArrowLeft size={18} /></button>
         <h1 className={styles.stepHeading}>Pilih Frame</h1>
       </div>
-      {loading ? (
-        <div className={styles.stepLoading}><Loader2 className="spin" size={40} /></div>
-      ) : templates.length === 0 ? (
+      {templates.length === 0 ? (
         <p className={styles.stepEmpty}>Tidak ada template.</p>
       ) : (
         <div className={styles.templateGrid}>
