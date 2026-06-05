@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Camera } from 'lucide-react';
 import styles from './page.module.css';
 import type { StripResult, TemplateData } from '@/components/steps/types';
 import HomePage from '@/components/steps/homepage/HomePage';
@@ -14,8 +15,9 @@ export default function Home() {
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
   const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
-  const [morphCircle, setMorphCircle] = useState<{x: number; y: number; size: number} | null>(null);
-  const homeRef = useRef<HTMLDivElement>(null);
+  const [btnMorph, setBtnMorph] = useState<{
+    x: number; y: number; w: number; h: number; phase: 'pill' | 'circle' | 'expand';
+  } | null>(null);
 
   useEffect(() => {
     fetch('/api/transactions/strips')
@@ -66,17 +68,16 @@ export default function Home() {
 
   const handleStart = useCallback((e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-    const startSize = Math.max(rect.width, rect.height) * 1.2;
-
-    setMorphCircle({ x, y, size: startSize });
+    setBtnMorph({ x: rect.left, y: rect.top, w: rect.width, h: rect.height, phase: 'pill' });
 
     requestAnimationFrame(() => {
-      const maxSize = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2.5;
-      setMorphCircle({ x, y, size: maxSize });
-      setStep(1);
+      setBtnMorph((prev) => prev ? { ...prev, phase: 'circle' } : prev);
     });
+
+    setTimeout(() => {
+      setBtnMorph((prev) => prev ? { ...prev, phase: 'expand' } : prev);
+      setStep(1);
+    }, 320);
   }, []);
 
   return (
@@ -99,19 +100,28 @@ export default function Home() {
           </div>
         </div>
       )}
-      {morphCircle && (
+
+      {btnMorph && (
         <div
-          className={styles.morphCircle}
+          className={`${styles.btnMorph} ${styles[`btnMorph_${btnMorph.phase}`]}`}
           style={{
-            left: morphCircle.x - morphCircle.size / 2,
-            top: morphCircle.y - morphCircle.size / 2,
-            width: morphCircle.size,
-            height: morphCircle.size,
+            left: btnMorph.x,
+            top: btnMorph.y,
+            width: btnMorph.phase === 'pill' ? btnMorph.w : btnMorph.h,
+            height: btnMorph.h,
           }}
-          onTransitionEnd={() => setMorphCircle(null)}
-        />
+          onTransitionEnd={() => {
+            if (btnMorph.phase === 'expand') setBtnMorph(null);
+          }}
+        >
+          <span className={`${styles.btnMorphText} ${btnMorph.phase !== 'pill' ? styles.btnMorphTextHidden : ''}`}>
+            Mulai Sekarang
+          </span>
+          <Camera className={styles.btnMorphIcon} size={btnMorph.phase === 'pill' ? 14 : 20} />
+        </div>
       )}
-      <div ref={homeRef}>
+
+      <div>
         {step === 0 ? (
           <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
         ) : (

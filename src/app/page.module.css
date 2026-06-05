@@ -24,14 +24,56 @@
   pointer-events: none;
 }
 
-.morphCircle {
+.btnMorph {
   position: fixed;
-  border-radius: 50%;
-  background: var(--mn-bg);
   z-index: 100;
+  background: var(--mn-text);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   pointer-events: none;
-  transition: all 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, width, height;
+}
+
+.btnMorph_pill {
+  border-radius: 28px;
+  transform: scale(1);
+}
+
+.btnMorph_circle {
+  border-radius: 50%;
+  transform: scale(1);
+}
+
+.btnMorph_expand {
+  border-radius: 50%;
+  transform: scale(60);
+}
+
+.btnMorphText {
+  transition: opacity 0.2s ease, width 0.2s ease, margin 0.2s ease;
+  overflow: hidden;
+}
+
+.btnMorphTextHidden {
+  opacity: 0;
+  width: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.btnMorphIcon {
+  transition: width 0.3s ease, height 0.3s ease;
 }
 
 .preloaderInner {
