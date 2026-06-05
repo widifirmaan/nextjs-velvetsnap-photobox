@@ -39,9 +39,9 @@
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.02em;
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              border-radius 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, width, height;
 }
 
@@ -61,7 +61,7 @@
 }
 
 .btnMorphText {
-  transition: opacity 0.2s ease, width 0.2s ease, margin 0.2s ease;
+  transition: opacity 0.35s ease, width 0.35s ease, margin 0.35s ease;
   overflow: hidden;
 }
 

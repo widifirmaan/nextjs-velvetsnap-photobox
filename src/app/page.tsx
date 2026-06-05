@@ -77,7 +77,7 @@ export default function Home() {
     setTimeout(() => {
       setBtnMorph((prev) => prev ? { ...prev, phase: 'expand' } : prev);
       setStep(1);
-    }, 320);
+    }, 500);
   }, []);
 
   return (
