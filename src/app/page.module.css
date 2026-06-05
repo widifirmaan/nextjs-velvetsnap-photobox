@@ -82,36 +82,25 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-}
-
-.iconZoomSvg {
   color: #fff;
-  animation: iconGrow 1s ease-out forwards;
+  background: #262626;
+  transition: opacity 0.6s ease 0.4s;
 }
 
-@keyframes iconGrow {
-  from {
-    transform: scale(1);
-    opacity: 1;
-  }
-  to {
-    transform: scale(30);
-    opacity: 0.3;
-  }
+.iconZoomFade {
+  opacity: 0;
 }
 
 .stepZoomIn {
-  animation: stepZoom 0.9s ease-out 0.1s both;
+  animation: stepZoom 0.8s ease-out forwards;
 }
 
 @keyframes stepZoom {
   from {
-    transform: scale(0.85);
-    opacity: 0;
+    transform: scale(0.92);
   }
   to {
     transform: scale(1);
-    opacity: 1;
   }
 }
 

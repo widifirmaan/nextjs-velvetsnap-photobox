@@ -9,13 +9,15 @@ import StepperFlow from '@/components/steps/StepperFlow';
 
 function ExpandOverlay({ show }: { show: boolean }) {
   const [scale, setScale] = useState(1);
-  const [opacity, setOpacity] = useState(1);
+  const [iconOpacity, setIconOpacity] = useState(1);
+  const [bgFade, setBgFade] = useState(false);
 
   useEffect(() => {
-    if (!show) { setScale(1); setOpacity(1); return; }
+    if (!show) { setScale(1); setIconOpacity(1); setBgFade(false); return; }
     const r = requestAnimationFrame(() => {
       setScale(35);
-      setOpacity(0.2);
+      setIconOpacity(0.15);
+      setBgFade(true);
     });
     return () => cancelAnimationFrame(r);
   }, [show]);
@@ -23,13 +25,13 @@ function ExpandOverlay({ show }: { show: boolean }) {
   if (!show) return null;
 
   return (
-    <div className={styles.iconZoom}>
+    <div className={`${styles.iconZoom} ${bgFade ? styles.iconZoomFade : ''}`}>
       <Camera
         size={120}
         style={{
           transform: `scale(${scale})`,
-          opacity,
-          transition: 'transform 1s ease-out, opacity 0.8s ease-out',
+          opacity: iconOpacity,
+          transition: 'transform 1s ease-out, opacity 0.6s ease-out',
         }}
       />
     </div>
@@ -152,13 +154,13 @@ export default function Home() {
 
       <ExpandOverlay show={btnMorph?.phase === 'expand'} />
 
-      <div className={step === 1 && btnMorph?.phase === 'expand' ? styles.stepZoomIn : ''}>
-        {step === 0 ? (
-          <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
-        ) : (
-          <div key="flow" className={styles.stepTransition}><StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} /></div>
-        )}
-      </div>
+      {step === 0 ? (
+        <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
+      ) : (
+        <div key="flow" className={btnMorph?.phase === 'expand' ? styles.stepZoomIn : styles.stepTransition}>
+          <StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} />
+        </div>
+      )}
     </>
   );
 }
