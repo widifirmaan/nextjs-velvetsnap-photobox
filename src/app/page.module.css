@@ -77,19 +77,11 @@
   transition: width 0.3s ease, height 0.3s ease;
 }
 
-.stepZoomIn {
-  animation: stepZoom 0.7s ease-out 0.15s forwards;
-}
-
-@keyframes stepZoom {
-  from {
-    transform: scale(0.93);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.clipReveal {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  will-change: clip-path;
 }
 
 .preloaderInner {

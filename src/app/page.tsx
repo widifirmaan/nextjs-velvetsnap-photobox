@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import styles from './page.module.css';
 import type { StripResult, TemplateData } from '@/components/steps/types';
@@ -15,9 +15,11 @@ export default function Home() {
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
   const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
+  const [morphOrigin, setMorphOrigin] = useState<{x: number; y: number} | null>(null);
   const [btnMorph, setBtnMorph] = useState<{
     x: number; y: number; w: number; h: number; phase: 'pill' | 'circle' | 'expand';
   } | null>(null);
+  const [clipStage, setClipStage] = useState<'init' | 'expand' | null>(null);
 
   useEffect(() => {
     fetch('/api/transactions/strips')
@@ -68,6 +70,9 @@ export default function Home() {
 
   const handleStart = useCallback((e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    setMorphOrigin({ x: cx, y: cy });
     setBtnMorph({ x: rect.left, y: rect.top, w: rect.width, h: rect.height, phase: 'pill' });
 
     requestAnimationFrame(() => {
@@ -77,9 +82,20 @@ export default function Home() {
     setTimeout(() => {
       setBtnMorph((prev) => prev ? { ...prev, phase: 'expand' } : prev);
       setStep(1);
+      setClipStage('init');
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          setClipStage('expand');
+        });
+      });
     }, 500);
-    setTimeout(() => setBtnMorph(null), 1300);
+    setTimeout(() => { setBtnMorph(null); setClipStage(null); }, 1400);
   }, []);
+
+  const clipStyle = morphOrigin && clipStage ? {
+    clipPath: `circle(${clipStage === 'init' ? '0px' : '150%'} at ${morphOrigin.x}px ${morphOrigin.y}px)`,
+    transition: clipStage === 'expand' ? 'clip-path 0.9s cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
+  } as React.CSSProperties : undefined;
 
   return (
     <>
@@ -111,7 +127,6 @@ export default function Home() {
             width: btnMorph.phase === 'pill' ? btnMorph.w : btnMorph.h,
             height: btnMorph.h,
           }}
-
         >
           <span className={`${styles.btnMorphText} ${btnMorph.phase !== 'pill' ? styles.btnMorphTextHidden : ''}`}>
             Mulai Sekarang
@@ -123,7 +138,7 @@ export default function Home() {
       {step === 0 ? (
         <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
       ) : (
-        <div key="flow" className={btnMorph?.phase === 'expand' ? styles.stepZoomIn : styles.stepTransition}>
+        <div key="flow" style={clipStyle} className={clipStage ? styles.clipReveal : styles.stepTransition}>
           <StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} />
         </div>
       )}
