@@ -19,17 +19,16 @@ export default function Home() {
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data?.length) {
-          Promise.all(
-            res.data.map((s: StripResult) => new Promise<void>((resolve) => {
-              const img = new window.Image();
-              img.onload = () => resolve();
-              img.onerror = () => resolve();
-              img.src = s.finalImage;
-            }))
-          ).then(() => setStrips(res.data));
+          setStrips(res.data);
+          const img = new window.Image();
+          img.onload = () => setShowPreloader(false);
+          img.onerror = () => setShowPreloader(false);
+          img.src = res.data[0].finalImage;
+        } else {
+          setShowPreloader(false);
         }
       })
-      .catch(() => {});
+      .catch(() => { setShowPreloader(false); });
     fetch('/api/transactions')
       .then((r) => r.json())
       .then((res) => { if (res.success) setTxCount(res.pagination.total); })
@@ -51,7 +50,7 @@ export default function Home() {
       })
       .catch(() => {});
 
-    const timer = setTimeout(() => setShowPreloader(false), 1000);
+    const timer = setTimeout(() => setShowPreloader(false), 5000);
     return () => clearTimeout(timer);
   }, []);
 
