@@ -3,7 +3,7 @@ import styles from '@/app/page.module.css';
 import { SAMPLE_IMAGES } from '../types';
 
 export default function SlideshowCard({ slideIdx, onStart }: {
-  slideIdx: number; onStart: () => void;
+  slideIdx: number; onStart: (e: React.MouseEvent) => void;
 }) {
   return (
     <a className={styles.cardWedding} onClick={onStart} style={{ cursor: 'pointer' }}>

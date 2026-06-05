@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react';
 import styles from '@/app/page.module.css';
 
 export default function IntroCard({ txCount, tmplCount, onStart }: {
-  txCount: number; tmplCount: number; onStart: () => void;
+  txCount: number; tmplCount: number; onStart: (e: React.MouseEvent) => void;
 }) {
   return (
     <div className={styles.introCard}>

@@ -12,7 +12,7 @@ import StripsCarousel from './StripsCarousel';
 import HomeFooter from './HomeFooter';
 
 export default function HomePage({ strips, txCount, tmplCount, onStart }: {
-  strips: StripResult[]; txCount: number; tmplCount: number; onStart: () => void;
+  strips: StripResult[]; txCount: number; tmplCount: number; onStart: (e: React.MouseEvent) => void;
 }) {
   const [slideIdx, setSlideIdx] = useState(0);
   const [tooltipVisible, setTooltipVisible] = useState(false);

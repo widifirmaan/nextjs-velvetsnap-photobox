@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import styles from './page.module.css';
 import type { StripResult, TemplateData } from '@/components/steps/types';
 import HomePage from '@/components/steps/homepage/HomePage';
@@ -14,6 +14,8 @@ export default function Home() {
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
   const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
+  const [morphCircle, setMorphCircle] = useState<{x: number; y: number; size: number} | null>(null);
+  const homeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch('/api/transactions/strips')
@@ -62,6 +64,21 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleStart = useCallback((e: React.MouseEvent) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const startSize = Math.max(rect.width, rect.height) * 1.2;
+
+    setMorphCircle({ x, y, size: startSize });
+
+    requestAnimationFrame(() => {
+      const maxSize = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2) * 2.5;
+      setMorphCircle({ x, y, size: maxSize });
+      setStep(1);
+    });
+  }, []);
+
   return (
     <>
       {showPreloader && (
@@ -82,11 +99,25 @@ export default function Home() {
           </div>
         </div>
       )}
-      {step === 0 ? (
-        <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={() => setStep(1)} /></div>
-      ) : (
-        <div key="flow" className={styles.stepTransition}><StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} /></div>
+      {morphCircle && (
+        <div
+          className={styles.morphCircle}
+          style={{
+            left: morphCircle.x - morphCircle.size / 2,
+            top: morphCircle.y - morphCircle.size / 2,
+            width: morphCircle.size,
+            height: morphCircle.size,
+          }}
+          onTransitionEnd={() => setMorphCircle(null)}
+        />
       )}
+      <div ref={homeRef}>
+        {step === 0 ? (
+          <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
+        ) : (
+          <div key="flow" className={styles.stepTransition}><StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} /></div>
+        )}
+      </div>
     </>
   );
 }
