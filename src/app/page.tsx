@@ -121,7 +121,13 @@ export default function Home() {
         </div>
       )}
 
-      <div>
+      {btnMorph?.phase === 'expand' && (
+        <div className={styles.iconZoom}>
+          <Camera size={120} className={styles.iconZoomSvg} />
+        </div>
+      )}
+
+      <div className={step === 1 && btnMorph?.phase === 'expand' ? styles.stepZoomIn : ''}>
         {step === 0 ? (
           <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
         ) : (
