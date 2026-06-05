@@ -8,16 +8,16 @@ import HomePage from '@/components/steps/homepage/HomePage';
 import StepperFlow from '@/components/steps/StepperFlow';
 
 function ExpandOverlay({ show }: { show: boolean }) {
-  const [scale, setScale] = useState(1);
-  const [iconOpacity, setIconOpacity] = useState(1);
-  const [bgFade, setBgFade] = useState(false);
+  const [stage, setStage] = useState<'init' | 'animate' | null>(null);
+  const elRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!show) { setScale(1); setIconOpacity(1); setBgFade(false); return; }
+    if (!show) { setStage(null); return; }
+    setStage('init');
     const r = requestAnimationFrame(() => {
-      setScale(35);
-      setIconOpacity(0.15);
-      setBgFade(true);
+      requestAnimationFrame(() => {
+        setStage('animate');
+      });
     });
     return () => cancelAnimationFrame(r);
   }, [show]);
@@ -25,14 +25,14 @@ function ExpandOverlay({ show }: { show: boolean }) {
   if (!show) return null;
 
   return (
-    <div className={`${styles.iconZoom} ${bgFade ? styles.iconZoomFade : ''}`}>
+    <div
+      ref={elRef}
+      className={`${styles.iconZoom} ${stage === 'animate' ? styles.iconZoomFade : ''}`}
+    >
       <Camera
         size={120}
-        style={{
-          transform: `scale(${scale})`,
-          opacity: iconOpacity,
-          transition: 'transform 1s ease-out, opacity 0.6s ease-out',
-        }}
+        className={styles.iconZoomSvg}
+        data-zoom={stage === 'animate' ? 'true' : 'false'}
       />
     </div>
   );
