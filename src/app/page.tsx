@@ -138,7 +138,7 @@ export default function Home() {
       {step === 0 ? (
         <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
       ) : (
-        <div key="flow" style={clipStyle} className={clipStage ? styles.clipReveal : styles.stepTransition}>
+        <div key="flow" style={clipStyle} className={clipStage ? styles.clipReveal : styles.stepContent}>
           <StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} />
         </div>
       )}

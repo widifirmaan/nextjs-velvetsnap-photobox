@@ -1805,6 +1805,12 @@
   animation: stepSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+.stepContent {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
 @keyframes stepSlideIn {
   from {
     opacity: 0;
