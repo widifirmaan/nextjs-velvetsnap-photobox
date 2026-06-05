@@ -1,11 +1,40 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import styles from './page.module.css';
 import type { StripResult, TemplateData } from '@/components/steps/types';
 import HomePage from '@/components/steps/homepage/HomePage';
 import StepperFlow from '@/components/steps/StepperFlow';
+
+function ExpandOverlay({ show }: { show: boolean }) {
+  const [scale, setScale] = useState(1);
+  const [opacity, setOpacity] = useState(1);
+
+  useEffect(() => {
+    if (!show) { setScale(1); setOpacity(1); return; }
+    const r = requestAnimationFrame(() => {
+      setScale(35);
+      setOpacity(0.2);
+    });
+    return () => cancelAnimationFrame(r);
+  }, [show]);
+
+  if (!show) return null;
+
+  return (
+    <div className={styles.iconZoom}>
+      <Camera
+        size={120}
+        style={{
+          transform: `scale(${scale})`,
+          opacity,
+          transition: 'transform 1s ease-out, opacity 0.8s ease-out',
+        }}
+      />
+    </div>
+  );
+}
 
 export default function Home() {
   const [step, setStep] = useState(0);
@@ -121,11 +150,7 @@ export default function Home() {
         </div>
       )}
 
-      {btnMorph?.phase === 'expand' && (
-        <div className={styles.iconZoom}>
-          <Camera size={120} className={styles.iconZoomSvg} />
-        </div>
-      )}
+      <ExpandOverlay show={btnMorph?.phase === 'expand'} />
 
       <div className={step === 1 && btnMorph?.phase === 'expand' ? styles.stepZoomIn : ''}>
         {step === 0 ? (
