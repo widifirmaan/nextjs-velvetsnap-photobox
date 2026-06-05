@@ -18,6 +18,12 @@
   pointer-events: none;
 }
 
+.preloaderHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .preloaderInner {
   display: flex;
   flex-direction: column;
@@ -480,7 +486,7 @@
 /* ── Fan Strips Layout ── */
 .fanTrack {
   flex: 1;
-  height: 90%;
+  height: 98%;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -497,9 +503,9 @@
 }
 
 .fanSlide {
-  height: 75%;
+  height: 95%;
   width: auto;
-  max-height: 460px;
+  max-height: 540px;
   display: block;
   object-fit: contain;
   border-radius: 8px;
@@ -668,7 +674,7 @@
   }
   .fanSlide {
     margin-left: 0;
-    height: 92%;
+    height: 98%;
     max-height: none;
   }
 }

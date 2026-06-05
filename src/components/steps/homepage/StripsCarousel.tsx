@@ -129,6 +129,8 @@ export default function StripsCarousel({ strips, smallVpRef }: {
               alt=""
               className={styles.fanSlide}
               draggable={false}
+              onLoad={updateTransforms}
+              onError={updateTransforms}
             />
           ))}
         </div>
