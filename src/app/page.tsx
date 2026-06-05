@@ -1,42 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Camera } from 'lucide-react';
 import styles from './page.module.css';
 import type { StripResult, TemplateData } from '@/components/steps/types';
 import HomePage from '@/components/steps/homepage/HomePage';
 import StepperFlow from '@/components/steps/StepperFlow';
-
-function ExpandOverlay({ show }: { show: boolean }) {
-  const [stage, setStage] = useState<'init' | 'animate' | null>(null);
-  const elRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!show) { setStage(null); return; }
-    setStage('init');
-    const r = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        setStage('animate');
-      });
-    });
-    return () => cancelAnimationFrame(r);
-  }, [show]);
-
-  if (!show) return null;
-
-  return (
-    <div
-      ref={elRef}
-      className={`${styles.iconZoom} ${stage === 'animate' ? styles.iconZoomFade : ''}`}
-    >
-      <Camera
-        size={120}
-        className={styles.iconZoomSvg}
-        data-zoom={stage === 'animate' ? 'true' : 'false'}
-      />
-    </div>
-  );
-}
 
 export default function Home() {
   const [step, setStep] = useState(0);
@@ -109,6 +78,7 @@ export default function Home() {
       setBtnMorph((prev) => prev ? { ...prev, phase: 'expand' } : prev);
       setStep(1);
     }, 500);
+    setTimeout(() => setBtnMorph(null), 1300);
   }, []);
 
   return (
@@ -141,9 +111,7 @@ export default function Home() {
             width: btnMorph.phase === 'pill' ? btnMorph.w : btnMorph.h,
             height: btnMorph.h,
           }}
-          onTransitionEnd={() => {
-            if (btnMorph.phase === 'expand') setBtnMorph(null);
-          }}
+
         >
           <span className={`${styles.btnMorphText} ${btnMorph.phase !== 'pill' ? styles.btnMorphTextHidden : ''}`}>
             Mulai Sekarang
@@ -151,8 +119,6 @@ export default function Home() {
           <Camera className={styles.btnMorphIcon} size={btnMorph.phase === 'pill' ? 14 : 20} />
         </div>
       )}
-
-      <ExpandOverlay show={btnMorph?.phase === 'expand'} />
 
       {step === 0 ? (
         <div key="home" className={styles.stepTransition}><HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} /></div>
