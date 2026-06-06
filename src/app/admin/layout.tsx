@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className={styles.content}>
         {children}
         <footer className={styles.footer}>
-          <span>© {new Date().getFullYear()} VelvetSnap Photo Booth</span>
+          <span>Velvetsnap Photobooth Platform by <a href="https://widifirmaan.web.id" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>W</a></span>
         </footer>
       </div>
     </div>
