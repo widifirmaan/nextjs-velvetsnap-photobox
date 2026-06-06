@@ -2,13 +2,14 @@
 import { TemplateData, PhotoAdjust } from '../types';
 import styles from '@/app/main/page.module.css';
 
-export default function EditorFrame({ captures, templateData, keyedFrameImage, frameRatio, photoAdjust, selectedFilter, slotCssFilter }: {
+export default function EditorFrame({ captures, templateData, keyedFrameImage, frameRatio, photoAdjust, selectedSlotIdx, setSelectedSlotIdx, selectedFilter, slotCssFilter }: {
   captures: string[];
   templateData: TemplateData | null;
   keyedFrameImage: string;
   frameRatio: number;
   photoAdjust: PhotoAdjust[];
   selectedSlotIdx: number;
+  setSelectedSlotIdx: (idx: number) => void;
   selectedFilter: string;
   slotCssFilter: (idx: number) => string;
 }) {
@@ -20,9 +21,11 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
             const src = captures[idx];
             if (!src) return null;
             return (
-              <div key={idx} style={{
+              <div key={idx} onClick={() => setSelectedSlotIdx(idx)} style={{
                 position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`,
                 width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden', zIndex: 1,
+                cursor: 'pointer', outline: selectedSlotIdx === idx ? '3px solid #262626' : 'none',
+                outlineOffset: '-3px', borderRadius: '2px',
               }}>
                 <div
                   style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}

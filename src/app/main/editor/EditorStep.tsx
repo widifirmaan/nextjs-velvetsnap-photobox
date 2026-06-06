@@ -2,7 +2,6 @@
 import { ArrowLeft, RefreshCcw, Check } from 'lucide-react';
 import StepperBar from '../StepperBar';
 import EditorFrame from './EditorFrame';
-import SlotSelector from './SlotSelector';
 import AdjustSlider from './AdjustSlider';
 import { TemplateData, PhotoAdjust } from '../types';
 import styles from '@/app/main/page.module.css';
@@ -24,8 +23,6 @@ export default function EditorStep({
   const handleRetake = () => onBack();
 
   const hasTemplate = templateData && templateData.frameImage && templateData.slotsLayout && templateData.slotsLayout.length > 0;
-
-  const slotSources = (templateData?.slotsLayout || []).map((_, idx) => captures[idx]);
 
   const sel = photoAdjust[selectedSlotIdx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
 
@@ -58,6 +55,7 @@ export default function EditorStep({
           frameRatio={frameRatio}
           photoAdjust={photoAdjust}
           selectedSlotIdx={selectedSlotIdx}
+          setSelectedSlotIdx={setSelectedSlotIdx}
           selectedFilter={selectedFilter}
           slotCssFilter={slotCssFilter}
         />
@@ -65,12 +63,6 @@ export default function EditorStep({
           <button className={styles.boothBtnSecondary} onClick={handleRetake} style={{ alignSelf: 'flex-start' }}>
             <ArrowLeft size={16} /> Back
           </button>
-
-          <SlotSelector
-            slotSources={slotSources}
-            selectedSlotIdx={selectedSlotIdx}
-            setSelectedSlotIdx={setSelectedSlotIdx}
-          />
 
           <div className={styles.editorAdjustSection}>
             <h4>Adjustments</h4>
