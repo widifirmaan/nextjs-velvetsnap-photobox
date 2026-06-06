@@ -6,6 +6,9 @@
     "dev": "node node_modules/.bin/next dev --webpack",
     "build": "node node_modules/.bin/next build",
     "start": "node node_modules/.bin/next start",
+    "dev-win": "next dev --webpack",
+    "build-win": "next build",
+    "start-win": "next start",
     "lint": "eslint"
   },
   "dependencies": {

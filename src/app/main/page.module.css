@@ -1,0 +1,1832 @@
+/* ── Yan Hladchenko minimal style — kiosk-optimized ── */
+
+/* ── Fullscreen Preloader ── */
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.preloaderHide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.preloaderHidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.btnMorph {
+  position: fixed;
+  z-index: 100;
+  background: var(--mn-text);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 1s cubic-bezier(0.2, 0, 0.2, 1),
+              opacity 0.6s ease 0.55s;
+  will-change: transform;
+}
+
+.btnMorph_pill {
+  border-radius: 28px;
+  transform: scale(1);
+}
+
+.btnMorph_circle {
+  border-radius: 50%;
+  transform: scale(1);
+}
+
+.btnMorph_expand {
+  border-radius: 50%;
+  transform: scale(80);
+  opacity: 0;
+}
+
+.btnMorphText {
+  transition: opacity 0.35s ease, width 0.35s ease, margin 0.35s ease;
+  overflow: hidden;
+}
+
+.btnMorphTextHidden {
+  opacity: 0;
+  width: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.btnMorphIcon {
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.clipReveal {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  will-change: clip-path;
+}
+
+.preloaderInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.preloaderLogo {
+  animation: preloaderPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes preloaderPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.7; }
+}
+
+.preloaderTitle {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #262626;
+  margin-top: 4px;
+}
+
+.preloaderSub {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #888;
+  margin-top: -2px;
+}
+
+.preloaderSpinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2.5px solid #e0e0e0;
+  border-top-color: #262626;
+  animation: preloaderSpin 0.8s linear infinite;
+  margin-top: 12px;
+}
+
+@keyframes preloaderSpin {
+  to { transform: rotate(360deg); }
+}
+
+.preloaderWait {
+  font-size: 12px;
+  font-weight: 500;
+  color: #aaa;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+}
+
+.page {
+  background: var(--mn-bg);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px 24px 16px;
+  gap: 12px;
+}
+
+/* ── Header / Navigation ── */
+.header {
+  width: 100%;
+  max-width: var(--mn-max-w);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  margin: 0 auto;
+  min-height: 44px;
+}
+
+.location {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--mn-text-secondary);
+  cursor: pointer;
+  position: relative;
+  padding: 4px 0;
+  user-select: none;
+}
+
+.tooltip {
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  opacity: 0;
+  translate: 0 8px;
+  rotate: -3deg;
+  scale: 0.96;
+  transition: all 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.tooltipVisible {
+  opacity: 1;
+  translate: 0 0;
+  rotate: 0deg;
+  scale: 1;
+}
+
+.tooltipImage {
+  width: 160px;
+  height: 90px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 2px solid rgba(255,245,235,0.80);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.18);
+  background: #f0f0f0;
+}
+
+.tooltipPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: linear-gradient(135deg, #f7f7f7, #e8e8e8);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--mn-bg);
+  color: var(--mn-text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.navLink:hover {
+  background: var(--mn-card);
+  color: var(--mn-text);
+}
+
+.navSep {
+  width: 1px;
+  height: 24px;
+  background: var(--mn-border);
+  flex-shrink: 0;
+}
+
+/* ── Main content: 3 columns ── */
+.main {
+  width: 100%;
+  max-width: var(--mn-max-w);
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+  margin: 0 auto;
+}
+
+.colLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+.colCenter {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+}
+
+
+
+
+
+/* ── Intro card / Hero (left top) ── */
+.introCard {
+  background: var(--mn-card);
+  border-radius: var(--mn-radius);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.introContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 20px 20px;
+  flex: 1;
+}
+
+/* ── Logo ── */
+.logoWrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  flex-shrink: 0;
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logoTitle {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--mn-text);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.logoSub {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--mn-text-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.introDesc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--mn-text-secondary);
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+
+.introStats {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--mn-border);
+  border-bottom: 1px solid var(--mn-border);
+}
+
+.statItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.statNum {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--mn-text);
+}
+
+.statLabel {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--mn-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.statDivider {
+  width: 1px;
+  height: 28px;
+  background: var(--mn-border);
+  flex-shrink: 0;
+}
+
+.introCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 28px;
+  background: var(--mn-text);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+  transition: all 0.15s;
+  align-self: stretch;
+  text-align: center;
+  justify-content: center;
+  min-height: 46px;
+  margin-top: auto;
+}
+
+.introCta:hover {
+  opacity: 0.85;
+  scale: 0.97;
+}
+
+/* ── Small card (left bottom / center) ── */
+.cardSmall {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--mn-card);
+  border-radius: var(--mn-radius);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.cardSmall:hover {
+  transform: translateY(-1px);
+}
+
+.cardSmallIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(197,216,157,0.12);
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cardSmallBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.cardSmallTag {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--mn-text-secondary);
+}
+
+.cardSmallTitle {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--mn-text);
+  margin: 0;
+}
+
+.cardSmallDesc {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--mn-text-secondary);
+  letter-spacing: -0.01em;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Wedding card (center top) ── */
+.cardWedding {
+  background: #e8e8e8;
+  border-radius: var(--mn-radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.15s;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.cardWedding:hover {
+  transform: translateY(-1px);
+}
+
+.slideshow {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1.2s ease;
+}
+
+/* ── Promo card (center bottom) ── */
+.cardPromo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--mn-card);
+  border-radius: var(--mn-radius);
+  color: #e74c3c;
+  flex: 1;
+  min-height: 0;
+}
+
+.cardPromoContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.promoLabel {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+}
+
+.promoValue {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* ── Right column: Strips card ── */
+.colRight {
+  background: var(--mn-card);
+  border-radius: var(--mn-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.rightEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: var(--mn-text-secondary);
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+/* ── Fan Strips Layout ── */
+.fanTrack {
+  flex: 1;
+  height: 98%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  display: flex;
+  align-items: center;
+  padding: 0 40%;
+  perspective: 800px;
+  perspective-origin: center center;
+}
+
+.fanTrack::-webkit-scrollbar {
+  display: none;
+}
+
+.fanSlide {
+  height: 95%;
+  width: auto;
+  max-height: 540px;
+  display: block;
+  object-fit: contain;
+  border-radius: 8px;
+  flex-shrink: 0;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 6px 20px rgba(0,0,0,0.12));
+  user-select: none;
+  -webkit-user-drag: none;
+  margin-left: -28px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.fanSlide:first-child {
+  margin-left: 0;
+}
+
+/* ── Footer ── */
+.footer {
+  width: 100%;
+  max-width: var(--mn-max-w);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  margin: 0 auto;
+  padding-top: 8px;
+}
+
+.footer .nav {
+  display: none;
+}
+
+.footerText {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--mn-text-secondary);
+  letter-spacing: -0.01em;
+  text-align: center;
+  padding-bottom: 2px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .page {
+    padding: 16px 20px 12px;
+    gap: 10px;
+  }
+  .main {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  .colLeft {
+    grid-row: 1 / 3;
+  }
+  .colRight {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .colCenter {
+    grid-column: 2;
+    grid-row: 1;
+    flex-direction: row;
+  }
+  .colCenter .cardWedding {
+    flex: 1;
+  }
+  .colCenter .cardPromo {
+    flex: 1;
+  }
+  .stripFront {
+    max-width: 70%;
+  }
+  .stripBack {
+    left: 5%;
+  }
+  .stripBackR {
+    right: 5%;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 8px 8px 4px;
+    gap: 4px;
+  }
+  .header {
+    min-height: 32px;
+  }
+  .nav {
+    gap: 0;
+  }
+  .navLink {
+    display: none;
+  }
+  .navSep {
+    display: none;
+  }
+  .main {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .colLeft {
+    grid-row: 1;
+  }
+  .colCenter {
+    display: none;
+  }
+  .colRight {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .introContent {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+  }
+  .logoWrap {
+    gap: 8px;
+  }
+  .logo {
+    width: 32px;
+    height: 32px;
+  }
+  .logoTitle {
+    font-size: 14px;
+  }
+  .logoSub {
+    font-size: 9px;
+  }
+  .introDesc {
+    display: none;
+  }
+  .introStats {
+    padding: 4px 6px;
+    gap: 6px;
+    flex: 1;
+    min-width: 120px;
+  }
+  .statNum {
+    font-size: 12px;
+  }
+  .statLabel {
+    font-size: 8px;
+  }
+  .introCta {
+    min-height: 36px;
+    font-size: 12px;
+    padding: 8px 14px;
+    flex: 0;
+    margin-top: 0;
+  }
+  .cardSmall {
+    display: none;
+  }
+  .footerText {
+    font-size: 8px;
+    padding-bottom: 0;
+  }
+  .fanTrack {
+    padding: 0 0;
+    height: 100%;
+  }
+  .fanSlide {
+    margin-left: 0;
+    height: 98%;
+    max-height: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 8px 10px 6px;
+    gap: 6px;
+  }
+  .navSep {
+    display: none;
+  }
+  .nav {
+    gap: 2px;
+  }
+  .navLink {
+    padding: 5px 8px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .introContent {
+    gap: 8px;
+    padding: 14px;
+  }
+  .logo {
+    width: 40px;
+    height: 40px;
+  }
+  .logoTitle {
+    font-size: 14px;
+  }
+  .introDesc {
+    font-size: 12px;
+  }
+  .statNum {
+    font-size: 14px;
+  }
+  .introCta {
+    min-height: 42px;
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+  .footerText {
+    font-size: 10px;
+  }
+  .cardSmall {
+    padding: 12px 14px;
+  }
+  .cardSmallTitle {
+    font-size: 14px;
+  }
+}
+
+/* ════════════════════════════════════════
+   STEPPER FLOW (steps 1-5)
+   ════════════════════════════════════════ */
+
+.stepPage {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stepHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stepHeading {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.backBtn {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: #262626;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+
+.backBtn:active {
+  background: #f0f0f0;
+}
+
+.stepLoading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepEmpty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 15px;
+}
+
+/* ── Stepper Bar ── */
+
+.boothStepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 20px;
+}
+
+.boothStepItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boothStepDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e8e8e8;
+  color: #999;
+  transition: all 0.25s;
+}
+
+.boothStepActive .boothStepDot {
+  background: #262626;
+  color: #fff;
+}
+
+.boothStepDone .boothStepDot {
+  background: #262626;
+  color: #fff;
+}
+
+.boothStepLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: #999;
+  transition: color 0.25s;
+}
+
+.boothStepLabelActive {
+  color: #262626;
+  font-weight: 600;
+}
+
+.boothStepLabelDone {
+  color: #555;
+}
+
+.boothStepLine {
+  width: 32px;
+  height: 1.5px;
+  background: #ddd;
+  margin: 0 10px;
+  transition: background 0.25s;
+}
+
+.boothStepLineDone {
+  background: #262626;
+}
+
+/* ── Step 1: Template Grid ── */
+
+.stepPageTemplates {
+  align-items: center;
+}
+
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+  width: 100%;
+  flex: 1;
+  align-content: start;
+  padding-bottom: 16px;
+  overflow-y: auto;
+}
+
+.templateCard {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 20px;
+  border: 1.5px solid #eee;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.templateCard:active {
+  transform: scale(0.97);
+}
+
+.templateCardThumb {
+  width: 100%;
+  aspect-ratio: 2 / 3.2;
+  background: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.templateCardThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.templateCardBody {
+  padding: 14px 16px 16px;
+}
+
+.templateCardName {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.templateCardMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.templateCardPrice {
+  font-weight: 700;
+  font-size: 16px;
+  color: #262626;
+}
+
+.slotDots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.slotDot {
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  background: #262626;
+}
+
+/* ── Step 2: Booth ── */
+
+.stepPageBooth {
+  align-items: center;
+}
+
+.boothInfo {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #888;
+}
+
+.boothContent {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  max-width: 900px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+.boothViewfinder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.boothWebcamWrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  background: #000;
+}
+
+.boothWebcam {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.boothDslrPlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2d2d2d;
+  min-height: 200px;
+  max-height: 55vh;
+  flex-direction: column;
+  gap: 16px;
+  border-radius: 24px;
+}
+
+.boothDslrPlaceholder p {
+  color: #fff;
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+.boothCountdown {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 96px;
+  font-weight: 700;
+  z-index: 10;
+  border-radius: 24px;
+}
+
+/* ── Viewfinder overlay (framing corners) ── */
+.boothViewfinderOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  border-radius: 24px;
+}
+
+.viewfinderCornerTL,
+.viewfinderCornerTR,
+.viewfinderCornerBL,
+.viewfinderCornerBR {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-color: rgba(255,255,255,0.75);
+  border-style: solid;
+  border-width: 0;
+}
+
+.viewfinderCornerTL {
+  top: 12px;
+  left: 12px;
+  border-top-width: 2.5px;
+  border-left-width: 2.5px;
+}
+
+.viewfinderCornerTR {
+  top: 12px;
+  right: 12px;
+  border-top-width: 2.5px;
+  border-right-width: 2.5px;
+}
+
+.viewfinderCornerBL {
+  bottom: 12px;
+  left: 12px;
+  border-bottom-width: 2.5px;
+  border-left-width: 2.5px;
+}
+
+.viewfinderCornerBR {
+  bottom: 12px;
+  right: 12px;
+  border-bottom-width: 2.5px;
+  border-right-width: 2.5px;
+}
+
+/* ── Camera flash overlay ── */
+.boothFlash {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: #fff;
+  border-radius: 24px;
+  animation: boothFlashAnim 0.18s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes boothFlashAnim {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.boothPreview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 140px;
+}
+
+.boothStripPreview {
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #eee;
+  flex-shrink: 0;
+  max-height: 85%;
+}
+
+.boothStripPreview img {
+  display: block;
+}
+
+.boothDeleteSlot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 2;
+  padding: 0;
+}
+
+.boothStripPreview > [style*="position: absolute"]:hover .boothDeleteSlot {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .boothDeleteSlot { opacity: 1; }
+}
+
+.boothProceedBtn {
+  margin-top: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  background: #262626;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: opacity 0.15s;
+}
+
+.boothProceedBtn:active {
+  opacity: 0.8;
+}
+
+.boothControls {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.boothBtnRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.boothBtnPrimary {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #262626;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: opacity 0.15s;
+}
+
+.boothBtnPrimary:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.boothBtnPrimary:active {
+  opacity: 0.8;
+}
+
+.boothBtnSecondary {
+  padding: 10px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fff;
+  color: #262626;
+  font-weight: 500;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.15s;
+}
+
+.boothBtnSecondary:active {
+  background: #f5f5f5;
+}
+
+.boothModeToggle {
+  position: relative;
+  display: flex;
+  background: rgba(0,0,0,0.06);
+  border-radius: 100px;
+  padding: 2px;
+  width: 72px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.boothModeBtn {
+  all: unset;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  position: relative;
+  color: #888;
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 0.15s;
+}
+
+.boothModeActive {
+  color: #262626;
+}
+
+.boothModeSlider {
+  position: absolute;
+  top: 2px;
+  width: calc(50% - 2px);
+  height: calc(100% - 4px);
+  background: #fff;
+  border-radius: 100px;
+  transition: left 0.15s;
+  z-index: 1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.boothCamDropdown {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  min-width: 240px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  border: 1px solid #eee;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.boothCamDropdownOpen {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.boothCamOption {
+  all: unset;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  transition: background 0.15s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boothCamOption:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.boothCamOptionActive {
+  background: rgba(0,0,0,0.06);
+  font-weight: 600;
+}
+
+.boothMirrorOff {
+  opacity: 0.4;
+}
+
+.boothCamSwitcherGroup {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.boothCamSwitcherGroup .boothBtnSecondary {
+  min-width: 48px;
+  justify-content: center;
+}
+
+/* ── Step 3: Editor ── */
+
+.stepPageEditor {
+  align-items: center;
+}
+
+.editorLayout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 1000px;
+  flex: 1;
+  min-height: 0;
+  align-items: flex-start;
+}
+
+.editorPreview {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 20px;
+}
+
+.editorFrame {
+  position: relative;
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.editorSimplePreview {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+
+.editorSimplePreview img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.editorSidebar {
+  width: 260px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1.5px solid #eee;
+  min-height: 400px;
+}
+
+.editorFilters {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editorSlotGrid {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.editorSlotThumb {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2.5px solid transparent;
+  background: #f0f0f0;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #999;
+  transition: border-color 0.2s;
+}
+
+.editorSlotThumbActive {
+  border-color: #262626;
+}
+
+.editorSliderBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  flex-wrap: wrap;
+}
+
+.editorSliderGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editorSlider {
+  flex: 1;
+  height: 24px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.editorSlider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 4px;
+  background: #e8e8e8;
+}
+
+.editorSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #262626;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  margin-top: -8px;
+}
+
+.editorSlider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: #e8e8e8;
+}
+
+.editorSlider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #262626;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.editorAdjustSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.editorAdjustSection h4 {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.editorAdjustRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+}
+
+.editorAdjustLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: #262626;
+  min-width: 52px;
+  text-align: left;
+}
+
+.editorAdjustValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: #262626;
+  min-width: 44px;
+  text-align: center;
+}
+
+.editorRetakeBtn {
+  justify-content: center;
+}
+
+.filterGray {
+  filter: grayscale(100%);
+}
+
+.filterSepia {
+  filter: sepia(0.8) contrast(1.2) hue-rotate(-15deg);
+}
+
+/* ── Step 4: Payment ── */
+
+.stepPagePayment {
+  align-items: center;
+  justify-content: center;
+}
+
+.paymentCard {
+  background: #fff;
+  border-radius: 24px;
+  border: 1.5px solid #eee;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 400px;
+  width: 100%;
+}
+
+.paymentQr {
+  background: #f8f8f8;
+  padding: 24px;
+  border-radius: 20px;
+  margin: 16px 0;
+}
+
+.paymentPrice {
+  font-size: 28px;
+  font-weight: 700;
+  color: #262626;
+}
+
+.paymentSuccess {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.paymentSuccess h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.paymentSuccess p {
+  color: #888;
+}
+
+/* ── Step 5: Result ── */
+
+.stepPageResult {
+  align-items: center;
+}
+
+.resultLayout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 700px;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.resultImage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.resultImage img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.resultActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 200px;
+  padding-top: 4px;
+}
+
+.resultHomeBtn {
+  margin-top: auto;
+}
+
+/* ── Step Responsive ── */
+
+@media (max-width: 768px) {
+  .stepPage {
+    padding: 24px 16px 16px;
+  }
+  .boothStepLine {
+    width: 16px;
+    margin: 0 6px;
+  }
+  .boothStepLabel {
+    display: none;
+  }
+  .boothContent {
+    gap: 8px;
+  }
+  .boothPreview {
+    width: 80px;
+  }
+  .boothStripPreview {
+    width: 100%;
+  }
+  .boothStripPreview {
+    width: 80px;
+  }
+  .boothControls {
+    margin-top: 12px;
+  }
+  .editorLayout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .editorSidebar {
+    width: 200px;
+    padding: 14px;
+    min-height: auto;
+    gap: 12px;
+    overflow-y: auto;
+  }
+  .editorSidebar .editorAdjustSection {
+    padding: 8px 0;
+    gap: 6px;
+  }
+  .editorSidebar .editorAdjustRow {
+    min-height: 32px;
+    gap: 8px;
+  }
+  .editorSidebar .editorAdjustLabel {
+    font-size: 11px;
+    min-width: 40px;
+  }
+  .editorSidebar .editorAdjustValue {
+    font-size: 11px;
+    min-width: 32px;
+  }
+  .editorSidebar .editorSlider {
+    height: 20px;
+  }
+  .editorSidebar .editorSlider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  .editorSidebar .editorSlider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+  .editorSidebar .editorSlotThumb {
+    width: 48px;
+    height: 48px;
+  }
+  .resultLayout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .resultImage {
+    flex: 1;
+  }
+  .resultImage img {
+    max-width: 100%;
+    max-height: 50vh;
+  }
+  .resultActions {
+    width: 200px;
+    flex-direction: column;
+    padding-top: 0;
+  }
+  .templateGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .boothBtnRow {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .templateGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .boothBtnPrimary {
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+
+/* ── Step transition ── */
+.stepTransition {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  animation: stepSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stepContent {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes stepSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
