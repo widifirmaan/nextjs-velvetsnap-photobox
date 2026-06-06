@@ -1,4 +1,5 @@
 'use client';
+import { Pencil } from 'lucide-react';
 import { TemplateData, PhotoAdjust } from '../types';
 import styles from '@/app/main/page.module.css';
 
@@ -24,8 +25,7 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
               <div key={idx} onClick={() => setSelectedSlotIdx(idx)} style={{
                 position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`,
                 width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden', zIndex: 1,
-                cursor: 'pointer', outline: selectedSlotIdx === idx ? '3px solid #262626' : 'none',
-                outlineOffset: '-3px', borderRadius: '2px',
+                cursor: 'pointer', borderRadius: '2px',
               }}>
                 <div
                   style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
@@ -38,6 +38,14 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
                       transformOrigin: 'center', pointerEvents: 'none',
                       filter: slotCssFilter(idx),
                     }} />
+                  {selectedSlotIdx === idx && (
+                    <div style={{
+                      position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      background: 'rgba(0,0,0,0.25)', pointerEvents: 'none',
+                    }}>
+                      <Pencil size={28} color="#fff" />
+                    </div>
+                  )}
                 </div>
               </div>
             );
