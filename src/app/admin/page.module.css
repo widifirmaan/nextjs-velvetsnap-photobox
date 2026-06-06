@@ -343,8 +343,21 @@
 @media (max-width: 640px) {
   .statsGrid {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .statCard {
+    padding: 16px;
+  }
+  .statValue {
+    font-size: 24px;
   }
   .barChart {
     gap: 6px;
+  }
+  .sections {
+    overflow-x: auto;
+  }
+  .sections table {
+    min-width: 500px;
   }
 }

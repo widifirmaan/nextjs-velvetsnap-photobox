@@ -314,8 +314,12 @@
     font-size: 12px;
   }
 
+  .tableContainer {
+    overflow-x: auto;
+  }
+
   .table {
-    min-width: 500px;
+    min-width: 600px;
   }
 
   .header {

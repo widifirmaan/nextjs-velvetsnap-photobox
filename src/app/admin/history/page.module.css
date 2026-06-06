@@ -303,6 +303,19 @@
   border: 1px solid var(--mn-border);
 }
 
+@media (max-width: 480px) {
+  .modal {
+    border-radius: 16px;
+    max-width: 100%;
+  }
+  .modalBody {
+    padding: 16px;
+  }
+  .modalGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .modalHeader {
   display: flex;
   justify-content: space-between;
@@ -430,6 +443,12 @@
   .filterRow {
     flex-direction: column;
   }
+  .filterActions {
+    width: 100%;
+  }
+  .filterActions button {
+    flex: 1;
+  }
   .modalGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -438,5 +457,17 @@
   .table tbody td:nth-child(5),
   .table thead th:nth-child(5) {
     display: none;
+  }
+  .tableContainer {
+    overflow-x: auto;
+  }
+  .table {
+    min-width: 460px;
+  }
+  .confirmModal {
+    padding: 24px 20px;
+  }
+  .pagination {
+    flex-wrap: wrap;
   }
 }
