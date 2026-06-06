@@ -958,13 +958,24 @@
 
 .templateGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-rows: repeat(2, auto);
+  grid-auto-columns: 200px;
+  grid-auto-flow: column;
+  gap: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
   width: 100%;
-  flex: 1;
-  align-content: start;
-  padding-bottom: 16px;
-  overflow-y: auto;
+  padding: 8px 0 16px;
+  scrollbar-width: thin;
+}
+
+.templateGrid::-webkit-scrollbar {
+  height: 6px;
+}
+
+.templateGrid::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
 }
 
 .templateCard {
@@ -985,7 +996,7 @@
 
 .templateCardThumb {
   width: 100%;
-  aspect-ratio: 2 / 3.2;
+  aspect-ratio: 3 / 4;
   background: #f8f8f8;
   display: flex;
   align-items: center;
@@ -1811,8 +1822,8 @@
     padding-top: 0;
   }
   .templateGrid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
+    grid-auto-columns: 180px;
+    gap: 10px;
   }
   .boothBtnRow {
     flex-wrap: wrap;
@@ -1821,8 +1832,8 @@
 
 @media (max-width: 480px) {
   .templateGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    grid-auto-columns: 150px;
+    gap: 8px;
   }
   .boothBtnPrimary {
     padding: 14px 20px;
