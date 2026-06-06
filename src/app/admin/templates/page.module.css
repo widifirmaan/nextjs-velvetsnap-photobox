@@ -120,6 +120,7 @@
   overflow-x: auto;
   animation: fadeInUp 0.4s ease backwards;
   animation-delay: 0.15s;
+  margin-bottom: 60px;
 }
 
 .table {
