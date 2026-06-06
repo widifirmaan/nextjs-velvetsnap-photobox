@@ -97,8 +97,8 @@ export default function Home() {
           setClipStage('expand');
         });
       });
-    }, 500);
-    setTimeout(() => { setBtnMorph(null); setClipStage(null); }, 1400);
+    }, 900);
+    setTimeout(() => { setBtnMorph(null); setClipStage(null); }, 2000);
   }, []);
 
   const clipStyle = morphOrigin && clipStage ? {
