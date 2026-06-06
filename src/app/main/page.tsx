@@ -129,20 +129,33 @@ export default function Home() {
       )}
 
       {btnMorph && (
-        <div
-          className={`${styles.btnMorph} ${styles[`btnMorph_${btnMorph.phase}`]}`}
-          style={{
-            left: btnMorph.phase === 'pill' ? btnMorph.x : btnMorph.x + (btnMorph.w - btnMorph.h) / 2,
-            top: btnMorph.y,
-            width: btnMorph.phase === 'pill' ? btnMorph.w : btnMorph.h,
-            height: btnMorph.h,
-          }}
-        >
-          <span className={`${styles.btnMorphText} ${btnMorph.phase !== 'pill' ? styles.btnMorphTextHidden : ''}`}>
+        <>
+          <div
+            className={`${styles.btnGhost} ${btnMorph.phase !== 'pill' ? styles.btnGhostHidden : ''}`}
+            style={{
+              left: btnMorph.x,
+              top: btnMorph.y,
+              width: btnMorph.w,
+              height: btnMorph.h,
+            }}
+          >
             Mulai Sekarang
-          </span>
-          <Camera className={styles.btnMorphIcon} size={btnMorph.phase === 'pill' ? 14 : 20} />
-        </div>
+          </div>
+          <div
+            className={`${styles.btnMorph} ${styles[`btnMorph_${btnMorph.phase}`]}`}
+            style={{
+              left: btnMorph.phase === 'pill' ? btnMorph.x : btnMorph.x + (btnMorph.w - btnMorph.h) / 2,
+              top: btnMorph.y,
+              width: btnMorph.phase === 'pill' ? btnMorph.w : btnMorph.h,
+              height: btnMorph.h,
+            }}
+          >
+            <span className={styles.btnMorphText}>
+              Mulai Sekarang
+            </span>
+            <Camera className={styles.btnMorphIcon} size={btnMorph.phase === 'pill' ? 14 : 20} />
+          </div>
+        </>
       )}
 
       <div className={styles.stepTransition} style={{ display: step !== 0 ? 'none' : undefined }}>

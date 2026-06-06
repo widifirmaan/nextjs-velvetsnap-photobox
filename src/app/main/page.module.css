@@ -62,16 +62,40 @@
   opacity: 0;
 }
 
-.btnMorphText {
-  transition: opacity 0.35s ease, width 0.35s ease, margin 0.35s ease;
-  overflow: hidden;
+.btnGhost {
+  position: fixed;
+  z-index: 99;
+  background: var(--mn-text);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  border-radius: 28px;
+  transition: opacity 0.8s ease;
+  will-change: opacity;
 }
 
-.btnMorphTextHidden {
+.btnGhostHidden {
   opacity: 0;
-  width: 0;
-  margin: 0;
-  overflow: hidden;
+}
+
+.btnMorphText {
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: right center;
+}
+
+.btnMorph_pill .btnMorphText {
+  transform: scaleX(1);
+}
+
+.btnMorph_circle .btnMorphText,
+.btnMorph_expand .btnMorphText {
+  transform: scaleX(0);
 }
 
 .btnMorphIcon {
