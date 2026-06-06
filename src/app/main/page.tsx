@@ -79,8 +79,8 @@ export default function Home() {
 
   const handleStart = useCallback((e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
     setMorphOrigin({ x: cx, y: cy });
     setBtnMorph({ x: rect.left, y: rect.top, w: rect.width, h: rect.height, phase: 'pill' });
 
