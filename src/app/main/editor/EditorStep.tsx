@@ -15,8 +15,8 @@ export default function EditorStep({
   onNext, onBack,
 }: {
   captures: string[]; templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
-  photoAdjust: { scale: number; x: number; y: number; brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }[];
-  setPhotoAdjust: React.Dispatch<React.SetStateAction<{ scale: number; x: number; y: number; brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }[]>>;
+  photoAdjust: PhotoAdjust[];
+  setPhotoAdjust: React.Dispatch<React.SetStateAction<PhotoAdjust[]>>;
   selectedSlotIdx: number; setSelectedSlotIdx: (v: number) => void;
   selectedFilter: string; setSelectedFilter: (v: string) => void;
   onNext: () => void; onBack: () => void;
@@ -27,12 +27,12 @@ export default function EditorStep({
 
   const slotSources = (templateData?.slotsLayout || []).map((_, idx) => captures[idx]);
 
-  const sel = photoAdjust[selectedSlotIdx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 };
+  const sel = photoAdjust[selectedSlotIdx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
 
   const updateSlot = (idx: number, patch: Partial<typeof sel>) => {
     setPhotoAdjust((prev) => {
       const next = prev.map((a) => ({ ...a }));
-      if (!next[idx]) next[idx] = { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 };
+      if (!next[idx]) next[idx] = { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
       Object.assign(next[idx], patch);
       return next;
     });
@@ -44,8 +44,7 @@ export default function EditorStep({
     const t = a.temperature;
     const hueRotate = t * 0.25;
     const warmSepia = t > 0 ? t * 0.08 : 0;
-    const blur = a.sharpen < 0 ? `blur(${Math.abs(a.sharpen) * 0.04}px)` : '';
-    return `brightness(${a.brightness}%) contrast(${a.contrast}%) saturate(${a.saturation}%) hue-rotate(${hueRotate}deg) sepia(${warmSepia}%)${blur}`;
+    return `brightness(${a.brightness}%) contrast(${a.contrast}%) saturate(${a.saturation}%) hue-rotate(${hueRotate}deg) sepia(${warmSepia}%)`;
   };
 
   return (
@@ -87,9 +86,6 @@ export default function EditorStep({
             <AdjustSlider label="Temp" value={sel.temperature} min={-100} max={100}
               onChange={(v) => updateSlot(selectedSlotIdx, { temperature: v })}
               display={`${sel.temperature > 0 ? 'Warm' : sel.temperature < 0 ? 'Cold' : 'Neutral'}`} />
-            <AdjustSlider label="Smooth" value={sel.sharpen} min={-100} max={100}
-              onChange={(v) => updateSlot(selectedSlotIdx, { sharpen: v })}
-              display={`${sel.sharpen > 0 ? 'Sharpen' : sel.sharpen < 0 ? 'Smooth' : 'None'}`} />
           </div>
 
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>

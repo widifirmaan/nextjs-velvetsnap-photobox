@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage } from '@/lib/canvas-utils';
-import { TEMPLATE_CONFIGS, type TemplateData } from './types';
+import { TEMPLATE_CONFIGS, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';
 import EditorStep from './editor/EditorStep';
@@ -15,7 +15,7 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
   const [captures, setCaptures] = useState<string[]>([]);
-  const [photoAdjust, setPhotoAdjust] = useState<{ scale: number; x: number; y: number; brightness: number; contrast: number; saturation: number; temperature: number; sharpen: number }[]>([]);
+  const [photoAdjust, setPhotoAdjust] = useState<PhotoAdjust[]>([]);
   const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState('none');
   const [keyedFrameImage, setKeyedFrameImage] = useState('');
@@ -73,7 +73,7 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
   };
 
   useEffect(() => {
-    setPhotoAdjust(captures.map(() => ({ scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0, sharpen: 0 })));
+    setPhotoAdjust(captures.map(() => ({ scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 })));
   }, [captures]);
 
   useEffect(() => {

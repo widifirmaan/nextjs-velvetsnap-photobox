@@ -27,7 +27,6 @@ export interface PhotoAdjust {
   contrast: number;
   saturation: number;
   temperature: number;
-  sharpen: number;
 }
 
 export const SAMPLE_IMAGES = [
