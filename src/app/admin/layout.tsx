@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/templates', label: 'Templates', icon: Layers },
     { href: '/admin/devices', label: 'Devices', icon: Server },
-    { href: '/strips-studio', label: 'Strips Studio', icon: Image },
+    { href: '/admin/template-studio', label: 'Strips Studio', icon: Image },
   ];
 
   const bottomLinks = [
@@ -22,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const isActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
+    if (href === '/admin/templates') return pathname.startsWith('/admin/templates');
     return pathname.startsWith(href);
   };
 
