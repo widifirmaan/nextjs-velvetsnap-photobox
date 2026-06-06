@@ -1,34 +1,56 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image } from 'lucide-react';
 import styles from './layout.module.css';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  const navLinks = [
+    { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+    { href: '/admin/templates', label: 'Templates', icon: Layers },
+    { href: '/admin/devices', label: 'Devices', icon: Server },
+    { href: '/strips-studio', label: 'Strips Studio', icon: Image },
+  ];
+
+  const bottomLinks = [
+    { href: '/admin/history', label: 'History', icon: Clock },
+    { href: '/admin/finance', label: 'Finance', icon: DollarSign },
+  ];
+
+  const isActive = (href: string) => {
+    if (href === '/admin') return pathname === '/admin';
+    return pathname.startsWith(href);
+  };
+
   return (
     <div className={styles.adminLayout}>
       <div className={`glass-panel ${styles.sidebar}`}>
         <div className={styles.brand}>VelvetSnap</div>
         <nav className={styles.nav}>
-          <Link href="/admin" className={styles.navLink}>
-            <LayoutDashboard size={20} /> Overview
-          </Link>
-          <Link href="/admin/templates" className={styles.navLink}>
-            <Layers size={20} /> Templates
-          </Link>
-          <Link href="/admin/devices" className={styles.navLink}>
-            <Server size={20} /> Devices
-          </Link>
-          <Link href="/strips-studio" className={styles.navLink}>
-            <Image size={20} /> Strips Studio
-          </Link>
+          {navLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link key={link.href} href={link.href}
+                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}>
+                <Icon size={20} /> {link.label}
+              </Link>
+            );
+          })}
 
           <div className={styles.navDivider} />
 
-          <Link href="/admin/history" className={styles.navLink}>
-            <Clock size={20} /> History
-          </Link>
-          <Link href="/admin/finance" className={styles.navLink}>
-            <DollarSign size={20} /> Finance
-          </Link>
+          {bottomLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link key={link.href} href={link.href}
+                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}>
+                <Icon size={20} /> {link.label}
+              </Link>
+            );
+          })}
         </nav>
         
         <div className={styles.footer}>
@@ -40,6 +62,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       
       <div className={styles.content}>
         {children}
+        <footer className={styles.footer}>
+          <span>© {new Date().getFullYear()} VelvetSnap Photo Booth</span>
+        </footer>
       </div>
     </div>
   );
