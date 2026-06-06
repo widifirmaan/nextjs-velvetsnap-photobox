@@ -114,10 +114,26 @@ export interface EditorCanvasHandle {
 
 const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize }, ref) {
   const stageRef = useRef<Konva.Stage>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<Konva.Layer>(null);
   const guideLayerRef = useRef<Konva.Layer>(null);
   const trRef = useRef<Konva.Transformer>(null);
   const [guides, setGuides] = useState<GuideLine[]>([]);
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const w = entry.contentRect.width;
+        const s = Math.min(1, w / canvasSize.w);
+        setScale(s);
+      }
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [canvasSize.w]);
 
   useImperativeHandle(ref, () => ({
     getThumbnail: () => {
@@ -211,7 +227,9 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
   }, [onUpdate]);
 
   return (
-    <Stage
+    <div ref={containerRef} style={{ width: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+        <Stage
       ref={stageRef}
       width={canvasSize.w}
       height={canvasSize.h}
@@ -266,7 +284,9 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
           />
         ))}
       </Layer>
-    </Stage>
+      </Stage>
+      </div>
+    </div>
   );
 });
 

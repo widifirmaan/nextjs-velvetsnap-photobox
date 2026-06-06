@@ -41,6 +41,7 @@
   grid-template-columns: 200px 1fr 280px;
   gap: 20px;
   min-height: 600px;
+  min-width: 0;
 }
 
 .canvasArea {
@@ -51,8 +52,9 @@
   align-items: center;
   justify-content: center;
   min-height: 600px;
-  overflow: auto;
+  overflow: hidden;
   border: 1px solid var(--mn-border);
+  min-width: 0;
 }
 
 @media (max-width: 1024px) {
