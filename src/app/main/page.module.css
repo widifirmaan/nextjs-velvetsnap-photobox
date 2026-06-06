@@ -1498,9 +1498,9 @@
 }
 
 .editorSlotThumb {
-  width: 60px;
-  height: 60px;
-  border-radius: 12px;
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
   overflow: hidden;
   border: 2.5px solid transparent;
   background: #f0f0f0;
@@ -1512,11 +1512,50 @@
   font-size: 18px;
   font-weight: 700;
   color: #999;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, transform 0.15s;
+  position: relative;
+}
+
+.editorSlotThumb:hover {
+  transform: scale(1.05);
 }
 
 .editorSlotThumbActive {
   border-color: #262626;
+  box-shadow: 0 0 0 2px #262626;
+  transform: scale(1.05);
+}
+
+.editorSlotBadge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.editorSlotCheck {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #262626;
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }
 
 .editorSliderBar {
