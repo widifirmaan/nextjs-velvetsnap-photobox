@@ -558,10 +558,11 @@
   background: var(--mn-card);
   border-radius: var(--mn-radius);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
   overflow: hidden;
   min-height: 0;
+  height: 100%;
 }
 
 .rightEmpty {
@@ -577,9 +578,9 @@
 /* ── Fan Strips Layout ── */
 .fanTrack {
   flex: 1;
-  height: 98%;
   overflow-x: auto;
   overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   display: flex;
   align-items: center;
@@ -593,9 +594,9 @@
 }
 
 .fanSlide {
-  height: 95%;
+  max-height: 100%;
   width: auto;
-  max-height: 540px;
+  height: auto;
   display: block;
   object-fit: contain;
   border-radius: 8px;
@@ -604,6 +605,7 @@
   filter: drop-shadow(0 6px 20px rgba(0,0,0,0.12));
   user-select: none;
   -webkit-user-drag: none;
+  backface-visibility: hidden;
   margin-left: -28px;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
