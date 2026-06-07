@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
+import { AdminPageHeader } from '@/app/admin/components';
 import EditorCanvas from './component/EditorCanvas';
 import type { EditorCanvasHandle } from './component/EditorCanvas';
 import ElementToolbar from './component/ElementToolbar';
@@ -24,11 +25,17 @@ export default function StripsStudioPage() {
   const [saved, setSaved] = useState(false);
 
   const editorRef = useRef<EditorCanvasHandle>(null);
+  const stickerTargetRef = useRef<string | null>(null);
   const [stickerTargetId, setStickerTargetId] = useState<string | null>(null);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
 
   const addElement = useCallback((type: IStripElement['type']) => {
+    if (type === 'sticker') {
+      stickerTargetRef.current = '__new__';
+      setStickerTargetId('__new__');
+      return;
+    }
     const id = uuid();
     const base: IStripElement = {
       id,
@@ -46,31 +53,42 @@ export default function StripsStudioPage() {
       base.props = { shape: 'rounded', borderWidth: 2, borderColor: '#ffffff', borderRadius: 8 };
     } else if (type === 'text') {
       base.props = { content: 'Type here', fontSize: 24, fontFamily: 'Inter', color: '#3d2c2c', fontWeight: '700', textAlign: 'center' };
-    } else if (type === 'sticker') {
-      base.props = { stickerUrl: '', opacity: 1 };
     } else if (type === 'shape') {
       base.props = { shapeType: 'rect', fillColor: '#C5D89D', strokeColor: '#9CAB84', strokeWidth: 2, opacity: 1 };
     }
     setElements((prev) => [...prev, base]);
     setSelectedId(id);
-    if (type === 'sticker') {
-      setStickerTargetId(id);
-    }
   }, [elements.length]);
 
   const openStickerGallery = (elementId: string) => {
+    stickerTargetRef.current = elementId;
     setStickerTargetId(elementId);
   };
 
   const handleAssetSelect = (url: string) => {
-    if (!stickerTargetId) return;
-    setElements((prev) =>
-      prev.map((el) =>
-        el.id === stickerTargetId
-          ? { ...el, props: { ...el.props, stickerUrl: url } }
-          : el
-      )
-    );
+    const target = stickerTargetRef.current;
+    if (!target) return;
+    if (target === '__new__') {
+      const id = uuid();
+      setElements((prev) => [...prev, {
+        id,
+        type: 'sticker',
+        x: 20, y: 20,
+        width: 150, height: 150,
+        rotation: 0,
+        zIndex: prev.length,
+        visible: true,
+        props: { stickerUrl: url, opacity: 1 },
+      }]);
+      setSelectedId(id);
+    } else {
+      setElements((prev) =>
+        prev.map((el) =>
+          el.id === target ? { ...el, props: { ...el.props, stickerUrl: url } } : el
+        )
+      );
+    }
+    stickerTargetRef.current = null;
     setStickerTargetId(null);
   };
 
@@ -163,25 +181,10 @@ export default function StripsStudioPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <h1 className="title" style={{ textAlign: 'left', marginBottom: 4 }}>Strips Studio</h1>
-          <p className="subtitle" style={{ textAlign: 'left', marginBottom: 0 }}>Design your strip template — drag, drop, style</p>
-        </div>
-        <div className={styles.headerActions}>
-          <div className={styles.nameField}>
-            <input
-              type="text"
-              placeholder="Template name"
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-            />
-          </div>
-          <button className="mac-button" onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving...' : saved ? '✓ Saved' : 'Save Template'}
-          </button>
-        </div>
-      </header>
+      <AdminPageHeader
+        title="Strips Studio"
+        subtitle="Design your strip template — drag, drop, style"
+      />
 
       <div className={styles.editorLayout}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -225,6 +228,20 @@ export default function StripsStudioPage() {
           onClose={() => setStickerTargetId(null)}
         />
       )}
+
+      <div className={styles.bottomBar}>
+        <div className={styles.nameField}>
+          <input
+            type="text"
+            placeholder="Template name"
+            value={templateName}
+            onChange={(e) => setTemplateName(e.target.value)}
+          />
+        </div>
+        <button className="mac-button" onClick={handleSave} disabled={saving}>
+          {saving ? 'Saving...' : saved ? '✓ Saved' : 'Save Template'}
+        </button>
+      </div>
     </div>
   );
 }

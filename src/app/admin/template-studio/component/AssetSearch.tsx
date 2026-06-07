@@ -2,221 +2,135 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './AssetSearch.module.css';
-import { STICKER_CATEGORIES, renderEmojiToDataUrl } from '../data/stickers';
 
 interface AssetSearchProps {
   onSelect: (url: string) => void;
   onClose: () => void;
 }
 
-const GIPHY_API_KEY = process.env.NEXT_PUBLIC_GIPHY_API_KEY || '';
-
-
-
 export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
-  const [tab, setTab] = useState<'emoji' | 'giphy'>('emoji');
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState<string>(STICKER_CATEGORIES[0]?.name || '');
-  const [giphyResults, setGiphyResults] = useState<any[]>([]);
-  const [giphyLoading, setGiphyLoading] = useState(false);
-  const [giphyError, setGiphyError] = useState('');
+  const [imageResults, setImageResults] = useState<{ url: string; thumbnail: string; title: string }[]>([]);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imageError, setImageError] = useState('');
+  const [processingUrl, setProcessingUrl] = useState<string | null>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [recentStickers, setRecentStickers] = useState<string[]>([]);
 
-  useEffect(() => {
+  const handleImageSelect = async (imageUrl: string) => {
+    setProcessingUrl(imageUrl);
     try {
-      const stored = localStorage.getItem('strips_studio_recent_stickers');
-      if (stored) setRecentStickers(JSON.parse(stored));
-    } catch {}
-  }, []);
-
-  const saveRecent = (url: string) => {
-    const next = [url, ...recentStickers.filter(s => s !== url)].slice(0, 20);
-    setRecentStickers(next);
-    localStorage.setItem('strips_studio_recent_stickers', JSON.stringify(next));
-  };
-
-  const handleSelect = (url: string) => {
-    saveRecent(url);
-    onSelect(url);
-  };
-
-  const searchGiphy = useCallback(async (query: string) => {
-    if (!GIPHY_API_KEY) {
-      setGiphyError('GIPHY API key not configured. Set NEXT_PUBLIC_GIPHY_API_KEY in .env');
-      return;
-    }
-    if (!query.trim()) return;
-    setGiphyLoading(true);
-    setGiphyError('');
-    try {
-      const res = await fetch(
-        `https://api.giphy.com/v1/stickers/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=24&rating=g`
-      );
+      const res = await fetch('/api/image/remove-bg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl }),
+      });
       const data = await res.json();
-      if (data.data) {
-        setGiphyResults(data.data);
+      if (data.success) {
+        onSelect(data.data.url);
+        onClose();
       } else {
-        setGiphyError('No results found');
+        setImageError(data.error || 'Remove background failed');
+        setProcessingUrl(null);
       }
-    } catch (e) {
-      setGiphyError('Failed to fetch stickers. Check your network.');
+    } catch {
+      setImageError('Remove background failed');
+      setProcessingUrl(null);
+    }
+  };
+
+  const searchImages = useCallback(async (query: string) => {
+    if (!query.trim()) return;
+    setImageLoading(true);
+    setImageError('');
+    try {
+      const res = await fetch('/api/image/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setImageResults(data.data || []);
+      } else {
+        setImageError(data.error || 'Search failed');
+      }
+    } catch {
+      setImageError('Search failed. Check your network.');
     } finally {
-      setGiphyLoading(false);
+      setImageLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (searchTimeout.current) clearTimeout(searchTimeout.current);
-    if (tab === 'giphy' && search.trim()) {
-      searchTimeout.current = setTimeout(() => searchGiphy(search), 500);
+    if (search.trim()) {
+      searchTimeout.current = setTimeout(() => searchImages(search), 500);
     }
     return () => { if (searchTimeout.current) clearTimeout(searchTimeout.current); };
-  }, [search, tab, searchGiphy]);
-
-  const currentCategory = STICKER_CATEGORIES.find(c => c.name === category);
-  const filteredEmojis = search.trim()
-    ? STICKER_CATEGORIES.flatMap(c => c.emojis).filter(e => e.includes(search))
-    : currentCategory?.emojis || [];
-
-  const tabs = [
-    { id: 'emoji' as const, label: 'Emoji' },
-    ...(GIPHY_API_KEY ? [{ id: 'giphy' as const, label: 'Online' }] : []),
-  ];
+  }, [search, searchImages]);
 
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h3 style={{ margin: 0 }}>Sticker Gallery</h3>
+          <h3 style={{ margin: 0 }}>Image Search</h3>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
-        <div className={styles.tabs}>
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              className={`${styles.tab} ${tab === t.id ? styles.tabActive : ''}`}
-              onClick={() => { setTab(t.id); setSearch(''); setGiphyResults([]); }}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {tab === 'emoji' && (
-          <div>
+        <div>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
             <input
               type="text"
-              placeholder="Search emoji..."
+              placeholder="Search images..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className={styles.searchInput}
+              style={{ marginBottom: 0, flex: 1 }}
               autoFocus
             />
-            {!search.trim() && (
-              <div className={styles.categories}>
-                {STICKER_CATEGORIES.map(c => (
-                  <button
-                    key={c.name}
-                    className={`${styles.catBtn} ${c.name === category ? styles.catActive : ''}`}
-                    onClick={() => setCategory(c.name)}
-                  >
-                    <span style={{ fontSize: 20 }}>{c.emojis[0]}</span>
-                    <span style={{ fontSize: 11 }}>{c.name}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className={styles.grid}>
-              {filteredEmojis.map((emoji, i) => (
+            <button
+              className={styles.searchBtn}
+              onClick={() => searchImages(search)}
+              disabled={imageLoading || !search.trim()}
+            >
+              {imageLoading ? '...' : 'Search'}
+            </button>
+          </div>
+
+          {imageError && (
+            <p style={{ fontSize: 13, color: '#e74c3c', textAlign: 'center', padding: 12 }}>
+              {imageError}
+            </p>
+          )}
+
+          {imageLoading && (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 24 }}>
+              <div className={styles.spinner} />
+            </div>
+          )}
+
+          {imageResults.length > 0 && !imageLoading && (
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginBottom: 8 }}>
+              Select an image to remove background and add to canvas
+            </p>
+          )}
+
+          {imageResults.length > 0 && (
+            <div className={styles.imageGrid}>
+              {imageResults.map((img, i) => (
                 <button
                   key={i}
-                  className={styles.stickerItem}
-                  title={emoji}
-                  onClick={() => handleSelect(renderEmojiToDataUrl(emoji, 300))}
+                  className={`${styles.stickerItem} ${processingUrl === img.url ? styles.processing : ''}`}
+                  onClick={() => handleImageSelect(img.url)}
+                  disabled={!!processingUrl}
+                  title={img.title}
                 >
-                  <span style={{ fontSize: 28 }}>{emoji}</span>
+                  <img src={img.thumbnail} alt={img.title} loading="lazy" />
                 </button>
               ))}
             </div>
-          </div>
-        )}
-
-        {tab === 'giphy' && (
-          <div>
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-              <input
-                type="text"
-                placeholder="Search stickers..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className={styles.searchInput}
-                style={{ marginBottom: 0, flex: 1 }}
-                autoFocus
-              />
-              <button
-                className={styles.searchBtn}
-                onClick={() => searchGiphy(search)}
-                disabled={giphyLoading || !search.trim()}
-              >
-                {giphyLoading ? '...' : 'Search'}
-              </button>
-            </div>
-            {giphyError && (
-              <p style={{ fontSize: 13, color: '#e74c3c', textAlign: 'center', padding: 12 }}>
-                {giphyError}
-              </p>
-            )}
-            {!GIPHY_API_KEY && (
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', padding: 16 }}>
-                Set <code>NEXT_PUBLIC_GIPHY_API_KEY</code> in .env.local to enable online sticker search.
-                Get a free key at <a href="https://developers.giphy.com" target="_blank" rel="noopener" style={{ color: 'var(--accent-color)' }}>developers.giphy.com</a>
-              </p>
-            )}
-            {giphyResults.length > 0 && (
-              <div className={styles.grid}>
-                {giphyResults.map((sticker: any, i: number) => {
-                  const url = sticker.images?.fixed_width?.webp || sticker.images?.fixed_width?.url;
-                  return url ? (
-                    <button
-                      key={sticker.id || i}
-                      className={styles.stickerItem}
-                      onClick={() => handleSelect(url)}
-                    >
-                      <img
-                        src={url}
-                        alt={sticker.title || 'Sticker'}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 8 }}
-                        loading="lazy"
-                      />
-                    </button>
-                  ) : null;
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {recentStickers.length > 0 && (
-          <div style={{ marginTop: 16 }}>
-            <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>Recent</p>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              {recentStickers.slice(0, 8).map((url, i) => (
-                <button
-                  key={i}
-                  onClick={() => onSelect(url)}
-                  style={{
-                    width: 44, height: 44, borderRadius: 8, overflow: 'hidden',
-                    border: '1px solid rgba(0,0,0,0.06)', background: '#fff', cursor: 'pointer', padding: 0,
-                  }}
-                >
-                  <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

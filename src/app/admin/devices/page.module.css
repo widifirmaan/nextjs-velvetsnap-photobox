@@ -4,7 +4,7 @@
   align-items: flex-start;
   margin-bottom: 32px;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 24px;
 }
 
 .sections {
@@ -59,6 +59,7 @@
 
 .cameraTypeRow {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
@@ -231,11 +232,115 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    margin-bottom: 24px;
+  }
+  
+  .section {
+    padding: 20px;
+  }
+  
+  .sectionHeader {
+    margin-bottom: 16px;
+  }
+  
+  .sectionHeader h2 {
+    font-size: 15px;
+  }
+  
+  .cameraTypeRow {
+    gap: 8px;
+  }
+  
+  .typeCard {
+    min-width: 100px;
+    padding: 16px 12px;
+    font-size: 13px;
+  }
+  
+  .typeLabel {
+    font-size: 12px;
+  }
+  
+  .fieldGroup {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .saveBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  
+  .storageBadge {
+    margin-left: 0;
+  }
+}
+
 @media (max-width: 640px) {
   .fieldGroup {
     grid-template-columns: 1fr;
   }
   .storageBadge {
     margin-left: 0;
+  }
+  
+  .cameraTypeRow {
+    flex-wrap: wrap;
+  }
+  
+  .typeCard {
+    flex: 0 1 calc(50% - 6px);
+  }
+  
+  .section {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 12px;
+  }
+  
+  .sectionHeader h2 {
+    font-size: 14px;
+  }
+  
+  .typeCard {
+    flex: 1;
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+  
+  .typeLabel {
+    font-size: 11px;
+  }
+  
+  .typeDesc {
+    font-size: 10px;
+  }
+  
+  .radioCard {
+    padding: 12px 12px;
+    font-size: 13px;
+  }
+  
+  .field select,
+  .field input[type='number'] {
+    font-size: 16px;
+    padding: 12px;
+  }
+  
+  .saveBar {
+    width: 100%;
+  }
+  
+  .saveBar button {
+    width: 100%;
   }
 }

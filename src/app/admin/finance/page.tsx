@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Calendar, Clock, Download, Loader2 } from 'lucide-react';
+import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
 import styles from './page.module.css';
 
 interface FinanceData {
@@ -18,18 +19,14 @@ export default function FinancePage() {
   const [data, setData] = useState<FinanceData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchFinance();
-  }, []);
+  useEffect(() => { fetchFinance(); }, []);
 
   const fetchFinance = async () => {
     setLoading(true);
     try {
       const res = await fetch('/api/finance');
       const json = await res.json();
-      if (json.success) {
-        setData(json.data);
-      }
+      if (json.success) setData(json.data);
     } catch (err) {
       console.error('Failed to fetch finance data:', err);
     } finally {
@@ -39,7 +36,6 @@ export default function FinancePage() {
 
   const exportCSV = () => {
     if (!data) return;
-
     const rows = [
       ['Period', 'Revenue (Rp)', 'Transactions'],
       ['Today', String(data.today.total), String(data.today.count)],
@@ -53,7 +49,6 @@ export default function FinancePage() {
       ['Template', 'Revenue (Rp)', 'Transactions'],
       ...data.templateRevenue.map((t) => [t._id || 'Unknown', String(t.total), String(t.count)]),
     ];
-
     const csv = rows.map((r) => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -86,53 +81,22 @@ export default function FinancePage() {
 
   return (
     <div>
-      <div className={styles.header}>
-        <div>
-          <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>Finance</h1>
-          <p className="subtitle" style={{ textAlign: 'left', marginBottom: 0 }}>
-            Revenue analytics and financial overview
-          </p>
-        </div>
-        <button className="mac-button" onClick={exportCSV}>
-          <Download size={18} /> Export CSV
-        </button>
-      </div>
+      <AdminPageHeader
+        title="Finance"
+        subtitle="Revenue analytics and financial overview"
+        action={
+          <button className="mac-button" onClick={exportCSV}>
+            <Download size={18} /> Export CSV
+          </button>
+        }
+      />
 
-      {/* Summary Cards */}
-      <div className={styles.summaryGrid}>
-        <div className={`glass-panel ${styles.summaryCard}`}>
-          <div className={`${styles.summaryIcon} ${styles.orange}`}>
-            <Clock size={22} />
-          </div>
-          <p className={styles.summaryLabel}>Today</p>
-          <p className={styles.summaryValue}>Rp {data.today.total.toLocaleString('id-ID')}</p>
-          <p className={styles.summaryCount}>{data.today.count} transactions</p>
-        </div>
-        <div className={`glass-panel ${styles.summaryCard}`}>
-          <div className={`${styles.summaryIcon} ${styles.blue}`}>
-            <Calendar size={22} />
-          </div>
-          <p className={styles.summaryLabel}>This Week</p>
-          <p className={styles.summaryValue}>Rp {data.week.total.toLocaleString('id-ID')}</p>
-          <p className={styles.summaryCount}>{data.week.count} transactions</p>
-        </div>
-        <div className={`glass-panel ${styles.summaryCard}`}>
-          <div className={`${styles.summaryIcon} ${styles.purple}`}>
-            <TrendingUp size={22} />
-          </div>
-          <p className={styles.summaryLabel}>This Month</p>
-          <p className={styles.summaryValue}>Rp {data.month.total.toLocaleString('id-ID')}</p>
-          <p className={styles.summaryCount}>{data.month.count} transactions</p>
-        </div>
-        <div className={`glass-panel ${styles.summaryCard}`}>
-          <div className={`${styles.summaryIcon} ${styles.green}`}>
-            <DollarSign size={22} />
-          </div>
-          <p className={styles.summaryLabel}>All Time</p>
-          <p className={styles.summaryValue}>Rp {data.allTime.total.toLocaleString('id-ID')}</p>
-          <p className={styles.summaryCount}>{data.allTime.count} transactions</p>
-        </div>
-      </div>
+      <AdminStatGrid>
+        <AdminStatCard icon={<Clock size={22} />} label="Today" value={`Rp ${data.today.total.toLocaleString('id-ID')}`} color="orange" delay={0.05} subtext={`${data.today.count} transactions`} />
+        <AdminStatCard icon={<Calendar size={22} />} label="This Week" value={`Rp ${data.week.total.toLocaleString('id-ID')}`} color="blue" delay={0.1} subtext={`${data.week.count} transactions`} />
+        <AdminStatCard icon={<TrendingUp size={22} />} label="This Month" value={`Rp ${data.month.total.toLocaleString('id-ID')}`} color="purple" delay={0.15} subtext={`${data.month.count} transactions`} />
+        <AdminStatCard icon={<DollarSign size={22} />} label="All Time" value={`Rp ${data.allTime.total.toLocaleString('id-ID')}`} color="green" delay={0.2} subtext={`${data.allTime.count} transactions`} />
+      </AdminStatGrid>
 
       {/* Daily Revenue Chart */}
       <div className={`glass-panel ${styles.chartSection}`}>
@@ -181,10 +145,7 @@ export default function FinancePage() {
                   <div className={styles.breakdownInfo}>
                     <div className={styles.breakdownName}>{t._id || 'Unknown'}</div>
                     <div className={styles.breakdownBar}>
-                      <div
-                        className={styles.breakdownBarFill}
-                        style={{ width: `${(t.total / maxTemplate) * 100}%` }}
-                      />
+                      <div className={styles.breakdownBarFill} style={{ width: `${(t.total / maxTemplate) * 100}%` }} />
                     </div>
                   </div>
                   <div className={styles.breakdownStats}>
@@ -213,10 +174,7 @@ export default function FinancePage() {
                     <div className={styles.breakdownInfo}>
                       <div className={styles.breakdownName}>{monthLabel}</div>
                       <div className={styles.breakdownBar}>
-                        <div
-                          className={styles.breakdownBarFill}
-                          style={{ width: `${(m.total / maxMonthly) * 100}%` }}
-                        />
+                        <div className={styles.breakdownBarFill} style={{ width: `${(m.total / maxMonthly) * 100}%` }} />
                       </div>
                     </div>
                     <div className={styles.breakdownStats}>

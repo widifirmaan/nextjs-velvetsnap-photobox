@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Camera, Save, Monitor, Printer, RefreshCw, CheckCircle, Usb } from 'lucide-react';
+import { AdminPageHeader } from '@/app/admin/components';
 import styles from './page.module.css';
 
 interface DeviceSettings {
@@ -46,10 +47,7 @@ export default function DevicesPage() {
   const [dslrTesting, setDslrTesting] = useState(false);
   const [dslrStatus, setDslrStatus] = useState<string | null>(null);
 
-  useEffect(() => {
-    setSettings(loadSettings());
-    setInitialized(true);
-  }, []);
+  useEffect(() => { setSettings(loadSettings()); setInitialized(true); }, []);
 
   useEffect(() => {
     if (!initialized) return;
@@ -113,17 +111,12 @@ export default function DevicesPage() {
 
   return (
     <div>
-      <div className={styles.header}>
-        <div>
-          <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>Device Settings</h1>
-          <p className="subtitle" style={{ textAlign: 'left', marginBottom: 0 }}>
-            Semua pengaturan disimpan di browser (localStorage) — setiap perangkat punya pengaturannya sendiri.
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Device Settings"
+        subtitle="Semua pengaturan disimpan di browser (localStorage) — setiap perangkat punya pengaturannya sendiri."
+      />
 
       <div className={styles.sections}>
-        {/* Camera Type */}
         <div className={`glass-panel ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}><Camera size={20} /></span>
@@ -151,10 +144,7 @@ export default function DevicesPage() {
               ) : (
                 <div className={styles.cameraList}>
                   {cameras.map((cam) => (
-                    <label
-                      key={cam.deviceId}
-                      className={`${styles.radioCard} ${settings.camera === cam.deviceId ? styles.radioCardActive : ''}`}
-                    >
+                    <label key={cam.deviceId} className={`${styles.radioCard} ${settings.camera === cam.deviceId ? styles.radioCardActive : ''}`}>
                       <input type="radio" name="camera" value={cam.deviceId} checked={settings.camera === cam.deviceId} onChange={() => update('camera', cam.deviceId)} />
                       <Monitor size={18} />
                       <span>{cam.label || `Camera ${cam.deviceId.slice(0, 8)}...`}</span>
@@ -179,7 +169,6 @@ export default function DevicesPage() {
           )}
         </div>
 
-        {/* Capture */}
         <div className={`glass-panel ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}><Camera size={20} /></span>
@@ -205,7 +194,6 @@ export default function DevicesPage() {
           </div>
         </div>
 
-        {/* Print */}
         <div className={`glass-panel ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}><Printer size={20} /></span>

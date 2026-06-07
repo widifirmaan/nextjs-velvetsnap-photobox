@@ -122,7 +122,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const container = containerRef.current?.parentElement;
     if (!container) return;
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
@@ -227,16 +227,16 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
   }, [onUpdate]);
 
   return (
-    <div ref={containerRef} style={{ width: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
-      <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
+    <div ref={containerRef}>
         <Stage
       ref={stageRef}
-      width={canvasSize.w}
-      height={canvasSize.h}
+      width={canvasSize.w * scale}
+      height={canvasSize.h * scale}
+      scaleX={scale}
+      scaleY={scale}
       style={{
         background: '#ffffff',
-        borderRadius: 12,
-        boxShadow: '0 8px 24px rgba(0,0,0,0.10)',
+        border: '1px solid #000',
       }}
       onClick={(e) => {
         if (e.target === e.target.getStage()) { onSelect(null); setGuides([]); }
@@ -285,7 +285,6 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
         ))}
       </Layer>
       </Stage>
-      </div>
     </div>
   );
 });
@@ -470,5 +469,16 @@ function StickerElement({ el, common }: { el: IStripElement; common: any }) {
       </Group>
     );
   }
-  return <KonvaImage {...common} image={image} />;
+  const imgW = image.width;
+  const imgH = image.height;
+  const scale = Math.min(el.width / imgW, el.height / imgH);
+  const dispW = imgW * scale;
+  const dispH = imgH * scale;
+  const offsetX = (el.width - dispW) / 2;
+  const offsetY = (el.height - dispH) / 2;
+  return (
+    <Group {...common}>
+      <KonvaImage image={image} x={offsetX} y={offsetY} width={dispW} height={dispH} />
+    </Group>
+  );
 }

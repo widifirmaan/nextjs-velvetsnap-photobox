@@ -3,6 +3,7 @@ import Template from '@/models/Template';
 import Transaction from '@/models/Transaction';
 import Link from 'next/link';
 import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'lucide-react';
+import { AdminPageHeader, AdminStatCard, AdminStatGrid, AdminBadge, AdminTableCard } from '@/app/admin/components';
 import styles from './page.module.css';
 
 export const revalidate = 0;
@@ -15,14 +16,12 @@ export default async function AdminDashboard() {
   const transactions = await Transaction.find({}).sort({ createdAt: -1 }).limit(10).lean();
   const totalSessions = await Transaction.countDocuments();
 
-  // Total revenue
   const totalRevenueAgg = await Transaction.aggregate([
     { $match: { status: 'PAID' } },
     { $group: { _id: null, total: { $sum: '$price' } } },
   ]);
   const revenue = totalRevenueAgg[0]?.total || 0;
 
-  // Today's revenue
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   const todayRevenueAgg = await Transaction.aggregate([
@@ -31,7 +30,6 @@ export default async function AdminDashboard() {
   ]);
   const todayRevenue = todayRevenueAgg[0]?.total || 0;
 
-  // Daily revenue for the last 7 days
   const weekStart = new Date(todayStart);
   weekStart.setDate(weekStart.getDate() - 6);
   const dailyRevenueAgg = await Transaction.aggregate([
@@ -46,7 +44,6 @@ export default async function AdminDashboard() {
     { $sort: { _id: 1 } },
   ]);
 
-  // Fill in missing days
   const dailyData = [];
   let maxRevenue = 0;
   for (let i = 6; i >= 0; i--) {
@@ -66,44 +63,18 @@ export default async function AdminDashboard() {
   }
 
   return (
-    <div className="page-container">
-      <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>Dashboard</h1>
-          <p className="subtitle" style={{ textAlign: 'left', marginBottom: '32px' }}>
-            VelvetSnap Co. — Admin Dashboard
-          </p>
+    <div>
+      <AdminPageHeader
+        title="Dashboard"
+        subtitle="VelvetSnap Co. — Admin Dashboard"
+      />
 
-      {/* Stat Cards */}
-      <div className={styles.statsGrid}>
-        <div className={`glass-panel ${styles.statCard}`}>
-          <div className={`${styles.statIcon} ${styles.blue}`}>
-            <Camera size={22} />
-          </div>
-          <p className={styles.statLabel}>Total Sessions</p>
-          <p className={styles.statValue}>{totalSessions.toLocaleString('id-ID')}</p>
-        </div>
-        <div className={`glass-panel ${styles.statCard}`}>
-          <div className={`${styles.statIcon} ${styles.green}`}>
-            <DollarSign size={22} />
-          </div>
-          <p className={styles.statLabel}>Total Revenue</p>
-          <p className={styles.statValue}>Rp {revenue.toLocaleString('id-ID')}</p>
-        </div>
-        <div className={`glass-panel ${styles.statCard}`}>
-          <div className={`${styles.statIcon} ${styles.orange}`}>
-            <TrendingUp size={22} />
-          </div>
-          <p className={styles.statLabel}>Today&apos;s Revenue</p>
-          <p className={styles.statValue}>Rp {todayRevenue.toLocaleString('id-ID')}</p>
-        </div>
-        <div className={`glass-panel ${styles.statCard}`}>
-          <div className={`${styles.statIcon} ${styles.purple}`}>
-            <Layers size={22} />
-          </div>
-          <p className={styles.statLabel}>Active Templates</p>
-          <p className={styles.statValue}>{activeTemplates.length}</p>
-          <p className={styles.statSubtext}>{templates.length} total</p>
-        </div>
-      </div>
+      <AdminStatGrid>
+        <AdminStatCard icon={<Camera size={22} />} label="Total Sessions" value={totalSessions.toLocaleString('id-ID')} color="blue" delay={0.05} />
+        <AdminStatCard icon={<DollarSign size={22} />} label="Total Revenue" value={`Rp ${revenue.toLocaleString('id-ID')}`} color="green" delay={0.1} />
+        <AdminStatCard icon={<TrendingUp size={22} />} label="Today&apos;s Revenue" value={`Rp ${todayRevenue.toLocaleString('id-ID')}`} color="orange" delay={0.15} />
+        <AdminStatCard icon={<Layers size={22} />} label="Active Templates" value={`${activeTemplates.length}`} color="purple" delay={0.2} subtext={`${templates.length} total`} />
+      </AdminStatGrid>
 
       {/* Revenue Chart */}
       <div className={`glass-panel ${styles.chartSection}`}>
@@ -137,9 +108,10 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick Links */}
+      {/* Quick Access */}
+      <h2 className={styles.sectionTitle}>Quick Access</h2>
       <div className={styles.quickLinksGrid}>
-        <Link href="/admin/templates" className={`glass-panel ${styles.quickLink}`}>
+        <Link href="/admin/templates" className={styles.quickLink}>
           <div className={`${styles.quickLinkIcon} ${styles.blue}`}>
             <Layers size={20} />
           </div>
@@ -149,7 +121,7 @@ export default async function AdminDashboard() {
           </div>
           <ChevronRight size={18} className={styles.quickLinkArrow} />
         </Link>
-        <Link href="/admin/history" className={`glass-panel ${styles.quickLink}`}>
+        <Link href="/admin/history" className={styles.quickLink}>
           <div className={`${styles.quickLinkIcon} ${styles.orange}`}>
             <Clock size={20} />
           </div>
@@ -159,7 +131,7 @@ export default async function AdminDashboard() {
           </div>
           <ChevronRight size={18} className={styles.quickLinkArrow} />
         </Link>
-        <Link href="/admin/finance" className={`glass-panel ${styles.quickLink}`}>
+        <Link href="/admin/finance" className={styles.quickLink}>
           <div className={`${styles.quickLinkIcon} ${styles.green}`}>
             <DollarSign size={20} />
           </div>
@@ -171,47 +143,40 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      {/* Recent Transactions Table */}
-      <div className={styles.sections}>
-        <div className={`glass-panel ${styles.section}`}>
-          <div className={styles.sectionHeader}>
-            <h2>Recent Transactions</h2>
-            <Link href="/admin/history" className={styles.viewAll}>
-              View All →
-            </Link>
-          </div>
-          {transactions.length === 0 ? (
-            <p className={styles.emptyState}>No transactions yet.</p>
-          ) : (
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Session ID</th>
-                  <th>Template</th>
-                  <th>Status</th>
-                  <th>Price</th>
-                  <th>Date</th>
+      {/* Recent Transactions */}
+      <AdminTableCard
+        title="Recent Transactions"
+        action={<Link href="/admin/history" className={styles.viewAll}>View All →</Link>}
+      >
+        {transactions.length === 0 ? (
+          <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No transactions yet.</p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Session ID</th>
+                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Template</th>
+                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Status</th>
+                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Price</th>
+                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactions.map((tx: any) => (
+                <tr key={tx._id.toString()} style={{ transition: 'background 0.2s' }}>
+                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>{tx.sessionId ? tx.sessionId.substring(0, 8) : 'N/A'}...</td>
+                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>{tx.templateId || 'Unknown'}</td>
+                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                    <AdminBadge status={tx.status || 'PENDING'} />
+                  </td>
+                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Rp {(tx.price || 0).toLocaleString('id-ID')}</td>
+                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>{new Date(tx.createdAt || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {transactions.map((tx: any) => (
-                  <tr key={tx._id.toString()}>
-                    <td>{tx.sessionId ? tx.sessionId.substring(0, 8) : 'N/A'}...</td>
-                    <td>{tx.templateId || 'Unknown'}</td>
-                    <td>
-                      <span className={`${styles.badge} ${styles[(tx.status || 'PENDING').toLowerCase()]}`}>
-                        {tx.status || 'PENDING'}
-                      </span>
-                    </td>
-                    <td>Rp {(tx.price || 0).toLocaleString('id-ID')}</td>
-                    <td>{new Date(tx.createdAt || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </AdminTableCard>
     </div>
   );
 }

@@ -34,8 +34,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {navLinks.map((link) => {
             const Icon = link.icon;
             return (
-              <Link key={link.href} href={link.href}
-                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}>
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
+              >
                 <Icon size={20} /> {link.label}
               </Link>
             );
@@ -46,16 +49,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {bottomLinks.map((link) => {
             const Icon = link.icon;
             return (
-              <Link key={link.href} href={link.href}
-                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}>
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
+              >
                 <Icon size={20} /> {link.label}
               </Link>
             );
           })}
         </nav>
         
-        <div className={styles.footer}>
-          <Link href="/" className={styles.navLink} style={{ color: 'var(--text-secondary)' }}>
+        <div className={styles.sidebarFooter}>
+          <Link 
+            href="/" 
+            className={styles.navLink} 
+            style={{ color: 'var(--text-secondary)' }}
+          >
             &larr; Return to App
           </Link>
         </div>
@@ -63,10 +73,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       
       <div className={styles.content}>
         {children}
-        <footer className={styles.footer}>
+        <footer className={styles.contentFooter}>
           <span>Velvetsnap Photobooth Platform by <a href="https://widifirmaan.web.id" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>W</a></span>
         </footer>
       </div>
+
+      {/* Mobile Top Bar */}
+      <div className={styles.mobileTopBar}>
+        <span>VelvetSnap Photobooth Platform</span>
+      </div>
+
+      {/* Bottom Navigation */}
+      <nav className={styles.bottomNav}>
+        {navLinks.map((link) => {
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
+              title={link.label}
+            >
+              <Icon size={24} />
+              <span className={styles.bottomNavLabel}>{link.label}</span>
+            </Link>
+          );
+        })}
+        {bottomLinks.map((link) => {
+          const Icon = link.icon;
+          return (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
+              title={link.label}
+            >
+              <Icon size={24} />
+              <span className={styles.bottomNavLabel}>{link.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }

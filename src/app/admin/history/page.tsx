@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Clock, Camera, Loader2, Search, X, Trash2, Printer, ImageIcon } from 'lucide-react';
+import { AdminPageHeader, AdminBadge, AdminEmptyState, AdminModal, AdminConfirmModal } from '@/app/admin/components';
 import styles from './page.module.css';
 
 interface Transaction {
@@ -57,13 +58,9 @@ export default function HistoryPage() {
     }
   }, [statusFilter, fromDate, toDate]);
 
-  useEffect(() => {
-    fetchData(1);
-  }, [fetchData]);
+  useEffect(() => { fetchData(1); }, [fetchData]);
 
-  const handleSearch = () => {
-    fetchData(1);
-  };
+  const handleSearch = () => fetchData(1);
 
   const handleClear = () => {
     setStatusFilter('ALL');
@@ -148,16 +145,11 @@ export default function HistoryPage() {
 
   return (
     <div>
-      <div className={styles.header}>
-        <div>
-          <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>Photo History</h1>
-          <p className="subtitle" style={{ textAlign: 'left', marginBottom: 0 }}>
-            Browse and filter past photobooth sessions
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        title="Photo History"
+        subtitle="Browse and filter past photobooth sessions"
+      />
 
-      {/* Filters */}
       <div className={`glass-panel ${styles.filters}`}>
         <div className={styles.filterRow}>
           <div className={styles.filterGroup}>
@@ -188,20 +180,13 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Content */}
       {loading ? (
         <div className={styles.loader}>
           <Loader2 className="spin" size={32} />
           <span>Loading sessions...</span>
         </div>
       ) : transactions.length === 0 ? (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>
-            <Camera size={28} />
-          </div>
-          <div className={styles.emptyTitle}>No sessions found</div>
-          <div className={styles.emptyDesc}>Try adjusting your filters or check back later.</div>
-        </div>
+        <AdminEmptyState icon={<Camera size={28} />} title="No sessions found" description="Try adjusting your filters or check back later." />
       ) : (
         <>
           <div className={`glass-panel ${styles.tableContainer}`}>
@@ -224,11 +209,7 @@ export default function HistoryPage() {
                     <td>{tx.templateId || 'Unknown'}</td>
                     <td className={styles.tablePrice}>Rp {(tx.price || 0).toLocaleString('id-ID')}</td>
                     <td><Camera size={14} /> {tx.captures?.length || 0}</td>
-                    <td>
-                      <span className={`${styles.badge} ${styles[(tx.status || 'PENDING').toLowerCase()]}`}>
-                        {tx.status || 'PENDING'}
-                      </span>
-                    </td>
+                    <td><AdminBadge status={tx.status || 'PENDING'} /></td>
                     <td className={styles.tableDate}>
                       {new Date(tx.createdAt || new Date()).toLocaleDateString('en-US', {
                         year: 'numeric', month: 'short', day: 'numeric',
@@ -254,26 +235,15 @@ export default function HistoryPage() {
             </table>
           </div>
 
-          {/* Pagination */}
           {pagination.totalPages > 1 && (
             <div className={styles.pagination}>
-              <button
-                className="mac-button secondary"
-                disabled={pagination.page <= 1}
-                onClick={() => fetchData(pagination.page - 1)}
-                style={{ padding: '8px 16px', fontSize: '14px' }}
-              >
+              <button className="mac-button secondary" disabled={pagination.page <= 1} onClick={() => fetchData(pagination.page - 1)} style={{ padding: '8px 16px', fontSize: '14px' }}>
                 ← Previous
               </button>
               <span className={styles.pageInfo}>
                 Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
               </span>
-              <button
-                className="mac-button secondary"
-                disabled={pagination.page >= pagination.totalPages}
-                onClick={() => fetchData(pagination.page + 1)}
-                style={{ padding: '8px 16px', fontSize: '14px' }}
-              >
+              <button className="mac-button secondary" disabled={pagination.page >= pagination.totalPages} onClick={() => fetchData(pagination.page + 1)} style={{ padding: '8px 16px', fontSize: '14px' }}>
                 Next →
               </button>
             </div>
@@ -281,72 +251,49 @@ export default function HistoryPage() {
         </>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {deleteTarget && (
-        <div className={styles.modalOverlay} onClick={() => !deleting && setDeleteTarget(null)}>
-          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.confirmIcon}><Trash2 size={28} /></div>
-            <h3>Delete Transaction?</h3>
-            <p>This action cannot be undone.</p>
-            <div className={styles.confirmActions}>
-              <button className="mac-button secondary" disabled={deleting} onClick={() => setDeleteTarget(null)} style={{ padding: '10px 24px' }}>
-                Cancel
-              </button>
-              <button className="mac-button" disabled={deleting} onClick={handleDelete} style={{ padding: '10px 24px', background: '#ff3b30', color: '#fff' }}>
-                {deleting ? <><Loader2 className="spin" size={16} /> Deleting...</> : 'Delete'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AdminConfirmModal
+        open={!!deleteTarget}
+        onClose={() => !deleting && setDeleteTarget(null)}
+        onConfirm={handleDelete}
+        title="Delete Transaction?"
+        message="This action cannot be undone."
+        loading={deleting}
+      />
 
-      {/* Transaction Modal */}
-      {selectedTx && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedTx(null)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h2>Transaction #{selectedTx.sessionId}</h2>
-              <button className={styles.modalClose} onClick={() => setSelectedTx(null)}>
-                <X size={20} />
-              </button>
+      <AdminModal open={!!selectedTx} onClose={() => setSelectedTx(null)} title={`Transaction #${selectedTx?.sessionId || ''}`}>
+        {selectedTx && (
+          <div className={styles.modalBody}>
+            <div className={styles.modalInfo}>
+              <span>Template: {selectedTx.templateId}</span>
+              <span>Status: <AdminBadge status={selectedTx.status} /></span>
+              <span>Price: Rp {(selectedTx.price || 0).toLocaleString('id-ID')}</span>
+              <span>Date: {new Date(selectedTx.createdAt).toLocaleString()}</span>
             </div>
-            <div className={styles.modalBody}>
-              <div className={styles.modalInfo}>
-                <span>Template: {selectedTx.templateId}</span>
-                <span>Status: {selectedTx.status}</span>
-                <span>Price: Rp {(selectedTx.price || 0).toLocaleString('id-ID')}</span>
-                <span>Date: {new Date(selectedTx.createdAt).toLocaleString()}</span>
-              </div>
 
-              {(selectedTx.finalImage || (selectedTx.captures && selectedTx.captures.length > 0)) && (
-                <div className={styles.modalSection}>
-                  <h3>Photos</h3>
-                  <div className={styles.modalGrid}>
-                    {selectedTx.finalImage && (
-                      <div className={styles.modalGridItem}>
-                        <img src={selectedTx.finalImage} alt="Final" />
-                        <div className={styles.modalActionRow}>
-                          <button
-                            className={styles.modalDownloadBtn}
-                            onClick={() => {
-                              const link = document.createElement('a');
-                              link.href = selectedTx.finalImage;
-                              link.download = `photobooth-${selectedTx.sessionId}.jpg`;
-                              link.click();
-                            }}
-                          >
-                            Download
-                          </button>
-                          <button
-                            className={styles.modalPrintBtn}
-                            onClick={() => {
-                              const img = new window.Image();
-                              img.onload = () => {
-                                const pw = img.naturalWidth;
-                                const ph = img.naturalHeight;
-                                const win = window.open('', '_blank');
-                                if (!win) return;
-                                win.document.write(`<!DOCTYPE html>
+            {(selectedTx.finalImage || (selectedTx.captures && selectedTx.captures.length > 0)) && (
+              <div className={styles.modalSection}>
+                <h3>Photos</h3>
+                <div className={styles.modalGrid}>
+                  {selectedTx.finalImage && (
+                    <div className={styles.modalGridItem}>
+                      <img src={selectedTx.finalImage} alt="Final" />
+                      <div className={styles.modalActionRow}>
+                        <button className={styles.modalDownloadBtn} onClick={() => {
+                          const link = document.createElement('a');
+                          link.href = selectedTx.finalImage;
+                          link.download = `photobooth-${selectedTx.sessionId}.jpg`;
+                          link.click();
+                        }}>
+                          Download
+                        </button>
+                        <button className={styles.modalPrintBtn} onClick={() => {
+                          const img = new window.Image();
+                          img.onload = () => {
+                            const pw = img.naturalWidth;
+                            const ph = img.naturalHeight;
+                            const win = window.open('', '_blank');
+                            if (!win) return;
+                            win.document.write(`<!DOCTYPE html>
 <html><head><title>Hasil Foto - ${selectedTx.sessionId}</title>
 <style>
   @page{size:${pw}px ${ph}px;margin:0}
@@ -356,39 +303,34 @@ export default function HistoryPage() {
 </style></head><body>
 <img src="${selectedTx.finalImage}" onload="setTimeout(function(){window.print()},200)" />
 </body></html>`);
-                                win.document.close();
-                              };
-                              img.src = selectedTx.finalImage;
-                            }}
-                          >
-                            <Printer size={13} /> Cetak
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                    {selectedTx.captures?.map((src, i) => (
-                      <div key={i} className={styles.modalGridItem}>
-                        <img src={src} alt={`Capture ${i + 1}`} />
-                        <button
-                          className={styles.modalDownloadBtn}
-                          onClick={() => {
-                            const link = document.createElement('a');
-                            link.href = src;
-                            link.download = `capture-${selectedTx.sessionId}-${i + 1}.jpg`;
-                            link.click();
-                          }}
-                        >
-                          Download
+                            win.document.close();
+                          };
+                          img.src = selectedTx.finalImage;
+                        }}>
+                          <Printer size={13} /> Cetak
                         </button>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
+                  {selectedTx.captures?.map((src, i) => (
+                    <div key={i} className={styles.modalGridItem}>
+                      <img src={src} alt={`Capture ${i + 1}`} />
+                      <button className={styles.modalDownloadBtn} onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = src;
+                        link.download = `capture-${selectedTx.sessionId}-${i + 1}.jpg`;
+                        link.click();
+                      }}>
+                        Download
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </AdminModal>
     </div>
   );
 }

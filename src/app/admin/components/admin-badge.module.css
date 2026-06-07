@@ -1,0 +1,24 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.success {
+  background: rgba(197, 216, 157, 0.12);
+  color: #9CAB84;
+}
+
+.warning {
+  background: rgba(137, 144, 109, 0.15);
+  color: #89986D;
+}
+
+.info {
+  background: rgba(137, 144, 109, 0.12);
+  color: #89986D;
+}

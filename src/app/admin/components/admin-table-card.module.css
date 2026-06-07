@@ -1,0 +1,26 @@
+.card {
+  padding: 24px;
+  margin-bottom: 32px;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.scrollWrap {
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.scrollWrap table {
+  min-width: 600px;
+}
