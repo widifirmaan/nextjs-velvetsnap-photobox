@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
       { source: '/booth', destination: '/main/booth' },
       { source: '/payment', destination: '/main/payment' },
       { source: '/result', destination: '/main/result' },
-      { source: '/strips-studio', destination: '/main/template-studio' },
+      { source: '/strips-studio', destination: '/admin/template-studio' },
     ];
   },
 };
