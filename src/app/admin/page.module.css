@@ -217,6 +217,7 @@
   flex-direction: column;
   gap: 32px;
   margin-bottom: 120px;
+  overflow-x: auto;
 }
 
 .section {
@@ -354,9 +355,6 @@
   }
   .barChart {
     gap: 6px;
-  }
-  .sections {
-    overflow-x: auto;
   }
   .sections table {
     min-width: 500px;
