@@ -120,6 +120,25 @@
   margin: 12px auto;
 }
 
+.processingBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: var(--accent-bg, #f0f7f0);
+  border: 1px solid var(--accent-color, #C5D89D);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.processingBanner .spinner {
+  margin: 0;
+  flex-shrink: 0;
+}
+
 @keyframes spin {
   to { transform: rotate(360deg); }
 }

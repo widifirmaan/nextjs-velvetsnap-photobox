@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
   try {
-    const { query } = await req.json();
+    const { query, page = 1 } = await req.json();
     if (!query || !query.trim()) {
       return NextResponse.json({ success: false, error: 'Query is required' }, { status: 400 });
     }
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=all&per_page=12&safesearch=true`;
+    const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=all&per_page=20&page=${page}&safesearch=true`;
 
     const res = await fetch(url);
     const data = await res.json();
@@ -35,7 +35,12 @@ export async function POST(req: Request) {
       source: item.pageURL,
     }));
 
-    return NextResponse.json({ success: true, data: results });
+    return NextResponse.json({
+      success: true,
+      data: results,
+      totalHits: data.totalHits || 0,
+      page,
+    });
   } catch (error) {
     return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
   }

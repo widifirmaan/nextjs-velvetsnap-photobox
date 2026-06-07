@@ -8,17 +8,12 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: 'imageUrl is required' }, { status: 400 });
     }
 
-    // Download the image
-    const imageRes = await fetch(imageUrl);
-    if (!imageRes.ok) {
-      return NextResponse.json({ success: false, error: 'Failed to download image' }, { status: 400 });
-    }
+    console.log('Starting remove-bg for:', imageUrl);
 
-    const imageBuffer = await imageRes.arrayBuffer();
-
-    // Remove background using local on-device engine (no API key needed)
-    const resultBlob = await removeBackground(imageBuffer, {
-      model: 'small',
+    // Remove background using local on-device engine
+    // Pass URL directly so the library handles download + decoding
+    const resultBlob = await removeBackground(imageUrl, {
+      model: 'medium',
       output: { format: 'image/png' },
     });
 
@@ -27,7 +22,8 @@ export async function POST(req: Request) {
     const dataUri = `data:image/png;base64,${base64}`;
 
     return NextResponse.json({ success: true, data: { url: dataUri } });
-  } catch (error) {
-    return NextResponse.json({ success: false, error: String(error) }, { status: 500 });
+  } catch (error: any) {
+    console.error('remove-bg error:', error?.message || error, error?.stack || '');
+    return NextResponse.json({ success: false, error: error?.message || String(error) }, { status: 500 });
   }
 }
