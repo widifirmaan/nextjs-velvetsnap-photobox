@@ -105,11 +105,12 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
         c.scrollLeft += 0.8;
         if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
         else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+        updateTransforms();
         autoRef.current = requestAnimationFrame(step);
       };
       autoRef.current = requestAnimationFrame(step);
     }, 3000);
-  }, []);
+  }, [updateTransforms]);
 
   const handleLoad = useCallback(() => {
     loadedCount.current++;
@@ -130,10 +131,11 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
       c.scrollLeft += 0.8;
       if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
       else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+      updateTransforms();
       autoRef.current = requestAnimationFrame(step);
     };
     autoRef.current = requestAnimationFrame(step);
-  }, []);
+  }, [updateTransforms]);
 
   useEffect(() => {
     if (!strips.length) return;
