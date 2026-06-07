@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { removeBackground } from '@imgly/background-removal';
 import styles from './AssetSearch.module.css';
 
 interface AssetSearchProps {
@@ -23,21 +24,15 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
   const handleImageSelect = async (imageUrl: string) => {
     setProcessingUrl(imageUrl);
     try {
-      const res = await fetch('/api/image/remove-bg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl }),
+      const blob = await removeBackground(imageUrl, {
+        model: 'isnet',
+        output: { format: 'image/png' },
       });
-      const data = await res.json();
-      if (data.success) {
-        onSelect(data.data.url);
-        onClose();
-      } else {
-        setImageError(data.error || 'Remove background failed');
-        setProcessingUrl(null);
-      }
-    } catch {
-      setImageError('Remove background failed');
+      const url = URL.createObjectURL(blob);
+      onSelect(url);
+      onClose();
+    } catch (err: any) {
+      setImageError(err?.message || 'Remove background failed');
       setProcessingUrl(null);
     }
   };

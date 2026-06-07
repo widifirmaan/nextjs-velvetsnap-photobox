@@ -12,6 +12,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
     "@imgly/background-removal-node": "^1.4.5",
     "cloudinary": "^2.10.0",
     "html-to-image": "^1.11.13",
