@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
+import { preload } from '@imgly/background-removal';
 import type { IStripElement } from '@/models/Template';
 import { AdminPageHeader } from '@/app/admin/components';
 import EditorCanvas from './component/EditorCanvas';
@@ -23,6 +24,23 @@ export default function StripsStudioPage() {
   const [templateId, setTemplateId] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [aiModelReady, setAiModelReady] = useState(false);
+  const [aiModelProgress, setAiModelProgress] = useState('');
+
+  useEffect(() => {
+    preload({
+      model: 'isnet',
+      progress: (key, current, total) => {
+        if (total > 0) {
+          const pct = Math.round((current / total) * 100);
+          setAiModelProgress(`Downloading AI model... ${pct}%`);
+        }
+      },
+    }).then(() => {
+      setAiModelReady(true);
+      setAiModelProgress('');
+    });
+  }, []);
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
@@ -237,6 +255,14 @@ export default function StripsStudioPage() {
             value={templateName}
             onChange={(e) => setTemplateName(e.target.value)}
           />
+        </div>
+        <div className={styles.modelStatus}>
+          {aiModelProgress && (
+            <span className={styles.modelLoading}>{aiModelProgress}</span>
+          )}
+          {aiModelReady && !aiModelProgress && (
+            <span className={styles.modelReady}>AI ready</span>
+          )}
         </div>
         <button className="mac-button" onClick={handleSave} disabled={saving}>
           {saving ? 'Saving...' : saved ? '✓ Saved' : 'Save Template'}

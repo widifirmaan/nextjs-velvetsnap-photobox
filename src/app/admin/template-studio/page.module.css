@@ -54,6 +54,27 @@
   border-top: 1px solid var(--mn-border);
 }
 
+.modelStatus {
+  font-size: 12px;
+  min-width: 160px;
+  text-align: center;
+}
+
+.modelLoading {
+  color: var(--text-muted);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.modelReady {
+  color: var(--accent-color, #C5D89D);
+  font-weight: 600;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 @media (max-width: 1024px) {
   .editorLayout {
     grid-template-columns: 1fr;
