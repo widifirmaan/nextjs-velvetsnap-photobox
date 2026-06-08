@@ -17,7 +17,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
   const [imageLoading, setImageLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [imageError, setImageError] = useState('');
-  const [processingUrl, setProcessingUrl] = useState<string | null>(null);
+  const [activeUrl, setActiveUrl] = useState<{ url: string; mode: 'choice' | 'processing' } | null>(null);
   const [page, setPage] = useState(1);
   const [totalHits, setTotalHits] = useState(0);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -33,13 +33,14 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
     } catch {}
   }, []);
 
-  const handleImageSelect = async (imageUrl: string) => {
+  const handleRemoveBg = async (imageUrl: string) => {
     if (model.status !== 'ready') {
       setImageError('AI model is not ready yet. Please wait...');
+      setActiveUrl(null);
       return;
     }
     const id = ++requestId.current;
-    setProcessingUrl(imageUrl);
+    setActiveUrl({ url: imageUrl, mode: 'processing' });
     log('info', 'removeBackground started', { imageUrl, modelStatus: model.status });
     const startedAt = Date.now();
     try {
@@ -59,7 +60,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
       const msg = err?.message || 'Remove background failed';
       log('error', 'removeBackground failed', { message: msg, elapsed: Date.now() - startedAt });
       setImageError(msg);
-      setProcessingUrl(null);
+      setActiveUrl(null);
       const isCorrupt = /download|corrupt|onnx|wasm|network|fetch|abort/i.test(msg);
       if (isCorrupt && model.status === 'ready') {
         model.retry();
@@ -67,10 +68,29 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
     }
   };
 
-  const handleCancel = () => {
-    requestId.current++;
-    log('warn', 'removeBackground cancelled by user');
-    setProcessingUrl(null);
+  const handleImageClick = (imageUrl: string) => {
+    if (activeUrl?.url === imageUrl) {
+      if (activeUrl.mode === 'processing') {
+        requestId.current++;
+        log('warn', 'removeBackground cancelled by user');
+      }
+      setActiveUrl(null);
+    } else {
+      setActiveUrl({ url: imageUrl, mode: 'choice' });
+    }
+  };
+
+  const handleFull = (imageUrl: string) => {
+    onSelect(imageUrl);
+    onClose();
+  };
+
+  const handleDismiss = () => {
+    if (activeUrl?.mode === 'processing') {
+      requestId.current++;
+      log('warn', 'removeBackground cancelled by user');
+    }
+    setActiveUrl(null);
   };
 
   const searchImages = useCallback(async (q: string, p: number, append: boolean) => {
@@ -220,17 +240,27 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
               {imageResults.map((img, i) => (
                 <button
                   key={i}
-                  className={`${styles.stickerItem} ${processingUrl === img.url ? styles.processing : ''}`}
-                  onClick={() => handleImageSelect(img.url)}
-                  disabled={!!processingUrl}
+                  className={`${styles.stickerItem} ${activeUrl?.url === img.url ? styles.active : ''}`}
+                  onClick={() => handleImageClick(img.url)}
+                  disabled={activeUrl?.url && activeUrl.url !== img.url}
                   title={img.title}
                 >
                   <img src={img.thumbnail} alt={img.title} loading="lazy" />
-                  {processingUrl === img.url && (
+                  {activeUrl?.url === img.url && activeUrl.mode === 'choice' && (
+                    <div className={styles.choiceOverlay}>
+                      <button className={styles.choiceBtn} onClick={(e) => { e.stopPropagation(); handleFull(img.url); }}>
+                        Full
+                      </button>
+                      <button className={styles.choiceBtn} onClick={(e) => { e.stopPropagation(); handleRemoveBg(img.url); }}>
+                        Transparent
+                      </button>
+                    </div>
+                  )}
+                  {activeUrl?.url === img.url && activeUrl.mode === 'processing' && (
                     <div className={styles.processingOverlay}>
                       <div className={styles.spinner} />
                       <span>Removing Background...</span>
-                      <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
+                      <button className={styles.cancelBtn} onClick={(e) => { e.stopPropagation(); handleDismiss(); }}>Cancel</button>
                     </div>
                   )}
                 </button>

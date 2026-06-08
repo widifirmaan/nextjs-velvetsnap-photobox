@@ -97,8 +97,40 @@
   object-fit: cover;
 }
 
-.processing {
+.active {
   position: relative;
+}
+
+.choiceOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.55);
+  border-radius: 12px;
+  z-index: 2;
+}
+
+.choiceBtn {
+  padding: 6px 18px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.9);
+  color: #222;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: transform 0.15s;
+  width: 100px;
+}
+
+.choiceBtn:hover {
+  transform: scale(1.08);
+  background: #fff;
 }
 
 .processingOverlay {
