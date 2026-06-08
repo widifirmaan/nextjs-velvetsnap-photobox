@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { ModelProvider } from '@/lib/ModelContext';
 
 export const metadata: Metadata = {
   title: 'VelvetSnap Co.',
@@ -19,7 +20,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/favicon.ico" />
       </head>
       <body>
-        {children}
+        <ModelProvider>
+          {children}
+        </ModelProvider>
         <script
           dangerouslySetInnerHTML={{
             __html: `

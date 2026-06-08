@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { removeBackground } from '@imgly/background-removal';
+import { useModel } from '@/lib/ModelContext';
 import styles from './AssetSearch.module.css';
 
 interface AssetSearchProps {
@@ -10,6 +10,7 @@ interface AssetSearchProps {
 }
 
 export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
+  const model = useModel();
   const [search, setSearch] = useState('');
   const [activeQuery, setActiveQuery] = useState('');
   const [imageResults, setImageResults] = useState<{ url: string; thumbnail: string; title: string }[]>([]);
@@ -22,8 +23,13 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleImageSelect = async (imageUrl: string) => {
+    if (model.status !== 'ready') {
+      setImageError('AI model is not ready yet. Please wait...');
+      return;
+    }
     setProcessingUrl(imageUrl);
     try {
+      const { removeBackground } = await import('@imgly/background-removal');
       const blob = await removeBackground(imageUrl, {
         model: 'isnet',
         output: { format: 'image/png' },
@@ -32,8 +38,13 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
       onSelect(url);
       onClose();
     } catch (err: any) {
-      setImageError(err?.message || 'Remove background failed');
+      const msg = err?.message || 'Remove background failed';
+      setImageError(msg);
       setProcessingUrl(null);
+      const isCorrupt = /download|corrupt|onnx|wasm|network|fetch|abort/i.test(msg);
+      if (isCorrupt && model.status === 'ready') {
+        model.retry();
+      }
     }
   };
 
@@ -104,6 +115,36 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 
+        {model.status === 'downloading' && (
+          <div className={styles.processingBanner} style={{ background: '#fff3cd', color: '#856404' }}>
+            <div className={styles.spinner} />
+            <span>Downloading AI model in background, please wait...</span>
+          </div>
+        )}
+        {model.status === 'error' && (
+          <div className={styles.processingBanner} style={{ background: '#f8d7da', color: '#721c24', flexDirection: 'column', gap: 8 }}>
+            <span>⚠ AI model failed to load</span>
+            {model.errorMessage && (
+              <span style={{ fontSize: 11, opacity: 0.8 }}>{model.errorMessage}</span>
+            )}
+            <button
+              onClick={model.retry}
+              style={{
+                padding: '6px 16px', borderRadius: 6, border: '1px solid #721c24',
+                background: '#fff', color: '#721c24', fontWeight: 600, fontSize: 12,
+                cursor: 'pointer',
+              }}
+            >
+              Retry Download
+            </button>
+          </div>
+        )}
+        {model.status === 'checking' && (
+          <div className={styles.processingBanner} style={{ background: '#e2e3f5', color: '#383d41' }}>
+            <div className={styles.spinner} />
+            <span>Preparing AI model...</span>
+          </div>
+        )}
         {processingUrl && (
           <div className={styles.processingBanner}>
             <div className={styles.spinner} />
