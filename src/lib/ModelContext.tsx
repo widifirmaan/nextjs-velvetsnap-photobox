@@ -23,21 +23,6 @@ const ModelContext = createContext<ModelContextValue>({
 const STORAGE_KEY = 'imgly_model_ready';
 const RETRY_KEY = 'imgly_model_retry';
 
-const ric = (cb: () => void) => {
-  if ('requestIdleCallback' in window) {
-    (window as any).requestIdleCallback(cb, { timeout: 5000 });
-  } else {
-    setTimeout(cb, 1000);
-  }
-};
-const cic = (id: any) => {
-  if ('cancelIdleCallback' in window) {
-    (window as any).cancelIdleCallback(id);
-  } else {
-    clearTimeout(id);
-  }
-};
-
 async function clearModelCache() {
   try {
     localStorage.removeItem(STORAGE_KEY);
@@ -163,8 +148,8 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
       loaded.current = true;
     } else {
       setStatus('checking');
-      const idle = ric(() => preload());
-      return () => cic(idle);
+      setProgress(0);
+      preload();
     }
   }, [preload]);
 
