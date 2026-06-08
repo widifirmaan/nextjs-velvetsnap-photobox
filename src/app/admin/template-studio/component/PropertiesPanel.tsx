@@ -4,6 +4,8 @@ import type { IStripElement } from '@/models/Template';
 
 interface PropertiesPanelProps {
   selected: IStripElement | null;
+  slotCount: number;
+  onSetSlotCount: (n: number) => void;
   onUpdateProps: (props: Record<string, any>) => void;
   onUpdate: (patch: Partial<IStripElement>) => void;
   onDelete: () => void;
@@ -17,6 +19,8 @@ const SHAPE_TYPES = ['rect', 'circle', 'ellipse', 'star', 'line'] as const;
 
 export default function PropertiesPanel({
   selected,
+  slotCount,
+  onSetSlotCount,
   onUpdateProps,
   onUpdate,
   onDelete,
@@ -24,10 +28,24 @@ export default function PropertiesPanel({
   onSendBackward,
   onBrowseStickers,
 }: PropertiesPanelProps) {
+  const slotOptions = [2, 3, 4, 5, 6];
+
   if (!selected) {
     return (
-      <aside className="properties-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', fontSize: 14 }}>
-        <p>Select an element to edit its properties</p>
+      <aside className="properties-panel">
+        <Section label="Strip Layout">
+          <FieldRow>
+            <SelectField
+              label="Photo Slots"
+              value={String(slotCount)}
+              options={slotOptions.map((n) => ({ value: String(n), label: `${n} Photos` }))}
+              onChange={(v) => onSetSlotCount(Number(v))}
+            />
+          </FieldRow>
+        </Section>
+        <p style={{ color: 'var(--text-muted)', fontSize: 14, textAlign: 'center', marginTop: 24 }}>
+          Select an element to edit
+        </p>
       </aside>
     );
   }
@@ -59,25 +77,37 @@ export default function PropertiesPanel({
       </Section>
 
       {selected.type === 'photo-slot' && (
-        <Section label="Photo Slot">
-          <FieldRow>
-            <SelectField
-              label="Shape"
-              value={p.shape || 'rounded'}
-              options={SHAPES.map((s) => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1) }))}
-              onChange={(v) => set('shape', v)}
-            />
-          </FieldRow>
-          <FieldRow>
-            <NumberField label="Border" value={p.borderWidth ?? 2} onChange={(v) => set('borderWidth', v)} min={0} />
-            <ColorField label="Color" value={p.borderColor || '#ffffff'} onChange={(v) => set('borderColor', v)} />
-          </FieldRow>
-          {p.shape === 'rounded' && (
+        <>
+          <Section label="Layout">
             <FieldRow>
-              <NumberField label="Radius" value={p.borderRadius ?? 8} onChange={(v) => set('borderRadius', v)} min={0} />
+              <SelectField
+                label="Photo Slots"
+                value={String(slotCount)}
+                options={slotOptions.map((n) => ({ value: String(n), label: `${n} Photos` }))}
+                onChange={(v) => onSetSlotCount(Number(v))}
+              />
             </FieldRow>
-          )}
-        </Section>
+          </Section>
+          <Section label="Photo Slot">
+            <FieldRow>
+              <SelectField
+                label="Shape"
+                value={p.shape || 'rounded'}
+                options={SHAPES.map((s) => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1) }))}
+                onChange={(v) => set('shape', v)}
+              />
+            </FieldRow>
+            <FieldRow>
+              <NumberField label="Border" value={p.borderWidth ?? 2} onChange={(v) => set('borderWidth', v)} min={0} />
+              <ColorField label="Color" value={p.borderColor || '#ffffff'} onChange={(v) => set('borderColor', v)} />
+            </FieldRow>
+            {p.shape === 'rounded' && (
+              <FieldRow>
+                <NumberField label="Radius" value={p.borderRadius ?? 8} onChange={(v) => set('borderRadius', v)} min={0} />
+              </FieldRow>
+            )}
+          </Section>
+        </>
       )}
 
       {selected.type === 'text' && (

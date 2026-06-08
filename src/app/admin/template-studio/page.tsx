@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { v4 as uuid } from 'uuid';
-import { preload } from '@imgly/background-removal';
 import type { IStripElement } from '@/models/Template';
 import { AdminPageHeader } from '@/app/admin/components';
+import { useModel } from '@/lib/ModelContext';
 import EditorCanvas from './component/EditorCanvas';
 import type { EditorCanvasHandle } from './component/EditorCanvas';
 import ElementToolbar from './component/ElementToolbar';
@@ -16,37 +16,76 @@ import styles from './page.module.css';
 const DEFAULT_CANVAS_W = 600;
 const DEFAULT_CANVAS_H = 900;
 
+function generateSlotLayout(slotCount: number): IStripElement[] {
+  const topPad = 50;
+  const bottomPad = 90;
+  const gap = 18;
+  const photoRatio = 0.72;
+  const availH = DEFAULT_CANVAS_H - topPad - bottomPad;
+  const photoH = Math.round((availH - (slotCount - 1) * gap) / slotCount);
+  const photoW = Math.round(photoH * photoRatio);
+  const x = Math.round((DEFAULT_CANVAS_W - photoW) / 2);
+  const elements: IStripElement[] = [];
+
+  for (let i = 0; i < slotCount; i++) {
+    const id = `slot-${i}`;
+    elements.push({
+      id, type: 'photo-slot',
+      x, y: Math.round(topPad + i * (photoH + gap)),
+      width: photoW, height: photoH,
+      rotation: 0, zIndex: i, visible: true,
+      props: { shape: 'rounded', borderWidth: 2, borderColor: '#ffffff', borderRadius: 8 },
+    });
+  }
+
+  elements.push({
+    id: 'text-velvet',
+    type: 'text',
+    x: 0,
+    y: DEFAULT_CANVAS_H - 70,
+    width: DEFAULT_CANVAS_W,
+    height: 50,
+    rotation: 0,
+    zIndex: slotCount,
+    visible: true,
+    props: {
+      content: 'Velvet Snap',
+      fontSize: 30,
+      fontFamily: 'Inter',
+      color: '#3d2c2c',
+      fontWeight: '700',
+      textAlign: 'center',
+    },
+  });
+
+  return elements;
+}
+
 export default function StripsStudioPage() {
-  const [elements, setElements] = useState<IStripElement[]>([]);
+  const [slotCount, setSlotCount] = useState(3);
+  const [elements, setElements] = useState<IStripElement[]>(() => generateSlotLayout(3));
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [canvasSize, setCanvasSize] = useState({ w: DEFAULT_CANVAS_W, h: DEFAULT_CANVAS_H });
   const [templateName, setTemplateName] = useState('');
   const [templateId, setTemplateId] = useState('');
+  const model = useModel();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [aiModelReady, setAiModelReady] = useState(false);
-  const [aiModelProgress, setAiModelProgress] = useState('');
-
-  useEffect(() => {
-    preload({
-      model: 'isnet',
-      progress: (key, current, total) => {
-        if (total > 0) {
-          const pct = Math.round((current / total) * 100);
-          setAiModelProgress(`Downloading AI model... ${pct}%`);
-        }
-      },
-    }).then(() => {
-      setAiModelReady(true);
-      setAiModelProgress('');
-    });
-  }, []);
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
   const [stickerTargetId, setStickerTargetId] = useState<string | null>(null);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
+
+  const setSlotLayout = useCallback((n: number) => {
+    setSlotCount(n);
+    const newSlots = generateSlotLayout(n);
+    setElements((prev) => [
+      ...newSlots,
+      ...prev.filter((el) => !el.id.startsWith('slot-') && el.id !== 'text-velvet'),
+    ]);
+  }, []);
 
   const addElement = useCallback((type: IStripElement['type']) => {
     if (type === 'sticker') {
@@ -231,6 +270,8 @@ export default function StripsStudioPage() {
 
         <PropertiesPanel
           selected={selected}
+          slotCount={slotCount}
+          onSetSlotCount={setSlotLayout}
           onUpdateProps={(props) => selected && updateElementProps(selected.id, props)}
           onUpdate={(patch) => selected && updateElement(selected.id, patch)}
           onDelete={() => selected && deleteElement(selected.id)}
@@ -257,11 +298,17 @@ export default function StripsStudioPage() {
           />
         </div>
         <div className={styles.modelStatus}>
-          {aiModelProgress && (
-            <span className={styles.modelLoading}>{aiModelProgress}</span>
+          {model.status === 'downloading' && (
+            <span className={styles.modelLoading}>AI model downloading... {model.progress}%</span>
           )}
-          {aiModelReady && !aiModelProgress && (
+          {model.status === 'ready' && (
             <span className={styles.modelReady}>AI ready</span>
+          )}
+          {model.status === 'error' && (
+            <span className={styles.modelLoading}>AI error — <button onClick={model.retry} style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>retry</button></span>
+          )}
+          {model.status === 'checking' && (
+            <span className={styles.modelLoading}>AI preparing...</span>
           )}
         </div>
         <button className="mac-button" onClick={handleSave} disabled={saving}>

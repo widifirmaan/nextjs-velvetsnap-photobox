@@ -242,7 +242,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
                   key={i}
                   className={`${styles.stickerItem} ${activeUrl?.url === img.url ? styles.active : ''}`}
                   onClick={() => handleImageClick(img.url)}
-                  disabled={activeUrl?.url && activeUrl.url !== img.url}
+                  disabled={!!activeUrl && activeUrl.url !== img.url}
                   title={img.title}
                 >
                   <img src={img.thumbnail} alt={img.title} loading="lazy" />
