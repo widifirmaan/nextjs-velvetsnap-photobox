@@ -65,6 +65,7 @@ export default function StripsStudioPage() {
   const [elements, setElements] = useState<IStripElement[]>(() => generateSlotLayout(3));
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [canvasSize, setCanvasSize] = useState({ w: DEFAULT_CANVAS_W, h: DEFAULT_CANVAS_H });
+  const [canvasBg, setCanvasBg] = useState('#ffffff');
   const [templateName, setTemplateName] = useState('');
   const [templateId, setTemplateId] = useState('');
   const model = useModel();
@@ -245,6 +246,29 @@ export default function StripsStudioPage() {
       <div className={styles.editorLayout}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <ElementToolbar onAdd={addElement} />
+          <aside style={{
+            background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
+            border: '1px solid var(--mn-border)',
+          }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
+              Background
+            </h3>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <input
+                type="color"
+                value={canvasBg}
+                onChange={(e) => setCanvasBg(e.target.value)}
+                style={{ width: 36, height: 36, padding: 0, border: '1px solid var(--mn-border)', borderRadius: 8, cursor: 'pointer' }}
+              />
+              <input
+                type="text"
+                value={canvasBg}
+                onChange={(e) => setCanvasBg(e.target.value)}
+                placeholder="#ffffff"
+                style={{ flex: 1, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--mn-border)', fontSize: 12, fontFamily: 'monospace' }}
+              />
+            </div>
+          </aside>
           <LayerPanel
             elements={elements}
             selectedId={selectedId}
@@ -264,6 +288,7 @@ export default function StripsStudioPage() {
             onSelect={setSelectedId}
             onUpdate={updateElement}
             canvasSize={canvasSize}
+            canvasBg={canvasBg}
           />
         </div>
 

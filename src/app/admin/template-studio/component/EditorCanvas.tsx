@@ -25,6 +25,7 @@ interface EditorCanvasProps {
   onSelect: (id: string | null) => void;
   onUpdate: (id: string, patch: Partial<IStripElement>) => void;
   canvasSize: { w: number; h: number };
+  canvasBg: string;
 }
 
 function getBounds(el: IStripElement): Bounds {
@@ -112,7 +113,7 @@ export interface EditorCanvasHandle {
   getThumbnail: () => string;
 }
 
-const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize }, ref) {
+const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize, canvasBg }, ref) {
   const stageRef = useRef<Konva.Stage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<Konva.Layer>(null);
@@ -235,7 +236,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       scaleX={scale}
       scaleY={scale}
       style={{
-        background: '#ffffff',
+        background: canvasBg,
         border: '1px solid #000',
       }}
       onClick={(e) => {
@@ -243,6 +244,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       }}
     >
       <Layer ref={layerRef}>
+        <Rect x={0} y={0} width={canvasSize.w} height={canvasSize.h} fill={canvasBg} listening={false} />
         {sorted.map((el) => (
           <CanvasElement
             key={el.id}
