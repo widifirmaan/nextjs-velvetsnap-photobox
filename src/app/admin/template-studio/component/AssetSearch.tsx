@@ -23,6 +23,16 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestId = useRef(0);
 
+  const log = useCallback(async (level: string, message: string, data?: any) => {
+    try {
+      await fetch('/api/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, message, data }),
+      });
+    } catch {}
+  }, []);
+
   const handleImageSelect = async (imageUrl: string) => {
     if (model.status !== 'ready') {
       setImageError('AI model is not ready yet. Please wait...');
@@ -30,19 +40,24 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
     }
     const id = ++requestId.current;
     setProcessingUrl(imageUrl);
+    log('info', 'removeBackground started', { imageUrl, modelStatus: model.status });
+    const startedAt = Date.now();
     try {
       const { removeBackground } = await import('@imgly/background-removal');
+      log('info', 'library imported', { elapsed: Date.now() - startedAt });
       const blob = await removeBackground(imageUrl, {
         model: 'isnet_quint8',
         output: { format: 'image/png' },
       });
-      if (id !== requestId.current) return;
+      if (id !== requestId.current) { log('warn', 'removeBackground cancelled after resolve'); return; }
+      log('info', 'removeBackground completed', { elapsed: Date.now() - startedAt, blobSize: blob.size });
       const url = URL.createObjectURL(blob);
       onSelect(url);
       onClose();
     } catch (err: any) {
-      if (id !== requestId.current) return;
+      if (id !== requestId.current) { log('warn', 'removeBackground cancelled after error'); return; }
       const msg = err?.message || 'Remove background failed';
+      log('error', 'removeBackground failed', { message: msg, elapsed: Date.now() - startedAt });
       setImageError(msg);
       setProcessingUrl(null);
       const isCorrupt = /download|corrupt|onnx|wasm|network|fetch|abort/i.test(msg);
@@ -54,6 +69,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
 
   const handleCancel = () => {
     requestId.current++;
+    log('warn', 'removeBackground cancelled by user');
     setProcessingUrl(null);
   };
 

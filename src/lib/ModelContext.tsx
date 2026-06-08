@@ -52,12 +52,23 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
   const [errorMessage, setErrorMessage] = useState('');
   const loaded = useRef(false);
 
+  const log = useCallback(async (level: string, message: string, data?: any) => {
+    try {
+      await fetch('/api/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, message, data }),
+      });
+    } catch {}
+  }, []);
+
   const preload = useCallback(async (attempt = 1) => {
     if (loaded.current) return;
     loaded.current = true;
     setStatus('downloading');
     setProgress(0);
     setErrorMessage('');
+    log('info', 'preload started', { attempt });
 
     try {
       const { removeBackground } = await import('@imgly/background-removal');
@@ -95,13 +106,15 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
       ctx!.fillStyle = '#00ff00';
       ctx!.fillRect(0, 0, 32, 32);
 
+      const startedAt = Date.now();
       await new Promise<void>((resolve, reject) => {
         canvas.toBlob(async (blob) => {
-          if (!blob) { reject(new Error('Canvas error')); return; }
+          if (!blob) { log('error', 'canvas blob failed'); reject(new Error('Canvas error')); return; }
           try {
             const url = URL.createObjectURL(blob);
             await removeBackground(url, { model: 'isnet_quint8', progress: onProgress });
             URL.revokeObjectURL(url);
+            log('info', 'preload dummy inference done', { elapsed: Date.now() - startedAt });
             resolve();
           } catch (e) {
             reject(e);
@@ -113,10 +126,12 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(STORAGE_KEY, 'true');
       localStorage.removeItem(RETRY_KEY);
       setStatus('ready');
+      log('info', 'preload completed');
     } catch (err: any) {
       loaded.current = false;
       const msg = err?.message || 'Unknown error';
       setErrorMessage(msg);
+      log('error', 'preload failed', { message: msg, attempt });
 
       const isCorrupt = /download|corrupt|onnx|wasm|network|fetch|abort/i.test(msg);
       if (isCorrupt) {
@@ -131,7 +146,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
 
       setStatus('error');
     }
-  }, []);
+  }, [log]);
 
   const retry = useCallback(async () => {
     loaded.current = false;
