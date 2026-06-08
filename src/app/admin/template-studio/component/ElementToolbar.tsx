@@ -7,7 +7,6 @@ interface ElementToolbarProps {
 }
 
 const TOOLS: { type: IStripElement['type']; label: string; icon: string }[] = [
-  { type: 'photo-slot', label: 'Photo Slot', icon: '📷' },
   { type: 'text', label: 'Text', icon: 'Aa' },
   { type: 'sticker', label: 'Sticker', icon: '✨' },
   { type: 'shape', label: 'Shape', icon: '◇' },
