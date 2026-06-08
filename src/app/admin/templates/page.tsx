@@ -194,7 +194,29 @@ export default function TemplatesAdmin() {
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
 
-  useEffect(() => { fetchTemplates(); }, []);
+  useEffect(() => {
+    fetchTemplates();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('newStrip') === '1') {
+      const raw = sessionStorage.getItem('stripTemplateData');
+      if (raw) {
+        try {
+          const data = JSON.parse(raw);
+          setFormData((prev) => ({
+            ...prev,
+            ...data,
+            name: '',
+            slotsLayout: [],
+            frameImage: '',
+          }));
+          setShowForm(true);
+        } catch (e) {
+          console.error('Failed to parse strip template data', e);
+        }
+        sessionStorage.removeItem('stripTemplateData');
+      }
+    }
+  }, []);
 
   const fetchTemplates = async () => {
     setLoading(true);

@@ -198,6 +198,29 @@ export default function PropertiesPanel({
         </Section>
       )}
 
+      {selected.type === 'background' && (
+        <Section label="Background Image">
+          <FieldRow>
+            <div style={{ width: '100%' }}>
+              <label style={{...labelStyle}}>Image URL</label>
+              <input
+                type="text"
+                value={p.stickerUrl || ''}
+                onChange={(e) => set('stickerUrl', e.target.value)}
+                placeholder="https://..."
+                style={{ width: '100%', padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', fontSize: 13, marginBottom: 6 }}
+              />
+              <button
+                onClick={onBrowseStickers}
+                style={{ width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--accent-color)', background: 'var(--accent-bg)', color: 'var(--accent-color)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+              >
+                🔍 Search Background
+              </button>
+            </div>
+          </FieldRow>
+        </Section>
+      )}
+
       {selected.type === 'shape' && (
         <Section label="Shape">
           <FieldRow>

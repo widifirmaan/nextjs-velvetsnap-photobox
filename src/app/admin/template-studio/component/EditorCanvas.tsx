@@ -26,7 +26,6 @@ interface EditorCanvasProps {
   onUpdate: (id: string, patch: Partial<IStripElement>) => void;
   canvasSize: { w: number; h: number };
   canvasBg: string;
-  canvasBgImage?: string | null;
 }
 
 function getBounds(el: IStripElement): Bounds {
@@ -114,7 +113,7 @@ export interface EditorCanvasHandle {
   getThumbnail: () => string;
 }
 
-const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize, canvasBg, canvasBgImage }, ref) {
+const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize, canvasBg }, ref) {
   const stageRef = useRef<Konva.Stage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<Konva.Layer>(null);
@@ -161,17 +160,40 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
 
   const others = elements.filter(el => el.id !== selectedId);
 
+  const clampBg = useCallback((el: IStripElement, newX: number, newY: number) => {
+    if (el.type !== 'background') return { x: newX, y: newY };
+    return {
+      x: Math.min(0, Math.max(newX, canvasSize.w - el.width)),
+      y: Math.min(0, Math.max(newY, canvasSize.h - el.height)),
+    };
+  }, [canvasSize]);
+
   const handleDragEnd = useCallback((id: string, e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target;
-    onUpdate(id, { x: node.x(), y: node.y() });
+    const el = elements.find(el => el.id === id);
+    if (el?.type === 'background') {
+      const { x, y } = clampBg(el, node.x(), node.y());
+      node.x(x); node.y(y);
+      onUpdate(id, { x, y });
+    } else {
+      onUpdate(id, { x: node.x(), y: node.y() });
+    }
     setGuides([]);
     guideLayerRef.current?.batchDraw();
-  }, [onUpdate]);
+  }, [onUpdate, elements, clampBg]);
 
   const handleDragMove = useCallback((id: string, e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target;
     const el = elements.find(el => el.id === id);
     if (!el) return;
+
+    if (el.type === 'background') {
+      const { x, y } = clampBg(el, node.x(), node.y());
+      node.x(x); node.y(y);
+      setGuides([]);
+      guideLayerRef.current?.batchDraw();
+      return;
+    }
 
     const b: Bounds = {
       left: node.x(),
@@ -187,7 +209,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     if (snapY !== null) node.y(snapY);
     setGuides(g);
     guideLayerRef.current?.batchDraw();
-  }, [elements, others, canvasSize]);
+  }, [elements, others, canvasSize, clampBg]);
 
   const handleTransformMove = useCallback((e: Konva.KonvaEventObject<Event>) => {
     if (!selectedId) return;
@@ -217,16 +239,21 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     const scaleY = node.scaleY();
     node.scaleX(1);
     node.scaleY(1);
-    onUpdate(id, {
-      x: node.x(),
-      y: node.y(),
-      width: Math.max(10, node.width() * scaleX),
-      height: Math.max(10, node.height() * scaleY),
-      rotation: node.rotation(),
-    });
+    let w = Math.max(10, node.width() * scaleX);
+    let h = Math.max(10, node.height() * scaleY);
+    let x = node.x();
+    let y = node.y();
+    const el = elements.find(el => el.id === id);
+    if (el?.type === 'background') {
+      w = Math.max(w, canvasSize.w);
+      h = Math.max(h, canvasSize.h);
+      const clamped = clampBg({ ...el, width: w, height: h }, x, y);
+      x = clamped.x; y = clamped.y;
+    }
+    onUpdate(id, { x, y, width: w, height: h, rotation: node.rotation() });
     setGuides([]);
     guideLayerRef.current?.batchDraw();
-  }, [onUpdate]);
+  }, [onUpdate, canvasSize, elements, clampBg]);
 
   return (
     <div ref={containerRef}>
@@ -246,7 +273,6 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     >
       <Layer ref={layerRef}>
         <Rect x={0} y={0} width={canvasSize.w} height={canvasSize.h} fill={canvasBg} listening={false} />
-        {canvasBgImage && <BgImage url={canvasBgImage} width={canvasSize.w} height={canvasSize.h} />}
         {sorted.map((el) => (
           <CanvasElement
             key={el.id}
@@ -292,20 +318,6 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     </div>
   );
 });
-
-function BgImage({ url, width, height }: { url: string; width: number; height: number }) {
-  const [img] = useImage(url);
-  if (!img) return null;
-  return (
-    <KonvaImage
-      image={img}
-      x={0} y={0}
-      width={width}
-      height={height}
-      listening={false}
-    />
-  );
-}
 
 export default EditorCanvas;
 
@@ -357,6 +369,7 @@ function CanvasElement({
           verticalAlign="middle"
         />
       );
+    case 'background':
     case 'sticker':
       return <StickerElement el={element} common={common} />;
     case 'shape': {

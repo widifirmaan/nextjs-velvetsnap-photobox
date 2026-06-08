@@ -5,6 +5,7 @@ import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
 import { AdminPageHeader } from '@/app/admin/components';
 import { useModel } from '@/lib/ModelContext';
+import { useRouter } from 'next/navigation';
 import EditorCanvas from './component/EditorCanvas';
 import type { EditorCanvasHandle } from './component/EditorCanvas';
 import ElementToolbar from './component/ElementToolbar';
@@ -66,24 +67,12 @@ export default function StripsStudioPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [canvasSize, setCanvasSize] = useState({ w: DEFAULT_CANVAS_W, h: DEFAULT_CANVAS_H });
   const [canvasBg, setCanvasBg] = useState('#ffffff');
-  const bgUploadRef = useRef<HTMLInputElement>(null);
-  const [canvasBgImage, setCanvasBgImage] = useState<string | null>(null);
-  const [templateName, setTemplateName] = useState('');
-  const [templateId, setTemplateId] = useState('');
   const model = useModel();
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-
-  const handleBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setCanvasBgImage(reader.result as string);
-    reader.readAsDataURL(file);
-  };
+  const router = useRouter();
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
+  const bgTargetRef = useRef(false);
   const [stickerTargetId, setStickerTargetId] = useState<string | null>(null);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
@@ -132,7 +121,35 @@ export default function StripsStudioPage() {
     setStickerTargetId(elementId);
   };
 
+  const openBgSearch = () => {
+    bgTargetRef.current = true;
+    setStickerTargetId('__bg__');
+  };
+
   const handleAssetSelect = (url: string) => {
+    if (bgTargetRef.current) {
+      bgTargetRef.current = false;
+      const id = 'bg-image';
+      const existing = elements.find((el) => el.id === id);
+      if (existing) {
+        updateElementProps(id, { stickerUrl: url });
+      } else {
+        setElements((prev) => [...prev, {
+          id, type: 'background',
+          x: -50, y: -50,
+          width: canvasSize.w + 100,
+          height: canvasSize.h + 100,
+          rotation: 0,
+          zIndex: -1,
+          visible: true,
+          props: { stickerUrl: url, opacity: 1 },
+        }]);
+      }
+      setSelectedId(id);
+      stickerTargetRef.current = null;
+      setStickerTargetId(null);
+      return;
+    }
     const target = stickerTargetRef.current;
     if (!target) return;
     if (target === '__new__') {
@@ -204,48 +221,6 @@ export default function StripsStudioPage() {
     });
   };
 
-  const handleSave = async () => {
-    if (!templateName.trim()) return alert('Please enter a template name');
-    setSaving(true);
-    setSaved(false);
-    try {
-      const thumbnail = editorRef.current?.getThumbnail() || '';
-      const body = {
-        templateId: templateId || `strip-${Date.now()}`,
-        name: templateName,
-        description: 'Designed in Strips Studio',
-        slots: elements.filter((el) => el.type === 'photo-slot').length,
-        price: 35000,
-        color: '#C5D89D',
-        isActive: true,
-        type: 'strip' as const,
-        canvasWidth: canvasSize.w,
-        canvasHeight: canvasSize.h,
-        thumbnail,
-        elements: elements.map((el) => ({
-          ...el,
-          props: { ...el.props },
-        })),
-      };
-      const res = await fetch('/api/templates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSaved(true);
-        setTemplateId(data.data.templateId);
-      } else {
-        alert('Save failed: ' + (data.error || 'Unknown error'));
-      }
-    } catch (err) {
-      alert('Save failed: ' + String(err));
-    } finally {
-      setSaving(false);
-    }
-  };
-
   return (
     <div className={styles.page}>
       <AdminPageHeader
@@ -260,6 +235,46 @@ export default function StripsStudioPage() {
             background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
             border: '1px solid var(--mn-border)',
           }}>
+            <button
+              onClick={() => {
+                const thumbnail = editorRef.current?.getThumbnail() || '';
+                const data = {
+                  type: 'strip' as const,
+                  name: '',
+                  description: 'Designed in Strips Studio',
+                  slots: elements.filter((el) => el.type === 'photo-slot').length,
+                  price: 35000,
+                  color: canvasBg,
+                  isActive: true,
+                  canvasWidth: canvasSize.w,
+                  canvasHeight: canvasSize.h,
+                  thumbnail,
+                  elements: elements.map((el) => ({ ...el, props: { ...el.props } })),
+                };
+                sessionStorage.setItem('stripTemplateData', JSON.stringify(data));
+                router.push('/admin/templates?newStrip=1');
+              }}
+              style={{
+                width: '100%', padding: '10px', borderRadius: 8,
+                border: 'none', background: 'var(--accent-color, #C5D89D)',
+                color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 10,
+              }}
+            >
+              💾 Save Template
+            </button>
+            {model.status === 'downloading' && (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginBottom: 10 }}>AI model downloading... {model.progress}%</div>
+            )}
+            {model.status === 'ready' && (
+              <div style={{ fontSize: 11, color: 'var(--accent-color)', fontWeight: 600, textAlign: 'center', marginBottom: 10 }}>AI ready</div>
+            )}
+            {model.status === 'error' && (
+              <div style={{ fontSize: 11, color: '#e74c3c', textAlign: 'center', marginBottom: 10 }}>AI error — <button onClick={model.retry} style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>retry</button></div>
+            )}
+            {model.status === 'checking' && (
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginBottom: 10 }}>AI preparing...</div>
+            )}
             <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
               Background
             </h3>
@@ -278,9 +293,8 @@ export default function StripsStudioPage() {
                 style={{ flex: 1, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--mn-border)', fontSize: 12, fontFamily: 'monospace' }}
               />
             </div>
-            <input ref={bgUploadRef} type="file" accept="image/*" onChange={handleBgUpload} style={{ display: 'none' }} />
             <button
-              onClick={() => bgUploadRef.current?.click()}
+              onClick={openBgSearch}
               style={{
                 width: '100%', padding: '8px', borderRadius: 8,
                 border: '1px solid var(--mn-border)', background: '#fff',
@@ -288,11 +302,11 @@ export default function StripsStudioPage() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               }}
             >
-              📁 Upload Image
+              🔍 Search Background
             </button>
-            {canvasBgImage && (
+            {elements.find((el) => el.id === 'bg-image') && (
               <button
-                onClick={() => { setCanvasBgImage(null); setCanvasBg('#ffffff'); }}
+                onClick={() => deleteElement('bg-image')}
                 style={{
                   width: '100%', marginTop: 6, padding: '4px', borderRadius: 6,
                   border: '1px solid #e74c3c', background: 'none',
@@ -323,7 +337,6 @@ export default function StripsStudioPage() {
             onUpdate={updateElement}
             canvasSize={canvasSize}
             canvasBg={canvasBg}
-            canvasBgImage={canvasBgImage}
           />
         </div>
 
@@ -347,33 +360,6 @@ export default function StripsStudioPage() {
         />
       )}
 
-      <div className={styles.bottomBar}>
-        <div className={styles.nameField}>
-          <input
-            type="text"
-            placeholder="Template name"
-            value={templateName}
-            onChange={(e) => setTemplateName(e.target.value)}
-          />
-        </div>
-        <div className={styles.modelStatus}>
-          {model.status === 'downloading' && (
-            <span className={styles.modelLoading}>AI model downloading... {model.progress}%</span>
-          )}
-          {model.status === 'ready' && (
-            <span className={styles.modelReady}>AI ready</span>
-          )}
-          {model.status === 'error' && (
-            <span className={styles.modelLoading}>AI error — <button onClick={model.retry} style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>retry</button></span>
-          )}
-          {model.status === 'checking' && (
-            <span className={styles.modelLoading}>AI preparing...</span>
-          )}
-        </div>
-        <button className="mac-button" onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving...' : saved ? '✓ Saved' : 'Save Template'}
-        </button>
-      </div>
     </div>
   );
 }
