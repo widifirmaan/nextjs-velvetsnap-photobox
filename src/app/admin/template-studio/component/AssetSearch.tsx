@@ -116,9 +116,16 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
         </div>
 
         {model.status === 'downloading' && (
-          <div className={styles.processingBanner} style={{ background: '#fff3cd', color: '#856404' }}>
-            <div className={styles.spinner} />
-            <span>Downloading AI model in background, please wait...</span>
+          <div className={styles.processingBanner} style={{ background: '#fff3cd', color: '#856404', flexDirection: 'column', gap: 6 }}>
+            <span>Downloading AI model... {model.progress}%</span>
+            <div style={{
+              width: '100%', height: 8, background: '#ffe69c', borderRadius: 4, overflow: 'hidden',
+            }}>
+              <div style={{
+                width: `${model.progress}%`, height: '100%', background: '#856404',
+                borderRadius: 4, transition: 'width 0.3s ease',
+              }} />
+            </div>
           </div>
         )}
         {model.status === 'error' && (

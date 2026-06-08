@@ -6,6 +6,7 @@ type ModelStatus = 'checking' | 'ready' | 'downloading' | 'error';
 
 interface ModelContextValue {
   status: ModelStatus;
+  progress: number;
   preload: () => Promise<void>;
   retry: () => Promise<void>;
   errorMessage: string;
@@ -13,6 +14,7 @@ interface ModelContextValue {
 
 const ModelContext = createContext<ModelContextValue>({
   status: 'checking',
+  progress: 0,
   preload: async () => {},
   retry: async () => {},
   errorMessage: '',
@@ -61,6 +63,7 @@ async function clearModelCache() {
 
 export function ModelProvider({ children }: { children: React.ReactNode }) {
   const [status, setStatus] = useState<ModelStatus>('checking');
+  const [progress, setProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const loaded = useRef(false);
 
@@ -68,10 +71,37 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
     if (loaded.current) return;
     loaded.current = true;
     setStatus('downloading');
+    setProgress(0);
     setErrorMessage('');
 
     try {
       const { removeBackground } = await import('@imgly/background-removal');
+
+      const fileCurrents: Record<string, number> = {};
+      const fileTotals: Record<string, number> = {};
+      let totalBytes = 0;
+      let downloadedBytes = 0;
+
+      const onProgress = (key: string, current: number, total: number) => {
+        if (key.startsWith('fetch:')) {
+          const name = key.slice(6);
+          if (!(name in fileTotals)) {
+            fileTotals[name] = total;
+            totalBytes += total;
+          }
+          const prev = fileCurrents[name] || 0;
+          const delta = current - prev;
+          if (delta > 0) {
+            downloadedBytes += delta;
+            fileCurrents[name] = current;
+          } else if (current === total && total > 0) {
+            const missing = total - prev;
+            downloadedBytes += missing;
+            fileCurrents[name] = current;
+          }
+          setProgress(Math.min(Math.round((downloadedBytes / Math.max(totalBytes, 1)) * 100), 99));
+        }
+      };
 
       const canvas = document.createElement('canvas');
       canvas.width = 32;
@@ -85,7 +115,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
           if (!blob) { reject(new Error('Canvas error')); return; }
           try {
             const url = URL.createObjectURL(blob);
-            await removeBackground(url);
+            await removeBackground(url, { progress: onProgress });
             URL.revokeObjectURL(url);
             resolve();
           } catch (e) {
@@ -94,6 +124,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
         }, 'image/png');
       });
 
+      setProgress(100);
       localStorage.setItem(STORAGE_KEY, 'true');
       localStorage.removeItem(RETRY_KEY);
       setStatus('ready');
@@ -138,7 +169,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
   }, [preload]);
 
   return (
-    <ModelContext.Provider value={{ status, preload, retry, errorMessage }}>
+    <ModelContext.Provider value={{ status, progress, preload, retry, errorMessage }}>
       {children}
     </ModelContext.Provider>
   );
