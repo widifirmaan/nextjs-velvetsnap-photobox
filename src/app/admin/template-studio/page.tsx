@@ -66,11 +66,21 @@ export default function StripsStudioPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [canvasSize, setCanvasSize] = useState({ w: DEFAULT_CANVAS_W, h: DEFAULT_CANVAS_H });
   const [canvasBg, setCanvasBg] = useState('#ffffff');
+  const bgUploadRef = useRef<HTMLInputElement>(null);
+  const [canvasBgImage, setCanvasBgImage] = useState<string | null>(null);
   const [templateName, setTemplateName] = useState('');
   const [templateId, setTemplateId] = useState('');
   const model = useModel();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  const handleBgUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCanvasBgImage(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
@@ -253,7 +263,7 @@ export default function StripsStudioPage() {
             <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
               Background
             </h3>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
               <input
                 type="color"
                 value={canvasBg}
@@ -268,6 +278,30 @@ export default function StripsStudioPage() {
                 style={{ flex: 1, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--mn-border)', fontSize: 12, fontFamily: 'monospace' }}
               />
             </div>
+            <input ref={bgUploadRef} type="file" accept="image/*" onChange={handleBgUpload} style={{ display: 'none' }} />
+            <button
+              onClick={() => bgUploadRef.current?.click()}
+              style={{
+                width: '100%', padding: '8px', borderRadius: 8,
+                border: '1px solid var(--mn-border)', background: '#fff',
+                cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+              }}
+            >
+              📁 Upload Image
+            </button>
+            {canvasBgImage && (
+              <button
+                onClick={() => { setCanvasBgImage(null); setCanvasBg('#ffffff'); }}
+                style={{
+                  width: '100%', marginTop: 6, padding: '4px', borderRadius: 6,
+                  border: '1px solid #e74c3c', background: 'none',
+                  cursor: 'pointer', fontSize: 11, color: '#e74c3c', fontWeight: 600,
+                }}
+              >
+                ✕ Remove Background Image
+              </button>
+            )}
           </aside>
           <LayerPanel
             elements={elements}
@@ -289,6 +323,7 @@ export default function StripsStudioPage() {
             onUpdate={updateElement}
             canvasSize={canvasSize}
             canvasBg={canvasBg}
+            canvasBgImage={canvasBgImage}
           />
         </div>
 

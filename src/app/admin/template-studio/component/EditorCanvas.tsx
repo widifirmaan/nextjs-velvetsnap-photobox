@@ -26,6 +26,7 @@ interface EditorCanvasProps {
   onUpdate: (id: string, patch: Partial<IStripElement>) => void;
   canvasSize: { w: number; h: number };
   canvasBg: string;
+  canvasBgImage?: string | null;
 }
 
 function getBounds(el: IStripElement): Bounds {
@@ -113,7 +114,7 @@ export interface EditorCanvasHandle {
   getThumbnail: () => string;
 }
 
-const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize, canvasBg }, ref) {
+const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize, canvasBg, canvasBgImage }, ref) {
   const stageRef = useRef<Konva.Stage>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const layerRef = useRef<Konva.Layer>(null);
@@ -245,6 +246,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     >
       <Layer ref={layerRef}>
         <Rect x={0} y={0} width={canvasSize.w} height={canvasSize.h} fill={canvasBg} listening={false} />
+        {canvasBgImage && <BgImage url={canvasBgImage} width={canvasSize.w} height={canvasSize.h} />}
         {sorted.map((el) => (
           <CanvasElement
             key={el.id}
@@ -290,6 +292,20 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     </div>
   );
 });
+
+function BgImage({ url, width, height }: { url: string; width: number; height: number }) {
+  const [img] = useImage(url);
+  if (!img) return null;
+  return (
+    <KonvaImage
+      image={img}
+      x={0} y={0}
+      width={width}
+      height={height}
+      listening={false}
+    />
+  );
+}
 
 export default EditorCanvas;
 
