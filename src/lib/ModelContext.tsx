@@ -100,7 +100,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
           if (!blob) { reject(new Error('Canvas error')); return; }
           try {
             const url = URL.createObjectURL(blob);
-            await removeBackground(url, { progress: onProgress });
+            await removeBackground(url, { model: 'isnet_quint8', progress: onProgress });
             URL.revokeObjectURL(url);
             resolve();
           } catch (e) {

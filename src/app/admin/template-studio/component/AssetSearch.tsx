@@ -33,7 +33,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
     try {
       const { removeBackground } = await import('@imgly/background-removal');
       const blob = await removeBackground(imageUrl, {
-        model: 'isnet',
+        model: 'isnet_quint8',
         output: { format: 'image/png' },
       });
       if (id !== requestId.current) return;
