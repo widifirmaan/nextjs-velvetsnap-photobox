@@ -127,13 +127,14 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const w = entry.contentRect.width;
-        const s = Math.min(1, w / canvasSize.w);
+        const h = entry.contentRect.height;
+        const s = Math.min(1, w / canvasSize.w, h / canvasSize.h);
         setScale(s);
       }
     });
     observer.observe(container);
     return () => observer.disconnect();
-  }, [canvasSize.w]);
+  }, [canvasSize.w, canvasSize.h]);
 
   useImperativeHandle(ref, () => ({
     getThumbnail: () => {
