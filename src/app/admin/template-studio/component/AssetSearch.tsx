@@ -21,12 +21,14 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
   const [page, setPage] = useState(1);
   const [totalHits, setTotalHits] = useState(0);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const requestId = useRef(0);
 
   const handleImageSelect = async (imageUrl: string) => {
     if (model.status !== 'ready') {
       setImageError('AI model is not ready yet. Please wait...');
       return;
     }
+    const id = ++requestId.current;
     setProcessingUrl(imageUrl);
     try {
       const { removeBackground } = await import('@imgly/background-removal');
@@ -34,10 +36,12 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
         model: 'isnet',
         output: { format: 'image/png' },
       });
+      if (id !== requestId.current) return;
       const url = URL.createObjectURL(blob);
       onSelect(url);
       onClose();
     } catch (err: any) {
+      if (id !== requestId.current) return;
       const msg = err?.message || 'Remove background failed';
       setImageError(msg);
       setProcessingUrl(null);
@@ -46,6 +50,11 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
         model.retry();
       }
     }
+  };
+
+  const handleCancel = () => {
+    requestId.current++;
+    setProcessingUrl(null);
   };
 
   const searchImages = useCallback(async (q: string, p: number, append: boolean) => {
@@ -205,6 +214,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
                     <div className={styles.processingOverlay}>
                       <div className={styles.spinner} />
                       <span>Removing Background...</span>
+                      <button className={styles.cancelBtn} onClick={handleCancel}>Cancel</button>
                     </div>
                   )}
                 </button>
