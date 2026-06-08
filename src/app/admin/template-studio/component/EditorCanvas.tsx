@@ -124,13 +124,12 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
   useEffect(() => {
     const container = containerRef.current?.parentElement;
     if (!container) return;
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const w = entry.contentRect.width;
-        const h = entry.contentRect.height;
-        const s = Math.min(1, w / canvasSize.w, h / canvasSize.h);
-        setScale(s);
-      }
+    const observer = new ResizeObserver(() => {
+      const rect = container.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
+        const s = Math.min(1, (w - 8) / canvasSize.w, (h - 8) / canvasSize.h);
+      setScale(s);
     });
     observer.observe(container);
     return () => observer.disconnect();
