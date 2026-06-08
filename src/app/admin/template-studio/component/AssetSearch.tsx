@@ -152,13 +152,6 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
             <span>Preparing AI model...</span>
           </div>
         )}
-        {processingUrl && (
-          <div className={styles.processingBanner}>
-            <div className={styles.spinner} />
-            <span>Removing Background with wAI, Please Wait...</span>
-          </div>
-        )}
-
         <div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
             <input
@@ -208,6 +201,12 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
                   title={img.title}
                 >
                   <img src={img.thumbnail} alt={img.title} loading="lazy" />
+                  {processingUrl === img.url && (
+                    <div className={styles.processingOverlay}>
+                      <div className={styles.spinner} />
+                      <span>Removing Background...</span>
+                    </div>
+                  )}
                 </button>
               ))}
             </div>

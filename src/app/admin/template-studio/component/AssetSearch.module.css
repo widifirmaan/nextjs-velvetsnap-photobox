@@ -98,16 +98,36 @@
 }
 
 .processing {
-  opacity: 0.5;
   position: relative;
 }
 
-.processing::after {
-  content: '';
+.processingOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(255,255,255,0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(0,0,0,0.55);
   border-radius: 12px;
+  z-index: 2;
+}
+
+.processingOverlay .spinner {
+  width: 22px;
+  height: 22px;
+  border-color: #fff;
+  border-top-color: transparent;
+  margin: 0;
+}
+
+.processingOverlay span {
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+  line-height: 1.2;
 }
 
 .spinner {
