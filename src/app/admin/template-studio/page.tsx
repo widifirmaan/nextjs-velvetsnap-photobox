@@ -21,7 +21,7 @@ function generateSlotLayout(slotCount: number): IStripElement[] {
   const photoW = DEFAULT_CANVAS_W - marginX * 2;
   const gap = 28;
   const topPad = 40;
-  const bottomPad = 100;
+  const bottomPad = 320;
   const availH = DEFAULT_CANVAS_H - topPad - bottomPad;
   const photoH = Math.round((availH - (slotCount - 1) * gap) / slotCount);
   const elements: IStripElement[] = [];
@@ -41,7 +41,7 @@ function generateSlotLayout(slotCount: number): IStripElement[] {
     id: 'text-velvet',
     type: 'text',
     x: 0,
-    y: DEFAULT_CANVAS_H - 80,
+    y: 1540,
     width: DEFAULT_CANVAS_W,
     height: 50,
     rotation: 0,
@@ -49,7 +49,7 @@ function generateSlotLayout(slotCount: number): IStripElement[] {
     visible: true,
     props: {
       content: 'Velvet Snap',
-      fontSize: 32,
+      fontSize: 40,
       fontFamily: 'Inter',
       color: '#3d2c2c',
       fontWeight: '700',
