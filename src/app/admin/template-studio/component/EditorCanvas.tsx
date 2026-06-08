@@ -370,6 +370,7 @@ function CanvasElement({
         />
       );
     case 'background':
+      return <BgElement el={element} common={common} />;
     case 'sticker':
       return <StickerElement el={element} common={common} />;
     case 'shape': {
@@ -486,6 +487,23 @@ function HexagonShape({ el, common, fill, stroke, strokeWidth }: { el: IStripEle
   return (
     <Group {...common}>
       <Line points={pts} closed fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
+    </Group>
+  );
+}
+
+function BgElement({ el, common }: { el: IStripElement; common: any }) {
+  const [image] = useImage(el.props.stickerUrl || '');
+  if (!image || !el.props.stickerUrl) return null;
+  const imgW = image.width;
+  const imgH = image.height;
+  const scale = Math.max(el.width / imgW, el.height / imgH);
+  const dispW = imgW * scale;
+  const dispH = imgH * scale;
+  const offsetX = (el.width - dispW) / 2;
+  const offsetY = (el.height - dispH) / 2;
+  return (
+    <Group {...common}>
+      <KonvaImage image={image} x={offsetX} y={offsetY} width={dispW} height={dispH} />
     </Group>
   );
 }
