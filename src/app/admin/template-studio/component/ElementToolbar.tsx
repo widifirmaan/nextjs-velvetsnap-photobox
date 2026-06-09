@@ -8,8 +8,7 @@ interface ElementToolbarProps {
 
 const TOOLS: { type: IStripElement['type']; label: string; icon: string }[] = [
   { type: 'text', label: 'Text', icon: 'Aa' },
-  { type: 'sticker', label: 'Sticker', icon: '✨' },
-  { type: 'shape', label: 'Shape', icon: '◇' },
+  { type: 'sticker', label: 'Image', icon: '🖼' },
 ];
 
 export default function ElementToolbar({ onAdd }: ElementToolbarProps) {

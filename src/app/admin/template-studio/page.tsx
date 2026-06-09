@@ -163,7 +163,10 @@ export default function StripsStudioPage() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [templateName, setTemplateName] = useState('');
+  const [templateDesc, setTemplateDesc] = useState('Designed in Strips Studio');
+  const [templatePrice, setTemplatePrice] = useState(35000);
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [showNewConfirm, setShowNewConfirm] = useState(false);
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
@@ -268,6 +271,19 @@ export default function StripsStudioPage() {
     } catch { return blobUrl; }
   };
 
+  const handleNewTemplate = () => {
+    setShowNewConfirm(false);
+    setElements(generateSlotLayout(3));
+    setSlotCount(3);
+    setSelectedId(null);
+    setTemplateName('');
+    setTemplateDesc('Designed in Strips Studio');
+    setTemplatePrice(35000);
+    setEditingTemplateId(null);
+    setCanvasSize({ w: DEFAULT_CANVAS_W, h: DEFAULT_CANVAS_H });
+    setCanvasBg('#ffffff');
+  };
+
   const handleSave = async () => {
     if (!templateName.trim()) return;
     setSaving(true);
@@ -300,9 +316,9 @@ export default function StripsStudioPage() {
       const body: Record<string, any> = {
         type: 'strip',
         name: templateName,
-        description: 'Designed in Strips Studio',
+        description: templateDesc || 'Designed in Strips Studio',
         slots: photoSlots.length,
-        price: 35000,
+        price: templatePrice,
         color: canvasBg,
         isActive: true,
         canvasWidth: canvasSize.w,
@@ -458,83 +474,83 @@ export default function StripsStudioPage() {
 
       <div className={styles.editorLayout}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          <ElementToolbar onAdd={addElement} />
           <aside style={{
             background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
             border: '1px solid var(--mn-border)',
           }}>
+            <button
+              onClick={() => setShowNewConfirm(true)}
+              style={{
+                width: '100%', padding: '10px', borderRadius: 8,
+                border: '1px solid var(--mn-border)', background: '#fff',
+                cursor: 'pointer', fontWeight: 700, fontSize: 13,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8,
+              }}
+            >
+              ✚ New Template
+            </button>
             <button
               onClick={() => setShowSaveModal(true)}
               style={{
                 width: '100%', padding: '10px', borderRadius: 8,
                 border: 'none', background: 'var(--accent-color, #C5D89D)',
                 color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 10,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
               }}
             >
               💾 Save Template
             </button>
-            {model.status === 'downloading' && (
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginBottom: 10 }}>AI model downloading... {model.progress}%</div>
-            )}
-            {model.status === 'ready' && (
-              <div style={{ fontSize: 11, color: 'var(--accent-color)', fontWeight: 600, textAlign: 'center', marginBottom: 10 }}>AI ready</div>
-            )}
-            {model.status === 'error' && (
-              <div style={{ fontSize: 11, color: '#e74c3c', textAlign: 'center', marginBottom: 10 }}>AI error — <button onClick={model.retry} style={{ background: 'none', border: 'none', color: 'inherit', textDecoration: 'underline', cursor: 'pointer' }}>retry</button></div>
-            )}
-            {model.status === 'checking' && (
-              <div style={{ fontSize: 11, color: 'var(--text-muted)', textAlign: 'center', marginBottom: 10 }}>AI preparing...</div>
-            )}
-            <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
-              Background
-            </h3>
-            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 8 }}>
-              <input
-                type="color"
-                value={canvasBg}
-                onChange={(e) => setCanvasBg(e.target.value)}
-                style={{ width: 36, height: 36, padding: 0, border: '1px solid var(--mn-border)', borderRadius: 8, cursor: 'pointer' }}
-              />
-              <input
-                type="text"
-                value={canvasBg}
-                onChange={(e) => setCanvasBg(e.target.value)}
-                placeholder="#ffffff"
-                style={{ flex: 1, padding: '6px 8px', borderRadius: 8, border: '1px solid var(--mn-border)', fontSize: 12, fontFamily: 'monospace' }}
-              />
-            </div>
-            <button
-              onClick={openBgSearch}
-              style={{
-                width: '100%', padding: '8px', borderRadius: 8,
-                border: '1px solid var(--mn-border)', background: '#fff',
-                cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-              }}
-            >
-              🔍 Search Background
-            </button>
-            {elements.find((el) => el.id === 'bg-image') && (
-              <button
-                onClick={() => deleteElement('bg-image')}
-                style={{
-                  width: '100%', marginTop: 6, padding: '4px', borderRadius: 6,
-                  border: '1px solid #e74c3c', background: 'none',
-                  cursor: 'pointer', fontSize: 11, color: '#e74c3c', fontWeight: 600,
-                }}
-              >
-                ✕ Remove Background Image
-              </button>
-            )}
           </aside>
+
+          <ElementToolbar onAdd={addElement} />
+
           <aside style={{
             background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
             border: '1px solid var(--mn-border)',
           }}>
             <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
-              Import Frame
+              Background
             </h3>
+            <div style={{
+              width: '100%', aspectRatio: '3/1', borderRadius: 8, overflow: 'hidden',
+              marginBottom: 10, background: '#f0f0f0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: '1px solid var(--mn-border)',
+            }}>
+              {(elements.find((el) => el.id === 'bg-image')?.props as any)?.stickerUrl ? (
+                <img
+                  src={(elements.find((el) => el.id === 'bg-image')!.props as any).stickerUrl}
+                  alt="Background"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>No background</span>
+              )}
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button
+                onClick={openBgSearch}
+                style={{
+                  flex: 1, padding: '8px', borderRadius: 8,
+                  border: '1px solid var(--mn-border)', background: '#fff',
+                  cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                }}
+              >
+                🔍 Search
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={importProcessing}
+                style={{
+                  flex: 1, padding: '8px', borderRadius: 8,
+                  border: '1px solid var(--mn-border)', background: '#fff',
+                  cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                  opacity: importProcessing ? 0.6 : 1,
+                }}
+              >
+                {importProcessing ? '⏳...' : '📁 Import'}
+              </button>
+            </div>
             <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
               onChange={async (e) => {
                 const file = e.target.files?.[0];
@@ -565,13 +581,12 @@ export default function StripsStudioPage() {
                         ...prev.filter((el) => el.id.startsWith('text-')),
                       ]);
                       setSlotCount(detected.length);
-                      const bgId = 'bg-image';
-                      const existingBg = elements.find((el) => el.id === bgId);
+                      const existingBg = elements.find((el) => el.id === 'bg-image');
                       if (existingBg) {
-                        updateElementProps(bgId, { stickerUrl: processed });
+                        updateElementProps('bg-image', { stickerUrl: processed });
                       } else {
                         setElements((prev) => [...prev, {
-                          id: bgId, type: 'background',
+                          id: 'bg-image', type: 'background',
                           x: -30, y: -30,
                           width: cw + 60, height: ch + 60,
                           rotation: 0, zIndex: 100, visible: true,
@@ -586,23 +601,8 @@ export default function StripsStudioPage() {
                 } catch { setImportProcessing(false); }
               }}
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={importProcessing}
-              style={{
-                width: '100%', padding: '8px', borderRadius: 8,
-                border: '1px solid var(--mn-border)', background: '#fff',
-                cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                opacity: importProcessing ? 0.6 : 1,
-              }}
-            >
-              {importProcessing ? '⏳ Processing...' : '📁 Upload Frame Image'}
-            </button>
-            <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '6px 0 0', lineHeight: 1.4 }}>
-              Upload a frame template PNG with transparent cutouts to auto-detect photo slots.
-            </p>
           </aside>
+
           <LayerPanel
             elements={elements}
             selectedId={selectedId}
@@ -646,6 +646,44 @@ export default function StripsStudioPage() {
         />
       )}
 
+      {showNewConfirm && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(2px)',
+        }} onClick={() => setShowNewConfirm(false)}>
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: 28, width: 360,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+          }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700 }}>New Template</h3>
+            <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-muted)' }}>
+              All current work will be cleared. Continue?
+            </p>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowNewConfirm(false)}
+                style={{
+                  padding: '10px 20px', borderRadius: 10, border: '1px solid var(--mn-border)',
+                  background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleNewTemplate}
+                style={{
+                  padding: '10px 24px', borderRadius: 10, border: 'none',
+                  background: '#e74c3c', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                Clear & Start New
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showSaveModal && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 1000, display: 'flex',
@@ -653,14 +691,14 @@ export default function StripsStudioPage() {
           background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(2px)',
         }} onClick={() => !saving && setShowSaveModal(false)}>
           <div style={{
-            background: '#fff', borderRadius: 16, padding: 28, width: 380,
+            background: '#fff', borderRadius: 16, padding: 28, width: 400,
             boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
           }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700 }}>
               {editingTemplateId ? 'Update Template' : 'Save Template'}
             </h3>
             <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-muted)' }}>
-              {editingTemplateId ? 'Update your strip template' : 'Enter a name for your strip template'}
+              {editingTemplateId ? 'Update your strip template' : 'Enter details for your strip template'}
             </p>
             <input
               type="text"
@@ -671,7 +709,29 @@ export default function StripsStudioPage() {
               style={{
                 width: '100%', padding: '12px 14px', borderRadius: 10,
                 border: '1px solid var(--mn-border)', fontSize: 15,
-                marginBottom: 20, fontFamily: 'inherit',
+                marginBottom: 12, fontFamily: 'inherit', boxSizing: 'border-box',
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={templateDesc}
+              onChange={(e) => setTemplateDesc(e.target.value)}
+              style={{
+                width: '100%', padding: '12px 14px', borderRadius: 10,
+                border: '1px solid var(--mn-border)', fontSize: 14,
+                marginBottom: 12, fontFamily: 'inherit', boxSizing: 'border-box',
+              }}
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={templatePrice}
+              onChange={(e) => setTemplatePrice(Number(e.target.value))}
+              style={{
+                width: '100%', padding: '12px 14px', borderRadius: 10,
+                border: '1px solid var(--mn-border)', fontSize: 14,
+                marginBottom: 20, fontFamily: 'inherit', boxSizing: 'border-box',
               }}
             />
             <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
