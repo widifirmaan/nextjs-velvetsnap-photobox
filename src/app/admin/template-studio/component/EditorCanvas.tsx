@@ -144,6 +144,12 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
 
   useEffect(() => {
     if (!trRef.current || !layerRef.current) return;
+    const el = elements.find(e => e.id === selectedId);
+    if (el?.type === 'photo-slot') {
+      trRef.current.nodes([]);
+      trRef.current.getLayer()?.batchDraw();
+      return;
+    }
     const selectedNode = layerRef.current.findOne(`#${selectedId}`);
     if (selectedNode) {
       trRef.current.nodes([selectedNode]);
@@ -344,7 +350,7 @@ function CanvasElement({
     width: element.width,
     height: element.height,
     rotation: element.rotation,
-    draggable: true,
+    draggable: element.type !== 'photo-slot',
     onClick: onSelect,
     onTap: onSelect,
     onDragEnd,
