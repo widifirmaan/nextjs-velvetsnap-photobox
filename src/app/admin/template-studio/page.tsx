@@ -624,7 +624,7 @@ export default function StripsStudioPage() {
                         ...slotEls,
                         ...prev.filter((el) => el.id.startsWith('text-') || el.id === 'bg-image').map((el) =>
                           el.id === 'bg-image'
-                            ? { ...el, x: 0, y: 0, width: cw, height: ch, zIndex: 100, props: { ...el.props, stickerUrl: processed } }
+                            ? { ...el, x: 0, y: 0, width: cw, height: ch, zIndex: detected.length, props: { ...el.props, stickerUrl: processed } }
                             : el
                         ),
                       ]);
@@ -635,7 +635,7 @@ export default function StripsStudioPage() {
                           id: 'bg-image', type: 'background',
                           x: 0, y: 0,
                           width: cw, height: ch,
-                          rotation: 0, zIndex: 100, visible: true,
+                          rotation: 0, zIndex: detected.length, visible: true,
                           props: { stickerUrl: processed, opacity: 1 },
                         }]);
                       }
