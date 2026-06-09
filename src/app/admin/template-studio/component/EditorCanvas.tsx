@@ -406,7 +406,7 @@ function CanvasElement({
     width: element.width,
     height: element.height,
     rotation: element.rotation,
-    draggable: element.type !== 'photo-slot',
+    draggable: true,
     onClick: onSelect,
     onTap: onSelect,
     onDragEnd,
