@@ -2,7 +2,7 @@
 
 import { useRef, useLayoutEffect, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Stage, Layer, Transformer, Rect, Circle, Text, Group, Image as KonvaImage, Ellipse, Star, Line, Path } from 'react-konva';
-import type Konva from 'konva';
+import Konva from 'konva';
 import type { IStripElement } from '@/models/Template';
 import { useImage } from './useImage';
 
@@ -114,7 +114,7 @@ function computeGuides(
 
 export interface EditorCanvasHandle {
   getThumbnail: () => string;
-  getFrameImage: () => Promise<string>;
+  getFrameImage: () => string;
 }
 
 const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize, canvasBg }, ref) {
@@ -128,42 +128,23 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
 
   useImperativeHandle(ref, () => ({
     getThumbnail: () => stageRef.current?.toDataURL({ mimeType: 'image/png', pixelRatio: 0.3 }) || '',
-    getFrameImage: async () => {
+    getFrameImage: () => {
       const stage = stageRef.current;
       if (!stage) return '';
       if (trRef.current) trRef.current.nodes([]);
-      stage.batchDraw();
-      const url = stage.toDataURL({ mimeType: 'image/png' });
+      // Render all elements onto a native canvas, then paint solid green
+      // over the slot pixel rects so chroma key always sees green
+      // regardless of overlapping element z-order or shape type.
+      const canvas = stage.toCanvas();
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return canvas.toDataURL('image/png');
       const groups = (stage as any).find('.photo-slot-group');
-      if (!groups.length) return url;
-      const slots = groups.map((g: any) => {
+      groups.forEach((g: any) => {
         const r = g.getClientRect();
-        return { x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.width), h: Math.round(r.height) };
+        ctx.fillStyle = '#00bf63';
+        ctx.fillRect(Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height));
       });
-      return new Promise((resolve) => {
-        const img = new window.Image();
-        img.onload = () => {
-          const c = document.createElement('canvas');
-          c.width = img.naturalWidth;
-          c.height = img.naturalHeight;
-          const ctx = c.getContext('2d');
-          if (!ctx) { resolve(url); return; }
-          ctx.drawImage(img, 0, 0);
-          const imageData = ctx.getImageData(0, 0, c.width, c.height);
-          const d = imageData.data;
-          for (const s of slots) {
-            for (let py = s.y; py < s.y + s.h && py < c.height; py++) {
-              for (let px = s.x; px < s.x + s.w && px < c.width; px++) {
-                d[(py * c.width + px) * 4 + 3] = 0;
-              }
-            }
-          }
-          ctx.putImageData(imageData, 0, 0);
-          resolve(c.toDataURL('image/png'));
-        };
-        img.onerror = () => resolve(url);
-        img.src = url;
-      });
+      return canvas.toDataURL('image/png');
     },
   }), []);
 

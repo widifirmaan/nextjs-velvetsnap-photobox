@@ -12,6 +12,7 @@ import ElementToolbar from './component/ElementToolbar';
 import LayerPanel from './component/LayerPanel';
 import PropertiesPanel from './component/PropertiesPanel';
 import AssetSearch from './component/AssetSearch';
+import { removeGreenScreen } from '@/lib/canvas-utils';
 import styles from './page.module.css';
 
 const DEFAULT_CANVAS_W = 600;
@@ -288,8 +289,8 @@ export default function StripsStudioPage() {
     await new Promise((r) => setTimeout(r, 50));
     try {
       const thumbnail = editorRef.current?.getThumbnail() || '';
-      const rawFrame = await editorRef.current?.getFrameImage();
-      const frameImage = rawFrame || '';
+      const rawFrame = editorRef.current?.getFrameImage() || '';
+      const frameImage = await removeGreenScreen(rawFrame);
       const elementImages: Record<string, string> = {};
       const savedElements = await Promise.all(elements.map(async (el) => {
         const copy = { ...el, props: { ...el.props } };
