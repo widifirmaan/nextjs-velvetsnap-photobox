@@ -188,10 +188,7 @@ export default function StripsStudioPage() {
     const params = new URLSearchParams(window.location.search);
     const editId = params.get('edit');
     if (!editId) return;
-    const raw = sessionStorage.getItem('stripTemplateData');
-    if (!raw) return;
-    try {
-      const data = JSON.parse(raw);
+    const applyData = (data: any) => {
       setEditingTemplateId(data._id || editId);
       setTemplateName(data.name || '');
       if (data.elements?.length) {
@@ -207,9 +204,26 @@ export default function StripsStudioPage() {
       if (slotEls?.length) {
         setSlotCount(slotEls.length);
       }
-    } catch (e) {
-      console.error('Failed to load edit data', e);
+    };
+    const raw = sessionStorage.getItem('stripTemplateData');
+    if (raw) {
+      try {
+        const data = JSON.parse(raw);
+        applyData(data);
+        return;
+      } catch (e) {
+        console.error('Failed to parse sessionStorage data', e);
+      }
     }
+    // Fallback: load from API
+    fetch('/api/templates')
+      .then((r) => r.json())
+      .then((res) => {
+        if (!res.success) return;
+        const matched = res.data.find((t: any) => t._id === editId || t.templateId === editId);
+        if (matched) applyData(matched);
+      })
+      .catch(() => {});
   }, []);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
