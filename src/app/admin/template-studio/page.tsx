@@ -15,14 +15,14 @@ import AssetSearch from './component/AssetSearch';
 import { removeGreenScreen } from '@/lib/canvas-utils';
 import styles from './page.module.css';
 
-const DEFAULT_CANVAS_W = 600;
-const DEFAULT_CANVAS_H = 1800;
+const DEFAULT_CANVAS_W = 1000;
+const DEFAULT_CANVAS_H = 3000;
 
 interface ISlot {
   x: number; y: number; w: number; h: number;
 }
 
-function removeChromaKey(dataUrl: string, targetW = 600, targetH = 1800): Promise<string> {
+function removeChromaKey(dataUrl: string, targetW = DEFAULT_CANVAS_W, targetH = DEFAULT_CANVAS_H): Promise<string> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.onload = () => {
@@ -50,7 +50,7 @@ function removeChromaKey(dataUrl: string, targetW = 600, targetH = 1800): Promis
   });
 }
 
-function detectTransparentSlots(imgEl: HTMLImageElement, cw = 600, ch = 1800): ISlot[] {
+function detectTransparentSlots(imgEl: HTMLImageElement, cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H): ISlot[] {
   const canvas = document.createElement('canvas');
   canvas.width = cw; canvas.height = ch;
   const ctx = canvas.getContext('2d');
