@@ -288,7 +288,8 @@ export default function StripsStudioPage() {
     await new Promise((r) => setTimeout(r, 50));
     try {
       const thumbnail = editorRef.current?.getThumbnail() || '';
-      const frameImage = editorRef.current?.getFrameImage() || '';
+      const rawFrame = await editorRef.current?.getFrameImage();
+      const frameImage = rawFrame || '';
       const elementImages: Record<string, string> = {};
       const savedElements = await Promise.all(elements.map(async (el) => {
         const copy = { ...el, props: { ...el.props } };
