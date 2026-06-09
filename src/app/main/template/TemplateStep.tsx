@@ -82,7 +82,7 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
       </div>
       <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg"
         videoConstraints={{ facingMode: 'user' }}
-        style={{ position: 'fixed', top: -9999, left: -9999, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+        style={{ position: 'fixed', top: 0, left: 0, width: 320, height: 240, opacity: 0, pointerEvents: 'none', zIndex: -1 }}
       />
       {templates.length === 0 ? (
         <p className={styles.stepEmpty}>Tidak ada template.</p>
