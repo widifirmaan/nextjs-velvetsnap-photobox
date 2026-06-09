@@ -145,20 +145,20 @@ function generateSlotLayout(slotCount: number): IStripElement[] {
   elements.push({
     id: 'text-velvet',
     type: 'text',
-    x: 0,
-    y: 1540,
-    width: DEFAULT_CANVAS_W,
-    height: 50,
+    x: DEFAULT_CANVAS_W - 200,
+    y: DEFAULT_CANVAS_H - 36,
+    width: 180,
+    height: 24,
     rotation: 0,
     zIndex: slotCount,
     visible: true,
     props: {
-      content: 'Velvet Snap',
-      fontSize: 40,
+      content: 'by VelvetSnap',
+      fontSize: 16,
       fontFamily: 'Inter',
       color: '#3d2c2c',
-      fontWeight: '700',
-      textAlign: 'center',
+      fontWeight: '300',
+      textAlign: 'right',
     },
   });
 
