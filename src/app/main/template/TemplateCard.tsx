@@ -16,15 +16,17 @@ interface TemplateCardProps {
     slots: number;
   };
   onSelect: (id: string) => void;
+  livePreviewUrl?: string;
 }
 
-export default function TemplateCard({ template, onSelect }: TemplateCardProps) {
+export default function TemplateCard({ template, onSelect, livePreviewUrl }: TemplateCardProps) {
   const thumbSrc = template.frameImage || template.thumbnail;
+  const displaySrc = livePreviewUrl || thumbSrc;
   return (
     <button key={template._id} className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
       <div className={styles.templateCardThumb}>
-        {thumbSrc ? (
-          <img src={thumbSrc} alt={template.name} loading="lazy" />
+        {displaySrc ? (
+          <img src={displaySrc} alt={template.name} loading="lazy" />
         ) : (
           <LayoutTemplate size={48} style={{ color: template.color }} />
         )}
