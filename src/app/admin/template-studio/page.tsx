@@ -118,13 +118,13 @@ function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
   return rects.sort((a, b) => Math.abs(a.y - b.y) < 3 ? a.x - b.x : a.y - b.y);
 }
 
-function generateSlotLayout(slotCount: number): IStripElement[] {
-  const marginX = Math.round(DEFAULT_CANVAS_W * 0.055);
-  const photoW = DEFAULT_CANVAS_W - marginX * 2;
+function generateSlotLayout(slotCount: number, cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H): IStripElement[] {
+  const marginX = Math.round(cw * 0.055);
+  const photoW = cw - marginX * 2;
   const gap = 28;
   const topPad = 40;
   const bottomPad = 320;
-  const availH = DEFAULT_CANVAS_H - topPad - bottomPad;
+  const availH = ch - topPad - bottomPad;
   const photoH = Math.round((availH - (slotCount - 1) * gap) / slotCount);
   const elements: IStripElement[] = [];
 
@@ -143,15 +143,15 @@ function generateSlotLayout(slotCount: number): IStripElement[] {
     id: 'text-velvet',
     type: 'text',
     x: 0,
-    y: 1540,
-    width: DEFAULT_CANVAS_W,
+    y: ch - bottomPad + 20,
+    width: cw,
     height: 50,
     rotation: 0,
     zIndex: slotCount,
     visible: true,
     props: {
       content: 'Velvet Snap',
-      fontSize: 40,
+      fontSize: Math.round(40 * (cw / DEFAULT_CANVAS_W)),
       fontFamily: 'Inter',
       color: '#3d2c2c',
       fontWeight: '700',
@@ -231,12 +231,12 @@ export default function StripsStudioPage() {
 
   const setSlotLayout = useCallback((n: number) => {
     setSlotCount(n);
-    const newSlots = generateSlotLayout(n);
+    const newSlots = generateSlotLayout(n, canvasSize.w, canvasSize.h);
     setElements((prev) => [
       ...newSlots,
       ...prev.filter((el) => !el.id.startsWith('slot-') && el.id !== 'text-velvet'),
     ]);
-  }, []);
+  }, [canvasSize]);
 
   const addElement = useCallback((type: IStripElement['type']) => {
     if (type === 'sticker') {
@@ -560,9 +560,13 @@ export default function StripsStudioPage() {
                     const processed = await removeChromaKey(dataUrl);
                     const img = new window.Image();
                     img.onload = () => {
+                      const imgW = img.naturalWidth || img.width;
+                      const imgH = img.naturalHeight || img.height;
+                      const cw = Math.min(600, Math.round(imgW));
+                      const ch = Math.round(cw * (imgH / imgW));
+                      setCanvasSize({ w: cw, h: ch });
                       const detected = detectTransparentSlots(img);
                       if (detected.length === 0) { setImportProcessing(false); return; }
-                      const cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H;
                       const slotEls: IStripElement[] = detected.map((s, i) => ({
                         id: `slot-${i}`,
                         type: 'photo-slot',
