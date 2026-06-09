@@ -73,6 +73,11 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
   };
 
   const handleImageClick = (imageUrl: string) => {
+    if (isBackground) {
+      onSelect(imageUrl);
+      onClose();
+      return;
+    }
     if (activeUrl?.url === imageUrl) {
       if (activeUrl.mode === 'processing') {
         requestId.current++;
@@ -270,7 +275,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
                     title={img.title}
                   >
                     <img src={img.thumbnail} alt={img.title} loading="lazy" />
-                    {activeUrl?.url === img.url && activeUrl.mode === 'choice' && (
+                    {activeUrl?.url === img.url && activeUrl.mode === 'choice' && !isBackground && (
                       <div className={styles.choiceOverlay}>
                         <button className={styles.choiceBtn} onClick={(e) => { e.stopPropagation(); handleFull(img.url); }}>
                           Full
