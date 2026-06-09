@@ -142,29 +142,12 @@ export function removeGreenScreen(base64: string): Promise<string> {
       try { imgData = ctx.getImageData(0, 0, canvas.width, canvas.height); }
       catch { resolve(base64); return; }
       const d = imgData.data;
-      const w = imgData.width, h = imgData.height;
       const targetR = 0, targetG = 191, targetB = 99;
       for (let i = 0; i < d.length; i += 4) {
         const r = d[i], g = d[i + 1], b = d[i + 2];
         const dr = r - targetR, dg = g - targetG, db = b - targetB;
         if (dr * dr + dg * dg + db * db < 5000) { d[i + 3] = 0; }
       }
-      // Dilate transparent areas by 3px to cut anti-aliased green edge
-      const erode = new Uint8ClampedArray(d);
-      const ERODE = 1;
-      for (let y = 0; y < h; y++) {
-        for (let x = 0; x < w; x++) {
-          const idx = (y * w + x) * 4;
-          if (d[idx + 3] === 0) continue;
-          for (let r = 1; r <= ERODE; r++) {
-            if (x - r >= 0 && d[(y * w + (x - r)) * 4 + 3] === 0) { erode[idx + 3] = 0; break; }
-            if (x + r < w && d[(y * w + (x + r)) * 4 + 3] === 0) { erode[idx + 3] = 0; break; }
-            if (y - r >= 0 && d[((y - r) * w + x) * 4 + 3] === 0) { erode[idx + 3] = 0; break; }
-            if (y + r < h && d[((y + r) * w + x) * 4 + 3] === 0) { erode[idx + 3] = 0; break; }
-          }
-        }
-      }
-      d.set(erode);
       ctx.putImageData(imgData, 0, 0);
       resolve(canvas.toDataURL('image/png'));
     };
