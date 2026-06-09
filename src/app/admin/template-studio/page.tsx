@@ -136,9 +136,9 @@ export default function StripsStudioPage() {
       } else {
         setElements((prev) => [...prev, {
           id, type: 'background',
-          x: -50, y: -50,
-          width: canvasSize.w + 100,
-          height: canvasSize.h + 100,
+          x: -60, y: -60,
+          width: canvasSize.w + 120,
+          height: canvasSize.h + 120,
           rotation: 0,
           zIndex: -1,
           visible: true,
