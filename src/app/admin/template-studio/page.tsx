@@ -413,7 +413,11 @@ export default function StripsStudioPage() {
       const id = 'bg-image';
       const existing = elements.find((el) => el.id === id);
       if (existing) {
-        updateElementProps(id, { stickerUrl: url });
+        setElements((prev) =>
+          prev.map((el) =>
+            el.id === id ? { ...el, zIndex: -1, props: { ...el.props, stickerUrl: url, searchBg: true } } : el
+          )
+        );
       } else {
         setElements((prev) => [...prev, {
           id, type: 'background',
@@ -423,7 +427,7 @@ export default function StripsStudioPage() {
           rotation: 0,
           zIndex: -1,
           visible: true,
-          props: { stickerUrl: url, opacity: 1 },
+          props: { stickerUrl: url, opacity: 1, searchBg: true },
         }]);
       }
       stickerTargetRef.current = null;
@@ -683,6 +687,7 @@ export default function StripsStudioPage() {
         <AssetSearch
           onSelect={handleAssetSelect}
           onClose={() => setStickerTargetId(null)}
+          isBackground={stickerTargetId === '__bg__'}
         />
       )}
 

@@ -7,9 +7,10 @@ import styles from './AssetSearch.module.css';
 interface AssetSearchProps {
   onSelect: (url: string) => void;
   onClose: () => void;
+  isBackground?: boolean;
 }
 
-export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
+export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSearchProps) {
   const model = useModel();
   const [activeTab, setActiveTab] = useState<'search' | 'upload' | 'color'>('search');
   const [search, setSearch] = useState('');
@@ -326,7 +327,12 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
                     const file = e.target.files?.[0];
                     if (!file) return;
                     const url = URL.createObjectURL(file);
-                    setUploadedUrl(url);
+                    if (isBackground) {
+                      onSelect(url);
+                      onClose();
+                    } else {
+                      setUploadedUrl(url);
+                    }
                   }}
                 />
               </label>
@@ -337,7 +343,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
                   alt="Uploaded"
                   style={{ maxWidth: '100%', maxHeight: 300, display: 'block', borderRadius: 8 }}
                 />
-                {activeUrl?.url === uploadedUrl && activeUrl.mode === 'choice' && (
+                {activeUrl?.url === uploadedUrl && activeUrl.mode === 'choice' && !isBackground && (
                   <div className={styles.choiceOverlay}>
                     <button className={styles.choiceBtn} onClick={(e) => { e.stopPropagation(); handleFull(uploadedUrl); }}>
                       Full
@@ -356,7 +362,7 @@ export default function AssetSearch({ onSelect, onClose }: AssetSearchProps) {
                 )}
               </div>
             )}
-            {uploadedUrl && (
+            {uploadedUrl && !isBackground && (
               <div style={{ marginTop: 12, display: 'flex', gap: 8, justifyContent: 'center' }}>
                 <button
                   onClick={() => { setUploadedUrl(null); setActiveUrl(null); }}

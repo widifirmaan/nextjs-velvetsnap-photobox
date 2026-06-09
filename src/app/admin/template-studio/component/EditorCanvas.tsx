@@ -406,7 +406,7 @@ function CanvasElement({
     width: element.width,
     height: element.height,
     rotation: element.rotation,
-    draggable: element.type !== 'background',
+    draggable: element.type === 'background' ? element.props?.searchBg === true : true,
     onClick: onSelect,
     onTap: onSelect,
     onDragEnd,
@@ -418,7 +418,7 @@ function CanvasElement({
   const elCommon = element.type === 'photo-slot'
     ? { ...common, name: 'photo-slot-group' }
     : element.type === 'background'
-      ? { ...common, name: 'bg-element', listening: false }
+      ? { ...common, name: 'bg-element', listening: element.props?.searchBg !== true }
       : common;
 
   switch (element.type) {
