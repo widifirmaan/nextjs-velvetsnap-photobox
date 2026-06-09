@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import styles from '@/app/main/page.module.css';
-import { removeGreenScreen, composeFrameImage } from '@/lib/canvas-utils';
+import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
 import { TEMPLATE_CONFIGS, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';
@@ -33,32 +33,51 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
 
   useEffect(() => {
     if (!templateId) return;
-    fetch('/api/templates')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.success) {
-          const matched = data.data.find((t: any) => t.templateId === templateId);
-          if (matched) {
-            setTemplateData(matched);
-            setPrice(matched.price || 35000);
-            if (matched.frameImage) {
-              removeGreenScreen(matched.frameImage).then((keyed) => {
-                setKeyedFrameImage(keyed);
-                const img = new window.Image();
-                img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-                img.src = keyed;
-              });
-            }
-          } else {
-            const fallback = TEMPLATE_CONFIGS[templateId];
-            if (fallback) {
-              setTemplateData({ templateId, name: fallback.name, slots: fallback.slots, price: 35000, color: '#ffffff' } as TemplateData);
-            }
-          }
+    const loadTemplate = async () => {
+      // Try to find template from already fetched allTemplates
+      let matched = allTemplates.find((t) => t.templateId === templateId);
+      if (!matched) {
+        try {
+          const res = await fetch('/api/templates');
+          const data = await res.json();
+          if (data.success) matched = data.data.find((t: any) => t.templateId === templateId);
+        } catch {}
+      }
+      if (matched) {
+        setTemplateData(matched);
+        setPrice(matched.price || 35000);
+        const cw = matched.canvasWidth || 600;
+        const ch = matched.canvasHeight || 900;
+
+        if (matched.type === 'strip' && matched.elements?.length) {
+          const slotsLayout = stripElementsToSlotsLayout(matched.elements, cw, ch);
+          matched.slotsLayout = slotsLayout;
+          if (!matched.slots) matched.slots = slotsLayout.length;
+          try {
+            const frameDataUrl = await renderStripFrame(matched.elements, cw, ch, matched.color || '#ffffff');
+            const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
+            const img = new window.Image();
+            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+            img.src = bgFrameDataUrl;
+            setKeyedFrameImage(bgFrameDataUrl);
+          } catch {}
+        } else if (matched.frameImage) {
+          removeGreenScreen(matched.frameImage).then((keyed) => {
+            setKeyedFrameImage(keyed);
+            const img = new window.Image();
+            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+            img.src = keyed;
+          });
         }
-      })
-      .catch(() => {});
-  }, [templateId]);
+      } else {
+        const fallback = TEMPLATE_CONFIGS[templateId];
+        if (fallback) {
+          setTemplateData({ templateId, name: fallback.name, slots: fallback.slots, price: 35000, color: '#ffffff' } as TemplateData);
+        }
+      }
+    };
+    loadTemplate();
+  }, [templateId, allTemplates]);
 
   const handleAddCapture = useCallback((url: string) => {
     setCaptures((prev) => {
@@ -78,11 +97,19 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
 
   useEffect(() => {
     if (!captures.length || !templateData?.slotsLayout?.length) return;
-    const frameSrc = keyedFrameImage || templateData.frameImage || '';
-    if (!frameSrc) return;
-    composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
-      .then(setCompositedImage)
-      .catch(() => {});
+    if (templateData.type === 'strip' && templateData.elements?.length && templateData.canvasWidth && templateData.canvasHeight) {
+      composeStripImage(
+        templateData.elements, templateData.color || '#ffffff',
+        captures, photoAdjust,
+        templateData.canvasWidth, templateData.canvasHeight,
+      ).then(setCompositedImage).catch(() => {});
+    } else {
+      const frameSrc = keyedFrameImage || templateData.frameImage || '';
+      if (!frameSrc) return;
+      composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
+        .then(setCompositedImage)
+        .catch(() => {});
+    }
   }, [captures, photoAdjust, templateData, keyedFrameImage]);
 
   const slotsCount = templateData?.slots || TEMPLATE_CONFIGS[templateId || '']?.slots || 3;

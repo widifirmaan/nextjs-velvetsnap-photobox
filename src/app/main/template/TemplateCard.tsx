@@ -10,6 +10,7 @@ interface TemplateCardProps {
     templateId: string;
     name: string;
     frameImage?: string;
+    thumbnail?: string;
     color: string;
     price: number;
     slots: number;
@@ -18,11 +19,12 @@ interface TemplateCardProps {
 }
 
 export default function TemplateCard({ template, onSelect }: TemplateCardProps) {
+  const thumbSrc = template.frameImage || template.thumbnail;
   return (
     <button key={template._id} className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
       <div className={styles.templateCardThumb}>
-        {template.frameImage ? (
-          <img src={template.frameImage} alt={template.name} loading="lazy" />
+        {thumbSrc ? (
+          <img src={thumbSrc} alt={template.name} loading="lazy" />
         ) : (
           <LayoutTemplate size={48} style={{ color: template.color }} />
         )}

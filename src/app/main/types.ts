@@ -1,4 +1,4 @@
-import type { ISlot } from '@/lib/canvas-utils';
+import type { ISlot, IStripElement } from '@/lib/canvas-utils';
 
 export interface TemplateData {
   _id: string;
@@ -11,6 +11,11 @@ export interface TemplateData {
   isActive: boolean;
   frameImage?: string;
   slotsLayout?: ISlot[];
+  thumbnail?: string;
+  type?: 'frame' | 'strip';
+  canvasWidth?: number;
+  canvasHeight?: number;
+  elements?: IStripElement[];
 }
 
 export interface StripResult {

@@ -20,6 +20,11 @@ export async function GET() {
         isActive: obj.isActive,
         frameImage: obj.frameImage,
         slotsLayout: obj.slotsLayout,
+        thumbnail: obj.thumbnail,
+        type: obj.type,
+        canvasWidth: obj.canvasWidth,
+        canvasHeight: obj.canvasHeight,
+        elements: obj.elements,
       };
     });
 
