@@ -417,9 +417,9 @@ export default function StripsStudioPage() {
       } else {
         setElements((prev) => [...prev, {
           id, type: 'background',
-          x: -60, y: -60,
-          width: canvasSize.w + 120,
-          height: canvasSize.h + 120,
+          x: 0, y: 0,
+          width: canvasSize.w,
+          height: canvasSize.h,
           rotation: 0,
           zIndex: -1,
           visible: true,
@@ -631,7 +631,7 @@ export default function StripsStudioPage() {
                           x: 0, y: 0,
                           width: cw, height: ch,
                           rotation: 0, zIndex: 100, visible: true,
-                          props: { stickerUrl: processed, opacity: 1, fixed: true },
+                          props: { stickerUrl: processed, opacity: 1 },
                         }]);
                       }
                       setImportProcessing(false);

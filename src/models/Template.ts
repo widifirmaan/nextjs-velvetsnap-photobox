@@ -37,7 +37,6 @@ export interface IStripElement {
     strokeColor?: string;
     strokeWidth?: number;
     opacity?: number;
-    fixed?: boolean;
   };
 }
 
