@@ -622,13 +622,15 @@ export default function StripsStudioPage() {
                       }));
                       setElements((prev) => [
                         ...slotEls,
-                        ...prev.filter((el) => el.id.startsWith('text-')),
+                        ...prev.filter((el) => el.id.startsWith('text-') || el.id === 'bg-image').map((el) =>
+                          el.id === 'bg-image'
+                            ? { ...el, zIndex: 100, props: { ...el.props, stickerUrl: processed } }
+                            : el
+                        ),
                       ]);
                       setSlotCount(detected.length);
-                      const existingBg = elements.find((el) => el.id === 'bg-image');
-                      if (existingBg) {
-                        updateElementProps('bg-image', { stickerUrl: processed });
-                      } else {
+                      const hasBg = elements.some((el) => el.id === 'bg-image');
+                      if (!hasBg) {
                         setElements((prev) => [...prev, {
                           id: 'bg-image', type: 'background',
                           x: 0, y: 0,
