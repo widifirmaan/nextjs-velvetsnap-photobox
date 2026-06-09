@@ -587,7 +587,7 @@ export default function StripsStudioPage() {
                           id: bgId, type: 'background',
                           x: -30, y: -30,
                           width: cw + 60, height: ch + 60,
-                          rotation: 0, zIndex: -1, visible: true,
+                          rotation: 0, zIndex: 100, visible: true,
                           props: { stickerUrl: processed, opacity: 1 },
                         }]);
                       }
