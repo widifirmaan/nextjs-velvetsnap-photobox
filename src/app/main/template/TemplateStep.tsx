@@ -37,14 +37,17 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
     })();
   }, [templates]);
 
-  // Periodic camera capture every 2s
-  useEffect(() => {
-    const iv = setInterval(() => {
-      const shot = webcamRef.current?.getScreenshot();
-      if (shot) setLatestFrame(shot);
-    }, 2000);
-    return () => clearInterval(iv);
+  // Capture immediately on mount, then every 2s
+  const capture = useCallback(() => {
+    const shot = webcamRef.current?.getScreenshot();
+    if (shot) setLatestFrame(shot);
   }, []);
+
+  useEffect(() => {
+    const t = setTimeout(capture, 300);
+    const iv = setInterval(capture, 2000);
+    return () => { clearTimeout(t); clearInterval(iv); };
+  }, [capture]);
 
   // Composite templates with latest frame
   const composite = useCallback(async () => {
@@ -77,12 +80,10 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
         <button className={styles.backBtn} onClick={onBack}><ArrowLeft size={18} /></button>
         <h1 className={styles.stepHeading}>Pilih Frame</h1>
       </div>
-      <div className={styles.templateCameraStrip}>
-        <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg"
-          videoConstraints={{ facingMode: 'user' }}
-          className={styles.templateWebcam}
-        />
-      </div>
+      <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg"
+        videoConstraints={{ facingMode: 'user' }}
+        style={{ position: 'fixed', top: -9999, left: -9999, width: 1, height: 1, opacity: 0, pointerEvents: 'none' }}
+      />
       {templates.length === 0 ? (
         <p className={styles.stepEmpty}>Tidak ada template.</p>
       ) : (
