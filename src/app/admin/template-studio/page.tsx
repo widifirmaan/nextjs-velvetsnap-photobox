@@ -364,7 +364,13 @@ export default function StripsStudioPage() {
           body: JSON.stringify(body),
         });
       } else {
-        body.templateId = templateIdField;
+        // Fetch latest templates to compute unique ID (handles multi-tab)
+        const listRes = await fetch('/api/templates');
+        const listData = await listRes.json();
+        const existingIds = (listData.data || []).map((t: any) => t.templateId || '').filter(Boolean);
+        const freshId = generateTempId(existingIds);
+        setTemplateIdField(freshId);
+        body.templateId = freshId;
         res = await fetch('/api/templates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
