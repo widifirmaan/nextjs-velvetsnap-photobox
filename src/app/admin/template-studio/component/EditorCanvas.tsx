@@ -428,7 +428,23 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
   const bw = p.borderWidth ?? 2;
   const bc = p.borderColor || '#ffffff';
   const br = p.borderRadius ?? 8;
-  const fill = '#00bf63';
+  const fill = 'rgba(0, 191, 99, 0.12)';
+  const slotIndex = (parseInt(el.id.replace('slot-', ''), 10) || 0) + 1;
+
+  const slotNumber = (
+    <Text
+      text={String(slotIndex)}
+      fontSize={Math.min(el.width, el.height) * 0.35}
+      fill="rgba(0, 191, 99, 0.25)"
+      align="center"
+      verticalAlign="middle"
+      width={el.width}
+      height={el.height}
+      x={0}
+      y={0}
+      listening={false}
+    />
+  );
 
   switch (shape) {
     case 'circle': {
@@ -436,11 +452,24 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
       return (
         <Group {...common} x={el.x + el.width / 2} y={el.y + el.height / 2}>
           <Circle radius={r} fill={fill} stroke={bc} strokeWidth={bw} />
+          {slotNumber}
         </Group>
       );
     }
-    case 'heart':
-      return <HeartShape el={el} common={common} fill={fill} stroke={bc} strokeWidth={bw} />;
+    case 'heart': {
+      const hw = el.width;
+      const hh = el.height;
+      const hs = Math.min(hw, hh) * 0.45;
+      const hcx = hw / 2;
+      const hcy = hh * 0.4;
+      const heartPath = `M${hcx},${hcy + hs * 0.3} C${hcx - hs * 0.7},${hcy - hs * 0.2} ${hcx - hs},${hcy - hs * 0.5} ${hcx},${hcy - hs * 0.7} C${hcx + hs},${hcy - hs * 0.5} ${hcx + hs * 0.7},${hcy - hs * 0.2} ${hcx},${hcy + hs * 0.3} Z`;
+      return (
+        <Group {...common}>
+          <Path data={heartPath} fill={fill} stroke={bc} strokeWidth={bw} />
+          {slotNumber}
+        </Group>
+      );
+    }
     case 'star': {
       const cx = el.width / 2;
       const cy = el.height / 2;
@@ -448,6 +477,7 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
       return (
         <Group {...common}>
           <Star x={cx} y={cy} numPoints={5} innerRadius={r * 0.4} outerRadius={r} fill={fill} stroke={bc} strokeWidth={bw} />
+          {slotNumber}
         </Group>
       );
     }
@@ -463,6 +493,7 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
             stroke={bc}
             strokeWidth={bw}
           />
+          {slotNumber}
         </Group>
       );
     case 'polaroid':
@@ -470,49 +501,35 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
         <Group {...common}>
           <Rect x={0} y={0} width={el.width} height={el.height} fill={fill} stroke={bc} strokeWidth={bw} cornerRadius={2} />
           <Rect x={el.width * 0.2} y={el.height - 14} width={el.width * 0.6} height={8} fill={bc} cornerRadius={1} />
+          {slotNumber}
         </Group>
       );
-    case 'hexagon':
-      return <HexagonShape el={el} common={common} fill={fill} stroke={bc} strokeWidth={bw} />;
+    case 'hexagon': {
+      const hxw = el.width;
+      const hxh = el.height;
+      const hxr = Math.min(hxw, hxh) / 2;
+      const hxcx = hxw / 2;
+      const hxcy = hxh / 2;
+      const hxPoints: number[] = [];
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i - Math.PI / 2;
+        hxPoints.push(hxcx + hxr * Math.cos(angle), hxcy + hxr * Math.sin(angle));
+      }
+      return (
+        <Group {...common}>
+          <Line x={0} y={0} points={hxPoints} closed fill={fill} stroke={bc} strokeWidth={bw} />
+          {slotNumber}
+        </Group>
+      );
+    }
     default:
       return (
         <Group {...common}>
           <Rect x={0} y={0} width={el.width} height={el.height} fill={fill} stroke={bc} strokeWidth={bw} cornerRadius={br} />
+          {slotNumber}
         </Group>
       );
   }
-}
-
-function HeartShape({ el, common, fill, stroke, strokeWidth }: { el: IStripElement; common: any; fill: string; stroke: string; strokeWidth: number }) {
-  const w = el.width;
-  const h = el.height;
-  const s = Math.min(w, h) * 0.45;
-  const cx = w / 2;
-  const cy = h * 0.4;
-  const path = `M${cx},${cy + s * 0.3} C${cx - s * 0.7},${cy - s * 0.2} ${cx - s},${cy - s * 0.5} ${cx},${cy - s * 0.7} C${cx + s},${cy - s * 0.5} ${cx + s * 0.7},${cy - s * 0.2} ${cx},${cy + s * 0.3} Z`;
-  return (
-    <Group {...common}>
-      <Path data={path} fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-    </Group>
-  );
-}
-
-function HexagonShape({ el, common, fill, stroke, strokeWidth }: { el: IStripElement; common: any; fill: string; stroke: string; strokeWidth: number }) {
-  const w = el.width;
-  const h = el.height;
-  const r = Math.min(w, h) / 2;
-  const cx = w / 2;
-  const cy = h / 2;
-  const pts = [];
-  for (let i = 0; i < 6; i++) {
-    const a = (Math.PI / 3) * i - Math.PI / 6;
-    pts.push(cx + r * Math.cos(a), cy + r * Math.sin(a));
-  }
-  return (
-    <Group {...common}>
-      <Line points={pts} closed fill={fill} stroke={stroke} strokeWidth={strokeWidth} />
-    </Group>
-  );
 }
 
 function BgElement({ el, common }: { el: IStripElement; common: any }) {

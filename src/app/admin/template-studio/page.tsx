@@ -253,11 +253,36 @@ export default function StripsStudioPage() {
     setSelectedId(id);
   }, [elements.length]);
 
+  const blobToBase64 = async (blobUrl: string): Promise<string> => {
+    try {
+      const res = await fetch(blobUrl);
+      const blob = await res.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    } catch { return blobUrl; }
+  };
+
   const handleSave = async () => {
     if (!templateName.trim()) return;
     setSaving(true);
     try {
       const thumbnail = editorRef.current?.getThumbnail() || '';
+      const elementImages: Record<string, string> = {};
+      const savedElements = await Promise.all(elements.map(async (el) => {
+        const copy = { ...el, props: { ...el.props } };
+        const url = copy.props.stickerUrl;
+        if (url && (url.startsWith('blob:') || url.startsWith('data:image/'))) {
+          const b64 = await blobToBase64(url);
+          if (b64 !== url) {
+            elementImages[el.id] = b64;
+          }
+        }
+        return copy;
+      }));
       const body: Record<string, any> = {
         type: 'strip',
         name: templateName,
@@ -269,7 +294,8 @@ export default function StripsStudioPage() {
         canvasWidth: canvasSize.w,
         canvasHeight: canvasSize.h,
         thumbnail,
-        elements: elements.map((el) => ({ ...el, props: { ...el.props } })),
+        elementImages: Object.keys(elementImages).length ? elementImages : undefined,
+        elements: savedElements,
       };
       let res;
       if (editingTemplateId) {
