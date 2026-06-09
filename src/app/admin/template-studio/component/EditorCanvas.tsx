@@ -579,6 +579,20 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
 function BgElement({ el, common }: { el: IStripElement; common: any }) {
   const [image] = useImage(el.props.stickerUrl || '');
   if (!image || !el.props.stickerUrl) return null;
+  if (el.props.searchBg) {
+    const imgW = image.width;
+    const imgH = image.height;
+    const scale = Math.max(el.width / imgW, el.height / imgH);
+    const dispW = imgW * scale;
+    const dispH = imgH * scale;
+    const offsetX = (el.width - dispW) / 2;
+    const offsetY = (el.height - dispH) / 2;
+    return (
+      <Group {...common}>
+        <KonvaImage image={image} x={offsetX} y={offsetY} width={dispW} height={dispH} />
+      </Group>
+    );
+  }
   return (
     <Group {...common}>
       <KonvaImage image={image} width={el.width} height={el.height} />

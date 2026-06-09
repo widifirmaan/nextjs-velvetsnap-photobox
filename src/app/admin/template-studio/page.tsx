@@ -421,9 +421,9 @@ export default function StripsStudioPage() {
       } else {
         setElements((prev) => [...prev, {
           id, type: 'background',
-          x: 0, y: 0,
-          width: canvasSize.w,
-          height: canvasSize.h,
+          x: -60, y: -60,
+          width: canvasSize.w + 120,
+          height: canvasSize.h + 120,
           rotation: 0,
           zIndex: -1,
           visible: true,
@@ -624,7 +624,7 @@ export default function StripsStudioPage() {
                         ...slotEls,
                         ...prev.filter((el) => el.id.startsWith('text-') || el.id === 'bg-image').map((el) =>
                           el.id === 'bg-image'
-                            ? { ...el, zIndex: 100, props: { ...el.props, stickerUrl: processed } }
+                            ? { ...el, x: 0, y: 0, width: cw, height: ch, zIndex: 100, props: { ...el.props, stickerUrl: processed } }
                             : el
                         ),
                       ]);
