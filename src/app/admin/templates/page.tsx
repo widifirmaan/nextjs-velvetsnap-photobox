@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Plus, Edit2, Trash2, Loader2, Image, X, Sparkles, RefreshCw } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, Image, X, Sparkles, RefreshCw, ExternalLink } from 'lucide-react';
 import { AdminPageHeader, AdminTableCard } from '@/app/admin/components';
+import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 interface ISlot {
@@ -21,8 +22,13 @@ interface TemplateData {
   price: number;
   color: string;
   isActive: boolean;
+  type?: 'frame' | 'strip';
   frameImage?: string;
   slotsLayout?: ISlot[];
+  canvasWidth?: number;
+  canvasHeight?: number;
+  elements?: any[];
+  thumbnail?: string;
 }
 
 const defaultForm = {
@@ -189,6 +195,7 @@ export default function TemplatesAdmin() {
   const [processing, setProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [startPos, setStartPos] = useState({ x: 0, y: 0 });
@@ -205,10 +212,10 @@ export default function TemplatesAdmin() {
           setFormData((prev) => ({
             ...prev,
             ...data,
-            name: '',
             slotsLayout: [],
             frameImage: '',
           }));
+          if (data._id) setEditingId(data._id);
           setShowForm(true);
         } catch (e) {
           console.error('Failed to parse strip template data', e);
@@ -252,6 +259,11 @@ export default function TemplatesAdmin() {
   };
 
   const openEditForm = (t: TemplateData) => {
+    if (t.type === 'strip') {
+      sessionStorage.setItem('stripTemplateData', JSON.stringify(t));
+      router.push(`/admin/template-studio?edit=${t._id}`);
+      return;
+    }
     setEditingId(t._id);
     setFormData({
       templateId: t.templateId || '',
@@ -629,8 +641,8 @@ export default function TemplatesAdmin() {
                   </td>
                   <td>
                     <div className={styles.actionBtns}>
-                      <button className={styles.iconBtn} onClick={() => openEditForm(t)} title="Edit template">
-                        <Edit2 size={18} color="var(--accent-color)" />
+                      <button className={styles.iconBtn} onClick={() => openEditForm(t)} title={t.type === 'strip' ? 'Edit in Strips Studio' : 'Edit template'}>
+                        {t.type === 'strip' ? <ExternalLink size={18} color="var(--accent-color)" /> : <Edit2 size={18} color="var(--accent-color)" />}
                       </button>
                       <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => handleDelete(t._id)} title="Delete template">
                         <Trash2 size={18} color="var(--danger-color)" />

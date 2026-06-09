@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
 import { AdminPageHeader } from '@/app/admin/components';
@@ -69,11 +69,40 @@ export default function StripsStudioPage() {
   const [canvasBg, setCanvasBg] = useState('#ffffff');
   const model = useModel();
   const router = useRouter();
+  const loaded = useRef(false);
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
   const bgTargetRef = useRef(false);
   const [stickerTargetId, setStickerTargetId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (loaded.current) return;
+    loaded.current = true;
+    const params = new URLSearchParams(window.location.search);
+    const editId = params.get('edit');
+    if (!editId) return;
+    const raw = sessionStorage.getItem('stripTemplateData');
+    if (!raw) return;
+    try {
+      const data = JSON.parse(raw);
+      if (data.elements?.length) {
+        setElements(data.elements);
+      }
+      if (data.canvasWidth && data.canvasHeight) {
+        setCanvasSize({ w: data.canvasWidth, h: data.canvasHeight });
+      }
+      if (data.color) {
+        setCanvasBg(data.color);
+      }
+      const slotEls = data.elements?.filter((el: any) => el.id?.startsWith('slot-'));
+      if (slotEls?.length) {
+        setSlotCount(slotEls.length);
+      }
+    } catch (e) {
+      console.error('Failed to load edit data', e);
+    }
+  }, []);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
 
@@ -238,9 +267,15 @@ export default function StripsStudioPage() {
             <button
               onClick={() => {
                 const thumbnail = editorRef.current?.getThumbnail() || '';
+                const existing = sessionStorage.getItem('stripTemplateData');
+                let existingData: any = {};
+                if (existing) {
+                  try { existingData = JSON.parse(existing); } catch {}
+                }
                 const data = {
+                  ...existingData,
                   type: 'strip' as const,
-                  name: '',
+                  name: existingData.name || '',
                   description: 'Designed in Strips Studio',
                   slots: elements.filter((el) => el.type === 'photo-slot').length,
                   price: 35000,
