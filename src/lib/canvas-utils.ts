@@ -147,11 +147,11 @@ export function removeGreenScreen(base64: string): Promise<string> {
       for (let i = 0; i < d.length; i += 4) {
         const r = d[i], g = d[i + 1], b = d[i + 2];
         const dr = r - targetR, dg = g - targetG, db = b - targetB;
-        if (dr * dr + dg * dg + db * db < 1600) { d[i + 3] = 0; }
+        if (dr * dr + dg * dg + db * db < 5000) { d[i + 3] = 0; }
       }
       // Dilate transparent areas by 3px to cut anti-aliased green edge
       const erode = new Uint8ClampedArray(d);
-      const ERODE = 10;
+      const ERODE = 1;
       for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
           const idx = (y * w + x) * 4;
