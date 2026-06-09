@@ -131,11 +131,24 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     getFrameImage: () => {
       const stage = stageRef.current;
       if (!stage) return '';
-      const groups = stage.find('.photo-slot-group');
-      groups.forEach((g) => g.visible(false));
+      // Temporarily turn photo-slot fills to solid green (for removeGreenScreen)
+      // so the stepper overlay has transparent holes for photos
+      const groups = (stage as any).find('.photo-slot-group');
+      const saved: any[] = [];
+      groups.forEach((g: any) => {
+        g.getChildren().forEach((child: any) => {
+          if (child.fill) {
+            saved.push({ node: child, fill: child.fill(), opacity: child.opacity(), stroke: child.stroke(), strokeWidth: child.strokeWidth() });
+            child.fill('#00bf63');
+            child.opacity(1);
+            child.stroke('#ffffff');
+            child.strokeWidth(2);
+          }
+        });
+      });
       stage.batchDraw();
       const url = stage.toDataURL({ mimeType: 'image/png' });
-      groups.forEach((g) => g.visible(true));
+      saved.forEach(({ node, fill, opacity, stroke, strokeWidth }) => node.setAttrs({ fill, opacity, stroke, strokeWidth }));
       stage.batchDraw();
       return url;
     },
