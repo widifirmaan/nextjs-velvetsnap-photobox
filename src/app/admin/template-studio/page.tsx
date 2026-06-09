@@ -223,23 +223,27 @@ export default function StripsStudioPage() {
         setSlotCount(slotEls.length);
       }
     };
-    const raw = sessionStorage.getItem('stripTemplateData');
-    if (raw) {
-      try {
-        const data = JSON.parse(raw);
-        applyData(data);
-        proceed();
-        return;
-      } catch (e) {
-        console.error('Failed to parse sessionStorage data', e);
-      }
-    }
-    // Fallback: load from API
+    // Always fetch template list first for correct ID increment
     fetch('/api/templates')
       .then((r) => r.json())
       .then((res) => {
-        if (res.success) proceed(res.data);
-        else proceed();
+        const list = res.success ? res.data : [];
+        if (editId) {
+          const raw = sessionStorage.getItem('stripTemplateData');
+          if (raw) {
+            try {
+              const data = JSON.parse(raw);
+              applyData(data);
+              proceed(list);
+              return;
+            } catch (e) {
+              console.error('Failed to parse sessionStorage data', e);
+            }
+          }
+          const matched = list.find((t: any) => t._id === editId || t.templateId === editId);
+          if (matched) { applyData(matched); }
+        }
+        proceed(list);
       })
       .catch(() => proceed());
   }, []);
