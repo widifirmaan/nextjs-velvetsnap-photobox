@@ -44,8 +44,8 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(capture, 300);
-    const iv = setInterval(capture, 2000);
+    const t = setTimeout(capture, 100);
+    const iv = setInterval(capture, 100);
     return () => { clearTimeout(t); clearInterval(iv); };
   }, [capture]);
 
