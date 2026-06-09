@@ -269,6 +269,9 @@ export default function StripsStudioPage() {
   const handleSave = async () => {
     if (!templateName.trim()) return;
     setSaving(true);
+    setSelectedId(null);
+    // Wait a tick for state to propagate before rendering
+    await new Promise((r) => setTimeout(r, 50));
     try {
       const thumbnail = editorRef.current?.getThumbnail() || '';
       const frameImage = editorRef.current?.getFrameImage() || '';

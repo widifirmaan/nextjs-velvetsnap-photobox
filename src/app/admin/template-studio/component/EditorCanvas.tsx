@@ -131,8 +131,9 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     getFrameImage: () => {
       const stage = stageRef.current;
       if (!stage) return '';
-      // Temporarily turn photo-slot fills to solid green (for removeGreenScreen)
-      // so the stepper overlay has transparent holes for photos
+      // Hide transformer so it doesn't appear in frame image
+      if (trRef.current) trRef.current.nodes([]);
+      // Turn photo-slot fills to solid green for removeGreenScreen
       const groups = (stage as any).find('.photo-slot-group');
       const saved: any[] = [];
       groups.forEach((g: any) => {
@@ -148,6 +149,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       });
       stage.batchDraw();
       const url = stage.toDataURL({ mimeType: 'image/png' });
+      // Restore state
       saved.forEach(({ node, fill, opacity, stroke, strokeWidth }) => node.setAttrs({ fill, opacity, stroke, strokeWidth }));
       stage.batchDraw();
       return url;
