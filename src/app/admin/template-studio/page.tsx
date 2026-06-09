@@ -18,6 +18,22 @@ import styles from './page.module.css';
 const DEFAULT_CANVAS_W = 1000;
 const DEFAULT_CANVAS_H = 3000;
 
+function generateTempId(existing: string[]): string {
+  const now = new Date();
+  const y = String(now.getFullYear()).slice(-2);
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const prefix = `${y}${m}${d}`;
+  let max = 0;
+  for (const id of existing) {
+    if (id.startsWith(prefix)) {
+      const n = parseInt(id.slice(-4), 10);
+      if (!isNaN(n) && n > max) max = n;
+    }
+  }
+  return `${prefix}${String(max + 1).padStart(4, '0')}`;
+}
+
 interface ISlot {
   x: number; y: number; w: number; h: number;
 }
@@ -167,6 +183,8 @@ export default function StripsStudioPage() {
   const [templatePrice, setTemplatePrice] = useState(35000);
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [showNewConfirm, setShowNewConfirm] = useState(false);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [templateIdField, setTemplateIdField] = useState('');
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
@@ -178,7 +196,16 @@ export default function StripsStudioPage() {
     loaded.current = true;
     const params = new URLSearchParams(window.location.search);
     const editId = params.get('edit');
-    if (!editId) return;
+    // Generate template ID based on existing templates
+    const proceed = (templateList: any[] = []) => {
+      const existingIds = (templateList || []).map((t: any) => t.templateId || '').filter(Boolean);
+      setTemplateIdField(generateTempId(existingIds));
+      if (editId) {
+        const matched = templateList?.find((t: any) => t._id === editId || t.templateId === editId);
+        if (matched) applyData(matched);
+      }
+      setPageLoading(false);
+    };
     const applyData = (data: any) => {
       setEditingTemplateId(data._id || editId);
       setTemplateName(data.name || '');
@@ -201,6 +228,7 @@ export default function StripsStudioPage() {
       try {
         const data = JSON.parse(raw);
         applyData(data);
+        proceed();
         return;
       } catch (e) {
         console.error('Failed to parse sessionStorage data', e);
@@ -210,11 +238,10 @@ export default function StripsStudioPage() {
     fetch('/api/templates')
       .then((r) => r.json())
       .then((res) => {
-        if (!res.success) return;
-        const matched = res.data.find((t: any) => t._id === editId || t.templateId === editId);
-        if (matched) applyData(matched);
+        if (res.success) proceed(res.data);
+        else proceed();
       })
-      .catch(() => {});
+      .catch(() => proceed());
   }, []);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
@@ -337,7 +364,7 @@ export default function StripsStudioPage() {
           body: JSON.stringify(body),
         });
       } else {
-        body.templateId = `strip-${Date.now()}`;
+        body.templateId = templateIdField;
         res = await fetch('/api/templates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -480,22 +507,26 @@ export default function StripsStudioPage() {
           }}>
             <button
               onClick={() => setShowNewConfirm(true)}
+              disabled={pageLoading}
               style={{
                 width: '100%', padding: '10px', borderRadius: 8,
-                border: '1px solid var(--mn-border)', background: '#fff',
-                cursor: 'pointer', fontWeight: 700, fontSize: 13,
+                border: '1px solid var(--mn-border)', background: pageLoading ? '#eee' : '#fff',
+                cursor: pageLoading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 13,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8,
+                opacity: pageLoading ? 0.5 : 1,
               }}
             >
               ✚ New Template
             </button>
             <button
               onClick={() => setShowSaveModal(true)}
+              disabled={pageLoading}
               style={{
                 width: '100%', padding: '10px', borderRadius: 8,
-                border: 'none', background: 'var(--accent-color, #C5D89D)',
-                color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                border: 'none', background: pageLoading ? '#ccc' : 'var(--accent-color, #C5D89D)',
+                color: '#fff', fontWeight: 700, fontSize: 13, cursor: pageLoading ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                opacity: pageLoading ? 0.5 : 1,
               }}
             >
               💾 Save Template
@@ -710,6 +741,18 @@ export default function StripsStudioPage() {
                 width: '100%', padding: '12px 14px', borderRadius: 10,
                 border: '1px solid var(--mn-border)', fontSize: 15,
                 marginBottom: 12, fontFamily: 'inherit', boxSizing: 'border-box',
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Template ID (auto)"
+              value={templateIdField}
+              readOnly
+              style={{
+                width: '100%', padding: '12px 14px', borderRadius: 10,
+                border: '1px solid var(--mn-border)', fontSize: 14,
+                marginBottom: 12, fontFamily: 'inherit', boxSizing: 'border-box',
+                background: '#f5f5f5', color: '#555',
               }}
             />
             <input
