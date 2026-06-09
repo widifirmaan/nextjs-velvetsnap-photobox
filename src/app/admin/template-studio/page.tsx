@@ -22,20 +22,18 @@ interface ISlot {
   x: number; y: number; w: number; h: number;
 }
 
-function removeChromaKey(dataUrl: string): Promise<string> {
+function removeChromaKey(dataUrl: string, targetW = 600, targetH = 1800): Promise<string> {
   return new Promise((resolve) => {
     const img = new window.Image();
     img.onload = () => {
       try {
         const canvas = document.createElement('canvas');
-        const MAX_W = 1000;
-        const scale = MAX_W / (img.naturalWidth || img.width);
-        canvas.width = MAX_W;
-        canvas.height = Math.round((img.naturalHeight || img.height) * scale);
+        canvas.width = targetW;
+        canvas.height = targetH;
         const ctx = canvas.getContext('2d');
         if (!ctx) { resolve(dataUrl); return; }
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, targetW, targetH);
+        const imgData = ctx.getImageData(0, 0, targetW, targetH);
         const d = imgData.data;
         const targetR = 0, targetG = 191, targetB = 99;
         for (let i = 0; i < d.length; i += 4) {
@@ -52,35 +50,27 @@ function removeChromaKey(dataUrl: string): Promise<string> {
   });
 }
 
-function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
+function detectTransparentSlots(imgEl: HTMLImageElement, cw = 600, ch = 1800): ISlot[] {
   const canvas = document.createElement('canvas');
-  const maxDim = 800;
-  let w = imgEl.naturalWidth || imgEl.width;
-  let h = imgEl.naturalHeight || imgEl.height;
-  if (w > maxDim || h > maxDim) {
-    const scale = Math.min(maxDim / w, maxDim / h);
-    w = Math.round(w * scale);
-    h = Math.round(h * scale);
-  }
-  canvas.width = w; canvas.height = h;
+  canvas.width = cw; canvas.height = ch;
   const ctx = canvas.getContext('2d');
   if (!ctx) return [];
-  ctx.drawImage(imgEl, 0, 0, w, h);
+  ctx.drawImage(imgEl, 0, 0, cw, ch);
   let imgData;
-  try { imgData = ctx.getImageData(0, 0, w, h); } catch { return []; }
+  try { imgData = ctx.getImageData(0, 0, cw, ch); } catch { return []; }
   const data = imgData.data;
-  const grid: boolean[] = new Array(w * h);
+  const grid: boolean[] = new Array(cw * ch);
   const targetR = 0, targetG = 191, targetB = 99;
   for (let i = 0; i < data.length; i += 4) {
     const a = data[i + 3];
     const dr = data[i] - targetR, dg = data[i + 1] - targetG, db = data[i + 2] - targetB;
     grid[i / 4] = a < 50 || (dr * dr + dg * dg + db * db) < 1600;
   }
-  const visited = new Uint8Array(w * h);
+  const visited = new Uint8Array(cw * ch);
   const rects: ISlot[] = [];
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const idx = y * w + x;
+  for (let y = 0; y < ch; y++) {
+    for (let x = 0; x < cw; x++) {
+      const idx = y * cw + x;
       if (!grid[idx] || visited[idx]) continue;
       let minX = x, maxX = x, minY = y, maxY = y;
       const queue: [number, number][] = [[x, y]];
@@ -90,27 +80,24 @@ function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
         minX = Math.min(minX, cx); maxX = Math.max(maxX, cx);
         minY = Math.min(minY, cy); maxY = Math.max(maxY, cy);
         for (const [nx, ny] of [[cx+1, cy], [cx-1, cy], [cx, cy+1], [cx, cy-1]]) {
-          if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
-            const nidx = ny * w + nx;
+          if (nx >= 0 && nx < cw && ny >= 0 && ny < ch) {
+            const nidx = ny * cw + nx;
             if (grid[nidx] && !visited[nidx]) { visited[nidx] = 1; queue.push([nx, ny]); }
           }
         }
       }
       const rw = maxX - minX + 1, rh = maxY - minY + 1;
       const minSlotPx = 100;
-      const origW = imgEl.naturalWidth || imgEl.width;
-      const origH = imgEl.naturalHeight || imgEl.height;
-      const scaleX = origW / w, scaleY = origH / h;
-      if (rw * scaleX >= minSlotPx && rh * scaleY >= minSlotPx) {
-        const padX = Math.max(w * 0.05, 16);
-        const padY = Math.max(h * 0, 16);
+      if (rw >= minSlotPx && rh >= minSlotPx) {
+        const padX = Math.max(cw * 0.05, 16);
+        const padY = Math.max(ch * 0, 16);
         const px = Math.max(0, minX - padX);
         const py = Math.max(0, minY - padY);
         rects.push({
-          x: Math.round((px / w) * 100 * 10) / 10,
-          y: Math.round((py / h) * 100 * 10) / 10,
-          w: Math.round((Math.min(w - px, rw + padX * 2) / w) * 100 * 10) / 10,
-          h: Math.round((Math.min(h - py, rh + padY * 2) / h) * 100 * 10) / 10,
+          x: Math.round((px / cw) * 100 * 10) / 10,
+          y: Math.round((py / ch) * 100 * 10) / 10,
+          w: Math.round((Math.min(cw - px, rw + padX * 2) / cw) * 100 * 10) / 10,
+          h: Math.round((Math.min(ch - py, rh + padY * 2) / ch) * 100 * 10) / 10,
         });
       }
     }
@@ -118,13 +105,13 @@ function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
   return rects.sort((a, b) => Math.abs(a.y - b.y) < 3 ? a.x - b.x : a.y - b.y);
 }
 
-function generateSlotLayout(slotCount: number, cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H): IStripElement[] {
-  const marginX = Math.round(cw * 0.055);
-  const photoW = cw - marginX * 2;
+function generateSlotLayout(slotCount: number): IStripElement[] {
+  const marginX = Math.round(DEFAULT_CANVAS_W * 0.055);
+  const photoW = DEFAULT_CANVAS_W - marginX * 2;
   const gap = 28;
   const topPad = 40;
   const bottomPad = 320;
-  const availH = ch - topPad - bottomPad;
+  const availH = DEFAULT_CANVAS_H - topPad - bottomPad;
   const photoH = Math.round((availH - (slotCount - 1) * gap) / slotCount);
   const elements: IStripElement[] = [];
 
@@ -143,15 +130,15 @@ function generateSlotLayout(slotCount: number, cw = DEFAULT_CANVAS_W, ch = DEFAU
     id: 'text-velvet',
     type: 'text',
     x: 0,
-    y: ch - bottomPad + 20,
-    width: cw,
+    y: 1540,
+    width: DEFAULT_CANVAS_W,
     height: 50,
     rotation: 0,
     zIndex: slotCount,
     visible: true,
     props: {
       content: 'Velvet Snap',
-      fontSize: Math.round(40 * (cw / DEFAULT_CANVAS_W)),
+      fontSize: 40,
       fontFamily: 'Inter',
       color: '#3d2c2c',
       fontWeight: '700',
@@ -231,12 +218,12 @@ export default function StripsStudioPage() {
 
   const setSlotLayout = useCallback((n: number) => {
     setSlotCount(n);
-    const newSlots = generateSlotLayout(n, canvasSize.w, canvasSize.h);
+    const newSlots = generateSlotLayout(n);
     setElements((prev) => [
       ...newSlots,
       ...prev.filter((el) => !el.id.startsWith('slot-') && el.id !== 'text-velvet'),
     ]);
-  }, [canvasSize]);
+  }, []);
 
   const addElement = useCallback((type: IStripElement['type']) => {
     if (type === 'sticker') {
@@ -557,15 +544,11 @@ export default function StripsStudioPage() {
                   const reader = new FileReader();
                   reader.onloadend = async () => {
                     const dataUrl = reader.result as string;
-                    const processed = await removeChromaKey(dataUrl);
+                    const processed = await removeChromaKey(dataUrl, DEFAULT_CANVAS_W, DEFAULT_CANVAS_H);
                     const img = new window.Image();
                     img.onload = () => {
-                      const imgW = img.naturalWidth || img.width;
-                      const imgH = img.naturalHeight || img.height;
-                      const cw = Math.min(600, Math.round(imgW));
-                      const ch = Math.round(cw * (imgH / imgW));
-                      setCanvasSize({ w: cw, h: ch });
-                      const detected = detectTransparentSlots(img);
+                      const cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H;
+                      const detected = detectTransparentSlots(img, cw, ch);
                       if (detected.length === 0) { setImportProcessing(false); return; }
                       const slotEls: IStripElement[] = detected.map((s, i) => ({
                         id: `slot-${i}`,
