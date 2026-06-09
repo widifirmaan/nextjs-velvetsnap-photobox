@@ -46,10 +46,17 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
       if (matched) {
         setTemplateData(matched);
         setPrice(matched.price || 35000);
-        const cw = matched.canvasWidth || 600;
-        const ch = matched.canvasHeight || 900;
 
-        if (matched.type === 'strip' && matched.elements?.length) {
+        if (matched.frameImage) {
+          removeGreenScreen(matched.frameImage).then((keyed) => {
+            setKeyedFrameImage(keyed);
+            const img = new window.Image();
+            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+            img.src = keyed;
+          });
+        } else if (matched.type === 'strip' && matched.elements?.length) {
+          const cw = matched.canvasWidth || 600;
+          const ch = matched.canvasHeight || 900;
           const slotsLayout = stripElementsToSlotsLayout(matched.elements, cw, ch);
           matched.slotsLayout = slotsLayout;
           if (!matched.slots) matched.slots = slotsLayout.length;
@@ -61,13 +68,6 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
             img.src = bgFrameDataUrl;
             setKeyedFrameImage(bgFrameDataUrl);
           } catch {}
-        } else if (matched.frameImage) {
-          removeGreenScreen(matched.frameImage).then((keyed) => {
-            setKeyedFrameImage(keyed);
-            const img = new window.Image();
-            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-            img.src = keyed;
-          });
         }
       } else {
         const fallback = TEMPLATE_CONFIGS[templateId];
@@ -97,18 +97,17 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
 
   useEffect(() => {
     if (!captures.length || !templateData?.slotsLayout?.length) return;
-    if (templateData.type === 'strip' && templateData.elements?.length && templateData.canvasWidth && templateData.canvasHeight) {
+    const frameSrc = keyedFrameImage || templateData.frameImage || '';
+    if (frameSrc) {
+      composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
+        .then(setCompositedImage)
+        .catch(() => {});
+    } else if (templateData.type === 'strip' && templateData.elements?.length && templateData.canvasWidth && templateData.canvasHeight) {
       composeStripImage(
         templateData.elements, templateData.color || '#ffffff',
         captures, photoAdjust,
         templateData.canvasWidth, templateData.canvasHeight,
       ).then(setCompositedImage).catch(() => {});
-    } else {
-      const frameSrc = keyedFrameImage || templateData.frameImage || '';
-      if (!frameSrc) return;
-      composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
-        .then(setCompositedImage)
-        .catch(() => {});
     }
   }, [captures, photoAdjust, templateData, keyedFrameImage]);
 

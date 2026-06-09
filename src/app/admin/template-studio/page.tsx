@@ -271,6 +271,7 @@ export default function StripsStudioPage() {
     setSaving(true);
     try {
       const thumbnail = editorRef.current?.getThumbnail() || '';
+      const frameImage = editorRef.current?.getFrameImage() || '';
       const elementImages: Record<string, string> = {};
       const savedElements = await Promise.all(elements.map(async (el) => {
         const copy = { ...el, props: { ...el.props } };
@@ -283,16 +284,25 @@ export default function StripsStudioPage() {
         }
         return copy;
       }));
+      const photoSlots = elements.filter((el) => el.type === 'photo-slot').sort((a, b) => a.zIndex - b.zIndex);
+      const slotsLayout = photoSlots.map((el) => ({
+        x: Math.round((el.x / canvasSize.w) * 1000) / 10,
+        y: Math.round((el.y / canvasSize.h) * 1000) / 10,
+        w: Math.round((el.width / canvasSize.w) * 1000) / 10,
+        h: Math.round((el.height / canvasSize.h) * 1000) / 10,
+      }));
       const body: Record<string, any> = {
         type: 'strip',
         name: templateName,
         description: 'Designed in Strips Studio',
-        slots: elements.filter((el) => el.type === 'photo-slot').length,
+        slots: photoSlots.length,
         price: 35000,
         color: canvasBg,
         isActive: true,
         canvasWidth: canvasSize.w,
         canvasHeight: canvasSize.h,
+        frameImage,
+        slotsLayout,
         thumbnail,
         elementImages: Object.keys(elementImages).length ? elementImages : undefined,
         elements: savedElements,

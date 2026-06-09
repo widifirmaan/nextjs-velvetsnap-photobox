@@ -114,6 +114,7 @@ function computeGuides(
 
 export interface EditorCanvasHandle {
   getThumbnail: () => string;
+  getFrameImage: () => string;
 }
 
 const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function EditorCanvas({ elements, selectedId, onSelect, onUpdate, canvasSize, canvasBg }, ref) {
@@ -127,6 +128,17 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
 
   useImperativeHandle(ref, () => ({
     getThumbnail: () => stageRef.current?.toDataURL({ mimeType: 'image/png', pixelRatio: 0.3 }) || '',
+    getFrameImage: () => {
+      const stage = stageRef.current;
+      if (!stage) return '';
+      const groups = stage.find('.photo-slot-group');
+      groups.forEach((g) => g.visible(false));
+      stage.batchDraw();
+      const url = stage.toDataURL({ mimeType: 'image/png' });
+      groups.forEach((g) => g.visible(true));
+      stage.batchDraw();
+      return url;
+    },
   }), []);
 
   useLayoutEffect(() => {
@@ -377,9 +389,11 @@ function CanvasElement({
     opacity: p.opacity ?? 1,
   };
 
+  const elCommon = element.type === 'photo-slot' ? { ...common, name: 'photo-slot-group' } : common;
+
   switch (element.type) {
     case 'photo-slot':
-      return <PhotoSlotShape el={element} common={common} />;
+      return <PhotoSlotShape el={element} common={elCommon as any} />;
     case 'text':
       return (
         <Text
