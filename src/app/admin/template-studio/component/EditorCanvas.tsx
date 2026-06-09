@@ -418,7 +418,7 @@ function CanvasElement({
   const elCommon = element.type === 'photo-slot'
     ? { ...common, name: 'photo-slot-group' }
     : element.type === 'background'
-      ? { ...common, name: 'bg-element' }
+      ? { ...common, name: 'bg-element', listening: false }
       : common;
 
   switch (element.type) {

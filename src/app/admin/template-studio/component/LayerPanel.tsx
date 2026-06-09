@@ -29,7 +29,9 @@ export default function LayerPanel({
   onSendBackward,
   onDelete,
 }: LayerPanelProps) {
-  const sorted = [...elements].sort((a, b) => a.zIndex - b.zIndex);
+  const sorted = [...elements]
+    .filter((el) => el.type !== 'background')
+    .sort((a, b) => a.zIndex - b.zIndex);
 
   return (
     <div style={{

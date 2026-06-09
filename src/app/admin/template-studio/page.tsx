@@ -426,7 +426,6 @@ export default function StripsStudioPage() {
           props: { stickerUrl: url, opacity: 1 },
         }]);
       }
-      setSelectedId(id);
       stickerTargetRef.current = null;
       setStickerTargetId(null);
       return;
