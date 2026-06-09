@@ -628,10 +628,10 @@ export default function StripsStudioPage() {
                       } else {
                         setElements((prev) => [...prev, {
                           id: 'bg-image', type: 'background',
-                          x: -30, y: -30,
-                          width: cw + 60, height: ch + 60,
+                          x: 0, y: 0,
+                          width: cw, height: ch,
                           rotation: 0, zIndex: 100, visible: true,
-                          props: { stickerUrl: processed, opacity: 1 },
+                          props: { stickerUrl: processed, opacity: 1, fixed: true },
                         }]);
                       }
                       setImportProcessing(false);

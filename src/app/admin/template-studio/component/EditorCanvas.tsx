@@ -406,7 +406,7 @@ function CanvasElement({
     width: element.width,
     height: element.height,
     rotation: element.rotation,
-    draggable: true,
+    draggable: !(element.type === 'background' && element.props?.fixed),
     onClick: onSelect,
     onTap: onSelect,
     onDragEnd,
