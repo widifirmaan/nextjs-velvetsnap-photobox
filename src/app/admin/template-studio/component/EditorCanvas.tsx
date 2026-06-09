@@ -131,28 +131,22 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     getFrameImage: () => {
       const stage = stageRef.current;
       if (!stage) return '';
-      // Hide transformer so it doesn't appear in frame image
       if (trRef.current) trRef.current.nodes([]);
-      // Turn photo-slot fills to solid green for removeGreenScreen
-      const groups = (stage as any).find('.photo-slot-group');
-      const saved: any[] = [];
-      groups.forEach((g: any) => {
-        g.getChildren().forEach((child: any) => {
-          saved.push({ node: child, visible: child.visible(), opacity: child.opacity(), fill: child.fill(), stroke: child.stroke(), strokeWidth: child.strokeWidth() });
-          if (child.getClassName() === 'Text') {
-            child.visible(false);
-          } else {
-            child.fill('#00bf63');
-            child.opacity(1);
-            child.stroke('rgba(0,0,0,0)');
-            child.strokeWidth(0);
-          }
-        });
+      // Hide nodes that should not appear in the frame image:
+      // photo-slots, background elements, and the background colour rect
+      const toHide = [
+        ...(stage as any).find('.photo-slot-group'),
+        ...(stage as any).find('.background-element'),
+        (stage as any).findOne('.bg-rect'),
+      ].filter(Boolean) as any[];
+      const saved = toHide.map((n: any) => {
+        const s = n.visible();
+        n.visible(false);
+        return { node: n, visible: s };
       });
       stage.batchDraw();
       const url = stage.toDataURL({ mimeType: 'image/png' });
-      // Restore state
-      saved.forEach(({ node, visible, opacity, fill, stroke, strokeWidth }) => node.setAttrs({ visible, opacity, fill, stroke, strokeWidth }));
+      saved.forEach(({ node, visible }) => node.visible(visible));
       stage.batchDraw();
       return url;
     },
@@ -318,7 +312,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
         ))}
       </Layer>
       <Layer ref={layerRef}>
-        <Rect x={0} y={0} width={canvasSize.w} height={canvasSize.h} fill={canvasBg} listening={false} />
+        <Rect x={0} y={0} width={canvasSize.w} height={canvasSize.h} fill={canvasBg} listening={false} name="bg-rect" />
         {sorted.map((el) => (
           <CanvasElement
             key={el.id}
@@ -406,7 +400,11 @@ function CanvasElement({
     opacity: p.opacity ?? 1,
   };
 
-  const elCommon = element.type === 'photo-slot' ? { ...common, name: 'photo-slot-group' } : common;
+  const elCommon = element.type === 'photo-slot'
+    ? { ...common, name: 'photo-slot-group' }
+    : element.type === 'background'
+      ? { ...common, name: 'background-element' }
+      : common;
 
   switch (element.type) {
     case 'photo-slot':
