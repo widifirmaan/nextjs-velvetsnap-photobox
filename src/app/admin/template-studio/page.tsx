@@ -17,6 +17,106 @@ import styles from './page.module.css';
 const DEFAULT_CANVAS_W = 600;
 const DEFAULT_CANVAS_H = 1800;
 
+interface ISlot {
+  x: number; y: number; w: number; h: number;
+}
+
+function removeChromaKey(dataUrl: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas');
+        const MAX_W = 1000;
+        const scale = MAX_W / (img.naturalWidth || img.width);
+        canvas.width = MAX_W;
+        canvas.height = Math.round((img.naturalHeight || img.height) * scale);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { resolve(dataUrl); return; }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imgData.data;
+        const targetR = 0, targetG = 191, targetB = 99;
+        for (let i = 0; i < d.length; i += 4) {
+          const r = d[i], g = d[i + 1], b = d[i + 2];
+          const dr = r - targetR, dg = g - targetG, db = b - targetB;
+          if (dr * dr + dg * dg + db * db < 1600) d[i + 3] = 0;
+        }
+        ctx.putImageData(imgData, 0, 0);
+        resolve(canvas.toDataURL('image/png'));
+      } catch { resolve(dataUrl); }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+function detectTransparentSlots(imgEl: HTMLImageElement): ISlot[] {
+  const canvas = document.createElement('canvas');
+  const maxDim = 800;
+  let w = imgEl.naturalWidth || imgEl.width;
+  let h = imgEl.naturalHeight || imgEl.height;
+  if (w > maxDim || h > maxDim) {
+    const scale = Math.min(maxDim / w, maxDim / h);
+    w = Math.round(w * scale);
+    h = Math.round(h * scale);
+  }
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return [];
+  ctx.drawImage(imgEl, 0, 0, w, h);
+  let imgData;
+  try { imgData = ctx.getImageData(0, 0, w, h); } catch { return []; }
+  const data = imgData.data;
+  const grid: boolean[] = new Array(w * h);
+  const targetR = 0, targetG = 191, targetB = 99;
+  for (let i = 0; i < data.length; i += 4) {
+    const a = data[i + 3];
+    const dr = data[i] - targetR, dg = data[i + 1] - targetG, db = data[i + 2] - targetB;
+    grid[i / 4] = a < 50 || (dr * dr + dg * dg + db * db) < 1600;
+  }
+  const visited = new Uint8Array(w * h);
+  const rects: ISlot[] = [];
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = y * w + x;
+      if (!grid[idx] || visited[idx]) continue;
+      let minX = x, maxX = x, minY = y, maxY = y;
+      const queue: [number, number][] = [[x, y]];
+      visited[idx] = 1;
+      while (queue.length) {
+        const [cx, cy] = queue.shift()!;
+        minX = Math.min(minX, cx); maxX = Math.max(maxX, cx);
+        minY = Math.min(minY, cy); maxY = Math.max(maxY, cy);
+        for (const [nx, ny] of [[cx+1, cy], [cx-1, cy], [cx, cy+1], [cx, cy-1]]) {
+          if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
+            const nidx = ny * w + nx;
+            if (grid[nidx] && !visited[nidx]) { visited[nidx] = 1; queue.push([nx, ny]); }
+          }
+        }
+      }
+      const rw = maxX - minX + 1, rh = maxY - minY + 1;
+      const minSlotPx = 100;
+      const origW = imgEl.naturalWidth || imgEl.width;
+      const origH = imgEl.naturalHeight || imgEl.height;
+      const scaleX = origW / w, scaleY = origH / h;
+      if (rw * scaleX >= minSlotPx && rh * scaleY >= minSlotPx) {
+        const padX = Math.max(w * 0.05, 16);
+        const padY = Math.max(h * 0, 16);
+        const px = Math.max(0, minX - padX);
+        const py = Math.max(0, minY - padY);
+        rects.push({
+          x: Math.round((px / w) * 100 * 10) / 10,
+          y: Math.round((py / h) * 100 * 10) / 10,
+          w: Math.round((Math.min(w - px, rw + padX * 2) / w) * 100 * 10) / 10,
+          h: Math.round((Math.min(h - py, rh + padY * 2) / h) * 100 * 10) / 10,
+        });
+      }
+    }
+  }
+  return rects.sort((a, b) => Math.abs(a.y - b.y) < 3 ? a.x - b.x : a.y - b.y);
+}
+
 function generateSlotLayout(slotCount: number): IStripElement[] {
   const marginX = Math.round(DEFAULT_CANVAS_W * 0.055);
   const photoW = DEFAULT_CANVAS_W - marginX * 2;
@@ -70,6 +170,12 @@ export default function StripsStudioPage() {
   const model = useModel();
   const router = useRouter();
   const loaded = useRef(false);
+  const [importProcessing, setImportProcessing] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
@@ -86,6 +192,8 @@ export default function StripsStudioPage() {
     if (!raw) return;
     try {
       const data = JSON.parse(raw);
+      setEditingTemplateId(data._id || editId);
+      setTemplateName(data.name || '');
       if (data.elements?.length) {
         setElements(data.elements);
       }
@@ -144,6 +252,55 @@ export default function StripsStudioPage() {
     setElements((prev) => [...prev, base]);
     setSelectedId(id);
   }, [elements.length]);
+
+  const handleSave = async () => {
+    if (!templateName.trim()) return;
+    setSaving(true);
+    try {
+      const thumbnail = editorRef.current?.getThumbnail() || '';
+      const body: Record<string, any> = {
+        type: 'strip',
+        name: templateName,
+        description: 'Designed in Strips Studio',
+        slots: elements.filter((el) => el.type === 'photo-slot').length,
+        price: 35000,
+        color: canvasBg,
+        isActive: true,
+        canvasWidth: canvasSize.w,
+        canvasHeight: canvasSize.h,
+        thumbnail,
+        elements: elements.map((el) => ({ ...el, props: { ...el.props } })),
+      };
+      let res;
+      if (editingTemplateId) {
+        res = await fetch(`/api/templates/${editingTemplateId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      } else {
+        body.templateId = `strip-${Date.now()}`;
+        res = await fetch('/api/templates', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+      }
+      const data = await res.json();
+      if (data.success) {
+        setShowSaveModal(false);
+        if (!editingTemplateId) {
+          setEditingTemplateId(data.data._id);
+        }
+      } else {
+        alert('Save failed: ' + (data.error || 'Unknown error'));
+      }
+    } catch (err) {
+      alert('Save failed: ' + String(err));
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const openStickerGallery = (elementId: string) => {
     stickerTargetRef.current = elementId;
@@ -265,30 +422,7 @@ export default function StripsStudioPage() {
             border: '1px solid var(--mn-border)',
           }}>
             <button
-              onClick={() => {
-                const thumbnail = editorRef.current?.getThumbnail() || '';
-                const existing = sessionStorage.getItem('stripTemplateData');
-                let existingData: any = {};
-                if (existing) {
-                  try { existingData = JSON.parse(existing); } catch {}
-                }
-                const data = {
-                  ...existingData,
-                  type: 'strip' as const,
-                  name: existingData.name || '',
-                  description: 'Designed in Strips Studio',
-                  slots: elements.filter((el) => el.type === 'photo-slot').length,
-                  price: 35000,
-                  color: canvasBg,
-                  isActive: true,
-                  canvasWidth: canvasSize.w,
-                  canvasHeight: canvasSize.h,
-                  thumbnail,
-                  elements: elements.map((el) => ({ ...el, props: { ...el.props } })),
-                };
-                sessionStorage.setItem('stripTemplateData', JSON.stringify(data));
-                router.push('/admin/templates?newStrip=1');
-              }}
+              onClick={() => setShowSaveModal(true)}
               style={{
                 width: '100%', padding: '10px', borderRadius: 8,
                 border: 'none', background: 'var(--accent-color, #C5D89D)',
@@ -352,6 +486,81 @@ export default function StripsStudioPage() {
               </button>
             )}
           </aside>
+          <aside style={{
+            background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
+            border: '1px solid var(--mn-border)',
+          }}>
+            <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
+              Import Frame
+            </h3>
+            <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                setImportProcessing(true);
+                try {
+                  const reader = new FileReader();
+                  reader.onloadend = async () => {
+                    const dataUrl = reader.result as string;
+                    const processed = await removeChromaKey(dataUrl);
+                    const img = new window.Image();
+                    img.onload = () => {
+                      const detected = detectTransparentSlots(img);
+                      if (detected.length === 0) { setImportProcessing(false); return; }
+                      const cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H;
+                      const slotEls: IStripElement[] = detected.map((s, i) => ({
+                        id: `slot-${i}`,
+                        type: 'photo-slot',
+                        x: Math.round((s.x / 100) * cw),
+                        y: Math.round((s.y / 100) * ch),
+                        width: Math.round((s.w / 100) * cw),
+                        height: Math.round((s.h / 100) * ch),
+                        rotation: 0, zIndex: i, visible: true,
+                        props: { shape: 'rounded', borderWidth: 2, borderColor: '#ffffff', borderRadius: 8 },
+                      }));
+                      setElements((prev) => [
+                        ...slotEls,
+                        ...prev.filter((el) => el.id.startsWith('text-')),
+                      ]);
+                      setSlotCount(detected.length);
+                      const bgId = 'bg-image';
+                      const existingBg = elements.find((el) => el.id === bgId);
+                      if (existingBg) {
+                        updateElementProps(bgId, { stickerUrl: processed });
+                      } else {
+                        setElements((prev) => [...prev, {
+                          id: bgId, type: 'background',
+                          x: -30, y: -30,
+                          width: cw + 60, height: ch + 60,
+                          rotation: 0, zIndex: -1, visible: true,
+                          props: { stickerUrl: processed, opacity: 1 },
+                        }]);
+                      }
+                      setImportProcessing(false);
+                    };
+                    img.src = processed;
+                  };
+                  reader.readAsDataURL(file);
+                } catch { setImportProcessing(false); }
+              }}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={importProcessing}
+              style={{
+                width: '100%', padding: '8px', borderRadius: 8,
+                border: '1px solid var(--mn-border)', background: '#fff',
+                cursor: 'pointer', fontSize: 12, fontWeight: 600,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                opacity: importProcessing ? 0.6 : 1,
+              }}
+            >
+              {importProcessing ? '⏳ Processing...' : '📁 Upload Frame Image'}
+            </button>
+            <p style={{ fontSize: 10, color: 'var(--text-muted)', margin: '6px 0 0', lineHeight: 1.4 }}>
+              Upload a frame template PNG with transparent cutouts to auto-detect photo slots.
+            </p>
+          </aside>
           <LayerPanel
             elements={elements}
             selectedId={selectedId}
@@ -395,6 +604,61 @@ export default function StripsStudioPage() {
         />
       )}
 
+      {showSaveModal && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 1000, display: 'flex',
+          alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(2px)',
+        }} onClick={() => !saving && setShowSaveModal(false)}>
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: 28, width: 380,
+            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+          }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700 }}>
+              {editingTemplateId ? 'Update Template' : 'Save Template'}
+            </h3>
+            <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-muted)' }}>
+              {editingTemplateId ? 'Update your strip template' : 'Enter a name for your strip template'}
+            </p>
+            <input
+              type="text"
+              placeholder="Template name"
+              value={templateName}
+              onChange={(e) => setTemplateName(e.target.value)}
+              autoFocus
+              style={{
+                width: '100%', padding: '12px 14px', borderRadius: 10,
+                border: '1px solid var(--mn-border)', fontSize: 15,
+                marginBottom: 20, fontFamily: 'inherit',
+              }}
+            />
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowSaveModal(false)}
+                disabled={saving}
+                style={{
+                  padding: '10px 20px', borderRadius: 10, border: '1px solid var(--mn-border)',
+                  background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+                  opacity: saving ? 0.5 : 1,
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={saving || !templateName.trim()}
+                style={{
+                  padding: '10px 24px', borderRadius: 10, border: 'none',
+                  background: saving || !templateName.trim() ? '#ccc' : 'var(--accent-color, #C5D89D)',
+                  color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
+                }}
+              >
+                {saving ? 'Saving...' : editingTemplateId ? 'Update' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
