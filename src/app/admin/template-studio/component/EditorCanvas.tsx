@@ -8,6 +8,9 @@ import { useImage } from './useImage';
 
 const SNAP_THRESHOLD = 6;
 const GUIDE_COLOR = '#C5D89D';
+const GRID_STEP = 10;
+
+const snapToGrid = (v: number) => Math.round(v / GRID_STEP) * GRID_STEP;
 const GUIDE_WIDTH = 1;
 
 interface GuideLine {
@@ -122,6 +125,10 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
   const [guides, setGuides] = useState<GuideLine[]>([]);
   const [scale, setScale] = useState(0);
 
+  useImperativeHandle(ref, () => ({
+    getThumbnail: () => stageRef.current?.toDataURL({ mimeType: 'image/png', pixelRatio: 0.3 }) || '',
+  }), []);
+
   useLayoutEffect(() => {
     const container = containerRef.current?.parentElement;
     if (!container) return;
@@ -137,6 +144,24 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     observer.observe(container);
     return () => observer.disconnect();
   }, [canvasSize]);
+
+  useEffect(() => {
+    if (!trRef.current || !layerRef.current) return;
+    const el = elements.find(e => e.id === selectedId);
+    if (el?.type === 'background') {
+      trRef.current.nodes([]);
+      trRef.current.getLayer()?.batchDraw();
+      return;
+    }
+    const selectedNode = layerRef.current.findOne(`#${selectedId}`);
+    if (selectedNode) {
+      trRef.current.nodes([selectedNode]);
+      trRef.current.getLayer()?.batchDraw();
+    } else {
+      trRef.current.nodes([]);
+      trRef.current.getLayer()?.batchDraw();
+    }
+  }, [selectedId, elements]);
 
   const clampBg = useCallback((el: IStripElement, newX: number, newY: number) => {
     if (el.type !== 'background') return { x: newX, y: newY };
@@ -255,6 +280,14 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
         if (e.target === e.target.getStage()) { onSelect(null); setGuides([]); }
       }}
     >
+      <Layer listening={false}>
+        {Array.from({ length: Math.ceil(canvasSize.w / GRID_STEP) + 1 }).map((_, i) => (
+          <Line key={`gv${i}`} x={i * GRID_STEP} y={0} points={[0, 0, 0, canvasSize.h]} stroke="rgba(0,0,0,0.04)" strokeWidth={1} listening={false} />
+        ))}
+        {Array.from({ length: Math.ceil(canvasSize.h / GRID_STEP) + 1 }).map((_, i) => (
+          <Line key={`gh${i}`} x={0} y={i * GRID_STEP} points={[0, 0, canvasSize.w, 0]} stroke="rgba(0,0,0,0.04)" strokeWidth={1} listening={false} />
+        ))}
+      </Layer>
       <Layer ref={layerRef}>
         <Rect x={0} y={0} width={canvasSize.w} height={canvasSize.h} fill={canvasBg} listening={false} />
         {sorted.map((el) => (
@@ -272,6 +305,13 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
           ref={trRef}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 10 || newBox.height < 10) return oldBox;
+            const el = elements.find(e => e.id === selectedId);
+            if (el?.type === 'photo-slot') {
+              newBox.x = snapToGrid(newBox.x);
+              newBox.y = snapToGrid(newBox.y);
+              newBox.width = snapToGrid(newBox.width);
+              newBox.height = snapToGrid(newBox.height);
+            }
             return newBox;
           }}
           rotateEnabled={true}

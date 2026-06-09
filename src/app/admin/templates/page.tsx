@@ -18,6 +18,9 @@ interface TemplateData {
   type?: 'frame' | 'strip';
   frameImage?: string;
   thumbnail?: string;
+  canvasWidth?: number;
+  canvasHeight?: number;
+  elements?: any[];
 }
 
 export default function TemplatesAdmin() {
