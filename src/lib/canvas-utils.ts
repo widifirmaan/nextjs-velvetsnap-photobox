@@ -308,9 +308,11 @@ export function renderStripFrame(
       } else if (el.type === 'text') {
         ctx.font = `${el.props.fontWeight === '700' ? 'bold ' : ''}${el.props.fontSize || 24}px ${el.props.fontFamily || 'Inter'}`;
         ctx.fillStyle = el.props.color || '#3d2c2c';
-        ctx.textAlign = el.props.textAlign || 'left';
+        const ta = el.props.textAlign || 'left';
+        ctx.textAlign = ta as CanvasTextAlign;
         ctx.textBaseline = 'middle';
-        ctx.fillText(el.props.content || 'Text', el.x, el.y + el.height / 2, el.width);
+        const tx = ta === 'center' ? el.x + el.width / 2 : ta === 'right' ? el.x + el.width : el.x;
+        ctx.fillText(el.props.content || 'Text', tx, el.y + el.height / 2, el.width);
       } else if (el.type === 'sticker') {
         if (el.props.stickerUrl) {
           try {
@@ -509,9 +511,11 @@ export async function composeStripImage(
     } else if (el.type === 'text') {
       ctx.font = `${el.props.fontWeight === '700' ? 'bold ' : ''}${Math.round((el.props.fontSize || 24) * scale)}px ${el.props.fontFamily || 'Inter'}`;
       ctx.fillStyle = el.props.color || '#3d2c2c';
-      ctx.textAlign = el.props.textAlign || 'left';
+      const ta = el.props.textAlign || 'left';
+      ctx.textAlign = ta as CanvasTextAlign;
       ctx.textBaseline = 'middle';
-      ctx.fillText(el.props.content || 'Text', ex, ey + eh / 2, ew);
+      const tx = ta === 'center' ? ex + ew / 2 : ta === 'right' ? ex + ew : ex;
+      ctx.fillText(el.props.content || 'Text', tx, ey + eh / 2, ew);
       ctx.restore();
 
     } else if (el.type === 'sticker') {
