@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useLayoutEffect, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { Stage, Layer, Transformer, Rect, Circle, Text, Group, Image as KonvaImage, Ellipse, Star, Line, Path } from 'react-konva';
 import type Konva from 'konva';
 import type { IStripElement } from '@/models/Template';
@@ -120,51 +120,23 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
   const guideLayerRef = useRef<Konva.Layer>(null);
   const trRef = useRef<Konva.Transformer>(null);
   const [guides, setGuides] = useState<GuideLine[]>([]);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(0);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = containerRef.current?.parentElement;
     if (!container) return;
-    const observer = new ResizeObserver(() => {
+    const update = () => {
       const rect = container.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
-        const s = Math.min(1, (w - 8) / canvasSize.w, (h - 8) / canvasSize.h);
-      setScale(s);
-    });
+      const s = Math.min(1, (w - 8) / canvasSize.w, (h - 8) / canvasSize.h);
+      if (s > 0) setScale(s);
+    };
+    update();
+    const observer = new ResizeObserver(update);
     observer.observe(container);
     return () => observer.disconnect();
-  }, [canvasSize.w, canvasSize.h]);
-
-  useImperativeHandle(ref, () => ({
-    getThumbnail: () => {
-      return stageRef.current?.toDataURL({ mimeType: 'image/png', pixelRatio: 0.3 }) || '';
-    },
-  }), []);
-
-  useEffect(() => {
-    if (!trRef.current || !layerRef.current) return;
-    const el = elements.find(e => e.id === selectedId);
-    if (el?.type === 'photo-slot') {
-      trRef.current.nodes([]);
-      trRef.current.getLayer()?.batchDraw();
-      return;
-    }
-    const selectedNode = layerRef.current.findOne(`#${selectedId}`);
-    if (selectedNode) {
-      trRef.current.nodes([selectedNode]);
-      trRef.current.getLayer()?.batchDraw();
-    } else {
-      trRef.current.nodes([]);
-      trRef.current.getLayer()?.batchDraw();
-    }
-  }, [selectedId, elements]);
-
-  const sorted = elements
-    .filter((el) => el.visible)
-    .sort((a, b) => a.zIndex - b.zIndex);
-
-  const others = elements.filter(el => el.id !== selectedId);
+  }, [canvasSize]);
 
   const clampBg = useCallback((el: IStripElement, newX: number, newY: number) => {
     if (el.type !== 'background') return { x: newX, y: newY };
@@ -173,6 +145,12 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       y: Math.min(0, Math.max(newY, canvasSize.h - el.height)),
     };
   }, [canvasSize]);
+
+  const sorted = elements
+    .filter((el) => el.visible)
+    .sort((a, b) => a.zIndex - b.zIndex);
+
+  const others = elements.filter(el => el.id !== selectedId);
 
   const handleDragEnd = useCallback((id: string, e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target;
