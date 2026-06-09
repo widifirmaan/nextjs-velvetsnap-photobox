@@ -262,11 +262,11 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
             {imageResults.length > 0 && (
               <div className={styles.imageGrid}>
                 {imageResults.map((img, i) => (
-                  <button
+                  <div
                     key={i}
                     className={`${styles.stickerItem} ${activeUrl?.url === img.url ? styles.active : ''}`}
                     onClick={() => handleImageClick(img.url)}
-                    disabled={!!activeUrl && activeUrl.url !== img.url}
+                    style={{ cursor: 'pointer', position: 'relative' }}
                     title={img.title}
                   >
                     <img src={img.thumbnail} alt={img.title} loading="lazy" />
@@ -287,7 +287,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
                         <button className={styles.cancelBtn} onClick={(e) => { e.stopPropagation(); handleDismiss(); }}>Cancel</button>
                       </div>
                     )}
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
