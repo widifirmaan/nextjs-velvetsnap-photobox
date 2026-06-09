@@ -132,19 +132,38 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       const stage = stageRef.current;
       if (!stage) return '';
       if (trRef.current) trRef.current.nodes([]);
-      // Render all elements onto a native canvas, then paint solid green
-      // over the slot pixel rects so chroma key always sees green
-      // regardless of overlapping element z-order or shape type.
-      const canvas = stage.toCanvas();
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return canvas.toDataURL('image/png');
+      // Turn photo-slot fills to solid green (at their z-level) so chroma key
+      // removes them.  Elements ABOVE the slot (text, stickers) render on top
+      // and survive chroma key.  Background elements are hidden because they
+      // should be behind the photo anyway.
       const groups = (stage as any).find('.photo-slot-group');
+      const bgs = (stage as any).find('.bg-element');
+      const saved: any[] = [];
       groups.forEach((g: any) => {
-        const r = g.getClientRect();
-        ctx.fillStyle = '#00bf63';
-        ctx.fillRect(Math.round(r.x), Math.round(r.y), Math.round(r.width), Math.round(r.height));
+        g.getChildren().forEach((child: any) => {
+          saved.push({ node: child, visible: child.visible(), opacity: child.opacity(), fill: child.fill(), stroke: child.stroke(), strokeWidth: child.strokeWidth() });
+          if (child.getClassName() === 'Text') {
+            child.visible(false);
+          } else {
+            child.fill('#00bf63');
+            child.opacity(1);
+            child.stroke('rgba(0,0,0,0)');
+            child.strokeWidth(0);
+          }
+        });
       });
-      return canvas.toDataURL('image/png');
+      bgs.forEach((g: any) => {
+        saved.push({ node: g, visible: g.visible(), opacity: null, fill: null, stroke: null, strokeWidth: null });
+        g.visible(false);
+      });
+      stage.batchDraw();
+      const url = stage.toDataURL({ mimeType: 'image/png' });
+      saved.forEach(({ node, visible, opacity, fill, stroke, strokeWidth }) => {
+        if (opacity === null) { node.visible(visible); return; }
+        node.setAttrs({ visible, opacity, fill, stroke, strokeWidth });
+      });
+      stage.batchDraw();
+      return url;
     },
   }), []);
 
@@ -396,7 +415,11 @@ function CanvasElement({
     opacity: p.opacity ?? 1,
   };
 
-  const elCommon = element.type === 'photo-slot' ? { ...common, name: 'photo-slot-group' } : common;
+  const elCommon = element.type === 'photo-slot'
+    ? { ...common, name: 'photo-slot-group' }
+    : element.type === 'background'
+      ? { ...common, name: 'bg-element' }
+      : common;
 
   switch (element.type) {
     case 'photo-slot':
