@@ -138,19 +138,21 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       const saved: any[] = [];
       groups.forEach((g: any) => {
         g.getChildren().forEach((child: any) => {
-          if (child.fill) {
-            saved.push({ node: child, fill: child.fill(), opacity: child.opacity(), stroke: child.stroke(), strokeWidth: child.strokeWidth() });
+          saved.push({ node: child, visible: child.visible(), opacity: child.opacity(), fill: child.fill(), stroke: child.stroke(), strokeWidth: child.strokeWidth() });
+          if (child.getClassName() === 'Text') {
+            child.visible(false);
+          } else {
             child.fill('#00bf63');
             child.opacity(1);
-            child.stroke('#ffffff');
-            child.strokeWidth(2);
+            child.stroke('rgba(0,0,0,0)');
+            child.strokeWidth(0);
           }
         });
       });
       stage.batchDraw();
       const url = stage.toDataURL({ mimeType: 'image/png' });
       // Restore state
-      saved.forEach(({ node, fill, opacity, stroke, strokeWidth }) => node.setAttrs({ fill, opacity, stroke, strokeWidth }));
+      saved.forEach(({ node, visible, opacity, fill, stroke, strokeWidth }) => node.setAttrs({ visible, opacity, fill, stroke, strokeWidth }));
       stage.batchDraw();
       return url;
     },
