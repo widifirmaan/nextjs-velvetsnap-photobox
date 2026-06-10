@@ -501,15 +501,18 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
       );
     }
     case 'heart': {
-      const hw = el.width;
-      const hh = el.height;
-      const hs = Math.min(hw, hh) * 0.45;
-      const hcx = hw / 2;
-      const hcy = hh * 0.4;
-      const heartPath = `M${hcx},${hcy + hs * 0.3} C${hcx - hs * 0.7},${hcy - hs * 0.2} ${hcx - hs},${hcy - hs * 0.5} ${hcx},${hcy - hs * 0.7} C${hcx + hs},${hcy - hs * 0.5} ${hcx + hs * 0.7},${hcy - hs * 0.2} ${hcx},${hcy + hs * 0.3} Z`;
+      const cx = el.width / 2;
+      const cy = el.height / 2;
+      const s = Math.min(el.width, el.height) * 0.4;
+      const d = [
+        `M${cx},${cy + s * 0.7}`,
+        `C${cx - s * 0.7},${cy + s * 0.1} ${cx - s},${cy - s * 0.3} ${cx},${cy - s * 0.5}`,
+        `C${cx + s},${cy - s * 0.3} ${cx + s * 0.7},${cy + s * 0.1} ${cx},${cy + s * 0.7}`,
+        'Z',
+      ].join(' ');
       return (
         <Group {...common}>
-          <Path data={heartPath} fill={fill} stroke={bc} strokeWidth={bw} />
+          <Path data={d} fill={fill} stroke={bc} strokeWidth={bw} />
           {slotNumber}
         </Group>
       );
@@ -529,9 +532,9 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
       return (
         <Group {...common}>
           <Line
-            x={el.width / 2}
+            x={0}
             y={0}
-            points={[0, el.height / 2, el.width / 2, el.height, el.width, el.height / 2, el.width / 2, 0]}
+            points={[el.width / 2, 0, el.width, el.height / 2, el.width / 2, el.height, 0, el.height / 2]}
             closed
             fill={fill}
             stroke={bc}
