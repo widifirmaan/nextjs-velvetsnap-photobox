@@ -201,7 +201,6 @@
   flex-direction: column;
   justify-content: flex-end;
   background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(2px);
 }
 
 .mobilePanel {
