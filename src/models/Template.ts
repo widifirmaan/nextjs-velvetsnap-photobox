@@ -38,6 +38,7 @@ export interface IStripElement {
     strokeWidth?: number;
     opacity?: number;
     searchBg?: boolean;
+    letterSpacing?: number;
   };
 }
 

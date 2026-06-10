@@ -429,12 +429,15 @@ function CanvasElement({
         <Text
           {...common}
           text={p.content || 'Text'}
-          fontSize={p.fontSize || 24}
+          fontSize={p.fontSize || 48}
           fontFamily={p.fontFamily || 'Inter'}
           fill={p.color || '#3d2c2c'}
           fontStyle={(p.fontWeight === '700' ? 'bold ' : '') + (p.fontStyle || 'normal')}
           align={p.textAlign || 'left'}
           verticalAlign="middle"
+          letterSpacing={p.letterSpacing ?? 0}
+          stroke={p.strokeColor || undefined}
+          strokeWidth={p.strokeWidth ?? 0}
         />
       );
     case 'background':

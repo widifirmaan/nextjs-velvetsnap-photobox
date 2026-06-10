@@ -130,23 +130,42 @@ export default function PropertiesPanel({
                 { value: 'Georgia', label: 'Georgia' },
                 { value: 'Courier New', label: 'Courier New' },
                 { value: 'Arial', label: 'Arial' },
+                { value: 'Arial Black', label: 'Arial Black' },
                 { value: 'Times New Roman', label: 'Times New Roman' },
+                { value: 'Verdana', label: 'Verdana' },
+                { value: 'Trebuchet MS', label: 'Trebuchet MS' },
+                { value: 'Palatino Linotype', label: 'Palatino Linotype' },
+                { value: 'Impact', label: 'Impact' },
+                { value: 'Comic Sans MS', label: 'Comic Sans MS' },
+                { value: 'Lucida Console', label: 'Lucida Console' },
+                { value: 'Tahoma', label: 'Tahoma' },
+                { value: 'Garamond', label: 'Garamond' },
+                { value: 'Bookman', label: 'Bookman' },
               ]}
               onChange={(v) => set('fontFamily', v)}
             />
           </FieldRow>
           <FieldRow>
-            <NumberField label="Size" value={p.fontSize ?? 24} onChange={(v) => set('fontSize', v)} min={8} />
+            <NumberField label="Size" value={p.fontSize ?? 48} onChange={(v) => set('fontSize', v)} min={8} />
             <ColorField label="Color" value={p.color || '#3d2c2c'} onChange={(v) => set('color', v)} />
+          </FieldRow>
+          <FieldRow>
+            <NumberField label="Letter Spacing" value={p.letterSpacing ?? 0} onChange={(v) => set('letterSpacing', v)} min={-5} max={20} />
           </FieldRow>
           <FieldRow>
             <SelectField
               label="Weight"
               value={p.fontWeight || '400'}
               options={[
+                { value: '100', label: 'Thin' },
+                { value: '200', label: 'Extra Light' },
+                { value: '300', label: 'Light' },
                 { value: '400', label: 'Regular' },
+                { value: '500', label: 'Medium' },
                 { value: '600', label: 'Semi Bold' },
                 { value: '700', label: 'Bold' },
+                { value: '800', label: 'Extra Bold' },
+                { value: '900', label: 'Black' },
               ]}
               onChange={(v) => set('fontWeight', v)}
             />
@@ -171,6 +190,10 @@ export default function PropertiesPanel({
               ]}
               onChange={(v) => set('textAlign', v)}
             />
+          </FieldRow>
+          <FieldRow>
+            <ColorField label="Outline" value={p.strokeColor || ''} onChange={(v) => set('strokeColor', v)} />
+            <NumberField label="Width" value={p.strokeWidth ?? 0} onChange={(v) => set('strokeWidth', v)} min={0} max={20} />
           </FieldRow>
         </Section>
       )}

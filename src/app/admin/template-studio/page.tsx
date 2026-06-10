@@ -281,7 +281,7 @@ export default function StripsStudioPage() {
     if (type === 'photo-slot') {
       base.props = { shape: 'rounded', borderWidth: 2, borderColor: '#ffffff', borderRadius: 8 };
     } else if (type === 'text') {
-      base.props = { content: 'Type here', fontSize: 24, fontFamily: 'Inter', color: '#3d2c2c', fontWeight: '700', textAlign: 'center' };
+      base.props = { content: 'Type here', fontSize: 48, fontFamily: 'Inter', color: '#3d2c2c', fontWeight: '700', textAlign: 'center' };
     } else if (type === 'shape') {
       base.props = { shapeType: 'rect', fillColor: '#C5D89D', strokeColor: '#9CAB84', strokeWidth: 2, opacity: 1 };
     }
