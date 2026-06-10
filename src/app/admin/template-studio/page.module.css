@@ -99,12 +99,6 @@
   50% { opacity: 0.5; }
 }
 
-@media (max-width: 1024px) {
-  .editorLayout {
-    grid-template-columns: 1fr;
-  }
-}
-
 /* Mobile toolbar */
 .mobileToolbar {
   display: none;
@@ -156,6 +150,19 @@
 
   .mobileToolbar {
     display: flex;
+  }
+
+  .page {
+    padding-bottom: 130px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .editorLayout {
+    grid-template-columns: 1fr;
+  }
+  .page {
+    padding-bottom: 56px;
   }
 }
 
