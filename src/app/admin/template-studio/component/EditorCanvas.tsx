@@ -494,8 +494,8 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
     case 'circle': {
       const r = Math.min(el.width, el.height) / 2;
       return (
-        <Group {...common} x={el.x + el.width / 2} y={el.y + el.height / 2}>
-          <Circle radius={r} fill={fill} stroke={bc} strokeWidth={bw} />
+        <Group {...common}>
+          <Circle x={el.width / 2} y={el.height / 2} radius={r} fill={fill} stroke={bc} strokeWidth={bw} />
           {slotNumber}
         </Group>
       );
