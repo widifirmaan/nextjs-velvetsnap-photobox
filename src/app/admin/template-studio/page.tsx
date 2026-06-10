@@ -513,7 +513,7 @@ export default function StripsStudioPage() {
       />
 
       <div className={styles.editorLayout}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className={styles.leftSidebar}>
           <aside style={{
             background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
             border: '1px solid var(--mn-border)',
@@ -672,17 +672,19 @@ export default function StripsStudioPage() {
           />
         </div>
 
-        <PropertiesPanel
-          selected={selected}
-          slotCount={slotCount}
-          onSetSlotCount={setSlotLayout}
-          onUpdateProps={(props) => selected && updateElementProps(selected.id, props)}
-          onUpdate={(patch) => selected && updateElement(selected.id, patch)}
-          onDelete={() => selected && deleteElement(selected.id)}
-          onBringForward={() => selected && bringForward(selected.id)}
-          onSendBackward={() => selected && sendBackward(selected.id)}
-          onBrowseStickers={() => selected && openStickerGallery(selected.id)}
-        />
+        <div className={styles.rightSidebar}>
+          <PropertiesPanel
+            selected={selected}
+            slotCount={slotCount}
+            onSetSlotCount={setSlotLayout}
+            onUpdateProps={(props) => selected && updateElementProps(selected.id, props)}
+            onUpdate={(patch) => selected && updateElement(selected.id, patch)}
+            onDelete={() => selected && deleteElement(selected.id)}
+            onBringForward={() => selected && bringForward(selected.id)}
+            onSendBackward={() => selected && sendBackward(selected.id)}
+            onBrowseStickers={() => selected && openStickerGallery(selected.id)}
+          />
+        </div>
       </div>
 
       {stickerTargetId && (
