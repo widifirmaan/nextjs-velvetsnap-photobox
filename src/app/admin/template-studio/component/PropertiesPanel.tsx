@@ -200,31 +200,43 @@ export default function PropertiesPanel({
             <NumberField label="Letter Spacing" value={p.letterSpacing ?? 0} onChange={(v) => set('letterSpacing', v)} min={-5} max={20} />
           </FieldRow>
           <FieldRow>
-            <SelectField
-              label="Weight"
-              value={p.fontWeight || '400'}
-              options={[
-                { value: '100', label: 'Thin' },
-                { value: '200', label: 'Extra Light' },
-                { value: '300', label: 'Light' },
-                { value: '400', label: 'Regular' },
-                { value: '500', label: 'Medium' },
-                { value: '600', label: 'Semi Bold' },
-                { value: '700', label: 'Bold' },
-                { value: '800', label: 'Extra Bold' },
-                { value: '900', label: 'Black' },
-              ]}
-              onChange={(v) => set('fontWeight', v)}
-            />
-            <SelectField
-              label="Style"
-              value={p.fontStyle || 'normal'}
-              options={[
-                { value: 'normal', label: 'Normal' },
-                { value: 'italic', label: 'Italic' },
-              ]}
-              onChange={(v) => set('fontStyle', v)}
-            />
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Weight</label>
+              <select
+                value={p.fontWeight || '400'}
+                onChange={(e) => set('fontWeight', e.target.value)}
+                style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff', fontFamily: p.fontFamily || 'Inter', fontWeight: p.fontWeight || '400' }}
+              >
+                {[
+                  { value: '100', label: 'Thin' },
+                  { value: '200', label: 'Extra Light' },
+                  { value: '300', label: 'Light' },
+                  { value: '400', label: 'Regular' },
+                  { value: '500', label: 'Medium' },
+                  { value: '600', label: 'Semi Bold' },
+                  { value: '700', label: 'Bold' },
+                  { value: '800', label: 'Extra Bold' },
+                  { value: '900', label: 'Black' },
+                ].map((o) => (
+                  <option key={o.value} value={o.value} style={{ fontWeight: o.value }}>{o.label}</option>
+                ))}
+              </select>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Style</label>
+              <select
+                value={p.fontStyle || 'normal'}
+                onChange={(e) => set('fontStyle', e.target.value)}
+                style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff', fontFamily: p.fontFamily || 'Inter', fontStyle: p.fontStyle || 'normal' }}
+              >
+                {[
+                  { value: 'normal', label: 'Normal' },
+                  { value: 'italic', label: 'Italic' },
+                ].map((o) => (
+                  <option key={o.value} value={o.value} style={{ fontStyle: o.value }}>{o.label}</option>
+                ))}
+              </select>
+            </div>
           </FieldRow>
           <FieldRow>
             <SelectField
