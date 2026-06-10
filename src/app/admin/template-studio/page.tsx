@@ -190,6 +190,7 @@ export default function StripsStudioPage() {
   const stickerTargetRef = useRef<string | null>(null);
   const bgTargetRef = useRef(false);
   const [stickerTargetId, setStickerTargetId] = useState<string | null>(null);
+  const [activeMobilePanel, setActiveMobilePanel] = useState<'elements' | 'background' | 'layers' | 'properties' | null>(null);
 
   useEffect(() => {
     if (loaded.current) return;
@@ -505,6 +506,176 @@ export default function StripsStudioPage() {
     });
   };
 
+  const renderBackgroundSection = () => (
+    <aside style={{
+      background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
+      border: '1px solid var(--mn-border)',
+    }}>
+      <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
+        Background
+      </h3>
+      <div style={{
+        width: '100%', aspectRatio: '3/1', borderRadius: 8, overflow: 'hidden',
+        marginBottom: 10, background: '#f0f0f0',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        border: '1px solid var(--mn-border)',
+      }}>
+        {(elements.find((el) => el.id === 'bg-image')?.props as any)?.stickerUrl ? (
+          <img
+            src={(elements.find((el) => el.id === 'bg-image')!.props as any).stickerUrl}
+            alt="Background"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ) : (
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>No background</span>
+        )}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button
+          onClick={openBgSearch}
+          style={{
+            flex: 1, padding: '8px', borderRadius: 8,
+            border: '1px solid var(--mn-border)', background: '#fff',
+            cursor: 'pointer', fontSize: 12, fontWeight: 600,
+          }}
+        >
+          🔍 Search
+        </button>
+        <button
+          onClick={() => fileInputRef.current?.click()}
+          disabled={importProcessing}
+          style={{
+            flex: 1, padding: '8px', borderRadius: 8,
+            border: '1px solid var(--mn-border)', background: '#fff',
+            cursor: 'pointer', fontSize: 12, fontWeight: 600,
+            opacity: importProcessing ? 0.6 : 1,
+          }}
+        >
+          {importProcessing ? '⏳...' : '📁 Import'}
+        </button>
+      </div>
+      <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          setImportProcessing(true);
+          try {
+            const reader = new FileReader();
+            reader.onloadend = async () => {
+              const dataUrl = reader.result as string;
+              const processed = await removeChromaKey(dataUrl, DEFAULT_CANVAS_W, DEFAULT_CANVAS_H);
+              const img = new window.Image();
+              img.onload = () => {
+                const cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H;
+                const detected = detectTransparentSlots(img, cw, ch);
+                if (detected.length === 0) { setImportProcessing(false); return; }
+                const slotEls: IStripElement[] = detected.map((s, i) => ({
+                  id: `slot-${i}`,
+                  type: 'photo-slot',
+                  x: Math.round((s.x / 100) * cw),
+                  y: Math.round((s.y / 100) * ch),
+                  width: Math.round((s.w / 100) * cw),
+                  height: Math.round((s.h / 100) * ch),
+                  rotation: 0, zIndex: i, visible: true,
+                  props: { shape: 'rounded', borderWidth: 2, borderColor: '#ffffff', borderRadius: 8 },
+                }));
+                setElements((prev) => [
+                  ...slotEls,
+                  ...prev.filter((el) => el.id.startsWith('text-') || el.id === 'bg-image').map((el) =>
+                    el.id === 'bg-image'
+                      ? { ...el, x: 0, y: 0, width: cw, height: ch, zIndex: detected.length, props: { ...el.props, stickerUrl: processed } }
+                      : el
+                  ),
+                ]);
+                setSlotCount(detected.length);
+                const hasBg = elements.some((el) => el.id === 'bg-image');
+                if (!hasBg) {
+                  setElements((prev) => [...prev, {
+                    id: 'bg-image', type: 'background',
+                    x: 0, y: 0,
+                    width: cw, height: ch,
+                    rotation: 0, zIndex: detected.length, visible: true,
+                    props: { stickerUrl: processed, opacity: 1 },
+                  }]);
+                }
+                setImportProcessing(false);
+              };
+              img.src = processed;
+            };
+            reader.readAsDataURL(file);
+          } catch { setImportProcessing(false); }
+        }}
+      />
+    </aside>
+  );
+
+  const renderMobilePanel = () => {
+    if (!activeMobilePanel) return null;
+
+    const titles: Record<string, string> = {
+      elements: 'Elements',
+      background: 'Background',
+      layers: 'Layers',
+      properties: 'Properties',
+    };
+
+    let content: React.ReactNode = null;
+    switch (activeMobilePanel) {
+      case 'elements':
+        content = <ElementToolbar onAdd={addElement} />;
+        break;
+      case 'background':
+        content = renderBackgroundSection();
+        break;
+      case 'layers':
+        content = (
+          <LayerPanel
+            elements={elements}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            onToggleVisibility={toggleVisibility}
+            onBringForward={bringForward}
+            onSendBackward={sendBackward}
+            onDelete={deleteElement}
+          />
+        );
+        break;
+      case 'properties':
+        content = selected ? (
+          <PropertiesPanel
+            selected={selected}
+            slotCount={slotCount}
+            onSetSlotCount={setSlotLayout}
+            onUpdateProps={(props) => selected && updateElementProps(selected.id, props)}
+            onUpdate={(patch) => selected && updateElement(selected.id, patch)}
+            onDelete={() => selected && deleteElement(selected.id)}
+            onBringForward={() => selected && bringForward(selected.id)}
+            onSendBackward={() => selected && sendBackward(selected.id)}
+            onBrowseStickers={() => selected && openStickerGallery(selected.id)}
+          />
+        ) : (
+          <p style={{ padding: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
+            Select an element to edit
+          </p>
+        );
+        break;
+    }
+
+    return (
+      <div className={styles.mobileOverlay} onClick={() => setActiveMobilePanel(null)}>
+        <div className={styles.mobilePanel} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.mobilePanelHeader}>
+            <h3>{titles[activeMobilePanel]}</h3>
+            <button onClick={() => setActiveMobilePanel(null)}>✕</button>
+          </div>
+          <div className={styles.mobilePanelBody}>
+            {content}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.page}>
       <AdminPageHeader
@@ -548,106 +719,7 @@ export default function StripsStudioPage() {
 
           <ElementToolbar onAdd={addElement} />
 
-          <aside style={{
-            background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
-            border: '1px solid var(--mn-border)',
-          }}>
-            <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
-              Background
-            </h3>
-            <div style={{
-              width: '100%', aspectRatio: '3/1', borderRadius: 8, overflow: 'hidden',
-              marginBottom: 10, background: '#f0f0f0',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              border: '1px solid var(--mn-border)',
-            }}>
-              {(elements.find((el) => el.id === 'bg-image')?.props as any)?.stickerUrl ? (
-                <img
-                  src={(elements.find((el) => el.id === 'bg-image')!.props as any).stickerUrl}
-                  alt="Background"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>No background</span>
-              )}
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              <button
-                onClick={openBgSearch}
-                style={{
-                  flex: 1, padding: '8px', borderRadius: 8,
-                  border: '1px solid var(--mn-border)', background: '#fff',
-                  cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                }}
-              >
-                🔍 Search
-              </button>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={importProcessing}
-                style={{
-                  flex: 1, padding: '8px', borderRadius: 8,
-                  border: '1px solid var(--mn-border)', background: '#fff',
-                  cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                  opacity: importProcessing ? 0.6 : 1,
-                }}
-              >
-                {importProcessing ? '⏳...' : '📁 Import'}
-              </button>
-            </div>
-            <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
-              onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
-                setImportProcessing(true);
-                try {
-                  const reader = new FileReader();
-                  reader.onloadend = async () => {
-                    const dataUrl = reader.result as string;
-                    const processed = await removeChromaKey(dataUrl, DEFAULT_CANVAS_W, DEFAULT_CANVAS_H);
-                    const img = new window.Image();
-                    img.onload = () => {
-                      const cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H;
-                      const detected = detectTransparentSlots(img, cw, ch);
-                      if (detected.length === 0) { setImportProcessing(false); return; }
-                      const slotEls: IStripElement[] = detected.map((s, i) => ({
-                        id: `slot-${i}`,
-                        type: 'photo-slot',
-                        x: Math.round((s.x / 100) * cw),
-                        y: Math.round((s.y / 100) * ch),
-                        width: Math.round((s.w / 100) * cw),
-                        height: Math.round((s.h / 100) * ch),
-                        rotation: 0, zIndex: i, visible: true,
-                        props: { shape: 'rounded', borderWidth: 2, borderColor: '#ffffff', borderRadius: 8 },
-                      }));
-                      setElements((prev) => [
-                        ...slotEls,
-                        ...prev.filter((el) => el.id.startsWith('text-') || el.id === 'bg-image').map((el) =>
-                          el.id === 'bg-image'
-                            ? { ...el, x: 0, y: 0, width: cw, height: ch, zIndex: detected.length, props: { ...el.props, stickerUrl: processed } }
-                            : el
-                        ),
-                      ]);
-                      setSlotCount(detected.length);
-                      const hasBg = elements.some((el) => el.id === 'bg-image');
-                      if (!hasBg) {
-                        setElements((prev) => [...prev, {
-                          id: 'bg-image', type: 'background',
-                          x: 0, y: 0,
-                          width: cw, height: ch,
-                          rotation: 0, zIndex: detected.length, visible: true,
-                          props: { stickerUrl: processed, opacity: 1 },
-                        }]);
-                      }
-                      setImportProcessing(false);
-                    };
-                    img.src = processed;
-                  };
-                  reader.readAsDataURL(file);
-                } catch { setImportProcessing(false); }
-              }}
-            />
-          </aside>
+          {renderBackgroundSection()}
 
           <LayerPanel
             elements={elements}
@@ -686,6 +758,50 @@ export default function StripsStudioPage() {
           />
         </div>
       </div>
+
+      <div className={styles.mobileToolbar}>
+        <button
+          onClick={() => setActiveMobilePanel(activeMobilePanel === 'elements' ? null : 'elements')}
+          data-active={activeMobilePanel === 'elements'}
+        >
+          <span>📦</span> Elements
+        </button>
+        <button
+          onClick={() => setActiveMobilePanel(activeMobilePanel === 'background' ? null : 'background')}
+          data-active={activeMobilePanel === 'background'}
+        >
+          <span>🖼</span> Bg
+        </button>
+        <button
+          onClick={() => setActiveMobilePanel(activeMobilePanel === 'layers' ? null : 'layers')}
+          data-active={activeMobilePanel === 'layers'}
+        >
+          <span>🧩</span> Layers
+        </button>
+        <button
+          onClick={() => setActiveMobilePanel(activeMobilePanel === 'properties' ? null : 'properties')}
+          data-active={activeMobilePanel === 'properties'}
+        >
+          <span>⚙</span> Props
+        </button>
+        <div className={styles.mobileToolbarDivider} />
+        <button
+          onClick={() => setShowNewConfirm(true)}
+          disabled={pageLoading}
+          style={{ opacity: pageLoading ? 0.4 : 1 }}
+        >
+          <span>✚</span> New
+        </button>
+        <button
+          onClick={() => setShowSaveModal(true)}
+          disabled={pageLoading}
+          style={{ opacity: pageLoading ? 0.4 : 1 }}
+        >
+          <span>💾</span> Save
+        </button>
+      </div>
+
+      {renderMobilePanel()}
 
       {stickerTargetId && (
         <AssetSearch

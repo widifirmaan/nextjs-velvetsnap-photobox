@@ -38,7 +38,11 @@ export default function LayerPanel({
       background: '#fff',
       borderRadius: 16,
       border: '1px solid var(--mn-border)',
+      display: 'flex',
+      flexDirection: 'column',
       overflow: 'hidden',
+      flex: 1,
+      minHeight: 0,
     }}>
       <div style={{
         padding: '12px 14px 8px',
@@ -49,7 +53,7 @@ export default function LayerPanel({
         </h3>
       </div>
 
-      <div style={{ maxHeight: 280, overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
         {sorted.length === 0 ? (
           <p style={{ padding: '24px 14px', textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
             No elements yet

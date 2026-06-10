@@ -127,7 +127,131 @@
     gap: 12px;
     min-height: auto;
   }
-  
+
+  .leftSidebar {
+    display: none;
+  }
+
+  .rightSidebar {
+    display: none;
+  }
+
+  .mobileToolbar {
+    display: flex;
+  }
+}
+
+/* Mobile toolbar */
+.mobileToolbar {
+  display: none;
+  position: fixed;
+  bottom: 70px;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #fff;
+  border-top: 1px solid var(--mn-border);
+  border-bottom: 1px solid var(--mn-border);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+  padding: 6px 8px;
+  justify-content: space-around;
+  gap: 4px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobileToolbar button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  padding: 6px 4px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  transition: all 0.15s;
+}
+
+.mobileToolbar button span {
+  font-size: 16px;
+}
+
+.mobileToolbar button[data-active="true"] {
+  color: var(--accent-color, #C5D89D);
+  background: rgba(197, 216, 157, 0.1);
+}
+
+.mobileToolbarDivider {
+  width: 1px;
+  background: var(--mn-border);
+  margin: 4px 2px;
+  flex-shrink: 0;
+}
+
+/* Mobile overlay panel */
+.mobileOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(2px);
+}
+
+.mobilePanel {
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 30px rgba(0,0,0,0.12);
+  overflow: hidden;
+}
+
+.mobilePanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 10px;
+  border-bottom: 1px solid var(--mn-border);
+  flex-shrink: 0;
+}
+
+.mobilePanelHeader h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mobilePanelHeader button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobilePanelHeader button:hover {
+  background: rgba(0,0,0,0.05);
+}
+
+.mobilePanelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 18px 20px;
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
 }
 
 @media (max-width: 480px) {
