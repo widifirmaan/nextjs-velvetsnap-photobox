@@ -105,6 +105,24 @@
   }
 }
 
+/* Mobile toolbar */
+.mobileToolbar {
+  display: none;
+  position: fixed;
+  bottom: 70px;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #fff;
+  border-top: 1px solid var(--mn-border);
+  border-bottom: 1px solid var(--mn-border);
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+  padding: 6px 8px;
+  justify-content: space-around;
+  gap: 4px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
 @media (max-width: 768px) {
   .headerActions {
     width: 100%;
@@ -139,24 +157,6 @@
   .mobileToolbar {
     display: flex;
   }
-}
-
-/* Mobile toolbar */
-.mobileToolbar {
-  display: none;
-  position: fixed;
-  bottom: 70px;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  background: #fff;
-  border-top: 1px solid var(--mn-border);
-  border-bottom: 1px solid var(--mn-border);
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-  padding: 6px 8px;
-  justify-content: space-around;
-  gap: 4px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .mobileToolbar button {
