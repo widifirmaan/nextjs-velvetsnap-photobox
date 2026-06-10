@@ -137,7 +137,7 @@
   .editorLayout {
     grid-template-columns: 1fr;
     gap: 12px;
-    min-height: auto;
+    min-height: 0;
   }
 
   .leftSidebar {
