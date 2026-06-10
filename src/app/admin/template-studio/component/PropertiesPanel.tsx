@@ -207,19 +207,8 @@ export default function PropertiesPanel({
                 onChange={(e) => set('fontWeight', e.target.value)}
                 style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff', fontFamily: p.fontFamily || 'Inter', fontWeight: p.fontWeight || '400' }}
               >
-                {[
-                  { value: '100', label: 'Thin' },
-                  { value: '200', label: 'Extra Light' },
-                  { value: '300', label: 'Light' },
-                  { value: '400', label: 'Regular' },
-                  { value: '500', label: 'Medium' },
-                  { value: '600', label: 'Semi Bold' },
-                  { value: '700', label: 'Bold' },
-                  { value: '800', label: 'Extra Bold' },
-                  { value: '900', label: 'Black' },
-                ].map((o) => (
-                  <option key={o.value} value={o.value} style={{ fontWeight: o.value }}>{o.label}</option>
-                ))}
+                <option value="400" style={{ fontWeight: 400 }}>Regular</option>
+                <option value="700" style={{ fontWeight: 700 }}>Bold</option>
               </select>
             </div>
             <div style={{ flex: 1 }}>
