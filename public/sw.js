@@ -1,4 +1,5 @@
-const CACHE = 'velvetsnap-v2';
+const CACHE = 'velvetsnap-v3';
+const CACHE_BUST = '20260610';
 
 const PRECACHE_URLS = [
   '/',
@@ -29,6 +30,24 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
+
+  // Network-first for pages; cache-first for static assets
+  const url = new URL(request.url);
+  const isPage = request.headers.get('Accept')?.includes('text/html');
+  const isAdmin = url.pathname.startsWith('/admin');
+
+  if (isPage || isAdmin) {
+    event.respondWith(
+      fetch(request).then((r) => {
+        if (r.status === 200) {
+          const clone = r.clone();
+          caches.open(CACHE).then((c) => c.put(request, clone));
+        }
+        return r;
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
 
   event.respondWith(
     caches.open(CACHE).then((cache) =>
