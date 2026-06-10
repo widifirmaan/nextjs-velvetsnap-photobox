@@ -1,6 +1,8 @@
 .adminLayout {
   display: flex;
   min-height: 100vh;
+  min-height: -webkit-fill-available;
+  min-height: 100dvh;
   width: 100%;
   position: relative;
 }
@@ -22,6 +24,8 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  height: -webkit-fill-available;
+  height: 100dvh;
   background: #fff;
   border-right: 1px solid var(--mn-border);
   transition: all var(--transition-normal);
