@@ -2,6 +2,63 @@
 
 import type { IStripElement } from '@/models/Template';
 
+const FONT_LIST = [
+  { value: 'Inter', label: 'Inter' },
+  { value: 'Playfair Display', label: 'Playfair Display' },
+  { value: 'Lora', label: 'Lora' },
+  { value: 'Cormorant Garamond', label: 'Cormorant Garamond' },
+  { value: 'EB Garamond', label: 'EB Garamond' },
+  { value: 'Montserrat', label: 'Montserrat' },
+  { value: 'Raleway', label: 'Raleway' },
+  { value: 'Poppins', label: 'Poppins' },
+  { value: 'Quicksand', label: 'Quicksand' },
+  { value: 'Nunito', label: 'Nunito' },
+  { value: 'DM Sans', label: 'DM Sans' },
+  { value: 'Space Grotesk', label: 'Space Grotesk' },
+  { value: 'JetBrains Mono', label: 'JetBrains Mono' },
+  { value: 'Sacramento', label: 'Sacramento' },
+  { value: 'Great Vibes', label: 'Great Vibes' },
+  { value: 'Alex Brush', label: 'Alex Brush' },
+  { value: 'Pacifico', label: 'Pacifico' },
+  { value: 'Dancing Script', label: 'Dancing Script' },
+  { value: 'Caveat', label: 'Caveat' },
+  { value: 'Amatic SC', label: 'Amatic SC' },
+  { value: 'Oswald', label: 'Oswald' },
+  { value: 'Bebas Neue', label: 'Bebas Neue' },
+  { value: 'Anton', label: 'Anton' },
+  { value: 'Limelight', label: 'Limelight' },
+  { value: 'Unica One', label: 'Unica One' },
+  { value: 'Josefin Sans', label: 'Josefin Sans' },
+  { value: 'Abril Fatface', label: 'Abril Fatface' },
+  { value: 'DM Serif Display', label: 'DM Serif Display' },
+  { value: 'Old Standard TT', label: 'Old Standard TT' },
+  { value: 'Libre Baskerville', label: 'Libre Baskerville' },
+  { value: 'Merriweather', label: 'Merriweather' },
+  { value: 'Fira Sans', label: 'Fira Sans' },
+  { value: 'Manrope', label: 'Manrope' },
+  { value: 'Epilogue', label: 'Epilogue' },
+  { value: 'Sora', label: 'Sora' },
+  { value: 'Outfit', label: 'Outfit' },
+  { value: 'DM Serif Text', label: 'DM Serif Text' },
+  { value: 'Zilla Slab', label: 'Zilla Slab' },
+  { value: 'Bitter', label: 'Bitter' },
+  { value: 'Spectral', label: 'Spectral' },
+  { value: 'Prata', label: 'Prata' },
+  { value: 'Bodoni Moda', label: 'Bodoni Moda' },
+  { value: 'Cinzel', label: 'Cinzel' },
+  { value: 'Work Sans', label: 'Work Sans' },
+  { value: 'Plus Jakarta Sans', label: 'Plus Jakarta Sans' },
+  { value: 'Hanken Grotesk', label: 'Hanken Grotesk' },
+  { value: 'Aleo', label: 'Aleo' },
+  { value: 'Archivo', label: 'Archivo' },
+  { value: 'Ubuntu', label: 'Ubuntu' },
+  { value: 'Nothing You Could Do', label: 'Nothing You Could Do' },
+  { value: 'Georgia', label: 'Georgia' },
+  { value: 'Courier New', label: 'Courier New' },
+  { value: 'Arial', label: 'Arial' },
+  { value: 'Times New Roman', label: 'Times New Roman' },
+];
+
 interface PropertiesPanelProps {
   selected: IStripElement | null;
   slotCount: number;
@@ -122,67 +179,18 @@ export default function PropertiesPanel({
             />
           </FieldRow>
           <FieldRow>
-            <SelectField
-              label="Font"
-              value={p.fontFamily || 'Inter'}
-              options={[
-                { value: 'Inter', label: 'Inter' },
-                { value: 'Playfair Display', label: 'Playfair Display' },
-                { value: 'Lora', label: 'Lora' },
-                { value: 'Cormorant Garamond', label: 'Cormorant Garamond' },
-                { value: 'EB Garamond', label: 'EB Garamond' },
-                { value: 'Montserrat', label: 'Montserrat' },
-                { value: 'Raleway', label: 'Raleway' },
-                { value: 'Poppins', label: 'Poppins' },
-                { value: 'Quicksand', label: 'Quicksand' },
-                { value: 'Nunito', label: 'Nunito' },
-                { value: 'DM Sans', label: 'DM Sans' },
-                { value: 'Space Grotesk', label: 'Space Grotesk' },
-                { value: 'JetBrains Mono', label: 'JetBrains Mono' },
-                { value: 'Sacramento', label: 'Sacramento' },
-                { value: 'Great Vibes', label: 'Great Vibes' },
-                { value: 'Alex Brush', label: 'Alex Brush' },
-                { value: 'Pacifico', label: 'Pacifico' },
-                { value: 'Dancing Script', label: 'Dancing Script' },
-                { value: 'Caveat', label: 'Caveat' },
-                { value: 'Amatic SC', label: 'Amatic SC' },
-                { value: 'Oswald', label: 'Oswald' },
-                { value: 'Bebas Neue', label: 'Bebas Neue' },
-                { value: 'Anton', label: 'Anton' },
-                { value: 'Limelight', label: 'Limelight' },
-                { value: 'Unica One', label: 'Unica One' },
-                { value: 'Josefin Sans', label: 'Josefin Sans' },
-                { value: 'Abril Fatface', label: 'Abril Fatface' },
-                { value: 'DM Serif Display', label: 'DM Serif Display' },
-                { value: 'Old Standard TT', label: 'Old Standard TT' },
-                { value: 'Libre Baskerville', label: 'Libre Baskerville' },
-                { value: 'Merriweather', label: 'Merriweather' },
-                { value: 'Fira Sans', label: 'Fira Sans' },
-                { value: 'Manrope', label: 'Manrope' },
-                { value: 'Epilogue', label: 'Epilogue' },
-                { value: 'Sora', label: 'Sora' },
-                { value: 'Outfit', label: 'Outfit' },
-                { value: 'DM Serif Text', label: 'DM Serif Text' },
-                { value: 'Zilla Slab', label: 'Zilla Slab' },
-                { value: 'Bitter', label: 'Bitter' },
-                { value: 'Spectral', label: 'Spectral' },
-                { value: 'Prata', label: 'Prata' },
-                { value: 'Bodoni Moda', label: 'Bodoni Moda' },
-                { value: 'Cinzel', label: 'Cinzel' },
-                { value: 'Work Sans', label: 'Work Sans' },
-                { value: 'Plus Jakarta Sans', label: 'Plus Jakarta Sans' },
-                { value: 'Hanken Grotesk', label: 'Hanken Grotesk' },
-                { value: 'Aleo', label: 'Aleo' },
-                { value: 'Archivo', label: 'Archivo' },
-                { value: 'Ubuntu', label: 'Ubuntu' },
-                { value: 'Nothing You Could Do', label: 'Nothing You Could Do' },
-                { value: 'Georgia', label: 'Georgia' },
-                { value: 'Courier New', label: 'Courier New' },
-                { value: 'Arial', label: 'Arial' },
-                { value: 'Times New Roman', label: 'Times New Roman' },
-              ]}
-              onChange={(v) => set('fontFamily', v)}
-            />
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>Font</label>
+              <select
+                value={p.fontFamily || 'Inter'}
+                onChange={(e) => set('fontFamily', e.target.value)}
+                style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff' }}
+              >
+                {FONT_LIST.map((f) => (
+                  <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
+                ))}
+              </select>
+            </div>
           </FieldRow>
           <FieldRow>
             <NumberField label="Size" value={p.fontSize ?? 48} onChange={(v) => set('fontSize', v)} min={8} />
