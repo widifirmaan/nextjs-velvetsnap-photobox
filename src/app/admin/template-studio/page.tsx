@@ -388,9 +388,7 @@ export default function StripsStudioPage() {
       const data = await res.json();
       if (data.success) {
         setShowSaveModal(false);
-        if (!editingTemplateId) {
-          setEditingTemplateId(data.data._id);
-        }
+        router.push('/admin/templates');
       } else {
         alert('Save failed: ' + (data.error || 'Unknown error'));
       }
