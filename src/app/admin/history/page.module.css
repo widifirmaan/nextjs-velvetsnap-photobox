@@ -137,6 +137,23 @@
   color: var(--text-secondary);
 }
 
+.tableThumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid var(--mn-border);
+  display: block;
+}
+
+.tableThumbPlaceholder {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: var(--clay-bg);
+}
+
 .actionBtns {
   display: flex;
   gap: 6px;
@@ -296,22 +313,28 @@
 
 @media (max-width: 640px) {
   .filterRow {
-    flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+  }
+  .filterGroup {
+    flex: 1;
+    min-width: 0;
   }
   .filterActions {
-    width: 100%;
+    width: auto;
+    flex-shrink: 0;
   }
   .filterActions button {
-    flex: 1;
+    flex: 0;
+    padding: 8px 14px;
+    font-size: 12px;
   }
   .modalGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .table tbody td:nth-child(2),
-  .table thead th:nth-child(2),
-  .table tbody td:nth-child(5),
-  .table thead th:nth-child(5) {
+  .table tbody td:nth-child(3),
+  .table thead th:nth-child(3),
+  .table tbody td:nth-child(6),
+  .table thead th:nth-child(6) {
     display: none;
   }
   .tableContainer {

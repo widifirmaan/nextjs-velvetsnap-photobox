@@ -193,6 +193,7 @@ export default function HistoryPage() {
             <table className={styles.table}>
               <thead>
                 <tr>
+                  <th>Preview</th>
                   <th>Session ID</th>
                   <th>Template</th>
                   <th>Price</th>
@@ -205,6 +206,13 @@ export default function HistoryPage() {
               <tbody>
                 {transactions.map((tx) => (
                   <tr key={tx._id} className={styles.tableRow} onClick={() => setSelectedTx(tx)}>
+                    <td>
+                      {tx.finalImage ? (
+                        <img src={tx.finalImage} alt="" className={styles.tableThumb} />
+                      ) : (
+                        <span className={styles.tableThumbPlaceholder} />
+                      )}
+                    </td>
                     <td><span className={styles.sessionId}>#{tx.sessionId || 'N/A'}</span></td>
                     <td>{tx.templateId || 'Unknown'}</td>
                     <td className={styles.tablePrice}>Rp {(tx.price || 0).toLocaleString('id-ID')}</td>
