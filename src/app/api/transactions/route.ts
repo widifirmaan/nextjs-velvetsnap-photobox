@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     const tx = await Transaction.create({
       sessionId,
       templateId,
-      price: price || 35000,
+      price: price ?? 35000,
       status: status || 'PAID',
       captures: capturesUrls,
       finalImage: finalImageUrl,

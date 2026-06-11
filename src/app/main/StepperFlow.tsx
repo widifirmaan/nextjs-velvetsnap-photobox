@@ -45,7 +45,7 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
       }
       if (matched) {
         setTemplateData(matched);
-        setPrice(matched.price || 35000);
+        setPrice(matched.price ?? 35000);
 
         if (matched.frameImage) {
           removeGreenScreen(matched.frameImage).then((keyed) => {
