@@ -11,26 +11,26 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     // Upload images to Cloudinary
     if (body.frameImage && isBase64(body.frameImage)) {
-      body.frameImage = await uploadBase64(body.frameImage, 'velvetsnap/templates');
+      body.frameImage = await uploadBase64(body.frameImage, 'velvetsnap/templates').catch(
+        (e: any) => { throw new Error('frameImage upload failed: ' + e.message); }
+      );
     }
     if (body.thumbnail && isBase64(body.thumbnail)) {
-      body.thumbnail = await uploadBase64(body.thumbnail, 'velvetsnap/templates');
+      body.thumbnail = await uploadBase64(body.thumbnail, 'velvetsnap/templates').catch(
+        (e: any) => { throw new Error('thumbnail upload failed: ' + e.message); }
+      );
     }
     // Upload element sticker images to Cloudinary
     if (body.elementImages && body.elements) {
-      const uploaded = await Promise.all(
-        Object.entries(body.elementImages as Record<string, string>).map(async ([eid, b64]) => {
-          if (isBase64(b64)) {
-            const url = await uploadBase64(b64, 'velvetsnap/templates');
-            return { id: eid, url };
-          }
-          return null;
-        })
-      );
-      for (const item of uploaded) {
-        if (!item) continue;
-        const el = (body.elements as any[]).find((e: any) => e.id === item.id);
-        if (el) el.props.stickerUrl = item.url;
+      const entries = Object.entries(body.elementImages as Record<string, string>);
+      for (const [eid, b64] of entries) {
+        if (isBase64(b64)) {
+          const url = await uploadBase64(b64, 'velvetsnap/templates').catch(
+            (e: any) => { throw new Error('element ' + eid + ' upload failed: ' + e.message); }
+          );
+          const el = (body.elements as any[]).find((e: any) => e.id === eid);
+          if (el) el.props.stickerUrl = url;
+        }
       }
       delete body.elementImages;
     }
