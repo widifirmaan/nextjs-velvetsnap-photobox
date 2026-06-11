@@ -110,7 +110,7 @@ export default function DevicesPage() {
   };
 
   return (
-    <div>
+    <div className={styles.pageWrapper}>
       <AdminPageHeader
         title="Device Settings"
         subtitle="Semua pengaturan disimpan di browser (localStorage) — setiap perangkat punya pengaturannya sendiri."
