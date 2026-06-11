@@ -9,19 +9,37 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLImageElement | null)[]>([]);
+  const posRef = useRef(0);
   const autoRef = useRef(0);
   const resumeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const readyRef = useRef(false);
   const loadedCount = useRef(0);
+  const dragging = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartPos = useRef(0);
 
   const tripled = [...strips.slice(0, 10), ...strips.slice(0, 10), ...strips.slice(0, 10)];
+
+  const applyTransform = useCallback(() => {
+    const c = trackRef.current;
+    if (!c) return;
+    c.style.transform = `translateX(${posRef.current}px)`;
+  }, []);
+
+  const loopPos = useCallback((pos: number) => {
+    const c = trackRef.current;
+    if (!c) return pos;
+    const totalWidth = c.scrollWidth;
+    const oneSet = totalWidth / 3;
+    if (pos <= -oneSet * 2) pos += oneSet;
+    else if (pos >= -oneSet) pos -= oneSet;
+    return pos;
+  }, []);
 
   const updateTransforms = useCallback(() => {
     const c = trackRef.current;
     if (!c) return;
-    const oneSet = c.scrollWidth / 3;
-    if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
-    else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
+    const absPos = Math.abs(posRef.current);
     if (smallVpRef.current) {
       slideRefs.current.forEach((el) => {
         if (!el) return;
@@ -31,11 +49,12 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
       });
       return;
     }
-    const cx = c.scrollLeft + c.clientWidth / 2;
+    const containerW = c.parentElement?.clientWidth || c.clientWidth;
+    const cx = containerW / 2 - posRef.current;
     slideRefs.current.forEach((el) => {
       if (!el) return;
       const ecx = el.offsetLeft + el.offsetWidth / 2;
-      const dist = (ecx - cx) / (c.clientWidth * 0.5);
+      const dist = (ecx - cx) / (containerW * 0.5);
       const abs = Math.abs(dist);
       const sign = Math.sign(dist);
       let rotY: number, scale: number, zIdx: number;
@@ -59,18 +78,41 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
     });
   }, [smallVpRef]);
 
+  const stepAuto = useCallback(() => {
+    posRef.current -= 0.8;
+    posRef.current = loopPos(posRef.current);
+    applyTransform();
+    updateTransforms();
+    autoRef.current = requestAnimationFrame(stepAuto);
+  }, [applyTransform, updateTransforms, loopPos]);
+
+  const startAutoScroll = useCallback(() => {
+    cancelAnimationFrame(autoRef.current);
+    autoRef.current = requestAnimationFrame(stepAuto);
+  }, [stepAuto]);
+
+  const stopAuto = useCallback(() => {
+    cancelAnimationFrame(autoRef.current);
+    clearTimeout(resumeTimer.current);
+  }, []);
+
+  const resumeAuto = useCallback(() => {
+    clearTimeout(resumeTimer.current);
+    resumeTimer.current = setTimeout(startAutoScroll, 3000);
+  }, [startAutoScroll]);
+
   useEffect(() => {
     if (!strips.length) return;
     const c = trackRef.current;
     if (!c) return;
-    requestAnimationFrame(() => {
-      if (c.scrollWidth > c.clientWidth) c.scrollLeft = c.scrollWidth / 3;
-      const onScroll = () => requestAnimationFrame(updateTransforms);
-      c.addEventListener('scroll', onScroll, { passive: true });
-      updateTransforms();
-      return () => c.removeEventListener('scroll', onScroll);
-    });
-  }, [updateTransforms, strips]);
+    posRef.current = -(c.scrollWidth / 3);
+    c.style.transform = `translateX(${posRef.current}px)`;
+    c.style.willChange = 'transform';
+    applyTransform();
+    updateTransforms();
+    const t = setTimeout(startAutoScroll, 100);
+    return () => { clearTimeout(t); stopAuto(); };
+  }, [strips.length, applyTransform, updateTransforms, startAutoScroll, stopAuto]);
 
   useEffect(() => {
     if (!strips.length || !onReady) return;
@@ -90,27 +132,30 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
     return () => clearTimeout(fallback);
   }, [onReady, strips]);
 
-  const handleUserInteract = useCallback(() => {
-    cancelAnimationFrame(autoRef.current);
-    clearTimeout(resumeTimer.current);
-  }, []);
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    stopAuto();
+    dragging.current = true;
+    dragStartX.current = e.clientX;
+    dragStartPos.current = posRef.current;
+    const c = trackRef.current;
+    if (c) c.style.transition = 'none';
+  }, [stopAuto]);
 
-  const scheduleResume = useCallback(() => {
-    clearTimeout(resumeTimer.current);
-    resumeTimer.current = setTimeout(() => {
-      const c = trackRef.current;
-      if (!c || c.scrollWidth <= c.clientWidth) return;
-      const step = () => {
-        const oneSet = c.scrollWidth / 3;
-        c.scrollLeft += 0.8;
-        if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
-        else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
-        updateTransforms();
-        autoRef.current = requestAnimationFrame(step);
-      };
-      autoRef.current = requestAnimationFrame(step);
-    }, 3000);
-  }, [updateTransforms]);
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragging.current) return;
+    const dx = e.clientX - dragStartX.current;
+    posRef.current = dragStartPos.current + dx;
+    posRef.current = loopPos(posRef.current);
+    applyTransform();
+    updateTransforms();
+  }, [applyTransform, updateTransforms, loopPos]);
+
+  const handlePointerUp = useCallback(() => {
+    dragging.current = false;
+    const c = trackRef.current;
+    if (c) c.style.transition = '';
+    resumeAuto();
+  }, [resumeAuto]);
 
   const handleLoad = useCallback(() => {
     loadedCount.current++;
@@ -123,48 +168,59 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
     }
   }, [onReady, strips.length]);
 
-  const startAutoScroll = useCallback(() => {
-    const c = trackRef.current;
-    if (!c || c.scrollWidth <= c.clientWidth) return;
-    const step = () => {
-      const oneSet = c.scrollWidth / 3;
-      c.scrollLeft += 0.8;
-      if (c.scrollLeft >= oneSet * 2) c.scrollLeft -= oneSet;
-      else if (c.scrollLeft < oneSet) c.scrollLeft += oneSet;
-      updateTransforms();
-      autoRef.current = requestAnimationFrame(step);
-    };
-    autoRef.current = requestAnimationFrame(step);
-  }, [updateTransforms]);
-
-  useEffect(() => {
-    if (!strips.length) return;
-    const t = setTimeout(startAutoScroll, 100);
-    return () => { clearTimeout(t); cancelAnimationFrame(autoRef.current); clearTimeout(resumeTimer.current); };
-  }, [startAutoScroll, strips.length]);
-
   return (
     <div className={styles.colRight}>
       {strips.length > 0 ? (
-        <div
-          ref={trackRef}
-          className={styles.fanTrack}
-          onPointerDown={handleUserInteract}
-          onPointerUp={scheduleResume}
-          onPointerLeave={scheduleResume}
-        >
-          {tripled.map((s, i) => (
-            <img
-              key={`${s._id}-${i}`}
-              ref={(el) => { slideRefs.current[i] = el; }}
-              src={s.finalImage}
-              alt=""
-              className={styles.fanSlide}
-              draggable={false}
-              onLoad={() => { updateTransforms(); handleLoad(); }}
-              onError={() => { updateTransforms(); handleLoad(); }}
-            />
-          ))}
+        <div className={styles.fanViewport}>
+          <div
+            ref={trackRef}
+            className={styles.fanTrack}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            onTouchStart={(e) => {
+              stopAuto();
+              dragging.current = true;
+              dragStartX.current = e.touches[0].clientX;
+              dragStartPos.current = posRef.current;
+              const c = trackRef.current;
+              if (c) c.style.transition = 'none';
+            }}
+            onTouchMove={(e) => {
+              if (!dragging.current) return;
+              const dx = e.touches[0].clientX - dragStartX.current;
+              posRef.current = dragStartPos.current + dx;
+              posRef.current = loopPos(posRef.current);
+              applyTransform();
+              updateTransforms();
+            }}
+            onTouchEnd={() => {
+              dragging.current = false;
+              const c = trackRef.current;
+              if (c) c.style.transition = '';
+              resumeAuto();
+            }}
+            onTouchCancel={() => {
+              dragging.current = false;
+              const c = trackRef.current;
+              if (c) c.style.transition = '';
+              resumeAuto();
+            }}
+          >
+            {tripled.map((s, i) => (
+              <img
+                key={`${s._id}-${i}`}
+                ref={(el) => { slideRefs.current[i] = el; }}
+                src={s.finalImage}
+                alt=""
+                className={styles.fanSlide}
+                draggable={false}
+                onLoad={() => { updateTransforms(); handleLoad(); }}
+                onError={() => { updateTransforms(); handleLoad(); }}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         <div className={styles.rightEmpty}>
