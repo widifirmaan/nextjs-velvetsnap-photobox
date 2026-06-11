@@ -144,7 +144,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <div>
+    <div className={styles.pageWrapper}>
       <AdminPageHeader
         title="Photo History"
         subtitle="Browse and filter past photobooth sessions"

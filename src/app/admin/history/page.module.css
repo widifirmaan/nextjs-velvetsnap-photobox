@@ -1,17 +1,30 @@
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pageWrapper > * {
+  min-height: 0;
+  flex-shrink: 1;
+}
+
 /* Filters */
 .filters {
   background: var(--clay-bg);
   border-radius: var(--clay-radius);
   box-shadow: var(--clay-shadow);
-  padding: 28px;
-  margin-bottom: 32px;
+  padding: 20px;
+  margin-bottom: 20px;
   animation: fadeInUp 0.4s ease backwards;
   animation-delay: 0.1s;
 }
 
 .filterRow {
   display: flex;
-  gap: 24px;
+  gap: 16px;
   align-items: flex-end;
   flex-wrap: wrap;
 }
@@ -61,9 +74,11 @@
   border-radius: var(--clay-radius);
   box-shadow: var(--clay-shadow);
   padding: 0;
-  overflow-x: auto;
+  overflow: auto;
   min-width: 0;
-  margin-bottom: 60px;
+  min-height: 0;
+  flex: 1;
+  margin-bottom: 24px;
 }
 
 .table {
@@ -74,7 +89,7 @@
 
 .table thead th {
   text-align: left;
-  padding: 14px 16px;
+  padding: 10px 12px;
   font-weight: 600;
   font-size: 11px;
   text-transform: uppercase;
@@ -98,8 +113,9 @@
 }
 
 .table tbody td {
-  padding: 14px 16px;
+  padding: 10px 12px;
   white-space: nowrap;
+  font-size: 12px;
 }
 
 .sessionId {
@@ -130,10 +146,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   background: var(--bg-secondary);
   color: var(--text-secondary);
   cursor: pointer;
@@ -156,7 +172,8 @@
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 12px;
+  flex-shrink: 0;
 }
 
 .pageInfo {
@@ -280,6 +297,7 @@
 @media (max-width: 640px) {
   .filterRow {
     flex-direction: column;
+    gap: 12px;
   }
   .filterActions {
     width: 100%;
@@ -297,61 +315,90 @@
     display: none;
   }
   .tableContainer {
-    overflow-x: auto;
+    overflow: auto;
+    margin-bottom: 16px;
   }
   .table {
-    min-width: 460px;
+    min-width: 400px;
   }
   .pagination {
     flex-wrap: wrap;
+    margin-top: 8px;
+    gap: 8px;
+  }
+  .pageInfo {
+    font-size: 12px;
   }
   .filters {
-    padding: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
   }
   .filterGroup input,
   .filterGroup select {
     font-size: 16px;
+    padding: 8px 10px;
   }
   .table thead th {
     font-size: 10px;
-    padding: 10px 8px;
+    padding: 8px 6px;
   }
   .table tbody td {
-    padding: 12px 8px;
-    font-size: 12px;
+    padding: 8px 6px;
+    font-size: 11px;
   }
 }
 
 @media (max-width: 480px) {
   .filters {
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 10px;
+    margin-bottom: 10px;
   }
   .filterGroup label {
-    font-size: 11px;
+    font-size: 10px;
   }
   .filterGroup input,
   .filterGroup select {
-    padding: 10px 12px;
-    font-size: 14px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  .filterRow {
+    gap: 8px;
   }
   .filterActions {
-    gap: 6px;
+    gap: 4px;
   }
   .filterActions button {
-    font-size: 12px;
-    padding: 8px 12px;
+    font-size: 11px;
+    padding: 6px 10px;
   }
   .tableContainer {
-    margin-bottom: 40px;
+    margin-bottom: 12px;
+  }
+  .table {
+    min-width: 340px;
   }
   .table thead th {
-    font-size: 9px;
-    padding: 8px 6px;
+    font-size: 8px;
+    padding: 6px 4px;
   }
   .table tbody td {
-    padding: 10px 6px;
-    font-size: 11px;
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+  .actionBtn {
+    width: 24px;
+    height: 24px;
+  }
+  .pagination {
+    margin-top: 6px;
+    gap: 6px;
+  }
+  .pagination button {
+    font-size: 11px !important;
+    padding: 6px 10px !important;
+  }
+  .pageInfo {
+    font-size: 10px;
   }
   .modalGrid {
     grid-template-columns: 1fr;
