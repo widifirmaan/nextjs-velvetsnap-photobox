@@ -98,22 +98,19 @@ export async function POST(req: Request) {
       await Transaction.collection.dropIndex('id_1');
     } catch {}
 
+    // Upload to Cloudinary first — never store base64 in DB
     let finalImageUrl = finalImage || '';
     let capturesUrls = captures || [];
 
     if (finalImage && isBase64(finalImage)) {
-      try {
-        finalImageUrl = await uploadBase64(finalImage, 'velvetsnap/final');
-      } catch {}
+      finalImageUrl = await uploadBase64(finalImage, 'velvetsnap/final');
     }
     if (captures?.length) {
       const b64Captures = captures.filter(isBase64);
       if (b64Captures.length) {
-        try {
-          const urls = await uploadBase64Array(b64Captures, 'velvetsnap/captures');
-          let idx = 0;
-          capturesUrls = captures.map((c: string) => isBase64(c) ? (urls[idx++] || c) : c);
-        } catch {}
+        const urls = await uploadBase64Array(b64Captures, 'velvetsnap/captures');
+        let idx = 0;
+        capturesUrls = captures.map((c: string) => isBase64(c) ? (urls[idx++] || c) : c);
       }
     }
 
