@@ -20,7 +20,7 @@ interface TemplateCardProps {
 }
 
 export default function TemplateCard({ template, onSelect, livePreviewUrl }: TemplateCardProps) {
-  const thumbSrc = template.frameImage || template.thumbnail;
+  const thumbSrc = template.thumbnail || template.frameImage;
   const displaySrc = livePreviewUrl || thumbSrc;
   return (
     <button key={template._id} className={styles.templateCard} onClick={() => onSelect(template.templateId)}>

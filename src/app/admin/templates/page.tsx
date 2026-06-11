@@ -102,12 +102,12 @@ export default function TemplatesAdmin() {
                 <tr key={t._id}>
                   <td>
                     <div className={styles.templateThumb}>
-                      {t.frameImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.frameImage} alt={t.name} />
-                      ) : t.thumbnail ? (
+                      {t.thumbnail ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={t.thumbnail} alt={t.name} />
+                      ) : t.frameImage ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={t.frameImage} alt={t.name} />
                       ) : (
                         <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>—</span>
                       )}
