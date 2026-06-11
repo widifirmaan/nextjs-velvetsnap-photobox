@@ -216,6 +216,9 @@ export default function StripsStudioPage() {
       if (data.canvasWidth && data.canvasHeight) {
         setCanvasSize({ w: data.canvasWidth, h: data.canvasHeight });
       }
+      if (typeof data.price === 'number') {
+        setTemplatePrice(data.price);
+      }
       if (data.color) {
         setCanvasBg(data.color);
       }
