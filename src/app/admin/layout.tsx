@@ -2,11 +2,21 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image } from 'lucide-react';
+import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image, Loader2 } from 'lucide-react';
 import styles from './layout.module.css';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [navigating, setNavigating] = useState(false);
+
+  useEffect(() => {
+    setNavigating(false);
+  }, [pathname]);
+
+  const handleNavClick = useCallback(() => {
+    setNavigating(true);
+  }, []);
 
   const navLinks = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
@@ -26,51 +36,66 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return pathname.startsWith(href);
   };
 
+  const renderNavLink = (link: { href: string; label: string; icon: any }) => {
+    const Icon = link.icon;
+    return (
+      <Link
+        key={link.href}
+        href={link.href}
+        onClick={handleNavClick}
+        className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
+      >
+        <Icon size={20} /> {link.label}
+      </Link>
+    );
+  };
+
+  const renderBottomNavItem = (link: { href: string; label: string; icon: any }) => {
+    const Icon = link.icon;
+    return (
+      <Link
+        key={link.href}
+        href={link.href}
+        onClick={handleNavClick}
+        className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
+        title={link.label}
+      >
+        <Icon size={24} />
+        <span className={styles.bottomNavLabel}>{link.label}</span>
+      </Link>
+    );
+  };
+
   return (
     <div className={styles.adminLayout}>
+      {navigating && (
+        <div className={styles.navLoader}>
+          <div className={styles.navLoaderInner}>
+            <Loader2 className="spin" size={32} />
+            <span>Loading...</span>
+          </div>
+        </div>
+      )}
+
       <div className={`glass-panel ${styles.sidebar}`}>
         <div className={styles.brand}>VelvetSnap</div>
         <nav className={styles.nav}>
-          {navLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
-              >
-                <Icon size={20} /> {link.label}
-              </Link>
-            );
-          })}
-
+          {navLinks.map(renderNavLink)}
           <div className={styles.navDivider} />
-
-          {bottomLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
-              >
-                <Icon size={20} /> {link.label}
-              </Link>
-            );
-          })}
+          {bottomLinks.map(renderNavLink)}
         </nav>
-        
+
         <div className={styles.sidebarFooter}>
-          <Link 
-            href="/" 
-            className={styles.navLink} 
+          <Link
+            href="/"
+            className={styles.navLink}
             style={{ color: 'var(--text-secondary)' }}
           >
             &larr; Return to App
           </Link>
         </div>
       </div>
-      
+
       <div className={styles.content}>
         {children}
         <footer className={styles.contentFooter}>
@@ -78,41 +103,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </footer>
       </div>
 
-      {/* Mobile Top Bar */}
       <div className={styles.mobileTopBar}>
         <span>VelvetSnap Photobooth Platform</span>
       </div>
 
-      {/* Bottom Navigation */}
       <nav className={styles.bottomNav}>
-        {navLinks.map((link) => {
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
-              title={link.label}
-            >
-              <Icon size={24} />
-              <span className={styles.bottomNavLabel}>{link.label}</span>
-            </Link>
-          );
-        })}
-        {bottomLinks.map((link) => {
-          const Icon = link.icon;
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
-              title={link.label}
-            >
-              <Icon size={24} />
-              <span className={styles.bottomNavLabel}>{link.label}</span>
-            </Link>
-          );
-        })}
+        {navLinks.map(renderBottomNavItem)}
+        {bottomLinks.map(renderBottomNavItem)}
       </nav>
     </div>
   );
