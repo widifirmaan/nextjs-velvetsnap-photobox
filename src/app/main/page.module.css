@@ -588,9 +588,9 @@
 }
 
 .fanSlide {
-  height: 200px;
+  max-height: 50dvh;
   width: auto;
-  max-height: 200px;
+  height: auto;
   display: block;
   object-fit: contain;
   border-radius: 8px;
@@ -759,8 +759,7 @@
   }
   .fanSlide {
     margin-left: 0;
-    height: 98%;
-    max-height: none;
+    height: auto;
   }
 }
 
