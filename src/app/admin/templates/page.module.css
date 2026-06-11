@@ -1,3 +1,16 @@
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pageWrapper > * {
+  min-height: 0;
+  flex-shrink: 1;
+}
+
 /* Form */
 .formCard {
   background: var(--clay-bg);
@@ -371,9 +384,13 @@
     gap: 8px;
   }
   
+  .table th, .table td {
+    padding: 6px 4px;
+    font-size: 10px;
+  }
+
   .table {
-    min-width: 100%;
-    font-size: 11px;
+    min-width: 520px;
   }
 }
 

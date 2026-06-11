@@ -74,7 +74,7 @@ export default function TemplatesAdmin() {
   };
 
   return (
-    <div>
+    <div className={styles.pageWrapper}>
       <AdminPageHeader
         title="Templates"
         subtitle="Manage photobooth templates and frames"
