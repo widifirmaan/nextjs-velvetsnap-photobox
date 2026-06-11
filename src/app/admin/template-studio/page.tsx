@@ -319,28 +319,62 @@ export default function StripsStudioPage() {
     setCanvasBg('#ffffff');
   };
 
+  const uploadBase64Client = async (dataUri: string, folder = 'velvetsnap/templates'): Promise<string> => {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUri, folder }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Upload failed');
+    return data.url;
+  };
+
   const handleSave = async () => {
     if (!templateName.trim()) return;
     setSaving(true);
     setSelectedId(null);
-    // Wait a tick for state to propagate before rendering
     await new Promise((r) => setTimeout(r, 50));
     try {
-      const thumbnail = editorRef.current?.getThumbnail() || '';
+      const thumbnailB64 = editorRef.current?.getThumbnail() || '';
       const rawFrame = editorRef.current?.getFrameImage() || '';
-      const frameImage = await removeGreenScreen(rawFrame);
-      const elementImages: Record<string, string> = {};
+      const frameB64 = await removeGreenScreen(rawFrame);
+      const toUpload: { key: string; b64: string; folder?: string }[] = [];
+      if (frameB64) toUpload.push({ key: 'frameImage', b64: frameB64 });
+      if (thumbnailB64) toUpload.push({ key: 'thumbnail', b64: thumbnailB64 });
+
       const savedElements = await Promise.all(elements.map(async (el) => {
         const copy = { ...el, props: { ...el.props } };
         const url = copy.props.stickerUrl;
         if (url && (url.startsWith('blob:') || url.startsWith('data:image/'))) {
           const b64 = await blobToBase64(url);
           if (b64 !== url) {
-            elementImages[el.id] = b64;
+            const key = 'el_' + el.id;
+            toUpload.push({ key, b64 });
           }
         }
         return copy;
       }));
+
+      // Upload all images to Cloudinary first
+      const uploaded = await Promise.all(toUpload.map(async (item) => {
+        const url = await uploadBase64Client(item.b64, item.folder || 'velvetsnap/templates');
+        return { key: item.key, url };
+      }));
+
+      let frameImage = '';
+      let thumbnail = '';
+      const stickerUrls: Record<string, string> = {};
+      for (const u of uploaded) {
+        if (u.key === 'frameImage') frameImage = u.url;
+        else if (u.key === 'thumbnail') thumbnail = u.url;
+        else if (u.key.startsWith('el_')) stickerUrls[u.key.slice(3)] = u.url;
+      }
+      // Apply uploaded sticker URLs to elements
+      for (const el of savedElements) {
+        if (stickerUrls[el.id]) el.props.stickerUrl = stickerUrls[el.id];
+      }
+
       const photoSlots = elements.filter((el) => el.type === 'photo-slot').sort((a, b) => a.zIndex - b.zIndex);
       const slotsLayout = photoSlots.map((el) => ({
         x: Math.round((el.x / canvasSize.w) * 1000) / 10,
@@ -361,7 +395,6 @@ export default function StripsStudioPage() {
         frameImage,
         slotsLayout,
         thumbnail,
-        elementImages: Object.keys(elementImages).length ? elementImages : undefined,
         elements: savedElements,
       };
       let res;
@@ -372,7 +405,6 @@ export default function StripsStudioPage() {
           body: JSON.stringify(body),
         });
       } else {
-        // Fetch latest templates to compute unique ID (handles multi-tab)
         const listRes = await fetch('/api/templates');
         const listData = await listRes.json();
         const existingIds = (listData.data || []).map((t: any) => t.templateId || '').filter(Boolean);
