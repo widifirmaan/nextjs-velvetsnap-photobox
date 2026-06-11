@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import mongoose from 'mongoose';
-import { uploadBase64, uploadBase64Array, isBase64, deleteImages } from '@/lib/cloudinary';
+import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/cloudinary';
 
 export async function GET(req: Request) {
   try {
@@ -54,14 +54,7 @@ export async function DELETE(req: Request) {
     if (!id) {
       return NextResponse.json({ success: false, error: 'id is required' }, { status: 400 });
     }
-    const tx = await Transaction.findById(id).lean();
-    if (tx) {
-      const imageUrls: string[] = [];
-      if (tx.finalImage) imageUrls.push(tx.finalImage);
-      if (tx.captures?.length) imageUrls.push(...tx.captures);
-      await deleteImages(imageUrls);
-      await Transaction.findByIdAndDelete(id);
-    }
+    await Transaction.findByIdAndDelete(id);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
