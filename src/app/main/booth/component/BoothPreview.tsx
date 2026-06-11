@@ -1,13 +1,14 @@
 'use client';
 
 import { ISlot } from '@/lib/canvas-utils';
-import { X, Check } from 'lucide-react';
+import { X, Check, Upload } from 'lucide-react';
 import { TemplateData } from '../../types';
 import styles from '@/app/main/page.module.css';
+import { useRef } from 'react';
 
 export default function BoothPreview({
   templateData, captures, keyedFrameImage, frameRatio, filledCount, slotsCount,
-  onDeleteCapture, onNext,
+  onAddCapture, onDeleteCapture, onNext,
 }: {
   templateData: TemplateData | null;
   captures: string[];
@@ -15,9 +16,28 @@ export default function BoothPreview({
   frameRatio: number;
   filledCount: number;
   slotsCount: number;
+  onAddCapture: (url: string, slotIdx?: number) => void;
   onDeleteCapture: (idx: number) => void;
   onNext: () => void;
 }) {
+  const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  const handleUpload = (idx: number) => {
+    fileRefs.current[idx]?.click();
+  };
+
+  const handleFileChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      if (dataUrl) onAddCapture(dataUrl, idx);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
   return (
     <>
       {templateData?.slotsLayout && (
@@ -31,11 +51,22 @@ export default function BoothPreview({
                   width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden',
                   background: src ? 'none' : 'rgba(0,0,0,0.06)', borderRadius: '2px',
                 }}>
-                  {src && (
+                  {src ? (
                     <>
                       <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       <button className={styles.boothDeleteSlot} onClick={() => onDeleteCapture(idx)}><X size={14} /></button>
                     </>
+                  ) : (
+                    <button className={styles.boothUploadSlot} onClick={() => handleUpload(idx)} type="button">
+                      <Upload size={20} />
+                      <input
+                        ref={(el) => { fileRefs.current[idx] = el; }}
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => handleFileChange(idx, e)}
+                      />
+                    </button>
                   )}
                 </div>
               );

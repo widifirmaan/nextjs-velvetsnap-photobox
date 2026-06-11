@@ -79,8 +79,11 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
     loadTemplate();
   }, [templateId, allTemplates]);
 
-  const handleAddCapture = useCallback((url: string) => {
+  const handleAddCapture = useCallback((url: string, slotIdx?: number) => {
     setCaptures((prev) => {
+      if (slotIdx !== undefined && slotIdx >= 0 && slotIdx < prev.length) {
+        const n = [...prev]; n[slotIdx] = url; return n;
+      }
       const idx = prev.findIndex((c) => c === '');
       if (idx !== -1) { const n = [...prev]; n[idx] = url; return n; }
       return [...prev, url];

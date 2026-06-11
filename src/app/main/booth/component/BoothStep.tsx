@@ -16,7 +16,7 @@ export default function BoothStep({
   onNext, onBack,
 }: {
   templateId: string; templateName: string; slotsCount: number; filledCount: number; captures: string[];
-  onAddCapture: (url: string) => void; onDeleteCapture: (idx: number) => void;
+  onAddCapture: (url: string, slotIdx?: number) => void; onDeleteCapture: (idx: number) => void;
   templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
   onNext: () => void; onBack: () => void;
 }) {
@@ -182,6 +182,7 @@ export default function BoothStep({
           frameRatio={frameRatio}
           filledCount={filledCount}
           slotsCount={slotsCount}
+          onAddCapture={onAddCapture}
           onDeleteCapture={onDeleteCapture}
           onNext={onNext}
         />
