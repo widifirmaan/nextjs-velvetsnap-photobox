@@ -80,7 +80,7 @@ export default function FinancePage() {
   const maxTemplate = Math.max(...data.templateRevenue.map((t) => t.total), 1);
 
   return (
-    <div>
+    <div className={styles.pageWrapper}>
       <AdminPageHeader
         title="Finance"
         subtitle="Revenue analytics and financial overview"
