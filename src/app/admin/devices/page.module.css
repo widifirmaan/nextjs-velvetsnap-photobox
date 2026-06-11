@@ -298,59 +298,6 @@
   }
 }
 
-.pageWrapper > * {
-  min-height: 0;
-  flex-shrink: 1;
-}
-
-.header {
-    flex-direction: column;
-    margin-bottom: 24px;
-  }
-  
-  .section {
-    padding: 20px;
-  }
-  
-  .sectionHeader {
-    margin-bottom: 16px;
-  }
-  
-  .sectionHeader h2 {
-    font-size: 15px;
-  }
-  
-  .cameraTypeRow {
-    gap: 8px;
-  }
-  
-  .typeCard {
-    min-width: 100px;
-    padding: 16px 12px;
-    font-size: 13px;
-  }
-  
-  .typeLabel {
-    font-size: 12px;
-  }
-  
-  .fieldGroup {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-  }
-  
-  .saveBar {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 40px;
-  }
-  
-  .storageBadge {
-    margin-left: 0;
-  }
-}
-
 @media (max-width: 640px) {
   .sections {
     gap: 12px;
