@@ -588,9 +588,9 @@
 }
 
 .fanSlide {
-  max-height: 320px;
+  height: 200px;
   width: auto;
-  height: auto;
+  max-height: 200px;
   display: block;
   object-fit: contain;
   border-radius: 8px;
