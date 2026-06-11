@@ -13,14 +13,33 @@ export default function PaymentStep({
   captcha: string[]; templateId: string; compositedImage: string | null;
   onSuccess: (id: string) => void; onBack: () => void;
 }) {
+  const uploadImage = async (dataUri: string, folder: string): Promise<string> => {
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dataUri, folder }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Upload failed');
+    return data.url;
+  };
+
   const handlePay = async () => {
     setPaid(true); setErrMsg(null);
     try {
-      const finalImage = compositedImage || '';
+      // Upload images to Cloudinary first to avoid body size limit
+      const finalImage = compositedImage?.startsWith('data:')
+        ? await uploadImage(compositedImage, 'velvetsnap/final')
+        : (compositedImage || '');
+      const captures = await Promise.all(
+        (captcha || []).map(async (c) =>
+          c.startsWith('data:') ? await uploadImage(c, 'velvetsnap/captures') : c
+        )
+      );
       const res = await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ templateId, price, status: 'PAID', captures: captcha, finalImage }),
+        body: JSON.stringify({ templateId, price, status: 'PAID', captures, finalImage }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) {
