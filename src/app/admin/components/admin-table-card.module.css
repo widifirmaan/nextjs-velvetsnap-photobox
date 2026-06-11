@@ -1,26 +1,72 @@
 .card {
-  padding: 24px;
-  margin-bottom: 32px;
+  padding: 20px;
+  margin-bottom: 24px;
   min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
 }
 
 .scrollWrap {
-  overflow-x: auto;
+  overflow: auto;
   min-width: 0;
+  flex: 1;
+  min-height: 0;
 }
 
 .scrollWrap table {
   min-width: 600px;
+}
+
+@media (max-width: 1024px) {
+  .card {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .header {
+    margin-bottom: 8px;
+  }
+  .title {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .title {
+    font-size: 13px;
+  }
+  .header {
+    margin-bottom: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .title {
+    font-size: 11px;
+  }
+  .header {
+    margin-bottom: 4px;
+  }
 }

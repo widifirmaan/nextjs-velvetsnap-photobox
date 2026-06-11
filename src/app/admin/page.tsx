@@ -3,7 +3,7 @@ import Template from '@/models/Template';
 import Transaction from '@/models/Transaction';
 import Link from 'next/link';
 import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'lucide-react';
-import { AdminPageHeader, AdminStatCard, AdminStatGrid, AdminBadge, AdminTableCard } from '@/app/admin/components';
+import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
 import styles from './page.module.css';
 
 export const revalidate = 0;
@@ -13,7 +13,6 @@ export default async function AdminDashboard() {
 
   const templates = await Template.find({}).lean();
   const activeTemplates = templates.filter((t: any) => t.isActive !== false);
-  const transactions = await Transaction.find({}).sort({ createdAt: -1 }).limit(10).lean();
   const totalSessions = await Transaction.countDocuments();
 
   const totalRevenueAgg = await Transaction.aggregate([
@@ -63,7 +62,7 @@ export default async function AdminDashboard() {
   }
 
   return (
-    <div>
+    <div className={styles.pageWrapper}>
       <AdminPageHeader
         title="Dashboard"
         subtitle="VelvetSnap Co. — Admin Dashboard"
@@ -143,40 +142,7 @@ export default async function AdminDashboard() {
         </Link>
       </div>
 
-      {/* Recent Transactions */}
-      <AdminTableCard
-        title="Recent Transactions"
-        action={<Link href="/admin/history" className={styles.viewAll}>View All →</Link>}
-      >
-        {transactions.length === 0 ? (
-          <p style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>No transactions yet.</p>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Session ID</th>
-                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Template</th>
-                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Status</th>
-                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Price</th>
-                <th style={{ textAlign: 'left', padding: '12px 8px', color: 'var(--text-secondary)', fontWeight: 500, fontSize: 13, textTransform: 'uppercase', letterSpacing: '0.03em', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((tx: any) => (
-                <tr key={tx._id.toString()} style={{ transition: 'background 0.2s' }}>
-                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>{tx.sessionId ? tx.sessionId.substring(0, 8) : 'N/A'}...</td>
-                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>{tx.templateId || 'Unknown'}</td>
-                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
-                    <AdminBadge status={tx.status || 'PENDING'} />
-                  </td>
-                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>Rp {(tx.price || 0).toLocaleString('id-ID')}</td>
-                  <td style={{ padding: '12px 8px', borderBottom: '1px solid rgba(0,0,0,0.05)' }}>{new Date(tx.createdAt || new Date()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </AdminTableCard>
+
     </div>
   );
 }

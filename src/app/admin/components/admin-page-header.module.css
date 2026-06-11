@@ -2,7 +2,43 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .header :global(.title) {
+    font-size: 20px;
+  }
+  .header :global(.subtitle) {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+  .header :global(.title) {
+    font-size: 17px;
+  }
+  .header :global(.subtitle) {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    margin-bottom: 8px;
+    gap: 6px;
+  }
+  .header :global(.title) {
+    font-size: 15px;
+    margin-bottom: 4px !important;
+  }
+  .header :global(.subtitle) {
+    font-size: 10px;
+  }
 }

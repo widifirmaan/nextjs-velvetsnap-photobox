@@ -33,7 +33,6 @@ export default function RootLayout({
                 caches.keys().then(function(keys) {
                   keys.forEach(function(k) { caches.delete(k); });
                 });
-                navigator.serviceWorker.register('/sw.js?v=3', { updateViaCache: 'none' });
               }
             `,
           }}
