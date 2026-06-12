@@ -1,16 +1,6 @@
-/**
- * Migration script: rename template fields and nest canvas data under templateData.
- *
- * Usage:
- *   npx tsx scripts/migrate-template-fields.ts
- */
-import mongoose from 'mongoose';
-import * as fs from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 
 const envPath = path.resolve(__dirname, '../.env');
 const envContent = fs.readFileSync(envPath, 'utf-8');
@@ -29,7 +19,7 @@ if (!MONGODB_URI) { console.error('MONGODB_URI not set'); process.exit(1); }
 
 async function migrate() {
   await mongoose.connect(MONGODB_URI);
-  const db = mongoose.connection.db!;
+  const db = mongoose.connection.db;
   const coll = db.collection('templates');
 
   const docs = await coll.find({}).toArray();
@@ -39,13 +29,12 @@ async function migrate() {
   let skipped = 0;
 
   for (const doc of docs) {
-    // Skip if already has the new fields
     if (doc.templateName || doc.templateData) {
       skipped++;
       continue;
     }
 
-    const update: Record<string, any> = {
+    const update = {
       $set: {
         templateName: doc.name || '',
         templateDesc: doc.description || '',
