@@ -52,8 +52,8 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
             img.src = keyed;
           });
         } else if (matched.type === 'strip' && matched.elements?.length) {
-          const cw = matched.canvasWidth || 600;
-          const ch = matched.canvasHeight || 900;
+          const cw = matched.canvasWidth || 1000;
+          const ch = matched.canvasHeight || 3000;
           const slotsLayout = stripElementsToSlotsLayout(matched.elements, cw, ch);
           matched.slotsLayout = slotsLayout;
           if (!matched.slots) matched.slots = slotsLayout.length;

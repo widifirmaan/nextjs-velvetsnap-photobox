@@ -88,8 +88,8 @@ const TemplateSchema = new Schema<ITemplate>({
     w: { type: Number, required: true },
     h: { type: Number, required: true }
   }],
-  canvasWidth: { type: Number, default: 600 },
-  canvasHeight: { type: Number, default: 900 },
+  canvasWidth: { type: Number, default: 1000 },
+  canvasHeight: { type: Number, default: 3000 },
   elements: [StripElementSchema],
   thumbnail: { type: String }
 }, { timestamps: true });
