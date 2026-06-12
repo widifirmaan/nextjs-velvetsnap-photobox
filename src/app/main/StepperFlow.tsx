@@ -75,13 +75,11 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
           const slotsLayout = stripElementsToSlotsLayout(matched.elements, cw, ch);
           matched.slotsLayout = slotsLayout;
           if (!matched.slots) matched.slots = slotsLayout.length;
-          if (matched.fullresUrl) {
-            matched.elements = matched.elements.map((el) =>
-              el.type === 'background' && el.props.stickerUrl
-                ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(matched.fullresUrl, cw, ch) } }
-                : el
-            );
-          }
+          matched.elements = matched.elements.map((el) =>
+            el.type === 'background' && el.props.stickerUrl
+              ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(el.props.stickerUrl, cw, ch) } }
+              : el
+          );
           try {
             const frameDataUrl = await renderStripFrame(matched.elements, cw, ch, matched.color || '#ffffff');
             const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
