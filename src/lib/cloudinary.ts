@@ -1,15 +1,24 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { Readable } from 'stream';
 
 cloudinary.config({
   secure: true,
 });
 
 export async function uploadBase64(dataUri: string, folder = 'velvetsnap'): Promise<string> {
-  const result = await cloudinary.uploader.upload(dataUri, {
-    folder,
-    resource_type: 'image',
+  const base64data = dataUri.replace(/^data:[\w\/-]+;base64,/, '');
+  const buffer = Buffer.from(base64data, 'base64');
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: 'image' },
+      (error, result) => {
+        if (error) reject(error);
+        else if (result) resolve(result.secure_url);
+        else reject(new Error('Upload returned no result'));
+      }
+    );
+    Readable.from(buffer).pipe(uploadStream);
   });
-  return result.secure_url;
 }
 
 export async function uploadBase64Array(dataUris: string[], folder = 'velvetsnap'): Promise<string[]> {
