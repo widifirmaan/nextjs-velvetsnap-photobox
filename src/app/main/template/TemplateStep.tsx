@@ -24,24 +24,28 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
   const compositingRef = useRef(false);
   const frameRef = useRef<string | null>(null);
 
-  // Fetch template list + full data in parallel batches
+  // Fetch template list — show cards immediately, load full data in background
   useEffect(() => {
+    let cancelled = false;
     fetch('/api/templates/list')
       .then((r) => r.json())
       .then(async (res) => {
+        if (cancelled) return;
         if (!res.success || !res.data?.length) { setLoading(false); return; }
         const active = res.data.filter((t: TemplateData) => t.isActive !== false);
         setTemplates(active);
+        setLoading(false); // <-- show cards NOW, raw thumbs visible
 
-        // Load full data in parallel (batch of 4) & chroma-key thumbnails
+        // Load full data (slotsLayout etc.) + chroma-key in background
         const batchSize = 4;
         for (let i = 0; i < active.length; i += batchSize) {
+          if (cancelled) return;
           const batch = active.slice(i, i + batchSize);
           await Promise.all(batch.map(async (t: any) => {
             try {
               const r = await fetch(`/api/templates/thumbnails?id=${t.templateId}`);
               const fullRes = await r.json();
-              if (!fullRes.success || !fullRes.data?.length) return;
+              if (cancelled || !fullRes.success || !fullRes.data?.length) return;
               const full = fullRes.data[0];
               setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
               if ((full.templateThumb || full.templateFull) && full.templateData?.slotsLayout?.length) {
@@ -51,9 +55,9 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
             } catch {}
           }));
         }
-        setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   // Capture webcam every 6s
