@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, Home, Loader2 } from 'lucide-react';
+import { composeStripImage } from '@/lib/canvas-utils';
 import styles from './page.module.css';
 
 export interface ISlot {
@@ -10,6 +11,11 @@ export interface ISlot {
   y: number;
   w: number;
   h: number;
+}
+
+export interface IStripElement {
+  id: string; type: string; x: number; y: number; width: number; height: number;
+  rotation: number; zIndex: number; visible: boolean; props: any;
 }
 
 export interface TemplateData {
@@ -21,6 +27,10 @@ export interface TemplateData {
   color: string;
   frameImage?: string;
   slotsLayout?: ISlot[];
+  type?: 'frame' | 'strip';
+  elements?: IStripElement[];
+  canvasWidth?: number;
+  canvasHeight?: number;
 }
 
 // Helper to chromakey / remove green color #00bf63 from template frame image dynamically
@@ -250,16 +260,20 @@ export default function ResultPage() {
 
   useEffect(() => {
     if (!imagesReady || compositedImage || !dbTemplate) return;
-    const frameSrc = keyedFrameImage || dbTemplate.frameImage || '';
-    if (!frameSrc || !dbTemplate.slotsLayout || dbTemplate.slotsLayout.length === 0) return;
+    if (!dbTemplate.slotsLayout || dbTemplate.slotsLayout.length === 0) return;
     setRendering(true);
-    composeFrameImage(
-      frameSrc,
-      dbTemplate.slotsLayout,
-      captures,
-      photoAdjust,
-      dbTemplate.color || '#ffffff',
-    ).then((dataUrl) => {
+    const doComposite = dbTemplate.type === 'strip' && dbTemplate.elements?.length && dbTemplate.canvasWidth && dbTemplate.canvasHeight
+      ? composeStripImage(
+          dbTemplate.elements, dbTemplate.color || '#ffffff',
+          captures, photoAdjust,
+          dbTemplate.canvasWidth, dbTemplate.canvasHeight,
+        )
+      : (() => {
+          const frameSrc = keyedFrameImage || dbTemplate.frameImage || '';
+          if (!frameSrc) return Promise.reject('No frame');
+          return composeFrameImage(frameSrc, dbTemplate.slotsLayout!, captures, photoAdjust, dbTemplate.color || '#ffffff');
+        })();
+    doComposite.then((dataUrl) => {
       setCompositedImage(dataUrl);
       sessionStorage.setItem('photobooth_composited', dataUrl);
     }).catch(console.error)

@@ -132,10 +132,6 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       const stage = stageRef.current;
       if (!stage) return '';
       if (trRef.current) trRef.current.nodes([]);
-      // Turn photo-slot fills to solid green (at their z-level) so chroma key
-      // removes them.  Elements ABOVE the slot (text, stickers) render on top
-      // and survive chroma key.  Background elements are hidden because they
-      // should be behind the photo anyway.
       const groups = (stage as any).find('.photo-slot-group');
       const bgs = (stage as any).find('.bg-element');
       const saved: any[] = [];
@@ -157,7 +153,8 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
         g.visible(false);
       });
       stage.batchDraw();
-      const url = stage.toDataURL({ mimeType: 'image/png' });
+      const pr = scale > 0 ? 1 / scale : 1;
+      const url = stage.toDataURL({ mimeType: 'image/png', pixelRatio: pr });
       saved.forEach(({ node, visible, opacity, fill, stroke, strokeWidth }) => {
         if (opacity === null) { node.visible(visible); return; }
         node.setAttrs({ visible, opacity, fill, stroke, strokeWidth });
@@ -165,7 +162,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       stage.batchDraw();
       return url;
     },
-  }), []);
+  }), [scale]);
 
   useLayoutEffect(() => {
     const container = containerRef.current?.parentElement;

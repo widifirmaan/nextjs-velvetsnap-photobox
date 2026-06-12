@@ -97,17 +97,19 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
 
   useEffect(() => {
     if (!captures.length || !templateData?.slotsLayout?.length) return;
-    const frameSrc = keyedFrameImage || templateData.frameImage || '';
-    if (frameSrc) {
-      composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
-        .then(setCompositedImage)
-        .catch(() => {});
-    } else if (templateData.type === 'strip' && templateData.elements?.length && templateData.canvasWidth && templateData.canvasHeight) {
+    if (templateData.type === 'strip' && templateData.elements?.length && templateData.canvasWidth && templateData.canvasHeight) {
       composeStripImage(
         templateData.elements, templateData.color || '#ffffff',
         captures, photoAdjust,
         templateData.canvasWidth, templateData.canvasHeight,
       ).then(setCompositedImage).catch(() => {});
+    } else {
+      const frameSrc = keyedFrameImage || templateData.frameImage || '';
+      if (frameSrc) {
+        composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
+          .then(setCompositedImage)
+          .catch(() => {});
+      }
     }
   }, [captures, photoAdjust, templateData, keyedFrameImage]);
 
