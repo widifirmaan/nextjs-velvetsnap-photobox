@@ -5,16 +5,14 @@ import { LayoutTemplate, Loader2, ArrowLeft, Camera as CameraIcon, Check } from 
 import styles from './page.module.css';
 import { useState, useEffect } from 'react';
 
-interface TemplateData {
+interface TemplateItem {
   _id: string;
   templateId: string;
   name: string;
-  description: string;
   slots: number;
   price: number;
   color: string;
   isActive: boolean;
-  frameImage?: string;
   thumbnail?: string;
 }
 
@@ -30,18 +28,18 @@ function SlotDots({ count }: { count: number }) {
 
 export default function TemplatesPage() {
   const router = useRouter();
-  const [templates, setTemplates] = useState<TemplateData[]>([]);
+  const [templates, setTemplates] = useState<TemplateItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/templates/thumbnails')
+    fetch('/api/templates/list')
       .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          setTemplates(data.data.filter((t: TemplateData) => t.isActive !== false) || []);
+      .then((res) => {
+        if (res.success) {
+          setTemplates(res.data.filter((t: TemplateItem) => t.isActive !== false) || []);
         }
       })
-      .catch((err) => console.error('Failed to load templates:', err))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
@@ -94,8 +92,8 @@ export default function TemplatesPage() {
           {templates.map((t) => (
             <button key={t._id} className={styles.card} onClick={() => handleSelect(t.templateId)}>
               <div className={styles.cardThumb}>
-                {t.thumbnail || t.frameImage ? (
-                  <img src={t.thumbnail || t.frameImage} alt={t.name} loading="lazy" decoding="async" />
+                {t.thumbnail ? (
+                  <img src={t.thumbnail} alt={t.name} loading="lazy" decoding="async" />
                 ) : (
                   <LayoutTemplate size={48} style={{ color: t.color }} />
                 )}

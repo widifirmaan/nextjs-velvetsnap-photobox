@@ -9,8 +9,8 @@ import EditorStep from './editor/EditorStep';
 import PaymentStep from './payment/component/PaymentStep';
 import ResultStep from './result/component/ResultStep';
 
-export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: {
-  step: number; setStep: (s: number) => void; allTemplates: TemplateData[]; onRefresh?: () => void;
+export default function StepperFlow({ step, setStep, onRefresh }: {
+  step: number; setStep: (s: number) => void; onRefresh?: () => void;
 }) {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
@@ -34,15 +34,12 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
   useEffect(() => {
     if (!templateId) return;
     const loadTemplate = async () => {
-      // Try to find template from already fetched allTemplates
-      let matched = allTemplates.find((t) => t.templateId === templateId);
-      if (!matched) {
-        try {
-          const res = await fetch('/api/templates');
-          const data = await res.json();
-          if (data.success) matched = data.data.find((t: any) => t.templateId === templateId);
-        } catch {}
-      }
+      let matched: TemplateData | undefined;
+      try {
+        const res = await fetch(`/api/templates/thumbnails?id=${templateId}`);
+        const data = await res.json();
+        if (data.success && data.data?.length) matched = data.data[0];
+      } catch {}
       if (matched) {
         setTemplateData(matched);
         setPrice(matched.price ?? 35000);
@@ -77,7 +74,7 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
       }
     };
     loadTemplate();
-  }, [templateId, allTemplates]);
+  }, [templateId]);
 
   const handleAddCapture = useCallback((url: string, slotIdx?: number) => {
     setCaptures((prev) => {
@@ -119,7 +116,7 @@ export default function StepperFlow({ step, setStep, allTemplates, onRefresh }: 
 
   const startOver = () => { onRefresh?.(); setStep(0); setCaptures([]); setTemplateId(null); setTemplateData(null); setCompositedImage(null); setPaid(false); setErrMsg(null); };
 
-  if (step === 1) return <div className={styles.stepTransition}><TemplateStep templates={allTemplates} onSelect={handleSelectTemplate} onBack={() => setStep(0)} /></div>;
+  if (step === 1) return <div className={styles.stepTransition}><TemplateStep onSelect={handleSelectTemplate} onBack={() => setStep(0)} /></div>;
 
   if (step === 2) return (
     <div className={styles.stepTransition}>

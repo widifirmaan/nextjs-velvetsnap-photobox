@@ -10,33 +10,53 @@ import { removeGreenScreen, composeFrameImage } from '@/lib/canvas-utils';
 import TemplateCard from './TemplateCard';
 
 interface TemplateStepProps {
-  templates: TemplateData[];
   onSelect: (id: string) => void;
   onBack: () => void;
 }
 
-export default function TemplateStep({ templates, onSelect, onBack }: TemplateStepProps) {
+export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
   const webcamRef = useRef<Webcam>(null);
   const [latestFrame, setLatestFrame] = useState<string | null>(null);
   const [livePreviewUrls, setLivePreviewUrls] = useState<Record<string, string>>({});
+  const [templates, setTemplates] = useState<TemplateData[]>([]);
+  const [loading, setLoading] = useState(true);
   const keyedFramesRef = useRef<Record<string, string>>({});
   const compositingRef = useRef(false);
   const frameRef = useRef<string | null>(null);
 
-  // Pre-compute keyed frame images for all templates (once)
+  // Fetch template list (lightweight), then progressively load full data
   useEffect(() => {
-    (async () => {
-      const map: Record<string, string> = {};
-      await Promise.all(templates.map(async (t) => {
-        const src = t.frameImage;
-        if (!src || !t.slotsLayout?.length) return;
-        try {
-          map[t.templateId] = await removeGreenScreen(src);
-        } catch {}
-      }));
-      keyedFramesRef.current = map;
-    })();
-  }, [templates]);
+    fetch('/api/templates/list')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data?.length) {
+          const active = res.data.filter((t: TemplateData) => t.isActive !== false);
+          setTemplates(active);
+          setLoading(false);
+          // Load full data one-by-one, staggered by 300ms
+          active.forEach((t: any, i: number) => {
+            setTimeout(() => {
+              fetch(`/api/templates/thumbnails?id=${t.templateId}`)
+                .then((r) => r.json())
+                .then(async (fullRes) => {
+                  if (!fullRes.success || !fullRes.data?.length) return;
+                  const full = fullRes.data[0];
+                  setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
+                  if (full.frameImage && full.slotsLayout?.length) {
+                    try {
+                      keyedFramesRef.current[full.templateId] = await removeGreenScreen(full.frameImage);
+                    } catch {}
+                  }
+                })
+                .catch(() => {});
+            }, i * 300);
+          });
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch(() => setLoading(false));
+  }, []);
 
   // Capture webcam every 3s
   const capture = useCallback(() => {
@@ -67,14 +87,13 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
         return { id: t.templateId, url };
       }));
       const map: Record<string, string> = {};
-      results.forEach(r => { if (r) map[r.id] = r.url; });
+      results.forEach((r) => { if (r) map[r.id] = r.url; });
       setLivePreviewUrls(map);
     } catch {} finally {
       compositingRef.current = false;
     }
   }, [templates]);
 
-  // Composite whenever a new capture arrives (throttled by compositingRef)
   useEffect(() => {
     if (!latestFrame) return;
     composite();
@@ -91,7 +110,9 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
         videoConstraints={{ facingMode: 'user' }}
         style={{ position: 'fixed', top: 0, left: 0, width: 320, height: 240, opacity: 0, pointerEvents: 'none', zIndex: -1 }}
       />
-      {templates.length === 0 ? (
+      {loading ? (
+        <div className={styles.stepEmpty}><Loader2 className="spin" size={40} /></div>
+      ) : templates.length === 0 ? (
         <div className={styles.stepEmpty}><Loader2 className="spin" size={40} /></div>
       ) : (
         <div className={styles.templateGrid}>

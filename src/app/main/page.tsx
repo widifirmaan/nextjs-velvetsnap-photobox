@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import styles from './page.module.css';
-import type { StripResult, TemplateData } from './types';
+import type { StripResult } from './types';
 import HomePage from './homepage/HomePage';
 import StepperFlow from './StepperFlow';
 
@@ -15,7 +15,6 @@ export default function Home() {
   const [strips, setStrips] = useState<StripResult[]>([]);
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
-  const [allTemplates, setAllTemplates] = useState<TemplateData[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
   const [morphOrigin, setMorphOrigin] = useState<{x: number; y: number} | null>(null);
   const [btnMorph, setBtnMorph] = useState<{
@@ -36,21 +35,9 @@ export default function Home() {
       .then((r) => r.json())
       .then((res) => { if (res.success) setTxCount(res.pagination.total); })
       .catch(() => {});
-    fetch('/api/templates')
+    fetch('/api/templates/list')
       .then((r) => r.json())
       .then((res) => { if (res.success) setTmplCount(res.data.length); })
-      .catch(() => {});
-    fetch('/api/templates/thumbnails')
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.success && res.data?.length) {
-          const active = res.data.filter((t: TemplateData) => t.isActive !== false);
-          setAllTemplates(active);
-          active.forEach((t: TemplateData) => {
-            if (t.frameImage) { const img = new window.Image(); img.src = t.frameImage; }
-          });
-        }
-      })
       .catch(() => {});
   }, [refreshKey]);
 
@@ -63,7 +50,7 @@ export default function Home() {
       const timer = setTimeout(() => {
         setPreloaderFade(true);
         setTimeout(() => setShowPreloader(false), 500);
-      }, 8000);
+      }, 4000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -163,7 +150,7 @@ export default function Home() {
       </div>
       {step !== 0 && (
         <div key="flow" style={clipStyle} className={clipStage ? styles.clipReveal : styles.stepContent}>
-          <StepperFlow step={step} setStep={setStep} allTemplates={allTemplates} onRefresh={handleRefresh} />
+          <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh} />
         </div>
       )}
     </>
