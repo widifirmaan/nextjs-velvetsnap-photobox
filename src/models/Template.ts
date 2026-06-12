@@ -116,4 +116,6 @@ const TemplateSchema = new Schema<any>({
   slots: { type: Number },
 }, { timestamps: true });
 
+TemplateSchema.index({ createdAt: -1 });
+
 export default mongoose.models.Template || mongoose.model<ITemplate>('Template', TemplateSchema);
