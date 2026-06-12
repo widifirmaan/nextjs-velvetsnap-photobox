@@ -44,14 +44,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
         setTemplateData(matched);
         setPrice(matched.price ?? 35000);
 
-        if (matched.frameImage) {
-          removeGreenScreen(matched.frameImage).then((keyed) => {
-            setKeyedFrameImage(keyed);
-            const img = new window.Image();
-            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-            img.src = keyed;
-          });
-        } else if (matched.type === 'strip' && matched.elements?.length) {
+        if (matched.type === 'strip' && matched.elements?.length) {
           const cw = matched.canvasWidth || 1000;
           const ch = matched.canvasHeight || 3000;
           const slotsLayout = stripElementsToSlotsLayout(matched.elements, cw, ch);
@@ -65,6 +58,13 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
             img.src = bgFrameDataUrl;
             setKeyedFrameImage(bgFrameDataUrl);
           } catch {}
+        } else if (matched.frameImage) {
+          removeGreenScreen(matched.frameImage).then((keyed) => {
+            setKeyedFrameImage(keyed);
+            const img = new window.Image();
+            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+            img.src = keyed;
+          });
         }
       } else {
         const fallback = TEMPLATE_CONFIGS[templateId];

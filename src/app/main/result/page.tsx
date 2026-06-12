@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, Home, Loader2 } from 'lucide-react';
-import { composeStripImage } from '@/lib/canvas-utils';
+import { composeStripImage, renderStripFrame } from '@/lib/canvas-utils';
 import styles from './page.module.css';
 
 export interface ISlot {
@@ -224,8 +224,19 @@ export default function ResultPage() {
           const matched = data.data.find((t: any) => t.templateId === template);
           if (matched) {
             setDbTemplate(matched);
-            if (matched.frameImage) {
-              return removeGreenScreen(matched.frameImage).then((keyed) => {
+            if (matched.type === 'strip' && matched.elements?.length) {
+              const cw = matched.canvasWidth || 1000;
+              const ch = matched.canvasHeight || 3000;
+              try {
+                const frameDataUrl = await renderStripFrame(matched.elements, cw, ch, matched.color || '#ffffff');
+                const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
+                setKeyedFrameImage(bgFrameDataUrl);
+                const img = new window.Image();
+                img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+                img.src = bgFrameDataUrl;
+              } catch {}
+            } else if (matched.frameImage) {
+              removeGreenScreen(matched.frameImage).then((keyed) => {
                 setKeyedFrameImage(keyed);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
