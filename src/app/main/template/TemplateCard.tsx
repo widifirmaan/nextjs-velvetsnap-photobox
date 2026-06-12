@@ -22,18 +22,16 @@ interface TemplateCardProps {
 }
 
 export default function TemplateCard({ template, onSelect, livePreviewUrl }: TemplateCardProps) {
-  const hasFrame = !!livePreviewUrl;
   return (
-    <button key={template._id} className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
+    <button className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
       <div className={styles.templateCardThumb}>
-        {!hasFrame ? (
-          <Loader2 className="spin" size={32} />
+        {livePreviewUrl ? (
+          <img src={livePreviewUrl} alt={template.templateName} loading="lazy" />
+        ) : template.templateThumb ? (
+          <img src={template.templateThumb} alt={template.templateName}
+            style={{ opacity: 0.5, filter: 'blur(2px)' }} />
         ) : (
-          livePreviewUrl ? (
-            <img src={livePreviewUrl} alt={template.templateName} loading="lazy" />
-          ) : (
-            <LayoutTemplate size={48} style={{ color: template.templateData?.color || '#007aff' }} />
-          )
+          <Loader2 className="spin" size={32} />
         )}
       </div>
       <div className={styles.templateCardBody}>

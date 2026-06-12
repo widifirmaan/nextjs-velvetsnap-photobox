@@ -24,41 +24,39 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
   const compositingRef = useRef(false);
   const frameRef = useRef<string | null>(null);
 
-  // Fetch template list (lightweight), then progressively load full data
+  // Fetch template list + full data in parallel batches
   useEffect(() => {
     fetch('/api/templates/list')
       .then((r) => r.json())
-      .then((res) => {
-        if (res.success && res.data?.length) {
-          const active = res.data.filter((t: TemplateData) => t.isActive !== false);
-          setTemplates(active);
-          setLoading(false);
-          // Load full data one-by-one, staggered by 300ms
-          active.forEach((t: any, i: number) => {
-            setTimeout(() => {
-              fetch(`/api/templates/thumbnails?id=${t.templateId}`)
-                .then((r) => r.json())
-                .then(async (fullRes) => {
-                  if (!fullRes.success || !fullRes.data?.length) return;
-                  const full = fullRes.data[0];
-                  setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
-                  if ((full.templateThumb || full.templateFull) && full.templateData?.slotsLayout?.length) {
-                    try {
-                      keyedFramesRef.current[full.templateId] = await removeGreenScreen(full.templateThumb || full.templateFull, 320);
-                    } catch {}
-                  }
-                })
-                .catch(() => {});
-            }, i * 300);
-          });
-        } else {
-          setLoading(false);
+      .then(async (res) => {
+        if (!res.success || !res.data?.length) { setLoading(false); return; }
+        const active = res.data.filter((t: TemplateData) => t.isActive !== false);
+        setTemplates(active);
+
+        // Load full data in parallel (batch of 4) & chroma-key thumbnails
+        const batchSize = 4;
+        for (let i = 0; i < active.length; i += batchSize) {
+          const batch = active.slice(i, i + batchSize);
+          await Promise.all(batch.map(async (t: any) => {
+            try {
+              const r = await fetch(`/api/templates/thumbnails?id=${t.templateId}`);
+              const fullRes = await r.json();
+              if (!fullRes.success || !fullRes.data?.length) return;
+              const full = fullRes.data[0];
+              setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
+              if ((full.templateThumb || full.templateFull) && full.templateData?.slotsLayout?.length) {
+                keyedFramesRef.current[full.templateId] =
+                  await removeGreenScreen(full.templateThumb || full.templateFull, 500);
+              }
+            } catch {}
+          }));
         }
+        setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
-  // Capture webcam every 3s
+  // Capture webcam every 6s
   const capture = useCallback(() => {
     const shot = webcamRef.current?.getScreenshot();
     if (shot) frameRef.current = shot;
@@ -67,7 +65,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
 
   useEffect(() => {
     capture();
-    const iv = setInterval(capture, 3000);
+    const iv = setInterval(capture, 6000);
     return () => clearInterval(iv);
   }, [capture]);
 
@@ -83,7 +81,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
         if (!keyed || !slots?.length) return null;
         const arr = Array(slots.length).fill(frame);
         const adjusts = Array(slots.length).fill({ scale: 1, x: 0, y: 0 });
-        const url = await composeFrameImage(keyed, slots, arr, adjusts, t.templateData?.color || '#ffffff', 320);
+        const url = await composeFrameImage(keyed, slots, arr, adjusts, t.templateData?.color || '#ffffff', 500);
         return { id: t.templateId, url };
       }));
       const map: Record<string, string> = {};
