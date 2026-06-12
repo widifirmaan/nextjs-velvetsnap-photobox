@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
-import { getHighResUrl } from '@/lib/cloudinary';
+import { getHighResUrl } from '@/lib/cloudinary-url';
 import { TEMPLATE_CONFIGS, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';

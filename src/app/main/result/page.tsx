@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, Home, Loader2 } from 'lucide-react';
 import { composeStripImage, renderStripFrame } from '@/lib/canvas-utils';
-import { getHighResUrl } from '@/lib/cloudinary';
+import { getHighResUrl } from '@/lib/cloudinary-url';
 import styles from './page.module.css';
 
 export interface ISlot {
@@ -220,7 +220,7 @@ export default function ResultPage() {
     setImagesReady(false);
     fetch('/api/templates')
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         if (data.success) {
           const matched = data.data.find((t: any) => t.templateId === template);
           if (matched) {

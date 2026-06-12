@@ -39,8 +39,34 @@ export interface TemplateData {
   templateData: ITemplateData;
 }
 
+export interface StripResult {
+  _id: string;
+  sessionId: string;
+  finalImage: string;
+}
+
+export interface PhotoAdjust {
+  scale: number;
+  x: number;
+  y: number;
+  brightness: number;
+  contrast: number;
+  saturation: number;
+  temperature: number;
+}
+
+export const SAMPLE_IMAGES = [
+  'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
+  'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80',
+  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80',
+  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+  'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&q=80',
+];
+
 export const TEMPLATE_CONFIGS: Record<string, { name: string; slots: number }> = {
   'newspaper': { name: 'Newspaper', slots: 4 },
   'classic': { name: 'Classic', slots: 3 },
   'polaroid': { name: 'Polaroid', slots: 2 },
 };
+
+export const STEP_LABELS = ['Template', 'Photo', 'Edit', 'Pay', 'Cetak'];
