@@ -15,7 +15,8 @@ export interface ISlot {
 }
 
 export interface IStripElement {
-  id: string; type: string; x: number; y: number; width: number; height: number;
+  id: string; type: 'text' | 'background' | 'photo-slot' | 'sticker' | 'shape';
+  x: number; y: number; width: number; height: number;
   rotation: number; zIndex: number; visible: boolean; props: any;
 }
 
