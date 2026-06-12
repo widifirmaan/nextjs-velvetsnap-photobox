@@ -30,12 +30,14 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
 
   const handleSelectTemplate = useCallback((id: string) => {
     setTemplateId(id);
+    setStripLoading(true);
     setStep(2);
   }, [setStep]);
 
   useEffect(() => {
     if (!templateId) return;
     const loadTemplate = async () => {
+      setStripLoading(true);
       let matched: TemplateData | undefined;
       try {
         const res = await fetch(`/api/templates/thumbnails?id=${templateId}`);
@@ -45,7 +47,6 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       if (matched) {
         setTemplateData(matched);
         setPrice(matched.templatePrice ?? 35000);
-        setStripLoading(true);
 
         const cw = matched.templateData.canvasWidth || 1000;
         const ch = matched.templateData.canvasHeight || 3000;
@@ -152,7 +153,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
   const slotsCount = templateData?.templateData?.slots || TEMPLATE_CONFIGS[templateId || '']?.slots || 3;
   const filledCount = useMemo(() => captures.filter((c) => c !== '').length, [captures]);
 
-  const startOver = () => { onRefresh?.(); setStep(0); setCaptures([]); setTemplateId(null); setTemplateData(null); setCompositedImage(null); setPaid(false); setErrMsg(null); };
+  const startOver = () => { onRefresh?.(); setStep(0); setCaptures([]); setTemplateId(null); setTemplateData(null); setCompositedImage(null); setPaid(false); setErrMsg(null); setKeyedFrameImage(''); setStripLoading(false); };
 
   if (step === 1) return <div className={styles.stepTransition}><TemplateStep onSelect={handleSelectTemplate} onBack={() => setStep(0)} /></div>;
 
@@ -171,7 +172,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       frameRatio={frameRatio}
       stripLoading={stripLoading}
       onNext={() => setStep(3)}
-      onBack={() => { setStep(1); setCaptures([]); }}
+      onBack={() => { setStep(1); setCaptures([]); setKeyedFrameImage(''); setStripLoading(false); }}
     />
     </div>
   );
