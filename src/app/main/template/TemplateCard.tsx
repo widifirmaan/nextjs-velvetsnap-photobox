@@ -1,7 +1,8 @@
 'use client';
 
-import { LayoutTemplate, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { SlotDots } from '../StepperBar';
+import { getOptimizedUrl } from '@/lib/cloudinary-url';
 import styles from '@/app/main/page.module.css';
 
 interface TemplateCardProps {
@@ -21,15 +22,20 @@ interface TemplateCardProps {
   livePreviewUrl?: string;
 }
 
+const cardSrc = (t: TemplateCardProps['template']) => {
+  const url = t.templateFull || t.templateThumb || '';
+  if (!url) return '';
+  if (url.startsWith('data:')) return url;
+  return getOptimizedUrl(url, 500);
+};
+
 export default function TemplateCard({ template, onSelect, livePreviewUrl }: TemplateCardProps) {
+  const src = livePreviewUrl || cardSrc(template);
   return (
     <button className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
       <div className={styles.templateCardThumb}>
-        {livePreviewUrl ? (
-          <img src={livePreviewUrl} alt={template.templateName} loading="lazy" />
-        ) : template.templateThumb ? (
-          <img src={template.templateThumb} alt={template.templateName}
-            style={{ opacity: 0.5, filter: 'blur(2px)' }} />
+        {src ? (
+          <img src={src} alt={template.templateName} loading="lazy" />
         ) : (
           <Loader2 className="spin" size={32} />
         )}
