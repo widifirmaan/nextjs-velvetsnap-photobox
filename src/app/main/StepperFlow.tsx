@@ -20,8 +20,8 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
   const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState('none');
   const [keyedFrameImage, setKeyedFrameImage] = useState('');
-  const [thumbFrame, setThumbFrame] = useState('');
   const [frameRatio, setFrameRatio] = useState(2 / 3);
+  const [stripLoading, setStripLoading] = useState(false);
   const [compositedImage, setCompositedImage] = useState<string | null>(null);
   const [price, setPrice] = useState(35000);
   const [paid, setPaid] = useState(false);
@@ -45,6 +45,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       if (matched) {
         setTemplateData(matched);
         setPrice(matched.templatePrice ?? 35000);
+        setStripLoading(true);
 
         const cw = matched.templateData.canvasWidth || 1000;
         const ch = matched.templateData.canvasHeight || 3000;
@@ -88,20 +89,17 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
             img.src = bgFrameDataUrl;
             setKeyedFrameImage(bgFrameDataUrl);
           } catch {}
-          // Step 1-2: thumb-based overlay (lightweight)
-          if (matched.templateThumb) {
-            removeGreenScreen(matched.templateThumb, 400).then(setThumbFrame).catch(() => {});
-          }
+          setStripLoading(false);
         } else if (matched.templateFull) {
           removeGreenScreen(matched.templateFull).then((keyed) => {
             setKeyedFrameImage(keyed);
             const img = new window.Image();
             img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
             img.src = keyed;
+            setStripLoading(false);
           });
-          if (matched.templateThumb) {
-            removeGreenScreen(matched.templateThumb, 400).then(setThumbFrame).catch(() => {});
-          }
+        } else {
+          setStripLoading(false);
         }
       } else {
         const fallback = TEMPLATE_CONFIGS[templateId];
@@ -169,8 +167,9 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       onAddCapture={handleAddCapture}
       onDeleteCapture={handleDeleteCapture}
       templateData={templateData}
-      keyedFrameImage={thumbFrame || keyedFrameImage}
+      keyedFrameImage={keyedFrameImage}
       frameRatio={frameRatio}
+      stripLoading={stripLoading}
       onNext={() => setStep(3)}
       onBack={() => { setStep(1); setCaptures([]); }}
     />

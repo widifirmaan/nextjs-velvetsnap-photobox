@@ -13,12 +13,12 @@ import styles from '@/app/main/page.module.css';
 export default function BoothStep({
   templateId, templateName, slotsCount, filledCount, captures,
   onAddCapture, onDeleteCapture, templateData, keyedFrameImage, frameRatio,
-  onNext, onBack,
+  stripLoading, onNext, onBack,
 }: {
   templateId: string; templateName: string; slotsCount: number; filledCount: number; captures: string[];
   onAddCapture: (url: string, slotIdx?: number) => void; onDeleteCapture: (idx: number) => void;
   templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
-  onNext: () => void; onBack: () => void;
+  stripLoading: boolean; onNext: () => void; onBack: () => void;
 }) {
   const webcamRef = useRef<Webcam>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -182,6 +182,7 @@ export default function BoothStep({
           frameRatio={frameRatio}
           filledCount={filledCount}
           slotsCount={slotsCount}
+          stripLoading={stripLoading}
           onAddCapture={onAddCapture}
           onDeleteCapture={onDeleteCapture}
           onNext={onNext}

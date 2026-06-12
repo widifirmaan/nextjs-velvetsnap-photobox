@@ -1,14 +1,14 @@
 'use client';
 
 import { ISlot } from '@/lib/canvas-utils';
-import { X, Check, Upload } from 'lucide-react';
+import { X, Check, Upload, Loader2 } from 'lucide-react';
 import { TemplateData } from '../../types';
 import styles from '@/app/main/page.module.css';
 import { useRef } from 'react';
 
 export default function BoothPreview({
   templateData, captures, keyedFrameImage, frameRatio, filledCount, slotsCount,
-  onAddCapture, onDeleteCapture, onNext,
+  stripLoading, onAddCapture, onDeleteCapture, onNext,
 }: {
   templateData: TemplateData | null;
   captures: string[];
@@ -16,6 +16,7 @@ export default function BoothPreview({
   frameRatio: number;
   filledCount: number;
   slotsCount: number;
+  stripLoading: boolean;
   onAddCapture: (url: string, slotIdx?: number) => void;
   onDeleteCapture: (idx: number) => void;
   onNext: () => void;
@@ -72,6 +73,11 @@ export default function BoothPreview({
       {templateData?.templateData?.slotsLayout && (
         <div className={styles.boothPreview}>
           <div className={styles.boothStripPreview} style={{ aspectRatio: frameRatio }}>
+            {stripLoading && !keyedFrameImage && (
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.6)', zIndex: 10 }}>
+                <Loader2 className="spin" size={36} />
+              </div>
+            )}
             {templateData.templateData.slotsLayout.map((slot: ISlot, idx: number) => {
               const src = captures[idx];
               return (
@@ -100,7 +106,7 @@ export default function BoothPreview({
                 </div>
               );
             })}
-            <img src={keyedFrameImage || templateData.templateFull || ''} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+            {keyedFrameImage && <img src={keyedFrameImage} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />}
           </div>
           {filledCount === slotsCount && (
             <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Edit</button>
