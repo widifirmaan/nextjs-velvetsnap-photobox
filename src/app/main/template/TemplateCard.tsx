@@ -2,7 +2,7 @@
 
 import { Loader2 } from 'lucide-react';
 import { SlotDots } from '../StepperBar';
-import { getOptimizedUrl } from '@/lib/cloudinary-url';
+import { getHighResUrl } from '@/lib/cloudinary-url';
 import styles from '@/app/main/page.module.css';
 
 interface TemplateCardProps {
@@ -24,9 +24,8 @@ interface TemplateCardProps {
 
 const cardSrc = (t: TemplateCardProps['template']) => {
   const url = t.templateFull || t.templateThumb || '';
-  if (!url) return '';
-  if (url.startsWith('data:')) return url;
-  return getOptimizedUrl(url, 500);
+  if (!url || url.startsWith('data:')) return url || '';
+  return getHighResUrl(url, 280, 500);
 };
 
 export default function TemplateCard({ template, onSelect, livePreviewUrl }: TemplateCardProps) {
