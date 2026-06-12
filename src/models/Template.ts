@@ -91,7 +91,7 @@ const TemplateDataSchema = new Schema<ITemplateData>({
   slots: { type: Number, default: 1 },
 }, { _id: false });
 
-const TemplateSchema = new Schema<ITemplate>({
+const TemplateSchema = new Schema<any>({
   templateId: { type: String, required: true, unique: true },
   templateName: { type: String, required: true },
   templateDesc: { type: String, default: '' },
