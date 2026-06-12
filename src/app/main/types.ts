@@ -37,6 +37,7 @@ export interface TemplateData {
   templateFull?: string;
   templateThumb?: string;
   templateData: ITemplateData;
+  isActive?: boolean;
 }
 
 export interface StripResult {
