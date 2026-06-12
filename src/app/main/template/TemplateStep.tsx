@@ -1,12 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import Webcam from 'react-webcam';
 import StepperBar from '../StepperBar';
 import styles from '@/app/main/page.module.css';
 import type { TemplateData } from '../types';
-import { removeGreenScreen, composeFrameImage } from '@/lib/canvas-utils';
+import { removeGreenScreen } from '@/lib/canvas-utils';
 import TemplateCard from './TemplateCard';
 
 interface TemplateStepProps {
@@ -15,91 +14,47 @@ interface TemplateStepProps {
 }
 
 export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
-  const webcamRef = useRef<Webcam>(null);
-  const [latestFrame, setLatestFrame] = useState<string | null>(null);
-  const [livePreviewUrls, setLivePreviewUrls] = useState<Record<string, string>>({});
   const [templates, setTemplates] = useState<TemplateData[]>([]);
+  const [keyedUrls, setKeyedUrls] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const keyedFramesRef = useRef<Record<string, string>>({});
-  const compositingRef = useRef(false);
-  const frameRef = useRef<string | null>(null);
+  const cancelledRef = useRef(false);
 
-  // Fetch template list — show cards immediately, load full data in background
   useEffect(() => {
-    let cancelled = false;
+    cancelledRef.current = false;
     fetch('/api/templates/list')
       .then((r) => r.json())
       .then(async (res) => {
-        if (cancelled) return;
+        if (cancelledRef.current) return;
         if (!res.success || !res.data?.length) { setLoading(false); return; }
         const active = res.data.filter((t: TemplateData) => t.isActive !== false);
         setTemplates(active);
-        setLoading(false); // <-- show cards NOW, raw thumbs visible
 
-        // Load full data (slotsLayout etc.) + chroma-key in background
+        // Fetch full detail + chroma-key thumbnails in parallel batches
         const batchSize = 4;
         for (let i = 0; i < active.length; i += batchSize) {
-          if (cancelled) return;
+          if (cancelledRef.current) return;
           const batch = active.slice(i, i + batchSize);
           await Promise.all(batch.map(async (t: any) => {
             try {
               const r = await fetch(`/api/templates/thumbnails?id=${t.templateId}`);
               const fullRes = await r.json();
-              if (cancelled || !fullRes.success || !fullRes.data?.length) return;
+              if (cancelledRef.current || !fullRes.success || !fullRes.data?.length) return;
               const full = fullRes.data[0];
               setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
-              if ((full.templateThumb || full.templateFull) && full.templateData?.slotsLayout?.length) {
-                keyedFramesRef.current[full.templateId] =
-                  await removeGreenScreen(full.templateThumb || full.templateFull, 500);
+              if (full.templateThumb || full.templateFull) {
+                const keyed = await removeGreenScreen(full.templateThumb || full.templateFull);
+                if (!cancelledRef.current) {
+                  setKeyedUrls((prev) => ({ ...prev, [full.templateId]: keyed }));
+                }
               }
             } catch {}
           }));
         }
+        setLoading(false);
       })
-      .catch(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
+      .catch(() => { if (!cancelledRef.current) setLoading(false); });
+    return () => { cancelledRef.current = true; };
   }, []);
-
-  // Capture webcam every 6s
-  const capture = useCallback(() => {
-    const shot = webcamRef.current?.getScreenshot();
-    if (shot) frameRef.current = shot;
-    if (shot) setLatestFrame(shot);
-  }, []);
-
-  useEffect(() => {
-    capture();
-    const iv = setInterval(capture, 6000);
-    return () => clearInterval(iv);
-  }, [capture]);
-
-  // Composite all templates with current frame
-  const composite = useCallback(async () => {
-    const frame = frameRef.current;
-    if (!frame || compositingRef.current) return;
-    compositingRef.current = true;
-    try {
-      const results = await Promise.all(templates.map(async (t) => {
-        const keyed = keyedFramesRef.current[t.templateId];
-        const slots = t.templateData.slotsLayout;
-        if (!keyed || !slots?.length) return null;
-        const arr = Array(slots.length).fill(frame);
-        const adjusts = Array(slots.length).fill({ scale: 1, x: 0, y: 0 });
-        const url = await composeFrameImage(keyed, slots, arr, adjusts, t.templateData?.color || '#ffffff', 500);
-        return { id: t.templateId, url };
-      }));
-      const map: Record<string, string> = {};
-      results.forEach((r) => { if (r) map[r.id] = r.url; });
-      setLivePreviewUrls(map);
-    } catch {} finally {
-      compositingRef.current = false;
-    }
-  }, [templates]);
-
-  useEffect(() => {
-    if (!latestFrame) return;
-    composite();
-  }, [latestFrame, composite]);
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageTemplates}`}>
@@ -108,11 +63,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
         <button className={styles.backBtn} onClick={onBack}><ArrowLeft size={18} /></button>
         <h1 className={styles.stepHeading}>Pilih Frame</h1>
       </div>
-      <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg"
-        videoConstraints={{ facingMode: 'user' }}
-        style={{ position: 'fixed', top: 0, left: 0, width: 320, height: 240, opacity: 0, pointerEvents: 'none', zIndex: -1 }}
-      />
-      {loading ? (
+      {loading && templates.length === 0 ? (
         <div className={styles.stepEmpty}><Loader2 className="spin" size={40} /></div>
       ) : templates.length === 0 ? (
         <div className={styles.stepEmpty}><Loader2 className="spin" size={40} /></div>
@@ -120,7 +71,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
         <div className={styles.templateGrid}>
           {templates.map((t) => (
             <TemplateCard key={t._id} template={t} onSelect={onSelect}
-              livePreviewUrl={livePreviewUrls[t.templateId]} />
+              keyedFrameUrl={keyedUrls[t.templateId]} />
           ))}
         </div>
       )}

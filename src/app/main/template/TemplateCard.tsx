@@ -2,7 +2,6 @@
 
 import { Loader2 } from 'lucide-react';
 import { SlotDots } from '../StepperBar';
-import { getHighResUrl } from '@/lib/cloudinary-url';
 import styles from '@/app/main/page.module.css';
 
 interface TemplateCardProps {
@@ -11,7 +10,6 @@ interface TemplateCardProps {
     templateId: string;
     templateName: string;
     templatePrice: number;
-    templateFull?: string;
     templateThumb?: string;
     templateData?: {
       color: string;
@@ -19,17 +17,11 @@ interface TemplateCardProps {
     };
   };
   onSelect: (id: string) => void;
-  livePreviewUrl?: string;
+  keyedFrameUrl?: string;
 }
 
-const cardSrc = (t: TemplateCardProps['template']) => {
-  const url = t.templateFull || t.templateThumb || '';
-  if (!url || url.startsWith('data:')) return url || '';
-  return getHighResUrl(url, 280, 500);
-};
-
-export default function TemplateCard({ template, onSelect, livePreviewUrl }: TemplateCardProps) {
-  const src = livePreviewUrl || cardSrc(template);
+export default function TemplateCard({ template, onSelect, keyedFrameUrl }: TemplateCardProps) {
+  const src = keyedFrameUrl || template.templateThumb || '';
   return (
     <button className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
       <div className={styles.templateCardThumb}>
