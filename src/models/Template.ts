@@ -42,21 +42,25 @@ export interface IStripElement {
   };
 }
 
+export interface ITemplateData {
+  elements: IStripElement[];
+  slotsLayout: ISlot[];
+  canvasWidth: number;
+  canvasHeight: number;
+  color: string;
+  type: 'frame' | 'strip';
+  slots: number;
+}
+
 export interface ITemplate extends Document {
   templateId: string;
-  name: string;
-  description: string;
-  slots: number;
-  price: number;
-  color: string;
+  templateName: string;
+  templateDesc: string;
+  templatePrice: number;
+  templateFull?: string;
+  templateThumb?: string;
+  templateData: ITemplateData;
   isActive: boolean;
-  type: 'frame' | 'strip';
-  fullresUrl?: string;
-  slotsLayout?: ISlot[];
-  canvasWidth?: number;
-  canvasHeight?: number;
-  elements?: IStripElement[];
-  thumbUrl?: string;
 }
 
 const StripElementSchema = new Schema<IStripElement>({
@@ -72,16 +76,8 @@ const StripElementSchema = new Schema<IStripElement>({
   props: { type: Schema.Types.Mixed, default: {} }
 }, { _id: false });
 
-const TemplateSchema = new Schema<ITemplate>({
-  templateId: { type: String, required: true, unique: true },
-  name: { type: String, required: true },
-  description: { type: String, required: true },
-  slots: { type: Number, required: true, default: 3 },
-  price: { type: Number, required: true },
-  color: { type: String, default: '#007aff' },
-  isActive: { type: Boolean, default: true },
-  type: { type: String, enum: ['frame', 'strip'], default: 'frame' },
-  fullresUrl: { type: String },
+const TemplateDataSchema = new Schema<ITemplateData>({
+  elements: [StripElementSchema],
   slotsLayout: [{
     x: { type: Number, required: true },
     y: { type: Number, required: true },
@@ -90,9 +86,34 @@ const TemplateSchema = new Schema<ITemplate>({
   }],
   canvasWidth: { type: Number, default: 1000 },
   canvasHeight: { type: Number, default: 3000 },
+  color: { type: String, default: '#007aff' },
+  type: { type: String, enum: ['frame', 'strip'], default: 'frame' },
+  slots: { type: Number, default: 1 },
+}, { _id: false });
+
+const TemplateSchema = new Schema<ITemplate>({
+  templateId: { type: String, required: true, unique: true },
+  templateName: { type: String, required: true },
+  templateDesc: { type: String, default: '' },
+  templatePrice: { type: Number, required: true },
+  templateFull: { type: String },
+  templateThumb: { type: String },
+  templateData: { type: TemplateDataSchema, default: () => ({}) },
+  isActive: { type: Boolean, default: true },
+
+  // Legacy flat fields — kept for backward compat with existing DB docs
+  name: { type: String },
+  description: { type: String },
+  price: { type: Number },
+  fullresUrl: { type: String },
+  thumbUrl: { type: String },
   elements: [StripElementSchema],
-  thumbUrl: { type: String }
+  slotsLayout: [{ x: Number, y: Number, w: Number, h: Number }],
+  canvasWidth: { type: Number },
+  canvasHeight: { type: Number },
+  color: { type: String },
+  type: { type: String, enum: ['frame', 'strip'] },
+  slots: { type: Number },
 }, { timestamps: true });
 
 export default mongoose.models.Template || mongoose.model<ITemplate>('Template', TemplateSchema);
-

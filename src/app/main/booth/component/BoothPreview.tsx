@@ -69,10 +69,10 @@ export default function BoothPreview({
 
   return (
     <>
-      {templateData?.slotsLayout && (
+      {templateData?.templateData?.slotsLayout && (
         <div className={styles.boothPreview}>
           <div className={styles.boothStripPreview} style={{ aspectRatio: frameRatio }}>
-            {templateData.slotsLayout.map((slot: ISlot, idx: number) => {
+            {templateData.templateData.slotsLayout.map((slot: ISlot, idx: number) => {
               const src = captures[idx];
               return (
                 <div key={idx} style={{
@@ -100,7 +100,7 @@ export default function BoothPreview({
                 </div>
               );
             })}
-            <img src={keyedFrameImage || templateData.fullresUrl || ''} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+            <img src={keyedFrameImage || templateData.templateFull || ''} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
           </div>
           {filledCount === slotsCount && (
             <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Edit</button>

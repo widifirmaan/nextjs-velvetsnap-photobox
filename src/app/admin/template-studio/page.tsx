@@ -209,30 +209,31 @@ export default function StripsStudioPage() {
     };
     const applyData = (data: any) => {
       setEditingTemplateId(data._id || editId);
-      setTemplateName(data.name || '');
-      if (typeof data.price === 'number') {
-        setTemplatePrice(data.price);
+      setTemplateName(data.templateName || data.name || '');
+      if (typeof data.templatePrice === 'number') {
+        setTemplatePrice(data.templatePrice);
       }
-      if (data.color) {
-        setCanvasBg(data.color);
+      if (data.templateData?.color || data.color) {
+        setCanvasBg(data.templateData?.color || data.color);
       }
-      if (data.canvasWidth && data.canvasHeight) {
-        setCanvasSize({ w: data.canvasWidth, h: data.canvasHeight });
-      }
-      if (data.elements?.length) {
-        setElements(data.elements);
-        const slotEls = data.elements.filter((el: any) => el.id?.startsWith('slot-'));
+      const cw = data.templateData?.canvasWidth || data.canvasWidth || 600;
+      const ch = data.templateData?.canvasHeight || data.canvasHeight || 900;
+      setCanvasSize({ w: cw, h: ch });
+      const elementsData = data.templateData?.elements || data.elements;
+      if (elementsData?.length) {
+        setElements(elementsData);
+        const slotEls = elementsData.filter((el: any) => el.id?.startsWith('slot-'));
         if (slotEls?.length) setSlotCount(slotEls.length);
-      } else if (data.fullresUrl && data.slotsLayout?.length) {
+      } else if ((data.templateFull || data.fullresUrl) && (data.templateData?.slotsLayout || data.slotsLayout)?.length) {
         // Legacy template: convert fullresUrl + slotsLayout to elements
-        const cw = data.canvasWidth || 600;
-        const ch = data.canvasHeight || 900;
+        const legacyUrl = data.templateFull || data.fullresUrl;
+        const legacySlots = data.templateData?.slotsLayout || data.slotsLayout;
         const bgEl: IStripElement = {
           id: uuid(), type: 'background', x: 0, y: 0,
           width: cw, height: ch, rotation: 0, zIndex: 0,
-          visible: true, props: { stickerUrl: data.fullresUrl },
+          visible: true, props: { stickerUrl: legacyUrl },
         };
-        const photoSlots: IStripElement[] = data.slotsLayout.map((s: any, i: number) => ({
+        const photoSlots: IStripElement[] = legacySlots.map((s: any, i: number) => ({
           id: 'slot-' + uuid(), type: 'photo-slot' as const,
           x: (s.x / 100) * cw, y: (s.y / 100) * ch,
           width: (s.w / 100) * cw, height: (s.h / 100) * ch,
@@ -355,8 +356,8 @@ export default function StripsStudioPage() {
       const rawFrame = editorRef.current?.getFrameImage() || '';
       const frameB64 = await removeGreenScreen(rawFrame);
       const toUpload: { key: string; b64: string; folder?: string }[] = [];
-      if (frameB64) toUpload.push({ key: 'fullresUrl', b64: frameB64 });
-      if (thumbnailB64) toUpload.push({ key: 'thumbUrl', b64: thumbnailB64 });
+      if (frameB64) toUpload.push({ key: 'templateFull', b64: frameB64 });
+      if (thumbnailB64) toUpload.push({ key: 'templateThumb', b64: thumbnailB64 });
 
       const savedElements = await Promise.all(elements.map(async (el) => {
         const copy = { ...el, props: { ...el.props } };
@@ -377,12 +378,12 @@ export default function StripsStudioPage() {
         return { key: item.key, url };
       }));
 
-      let fullresUrl = '';
-      let thumbUrl = '';
+      let templateFull = '';
+      let templateThumb = '';
       const stickerUrls: Record<string, string> = {};
       for (const u of uploaded) {
-        if (u.key === 'fullresUrl') fullresUrl = u.url;
-        else if (u.key === 'thumbUrl') thumbUrl = u.url;
+        if (u.key === 'templateFull') templateFull = u.url;
+        else if (u.key === 'templateThumb') templateThumb = u.url;
         else if (u.key.startsWith('el_')) stickerUrls[u.key.slice(3)] = u.url;
       }
       // Apply uploaded sticker URLs to elements
@@ -398,19 +399,21 @@ export default function StripsStudioPage() {
         h: Math.round((el.height / canvasSize.h) * 1000) / 10,
       }));
       const body: Record<string, any> = {
-        type: 'strip',
-        name: templateName,
-        description: templateDesc || 'Designed in Strips Studio',
-        slots: photoSlots.length,
-        price: templatePrice,
-        color: canvasBg,
+        templateName: templateName,
+        templateDesc: templateDesc || 'Designed in Strips Studio',
+        templatePrice: templatePrice,
+        templateFull,
+        templateThumb,
+        templateData: {
+          elements: savedElements,
+          slotsLayout,
+          canvasWidth: canvasSize.w,
+          canvasHeight: canvasSize.h,
+          color: canvasBg,
+          type: 'strip',
+          slots: slotsLayout.length,
+        },
         isActive: true,
-        canvasWidth: canvasSize.w,
-        canvasHeight: canvasSize.h,
-        fullresUrl,
-        slotsLayout,
-        thumbUrl,
-        elements: savedElements,
       };
       let res;
       if (editingTemplateId) {

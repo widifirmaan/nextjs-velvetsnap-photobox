@@ -225,19 +225,19 @@ export default function ResultPage() {
           const matched = data.data.find((t: any) => t.templateId === template);
           if (matched) {
             setDbTemplate(matched);
-            const cw = matched.canvasWidth || 1000;
-            const ch = matched.canvasHeight || 3000;
+            const cw = matched.templateData.canvasWidth || 1000;
+            const ch = matched.templateData.canvasHeight || 3000;
 
             // Convert legacy (frameImage + slotsLayout) to elements
-            if (!matched.elements?.length && matched.fullresUrl && matched.slotsLayout?.length) {
+            if (!matched.templateData.elements?.length && matched.templateFull && matched.templateData.slotsLayout?.length) {
               const els: any[] = [];
               els.push({
                 id: 'bg', type: 'background',
                 x: 0, y: 0, width: cw, height: ch,
                 rotation: 0, zIndex: 0, visible: true,
-                props: { stickerUrl: getHighResUrl(matched.fullresUrl, cw, ch), opacity: 1 },
+                props: { stickerUrl: getHighResUrl(matched.templateFull, cw, ch), opacity: 1 },
               });
-              (matched.slotsLayout || []).forEach((slot: any, i: number) => {
+              (matched.templateData.slotsLayout || []).forEach((slot: any, i: number) => {
                 els.push({
                   id: `slot-${i}`, type: 'photo-slot',
                   x: (slot.x / 100) * cw, y: (slot.y / 100) * ch,
@@ -246,26 +246,26 @@ export default function ResultPage() {
                   props: { borderWidth: 2, borderColor: '#ffffff', borderRadius: 8, shape: 'rounded', opacity: 1 },
                 });
               });
-              matched.elements = els;
-              matched.type = 'strip';
+              matched.templateData.elements = els;
+              matched.templateData.type = 'strip';
             }
 
-            if (matched.elements?.length) {
-              matched.elements = matched.elements.map((el: any) =>
+            if (matched.templateData.elements?.length) {
+              matched.templateData.elements = matched.templateData.elements.map((el: any) =>
                 el.type === 'background' && el.props?.stickerUrl
                   ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(el.props.stickerUrl, cw, ch) } }
                   : el
               );
               try {
-                const frameDataUrl = await renderStripFrame(matched.elements, cw, ch, matched.color || '#ffffff');
+                const frameDataUrl = await renderStripFrame(matched.templateData.elements, cw, ch, matched.templateData.color || '#ffffff');
                 const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
                 setKeyedFrameImage(bgFrameDataUrl);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
                 img.src = bgFrameDataUrl;
               } catch {}
-            } else if (matched.fullresUrl) {
-              removeGreenScreen(matched.fullresUrl).then((keyed) => {
+            } else if (matched.templateFull) {
+              removeGreenScreen(matched.templateFull).then((keyed) => {
                 setKeyedFrameImage(keyed);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
@@ -300,19 +300,19 @@ export default function ResultPage() {
 
   useEffect(() => {
     if (!imagesReady || compositedImage || !dbTemplate) return;
-    if (!dbTemplate.slotsLayout || dbTemplate.slotsLayout.length === 0) return;
+    if (!dbTemplate.templateData.slotsLayout || dbTemplate.templateData.slotsLayout.length === 0) return;
     setRendering(true);
-    const outW = dbTemplate.canvasWidth || 1000;
-    const doComposite = dbTemplate.type === 'strip' && dbTemplate.elements?.length && dbTemplate.slotsLayout?.length
+    const outW = dbTemplate.templateData.canvasWidth || 1000;
+    const doComposite = dbTemplate.templateData.type === 'strip' && dbTemplate.templateData.elements?.length && dbTemplate.templateData.slotsLayout?.length
       ? composeStripImage(
-          dbTemplate.elements, dbTemplate.color || '#ffffff',
+          dbTemplate.templateData.elements, dbTemplate.templateData.color || '#ffffff',
           captures, photoAdjust,
-          outW, dbTemplate.canvasHeight || 3000, outW,
+          outW, dbTemplate.templateData.canvasHeight || 3000, outW,
         )
       : (() => {
-          const frameSrc = keyedFrameImage || dbTemplate.fullresUrl || '';
+          const frameSrc = keyedFrameImage || dbTemplate.templateFull || '';
           if (!frameSrc) return Promise.reject('No frame');
-          return composeFrameImage(frameSrc, dbTemplate.slotsLayout!, captures, photoAdjust, dbTemplate.color || '#ffffff', outW);
+          return composeFrameImage(frameSrc, dbTemplate.templateData.slotsLayout!, captures, photoAdjust, dbTemplate.templateData.color || '#ffffff', outW);
         })();
     doComposite.then((dataUrl) => {
       setCompositedImage(dataUrl);

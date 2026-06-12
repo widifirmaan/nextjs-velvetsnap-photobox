@@ -26,16 +26,16 @@ export default function TemplateCard({ template, onSelect, livePreviewUrl }: Tem
           <Loader2 className="spin" size={32} />
         ) : (
           livePreviewUrl ? (
-            <img src={livePreviewUrl} alt={template.name} loading="lazy" />
+            <img src={livePreviewUrl} alt={template.templateName} loading="lazy" />
           ) : (
             <LayoutTemplate size={48} style={{ color: template.color }} />
           )
         )}
       </div>
       <div className={styles.templateCardBody}>
-        <div className={styles.templateCardName}>{template.name}</div>
+        <div className={styles.templateCardName}>{template.templateName}</div>
         <div className={styles.templateCardMeta}>
-          <span className={styles.templateCardPrice}>Rp{(template.price || 0).toLocaleString('id-ID')}</span>
+          <span className={styles.templateCardPrice}>Rp{(template.templatePrice || 0).toLocaleString('id-ID')}</span>
           <SlotDots count={template.slots} />
         </div>
       </div>

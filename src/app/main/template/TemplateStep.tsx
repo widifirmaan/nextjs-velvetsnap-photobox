@@ -42,9 +42,9 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
                   if (!fullRes.success || !fullRes.data?.length) return;
                   const full = fullRes.data[0];
                   setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
-                  if ((full.thumbUrl || full.fullresUrl) && full.slotsLayout?.length) {
+                  if ((full.templateThumb || full.templateFull) && full.templateData?.slotsLayout?.length) {
                     try {
-                      keyedFramesRef.current[full.templateId] = await removeGreenScreen(full.thumbUrl || full.fullresUrl, 320);
+                      keyedFramesRef.current[full.templateId] = await removeGreenScreen(full.templateThumb || full.templateFull, 320);
                     } catch {}
                   }
                 })
@@ -79,7 +79,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
     try {
       const results = await Promise.all(templates.map(async (t) => {
         const keyed = keyedFramesRef.current[t.templateId];
-        const slots = t.slotsLayout;
+        const slots = t.templateData.slotsLayout;
         if (!keyed || !slots?.length) return null;
         const arr = Array(slots.length).fill(frame);
         const adjusts = Array(slots.length).fill({ scale: 1, x: 0, y: 0 });

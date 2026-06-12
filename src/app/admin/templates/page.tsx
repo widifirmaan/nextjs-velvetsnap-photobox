@@ -9,18 +9,20 @@ import styles from './page.module.css';
 interface TemplateData {
   _id: string;
   templateId: string;
-  name: string;
-  description: string;
+  templateName: string;
+  templateDesc: string;
   slots: number;
-  price: number;
+  templatePrice: number;
   color: string;
   isActive: boolean;
   type?: 'frame' | 'strip';
-  fullresUrl?: string;
-  thumbUrl?: string;
-  canvasWidth?: number;
-  canvasHeight?: number;
-  elements?: any[];
+  templateFull?: string;
+  templateThumb?: string;
+  templateData?: {
+    canvasWidth?: number;
+    canvasHeight?: number;
+    elements?: any[];
+  };
 }
 
 export default function TemplatesAdmin() {
@@ -102,21 +104,21 @@ export default function TemplatesAdmin() {
                 <tr key={t._id}>
                   <td>
                     <div className={styles.templateThumb}>
-                      {t.thumbUrl ? (
+                      {t.templateThumb ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.thumbUrl} alt={t.name} />
-                      ) : t.fullresUrl ? (
+                        <img src={t.templateThumb} alt={t.templateName} />
+                      ) : t.templateFull ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.fullresUrl} alt={t.name} />
+                        <img src={t.templateFull} alt={t.templateName} />
                       ) : (
                         <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>—</span>
                       )}
                     </div>
                   </td>
                   <td>{t.templateId}</td>
-                  <td>{t.name}</td>
+                  <td>{t.templateName}</td>
                   <td>{t.slots}</td>
-                  <td>Rp {(t.price || 0).toLocaleString('id-ID')}</td>
+                  <td>Rp {(t.templatePrice || 0).toLocaleString('id-ID')}</td>
                   <td><span className={styles.colorSwatch} style={{ backgroundColor: t.color || '#000000' }} /></td>
                   <td>
                     <div className={styles.statusToggle}>

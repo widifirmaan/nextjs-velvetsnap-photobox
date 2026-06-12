@@ -18,7 +18,7 @@ export default function PaymentPage() {
         .then((d) => {
           if (d.success) {
             const t = d.data.find((t: any) => t.templateId === templateId);
-            if (t?.price) setPrice(t.price);
+            if (t?.templatePrice) setPrice(t.templatePrice);
           }
         })
         .catch(() => {});

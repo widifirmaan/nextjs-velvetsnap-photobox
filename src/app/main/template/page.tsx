@@ -92,16 +92,16 @@ export default function TemplatesPage() {
           {templates.map((t) => (
             <button key={t._id} className={styles.card} onClick={() => handleSelect(t.templateId)}>
               <div className={styles.cardThumb}>
-                {t.thumbUrl ? (
-                  <img src={t.thumbUrl} alt={t.name} loading="lazy" decoding="async" />
+                {t.templateThumb ? (
+                  <img src={t.templateThumb} alt={t.templateName} loading="lazy" decoding="async" />
                 ) : (
                   <LayoutTemplate size={48} style={{ color: t.color }} />
                 )}
               </div>
               <div className={styles.cardBody}>
-                <div className={styles.cardName}>{t.name}</div>
+                <div className={styles.cardName}>{t.templateName}</div>
                 <div className={styles.cardMeta}>
-                  <span className={styles.cardPrice}>Rp{(t.price || 0).toLocaleString('id-ID')}</span>
+                  <span className={styles.cardPrice}>Rp{(t.templatePrice || 0).toLocaleString('id-ID')}</span>
                   <SlotDots count={t.slots} />
                 </div>
               </div>
