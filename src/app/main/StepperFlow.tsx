@@ -20,6 +20,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
   const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState('none');
   const [keyedFrameImage, setKeyedFrameImage] = useState('');
+  const [thumbFrame, setThumbFrame] = useState('');
   const [frameRatio, setFrameRatio] = useState(2 / 3);
   const [compositedImage, setCompositedImage] = useState<string | null>(null);
   const [price, setPrice] = useState(35000);
@@ -89,6 +90,10 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
             img.src = bgFrameDataUrl;
             setKeyedFrameImage(bgFrameDataUrl);
           } catch {}
+          // Step 1-2: thumb-based overlay (lightweight)
+          if (matched.thumbUrl) {
+            removeGreenScreen(matched.thumbUrl, 400).then(setThumbFrame).catch(() => {});
+          }
         } else if (matched.fullresUrl) {
           removeGreenScreen(matched.fullresUrl).then((keyed) => {
             setKeyedFrameImage(keyed);
@@ -96,6 +101,9 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
             img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
             img.src = keyed;
           });
+          if (matched.thumbUrl) {
+            removeGreenScreen(matched.thumbUrl, 400).then(setThumbFrame).catch(() => {});
+          }
         }
       } else {
         const fallback = TEMPLATE_CONFIGS[templateId];
@@ -162,7 +170,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       onAddCapture={handleAddCapture}
       onDeleteCapture={handleDeleteCapture}
       templateData={templateData}
-      keyedFrameImage={keyedFrameImage}
+      keyedFrameImage={thumbFrame || keyedFrameImage}
       frameRatio={frameRatio}
       onNext={() => setStep(3)}
       onBack={() => { setStep(1); setCaptures([]); }}

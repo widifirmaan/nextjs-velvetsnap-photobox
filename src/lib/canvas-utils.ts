@@ -124,16 +124,15 @@ export async function composeFrameImage(
   });
 }
 
-export function removeGreenScreen(base64: string): Promise<string> {
+export function removeGreenScreen(base64: string, maxW: number = 1000): Promise<string> {
   return new Promise((resolve) => {
     if (!base64) { resolve(''); return; }
     const img = new window.Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const MAX_W = 1000;
-      const scale = MAX_W / (img.naturalWidth || img.width);
-      canvas.width = MAX_W;
+      const scale = maxW / (img.naturalWidth || img.width);
+      canvas.width = maxW;
       canvas.height = Math.round((img.naturalHeight || img.height) * scale);
       const ctx = canvas.getContext('2d');
       if (!ctx) { resolve(base64); return; }

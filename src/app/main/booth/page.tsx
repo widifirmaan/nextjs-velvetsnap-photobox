@@ -262,8 +262,8 @@ function BoothContent() {
             setDbTemplate(matched);
             setSlotsCount(matched.slots || 3);
             setTemplateName(matched.name);
-            if (matched.fullresUrl) {
-              removeGreenScreen(matched.fullresUrl).then((keyed) => {
+            if (matched.thumbUrl || matched.fullresUrl) {
+              removeGreenScreen(matched.thumbUrl || matched.fullresUrl, 400).then((keyed) => {
                 setKeyedFrameImage(keyed);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
