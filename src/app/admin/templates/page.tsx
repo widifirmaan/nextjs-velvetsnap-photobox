@@ -11,17 +11,16 @@ interface TemplateData {
   templateId: string;
   templateName: string;
   templateDesc: string;
-  slots: number;
   templatePrice: number;
-  color: string;
   isActive: boolean;
-  type?: 'frame' | 'strip';
   templateFull?: string;
   templateThumb?: string;
   templateData?: {
     canvasWidth?: number;
     canvasHeight?: number;
     elements?: any[];
+    color?: string;
+    slots?: number;
   };
 }
 

@@ -8,12 +8,20 @@ import { useState, useEffect } from 'react';
 interface TemplateItem {
   _id: string;
   templateId: string;
-  name: string;
-  slots: number;
-  price: number;
-  color: string;
+  templateName: string;
+  templateDesc: string;
+  templatePrice: number;
   isActive: boolean;
-  thumbUrl?: string;
+  templateFull?: string;
+  templateThumb?: string;
+  templateData?: {
+    slots: number;
+    color: string;
+    canvasWidth?: number;
+    canvasHeight?: number;
+    elements?: any[];
+    slotsLayout?: any[];
+  };
 }
 
 function SlotDots({ count }: { count: number }) {

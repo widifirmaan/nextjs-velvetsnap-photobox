@@ -8,10 +8,14 @@ interface TemplateCardProps {
   template: {
     _id: string;
     templateId: string;
-    name: string;
-    color: string;
-    price: number;
-    slots: number;
+    templateName: string;
+    templatePrice: number;
+    templateFull?: string;
+    templateThumb?: string;
+    templateData?: {
+      color: string;
+      slots: number;
+    };
   };
   onSelect: (id: string) => void;
   livePreviewUrl?: string;

@@ -21,17 +21,20 @@ export interface IStripElement {
 
 export interface TemplateData {
   templateId: string;
-  name: string;
-  description: string;
-  slots: number;
-  price: number;
-  color: string;
-  fullresUrl?: string;
-  slotsLayout?: ISlot[];
-  type?: 'frame' | 'strip';
-  elements?: IStripElement[];
-  canvasWidth?: number;
-  canvasHeight?: number;
+  templateName: string;
+  templateDesc: string;
+  templatePrice: number;
+  templateFull?: string;
+  templateThumb?: string;
+  templateData: {
+    slots: number;
+    color: string;
+    type?: 'frame' | 'strip';
+    elements?: IStripElement[];
+    slotsLayout?: ISlot[];
+    canvasWidth?: number;
+    canvasHeight?: number;
+  };
 }
 
 // Helper to chromakey / remove green color #00bf63 from template frame image dynamically
