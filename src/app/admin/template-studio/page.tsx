@@ -210,21 +210,36 @@ export default function StripsStudioPage() {
     const applyData = (data: any) => {
       setEditingTemplateId(data._id || editId);
       setTemplateName(data.name || '');
-      if (data.elements?.length) {
-        setElements(data.elements);
-      }
-      if (data.canvasWidth && data.canvasHeight) {
-        setCanvasSize({ w: data.canvasWidth, h: data.canvasHeight });
-      }
       if (typeof data.price === 'number') {
         setTemplatePrice(data.price);
       }
       if (data.color) {
         setCanvasBg(data.color);
       }
-      const slotEls = data.elements?.filter((el: any) => el.id?.startsWith('slot-'));
-      if (slotEls?.length) {
-        setSlotCount(slotEls.length);
+      if (data.canvasWidth && data.canvasHeight) {
+        setCanvasSize({ w: data.canvasWidth, h: data.canvasHeight });
+      }
+      if (data.elements?.length) {
+        setElements(data.elements);
+        const slotEls = data.elements.filter((el: any) => el.id?.startsWith('slot-'));
+        if (slotEls?.length) setSlotCount(slotEls.length);
+      } else if (data.frameImage && data.slotsLayout?.length) {
+        // Legacy template: convert frameImage + slotsLayout to elements
+        const cw = data.canvasWidth || 600;
+        const ch = data.canvasHeight || 900;
+        const bgEl: IStripElement = {
+          id: uuid(), type: 'background', x: 0, y: 0,
+          width: cw, height: ch, rotation: 0, zIndex: 0,
+          visible: true, props: { stickerUrl: data.frameImage },
+        };
+        const photoSlots: IStripElement[] = data.slotsLayout.map((s: any, i: number) => ({
+          id: 'slot-' + uuid(), type: 'photo-slot' as const,
+          x: (s.x / 100) * cw, y: (s.y / 100) * ch,
+          width: (s.w / 100) * cw, height: (s.h / 100) * ch,
+          rotation: 0, zIndex: i + 1, visible: true, props: {},
+        }));
+        setElements([bgEl, ...photoSlots, ...generateSlotLayout(0)]);
+        setSlotCount(photoSlots.length);
       }
     };
     // Always fetch template list first for correct ID increment
