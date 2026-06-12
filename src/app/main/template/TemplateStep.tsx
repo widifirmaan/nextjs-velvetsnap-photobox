@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import Webcam from 'react-webcam';
 import StepperBar from '../StepperBar';
 import styles from '@/app/main/page.module.css';
@@ -92,7 +92,7 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
         style={{ position: 'fixed', top: 0, left: 0, width: 320, height: 240, opacity: 0, pointerEvents: 'none', zIndex: -1 }}
       />
       {templates.length === 0 ? (
-        <p className={styles.stepEmpty}>Tidak ada template.</p>
+        <div className={styles.stepEmpty}><Loader2 className="spin" size={40} /></div>
       ) : (
         <div className={styles.templateGrid}>
           {templates.map((t) => (

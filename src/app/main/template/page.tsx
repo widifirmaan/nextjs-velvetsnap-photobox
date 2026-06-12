@@ -88,7 +88,7 @@ export default function TemplatesPage() {
           <Loader2 className="spin" size={40} color="#262626" />
         </div>
       ) : templates.length === 0 ? (
-        <p className={styles.empty}>Tidak ada template.</p>
+        <div className={styles.empty}><Loader2 className="spin" size={40} /></div>
       ) : (
         <div className={styles.grid}>
           {templates.map((t) => (
