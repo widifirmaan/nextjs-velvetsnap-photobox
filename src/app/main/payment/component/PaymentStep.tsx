@@ -14,10 +14,27 @@ export default function PaymentStep({
   onSuccess: (id: string) => void; onBack: () => void;
 }) {
   const uploadImage = async (dataUri: string, folder: string): Promise<string> => {
+    // Vercel Hobby: 4.5MB request body limit. Compress if base64 exceeds ~3.8MB
+    let payload = dataUri;
+    if (payload.length > 3.8 * 1024 * 1024) {
+      const img = await new Promise<HTMLImageElement>((res, rej) => {
+        const i = new window.Image();
+        i.onload = () => res(i);
+        i.onerror = rej;
+        i.src = payload;
+      });
+      const c = document.createElement('canvas');
+      const maxDim = 1600;
+      const sc = Math.min(1, maxDim / img.naturalWidth, maxDim / img.naturalHeight);
+      c.width = Math.round(img.naturalWidth * sc);
+      c.height = Math.round(img.naturalHeight * sc);
+      c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+      payload = c.toDataURL('image/jpeg', 0.75);
+    }
     const res = await fetch('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dataUri, folder }),
+      body: JSON.stringify({ dataUri: payload, folder }),
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Upload failed');
