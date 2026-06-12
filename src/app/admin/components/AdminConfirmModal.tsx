@@ -12,15 +12,15 @@ interface Props {
 
 export default function AdminConfirmModal({
   open, onClose, onConfirm, title, message,
-  confirmLabel = 'Delete', loading = false,
+  confirmLabel = 'Hapus', loading = false,
 }: Props) {
   return (
     <AdminModal open={open} onClose={onClose} title={title}>
       <p style={{ marginBottom: 24, color: 'var(--text-secondary)' }}>{message}</p>
       <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
-        <button className="btn btn-ghost" onClick={onClose} disabled={loading}>Cancel</button>
+        <button className="btn btn-ghost" onClick={onClose} disabled={loading}>Batal</button>
         <button className="btn btn-danger" onClick={onConfirm} disabled={loading}>
-          {loading ? 'Deleting...' : confirmLabel}
+          {loading ? 'Menghapus...' : confirmLabel}
         </button>
       </div>
     </AdminModal>

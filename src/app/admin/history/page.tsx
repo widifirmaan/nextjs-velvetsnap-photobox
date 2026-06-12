@@ -263,8 +263,8 @@ export default function HistoryPage() {
         open={!!deleteTarget}
         onClose={() => !deleting && setDeleteTarget(null)}
         onConfirm={handleDelete}
-        title="Delete Transaction?"
-        message="This action cannot be undone."
+        title="Hapus Transaksi?"
+        message="Tindakan ini tidak dapat dibatalkan."
         loading={deleting}
       />
 
