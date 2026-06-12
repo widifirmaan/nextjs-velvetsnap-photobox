@@ -44,7 +44,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
                   setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
                   if (full.fullresUrl && full.slotsLayout?.length) {
                     try {
-                      keyedFramesRef.current[full.templateId] = await removeGreenScreen(full.fullresUrl);
+                      keyedFramesRef.current[full.templateId] = await removeGreenScreen(full.fullresUrl, 320);
                     } catch {}
                   }
                 })

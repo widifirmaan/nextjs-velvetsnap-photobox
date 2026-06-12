@@ -251,7 +251,7 @@ export default function ResultPage() {
             }
 
             if (matched.elements?.length) {
-              // Override background stickerUrl with high-res fullresUrl
+              // Override background stickerUrl with high-res Cloudinary URL (for final compositing)
               if (matched.fullresUrl) {
                 matched.elements = matched.elements.map((el: any) =>
                   el.type === 'background' && el.props?.stickerUrl
@@ -259,16 +259,34 @@ export default function ResultPage() {
                     : el
                 );
               }
+              // Render display frame at responsive size (no upscaling)
+              const DISPLAY_W = 300;
+              const sc = DISPLAY_W / cw;
+              const displayH = Math.round(ch * sc);
+              const displayEls = matched.elements.map((el: any) => ({
+                ...el,
+                x: el.x * sc,
+                y: el.y * sc,
+                width: el.width * sc,
+                height: el.height * sc,
+                props: {
+                  ...el.props,
+                  fontSize: el.props.fontSize ? Math.round(el.props.fontSize * sc) : undefined,
+                  borderWidth: el.props.borderWidth ? Math.round(el.props.borderWidth * sc) : undefined,
+                  borderRadius: el.props.borderRadius ? Math.round(el.props.borderRadius * sc) : undefined,
+                  strokeWidth: el.props.strokeWidth ? Math.round(el.props.strokeWidth * sc) : undefined,
+                },
+              }));
               try {
-                const frameDataUrl = await renderStripFrame(matched.elements, cw, ch, matched.color || '#ffffff');
-                const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
+                const frameDataUrl = await renderStripFrame(displayEls, DISPLAY_W, displayH, matched.color || '#ffffff');
+                const bgFrameDataUrl = await removeGreenScreen(frameDataUrl, DISPLAY_W);
                 setKeyedFrameImage(bgFrameDataUrl);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
                 img.src = bgFrameDataUrl;
               } catch {}
             } else if (matched.fullresUrl) {
-              removeGreenScreen(getHighResUrl(matched.fullresUrl, cw, ch)).then((keyed) => {
+              removeGreenScreen(matched.fullresUrl, 300).then((keyed) => {
                 setKeyedFrameImage(keyed);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
