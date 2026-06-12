@@ -28,6 +28,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
         if (!res.success || !res.data?.length) { setLoading(false); return; }
         const active = res.data.filter((t: TemplateData) => t.isActive !== false);
         setTemplates(active);
+        setLoading(false); // grid muncul sekarang (card spinner)
 
         // Fetch full detail + chroma-key templateFull in parallel batches
         const batchSize = 4;
@@ -51,7 +52,6 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
             } catch {}
           }));
         }
-        setLoading(false);
       })
       .catch(() => { if (!cancelledRef.current) setLoading(false); });
     return () => { cancelledRef.current = true; };
