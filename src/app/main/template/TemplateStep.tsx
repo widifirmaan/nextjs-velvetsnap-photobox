@@ -21,8 +21,9 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
   const [livePreviewUrls, setLivePreviewUrls] = useState<Record<string, string>>({});
   const keyedFramesRef = useRef<Record<string, string>>({});
   const compositingRef = useRef(false);
+  const frameRef = useRef<string | null>(null);
 
-  // Pre-compute keyed frame images for all templates
+  // Pre-compute keyed frame images for all templates (once)
   useEffect(() => {
     (async () => {
       const map: Record<string, string> = {};
@@ -37,28 +38,30 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
     })();
   }, [templates]);
 
-  // Capture immediately on mount, then every 2s
+  // Capture webcam every 3s
   const capture = useCallback(() => {
     const shot = webcamRef.current?.getScreenshot();
+    if (shot) frameRef.current = shot;
     if (shot) setLatestFrame(shot);
   }, []);
 
   useEffect(() => {
-    const t = setTimeout(capture, 100);
-    const iv = setInterval(capture, 100);
-    return () => { clearTimeout(t); clearInterval(iv); };
+    capture();
+    const iv = setInterval(capture, 3000);
+    return () => clearInterval(iv);
   }, [capture]);
 
-  // Composite templates with latest frame
+  // Composite all templates with current frame
   const composite = useCallback(async () => {
-    if (!latestFrame || compositingRef.current) return;
+    const frame = frameRef.current;
+    if (!frame || compositingRef.current) return;
     compositingRef.current = true;
     try {
       const results = await Promise.all(templates.map(async (t) => {
         const keyed = keyedFramesRef.current[t.templateId];
         const slots = t.slotsLayout;
         if (!keyed || !slots?.length) return null;
-        const arr = Array(slots.length).fill(latestFrame);
+        const arr = Array(slots.length).fill(frame);
         const adjusts = Array(slots.length).fill({ scale: 1, x: 0, y: 0 });
         const url = await composeFrameImage(keyed, slots, arr, adjusts, t.color || '#ffffff');
         return { id: t.templateId, url };
@@ -69,9 +72,13 @@ export default function TemplateStep({ templates, onSelect, onBack }: TemplateSt
     } catch {} finally {
       compositingRef.current = false;
     }
-  }, [latestFrame, templates]);
+  }, [templates]);
 
-  useEffect(() => { composite(); }, [composite]);
+  // Composite whenever a new capture arrives (throttled by compositingRef)
+  useEffect(() => {
+    if (!latestFrame) return;
+    composite();
+  }, [latestFrame, composite]);
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageTemplates}`}>
