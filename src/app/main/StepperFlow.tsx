@@ -50,8 +50,16 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
           const slotsLayout = stripElementsToSlotsLayout(matched.elements, cw, ch);
           matched.slotsLayout = slotsLayout;
           if (!matched.slots) matched.slots = slotsLayout.length;
+          // Use latest frameImage as background stickerUrl (high-res, not the stale element url)
+          const els = matched.frameImage
+            ? matched.elements.map((el) =>
+                el.type === 'background' && el.props.stickerUrl
+                  ? { ...el, props: { ...el.props, stickerUrl: matched.frameImage } }
+                  : el
+              )
+            : matched.elements;
           try {
-            const frameDataUrl = await renderStripFrame(matched.elements, cw, ch, matched.color || '#ffffff');
+            const frameDataUrl = await renderStripFrame(els, cw, ch, matched.color || '#ffffff');
             const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
             const img = new window.Image();
             img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);

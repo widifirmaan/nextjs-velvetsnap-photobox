@@ -227,8 +227,15 @@ export default function ResultPage() {
             if (matched.type === 'strip' && matched.elements?.length) {
               const cw = matched.canvasWidth || 1000;
               const ch = matched.canvasHeight || 3000;
+              const els = matched.frameImage
+                ? matched.elements.map((el: any) =>
+                    el.type === 'background' && el.props?.stickerUrl
+                      ? { ...el, props: { ...el.props, stickerUrl: matched.frameImage } }
+                      : el
+                  )
+                : matched.elements;
               try {
-                const frameDataUrl = await renderStripFrame(matched.elements, cw, ch, matched.color || '#ffffff');
+                const frameDataUrl = await renderStripFrame(els, cw, ch, matched.color || '#ffffff');
                 const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
                 setKeyedFrameImage(bgFrameDataUrl);
                 const img = new window.Image();
