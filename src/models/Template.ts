@@ -51,12 +51,12 @@ export interface ITemplate extends Document {
   color: string;
   isActive: boolean;
   type: 'frame' | 'strip';
-  frameImage?: string;
+  fullresUrl?: string;
   slotsLayout?: ISlot[];
   canvasWidth?: number;
   canvasHeight?: number;
   elements?: IStripElement[];
-  thumbnail?: string;
+  thumbUrl?: string;
 }
 
 const StripElementSchema = new Schema<IStripElement>({
@@ -81,7 +81,7 @@ const TemplateSchema = new Schema<ITemplate>({
   color: { type: String, default: '#007aff' },
   isActive: { type: Boolean, default: true },
   type: { type: String, enum: ['frame', 'strip'], default: 'frame' },
-  frameImage: { type: String },
+  fullresUrl: { type: String },
   slotsLayout: [{
     x: { type: Number, required: true },
     y: { type: Number, required: true },
@@ -91,7 +91,7 @@ const TemplateSchema = new Schema<ITemplate>({
   canvasWidth: { type: Number, default: 1000 },
   canvasHeight: { type: Number, default: 3000 },
   elements: [StripElementSchema],
-  thumbnail: { type: String }
+  thumbUrl: { type: String }
 }, { timestamps: true });
 
 export default mongoose.models.Template || mongoose.model<ITemplate>('Template', TemplateSchema);

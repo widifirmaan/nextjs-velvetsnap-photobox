@@ -16,7 +16,7 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
 }) {
   return (
     <div className={styles.editorPreview}>
-      {templateData && templateData.frameImage && templateData.slotsLayout && templateData.slotsLayout.length > 0 ? (
+      {templateData && templateData.fullresUrl && templateData.slotsLayout && templateData.slotsLayout.length > 0 ? (
         <div className={styles.editorFrame} style={{ height: 'min(75vh, 600px)', aspectRatio: frameRatio, backgroundColor: templateData.color || '#fff' }}>
           {(templateData.slotsLayout || []).map((slot, idx) => {
             const src = captures[idx];
@@ -50,7 +50,7 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
               </div>
             );
           })}
-          <img src={keyedFrameImage || templateData.frameImage || ''} alt="Frame"
+          <img src={keyedFrameImage || templateData.fullresUrl || ''} alt="Frame"
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }} />
         </div>
       ) : (

@@ -49,13 +49,13 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
         const ch = matched.canvasHeight || 3000;
 
         // Convert legacy (frameImage + slotsLayout) to elements
-        if (!matched.elements?.length && matched.frameImage && matched.slotsLayout?.length) {
+        if (!matched.elements?.length && matched.fullresUrl && matched.slotsLayout?.length) {
           const els: any[] = [];
           els.push({
             id: 'bg', type: 'background',
             x: 0, y: 0, width: cw, height: ch,
             rotation: 0, zIndex: 0, visible: true,
-            props: { stickerUrl: getHighResUrl(matched.frameImage, cw, ch), opacity: 1 },
+            props: { stickerUrl: getHighResUrl(matched.fullresUrl, cw, ch), opacity: 1 },
           });
           (matched.slotsLayout || []).forEach((slot: any, i: number) => {
             els.push({
@@ -75,10 +75,10 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
           matched.slotsLayout = slotsLayout;
           if (!matched.slots) matched.slots = slotsLayout.length;
           // Override background stickerUrl with high-res frameImage
-          if (matched.frameImage) {
+          if (matched.fullresUrl) {
             matched.elements = matched.elements.map((el) =>
               el.type === 'background' && el.props.stickerUrl
-                ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(matched.frameImage, cw, ch) } }
+                ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(matched.fullresUrl, cw, ch) } }
                 : el
             );
           }
@@ -90,8 +90,8 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
             img.src = bgFrameDataUrl;
             setKeyedFrameImage(bgFrameDataUrl);
           } catch {}
-        } else if (matched.frameImage) {
-          removeGreenScreen(getHighResUrl(matched.frameImage, cw, ch)).then((keyed) => {
+        } else if (matched.fullresUrl) {
+          removeGreenScreen(getHighResUrl(matched.fullresUrl, cw, ch)).then((keyed) => {
             setKeyedFrameImage(keyed);
             const img = new window.Image();
             img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
@@ -136,7 +136,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
         templateData.canvasWidth || 1000, templateData.canvasHeight || 3000,
       ).then(setCompositedImage).catch(() => {});
     } else {
-      const frameSrc = keyedFrameImage || templateData.frameImage || '';
+      const frameSrc = keyedFrameImage || templateData.fullresUrl || '';
       if (frameSrc) {
         composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
           .then(setCompositedImage)

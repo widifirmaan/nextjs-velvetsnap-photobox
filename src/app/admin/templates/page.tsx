@@ -16,8 +16,8 @@ interface TemplateData {
   color: string;
   isActive: boolean;
   type?: 'frame' | 'strip';
-  frameImage?: string;
-  thumbnail?: string;
+  fullresUrl?: string;
+  thumbUrl?: string;
   canvasWidth?: number;
   canvasHeight?: number;
   elements?: any[];
@@ -102,12 +102,12 @@ export default function TemplatesAdmin() {
                 <tr key={t._id}>
                   <td>
                     <div className={styles.templateThumb}>
-                      {t.thumbnail ? (
+                      {t.thumbUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.thumbnail} alt={t.name} />
-                      ) : t.frameImage ? (
+                        <img src={t.thumbUrl} alt={t.name} />
+                      ) : t.fullresUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.frameImage} alt={t.name} />
+                        <img src={t.fullresUrl} alt={t.name} />
                       ) : (
                         <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>—</span>
                       )}

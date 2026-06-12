@@ -18,14 +18,14 @@ export async function POST(req: Request) {
     await connectDB();
     const body = await req.json();
 
-    if (body.frameImage && isBase64(body.frameImage)) {
-      body.frameImage = await uploadBase64(body.frameImage, 'velvetsnap/templates').catch(
-        (e: any) => { throw new Error('frameImage: ' + e.message); }
+    if (body.fullresUrl && isBase64(body.fullresUrl)) {
+      body.fullresUrl = await uploadBase64(body.fullresUrl, 'velvetsnap/templates').catch(
+        (e: any) => { throw new Error('fullresUrl upload failed: ' + e.message); }
       );
     }
-    if (body.thumbnail && isBase64(body.thumbnail)) {
-      body.thumbnail = await uploadBase64(body.thumbnail, 'velvetsnap/templates').catch(
-        (e: any) => { throw new Error('thumbnail: ' + e.message); }
+    if (body.thumbUrl && isBase64(body.thumbUrl)) {
+      body.thumbUrl = await uploadBase64(body.thumbUrl, 'velvetsnap/templates').catch(
+        (e: any) => { throw new Error('thumbUrl upload failed: ' + e.message); }
       );
     }
     if (body.elementImages && body.elements) {

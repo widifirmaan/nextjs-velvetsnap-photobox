@@ -223,14 +223,14 @@ export default function StripsStudioPage() {
         setElements(data.elements);
         const slotEls = data.elements.filter((el: any) => el.id?.startsWith('slot-'));
         if (slotEls?.length) setSlotCount(slotEls.length);
-      } else if (data.frameImage && data.slotsLayout?.length) {
-        // Legacy template: convert frameImage + slotsLayout to elements
+      } else if (data.fullresUrl && data.slotsLayout?.length) {
+        // Legacy template: convert fullresUrl + slotsLayout to elements
         const cw = data.canvasWidth || 600;
         const ch = data.canvasHeight || 900;
         const bgEl: IStripElement = {
           id: uuid(), type: 'background', x: 0, y: 0,
           width: cw, height: ch, rotation: 0, zIndex: 0,
-          visible: true, props: { stickerUrl: data.frameImage },
+          visible: true, props: { stickerUrl: data.fullresUrl },
         };
         const photoSlots: IStripElement[] = data.slotsLayout.map((s: any, i: number) => ({
           id: 'slot-' + uuid(), type: 'photo-slot' as const,
@@ -355,8 +355,8 @@ export default function StripsStudioPage() {
       const rawFrame = editorRef.current?.getFrameImage() || '';
       const frameB64 = await removeGreenScreen(rawFrame);
       const toUpload: { key: string; b64: string; folder?: string }[] = [];
-      if (frameB64) toUpload.push({ key: 'frameImage', b64: frameB64 });
-      if (thumbnailB64) toUpload.push({ key: 'thumbnail', b64: thumbnailB64 });
+      if (frameB64) toUpload.push({ key: 'fullresUrl', b64: frameB64 });
+      if (thumbnailB64) toUpload.push({ key: 'thumbUrl', b64: thumbnailB64 });
 
       const savedElements = await Promise.all(elements.map(async (el) => {
         const copy = { ...el, props: { ...el.props } };
@@ -377,12 +377,12 @@ export default function StripsStudioPage() {
         return { key: item.key, url };
       }));
 
-      let frameImage = '';
-      let thumbnail = '';
+      let fullresUrl = '';
+      let thumbUrl = '';
       const stickerUrls: Record<string, string> = {};
       for (const u of uploaded) {
-        if (u.key === 'frameImage') frameImage = u.url;
-        else if (u.key === 'thumbnail') thumbnail = u.url;
+        if (u.key === 'fullresUrl') fullresUrl = u.url;
+        else if (u.key === 'thumbUrl') thumbUrl = u.url;
         else if (u.key.startsWith('el_')) stickerUrls[u.key.slice(3)] = u.url;
       }
       // Apply uploaded sticker URLs to elements
@@ -407,9 +407,9 @@ export default function StripsStudioPage() {
         isActive: true,
         canvasWidth: canvasSize.w,
         canvasHeight: canvasSize.h,
-        frameImage,
+        fullresUrl,
         slotsLayout,
-        thumbnail,
+        thumbUrl,
         elements: savedElements,
       };
       let res;

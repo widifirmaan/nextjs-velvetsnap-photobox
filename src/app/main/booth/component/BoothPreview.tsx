@@ -100,7 +100,7 @@ export default function BoothPreview({
                 </div>
               );
             })}
-            <img src={keyedFrameImage || templateData.frameImage || ''} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
+            <img src={keyedFrameImage || templateData.fullresUrl || ''} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
           </div>
           {filledCount === slotsCount && (
             <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Edit</button>

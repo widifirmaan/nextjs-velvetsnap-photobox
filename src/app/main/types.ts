@@ -9,9 +9,9 @@ export interface TemplateData {
   price: number;
   color: string;
   isActive: boolean;
-  frameImage?: string;
+  fullresUrl?: string;
   slotsLayout?: ISlot[];
-  thumbnail?: string;
+  thumbUrl?: string;
   type?: 'frame' | 'strip';
   canvasWidth?: number;
   canvasHeight?: number;

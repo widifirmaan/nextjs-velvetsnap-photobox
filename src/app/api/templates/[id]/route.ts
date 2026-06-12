@@ -9,15 +9,14 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     await connectDB();
     const body = await req.json();
 
-    // Upload images to Cloudinary
-    if (body.frameImage && isBase64(body.frameImage)) {
-      body.frameImage = await uploadBase64(body.frameImage, 'velvetsnap/templates').catch(
-        (e: any) => { throw new Error('frameImage upload failed: ' + e.message); }
+    if (body.fullresUrl && isBase64(body.fullresUrl)) {
+      body.fullresUrl = await uploadBase64(body.fullresUrl, 'velvetsnap/templates').catch(
+        (e: any) => { throw new Error('fullresUrl upload failed: ' + e.message); }
       );
     }
-    if (body.thumbnail && isBase64(body.thumbnail)) {
-      body.thumbnail = await uploadBase64(body.thumbnail, 'velvetsnap/templates').catch(
-        (e: any) => { throw new Error('thumbnail upload failed: ' + e.message); }
+    if (body.thumbUrl && isBase64(body.thumbUrl)) {
+      body.thumbUrl = await uploadBase64(body.thumbUrl, 'velvetsnap/templates').catch(
+        (e: any) => { throw new Error('thumbUrl upload failed: ' + e.message); }
       );
     }
     // Upload element sticker images to Cloudinary
@@ -52,8 +51,8 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     }
 
     const imageUrls: string[] = [];
-    if (template.frameImage) imageUrls.push(template.frameImage);
-    if (template.thumbnail) imageUrls.push(template.thumbnail);
+    if (template.fullresUrl) imageUrls.push(template.fullresUrl);
+    if (template.thumbUrl) imageUrls.push(template.thumbUrl);
     if (template.elements) {
       for (const el of template.elements) {
         if (el.props?.stickerUrl) imageUrls.push(el.props.stickerUrl);

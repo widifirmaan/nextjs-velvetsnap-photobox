@@ -9,8 +9,6 @@ interface TemplateCardProps {
     _id: string;
     templateId: string;
     name: string;
-    frameImage?: string;
-    thumbnail?: string;
     color: string;
     price: number;
     slots: number;

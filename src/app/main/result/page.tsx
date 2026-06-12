@@ -26,7 +26,7 @@ export interface TemplateData {
   slots: number;
   price: number;
   color: string;
-  frameImage?: string;
+  fullresUrl?: string;
   slotsLayout?: ISlot[];
   type?: 'frame' | 'strip';
   elements?: IStripElement[];
@@ -229,13 +229,13 @@ export default function ResultPage() {
             const ch = matched.canvasHeight || 3000;
 
             // Convert legacy (frameImage + slotsLayout) to elements
-            if (!matched.elements?.length && matched.frameImage && matched.slotsLayout?.length) {
+            if (!matched.elements?.length && matched.fullresUrl && matched.slotsLayout?.length) {
               const els: any[] = [];
               els.push({
                 id: 'bg', type: 'background',
                 x: 0, y: 0, width: cw, height: ch,
                 rotation: 0, zIndex: 0, visible: true,
-                props: { stickerUrl: getHighResUrl(matched.frameImage, cw, ch), opacity: 1 },
+                props: { stickerUrl: getHighResUrl(matched.fullresUrl, cw, ch), opacity: 1 },
               });
               (matched.slotsLayout || []).forEach((slot: any, i: number) => {
                 els.push({
@@ -251,11 +251,11 @@ export default function ResultPage() {
             }
 
             if (matched.elements?.length) {
-              // Override background stickerUrl with high-res frameImage
-              if (matched.frameImage) {
+              // Override background stickerUrl with high-res fullresUrl
+              if (matched.fullresUrl) {
                 matched.elements = matched.elements.map((el: any) =>
                   el.type === 'background' && el.props?.stickerUrl
-                    ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(matched.frameImage, cw, ch) } }
+                    ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(matched.fullresUrl, cw, ch) } }
                     : el
                 );
               }
@@ -267,8 +267,8 @@ export default function ResultPage() {
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
                 img.src = bgFrameDataUrl;
               } catch {}
-            } else if (matched.frameImage) {
-              removeGreenScreen(getHighResUrl(matched.frameImage, cw, ch)).then((keyed) => {
+            } else if (matched.fullresUrl) {
+              removeGreenScreen(getHighResUrl(matched.fullresUrl, cw, ch)).then((keyed) => {
                 setKeyedFrameImage(keyed);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
@@ -312,7 +312,7 @@ export default function ResultPage() {
           dbTemplate.canvasWidth || 1000, dbTemplate.canvasHeight || 3000,
         )
       : (() => {
-          const frameSrc = keyedFrameImage || dbTemplate.frameImage || '';
+          const frameSrc = keyedFrameImage || dbTemplate.fullresUrl || '';
           if (!frameSrc) return Promise.reject('No frame');
           return composeFrameImage(frameSrc, dbTemplate.slotsLayout!, captures, photoAdjust, dbTemplate.color || '#ffffff');
         })();

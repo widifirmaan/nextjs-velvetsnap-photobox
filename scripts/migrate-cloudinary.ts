@@ -84,12 +84,12 @@ const TemplateSchema = new mongoose.Schema({
   color: { type: String, default: '#007aff' },
   isActive: { type: Boolean, default: true },
   type: { type: String, enum: ['frame', 'strip'], default: 'frame' },
-  frameImage: String,
+  fullresUrl: String,
   slotsLayout: [{ x: Number, y: Number, w: Number, h: Number }],
   canvasWidth: { type: Number, default: 600 },
   canvasHeight: { type: Number, default: 900 },
   elements: [StripElementSchema],
-  thumbnail: String,
+  thumbUrl: String,
 }, { timestamps: true });
 
 const Transaction = mongoose.models.Transaction || mongoose.model('Transaction', TransactionSchema);
@@ -166,25 +166,25 @@ async function migrateTemplates(): Promise<number> {
     const updates: Record<string, any> = {};
     let needsUpdate = false;
 
-    if (tmpl.frameImage && isBase64(tmpl.frameImage)) {
+    if (tmpl.fullresUrl && isBase64(tmpl.fullresUrl)) {
       try {
-        const url = await upload(tmpl.frameImage, 'velvetsnap/templates');
-        updates.frameImage = url;
+        const url = await upload(tmpl.fullresUrl, 'velvetsnap/templates');
+        updates.fullresUrl = url;
         needsUpdate = true;
-        console.log(`  [template ${tmpl.templateId}] frameImage uploaded`);
+        console.log(`  [template ${tmpl.templateId}] fullresUrl uploaded`);
       } catch (e) {
-        console.error(`  [template ${tmpl.templateId}] frameImage failed:`, e);
+        console.error(`  [template ${tmpl.templateId}] fullresUrl failed:`, e);
       }
     }
 
-    if (tmpl.thumbnail && isBase64(tmpl.thumbnail)) {
+    if (tmpl.thumbUrl && isBase64(tmpl.thumbUrl)) {
       try {
-        const url = await upload(tmpl.thumbnail, 'velvetsnap/templates');
-        updates.thumbnail = url;
+        const url = await upload(tmpl.thumbUrl, 'velvetsnap/templates');
+        updates.thumbUrl = url;
         needsUpdate = true;
-        console.log(`  [template ${tmpl.templateId}] thumbnail uploaded`);
+        console.log(`  [template ${tmpl.templateId}] thumbUrl uploaded`);
       } catch (e) {
-        console.error(`  [template ${tmpl.templateId}] thumbnail failed:`, e);
+        console.error(`  [template ${tmpl.templateId}] thumbUrl failed:`, e);
       }
     }
 

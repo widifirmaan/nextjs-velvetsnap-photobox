@@ -20,7 +20,7 @@ interface TemplateData {
   slots: number;
   price: number;
   color: string;
-  frameImage?: string;
+  fullresUrl?: string;
   slotsLayout?: ISlot[];
 }
 
@@ -262,8 +262,8 @@ function BoothContent() {
             setDbTemplate(matched);
             setSlotsCount(matched.slots || 3);
             setTemplateName(matched.name);
-            if (matched.frameImage) {
-              removeGreenScreen(matched.frameImage).then((keyed) => {
+            if (matched.fullresUrl) {
+              removeGreenScreen(matched.fullresUrl).then((keyed) => {
                 setKeyedFrameImage(keyed);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
@@ -426,7 +426,7 @@ function BoothContent() {
       sessionStorage.setItem('photobooth_adjust', JSON.stringify(photoAdjust));
     }
     // Generate composited image via Canvas (reliable, no DOM issues)
-    const frameSrc = keyedFrameImage || dbTemplate?.frameImage || '';
+    const frameSrc = keyedFrameImage || dbTemplate?.fullresUrl || '';
     if (frameSrc && dbTemplate?.slotsLayout && dbTemplate?.slotsLayout.length > 0) {
       composeFrameImage(
         frameSrc,
@@ -444,7 +444,7 @@ function BoothContent() {
   };
 
   if (step === 'editor') {
-    const hasTemplate = dbTemplate && dbTemplate.frameImage && dbTemplate.slotsLayout && dbTemplate.slotsLayout.length > 0;
+    const hasTemplate = dbTemplate && dbTemplate.fullresUrl && dbTemplate.slotsLayout && dbTemplate.slotsLayout.length > 0;
     return (
       <div className="page-container">
         <h1 className="title">Edit Photos</h1>
@@ -530,7 +530,7 @@ function BoothContent() {
                 );
               })}
               <img
-                src={keyedFrameImage || dbTemplate?.frameImage || ''}
+                src={keyedFrameImage || dbTemplate?.fullresUrl || ''}
                 alt="Frame"
                 style={{
                   position: 'absolute',
@@ -656,7 +656,7 @@ function BoothContent() {
           </div>
         )}
 
-        {dbTemplate && dbTemplate.frameImage && dbTemplate.slotsLayout && (
+        {dbTemplate && dbTemplate.fullresUrl && dbTemplate.slotsLayout && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
             <div className={styles.liveStrip} style={{ aspectRatio: frameRatio }}>
             {(dbTemplate.slotsLayout || []).map((slot, idx) => {
@@ -695,7 +695,7 @@ function BoothContent() {
               );
             })}
             <img
-              src={keyedFrameImage || dbTemplate.frameImage}
+              src={keyedFrameImage || dbTemplate.fullresUrl}
               alt=""
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
             />

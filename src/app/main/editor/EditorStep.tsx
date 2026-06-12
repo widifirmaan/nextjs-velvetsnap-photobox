@@ -22,7 +22,7 @@ export default function EditorStep({
 }) {
   const handleRetake = () => onBack();
 
-  const hasTemplate = templateData && templateData.frameImage && templateData.slotsLayout && templateData.slotsLayout.length > 0;
+  const hasTemplate = templateData && templateData.fullresUrl && templateData.slotsLayout && templateData.slotsLayout.length > 0;
 
   const sel = photoAdjust[selectedSlotIdx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
 

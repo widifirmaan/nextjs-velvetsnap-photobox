@@ -13,7 +13,7 @@ interface TemplateItem {
   price: number;
   color: string;
   isActive: boolean;
-  thumbnail?: string;
+  thumbUrl?: string;
 }
 
 function SlotDots({ count }: { count: number }) {
@@ -92,8 +92,8 @@ export default function TemplatesPage() {
           {templates.map((t) => (
             <button key={t._id} className={styles.card} onClick={() => handleSelect(t.templateId)}>
               <div className={styles.cardThumb}>
-                {t.thumbnail ? (
-                  <img src={t.thumbnail} alt={t.name} loading="lazy" decoding="async" />
+                {t.thumbUrl ? (
+                  <img src={t.thumbUrl} alt={t.name} loading="lazy" decoding="async" />
                 ) : (
                   <LayoutTemplate size={48} style={{ color: t.color }} />
                 )}
