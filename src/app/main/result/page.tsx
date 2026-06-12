@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Printer, Home, Loader2 } from 'lucide-react';
 import { composeStripImage, renderStripFrame } from '@/lib/canvas-utils';
+import { getHighResUrl } from '@/lib/cloudinary';
 import styles from './page.module.css';
 
 export interface ISlot {
@@ -224,13 +225,37 @@ export default function ResultPage() {
           const matched = data.data.find((t: any) => t.templateId === template);
           if (matched) {
             setDbTemplate(matched);
-            if (matched.type === 'strip' && matched.elements?.length) {
-              const cw = matched.canvasWidth || 1000;
-              const ch = matched.canvasHeight || 3000;
+            const cw = matched.canvasWidth || 1000;
+            const ch = matched.canvasHeight || 3000;
+
+            // Convert legacy (frameImage + slotsLayout) to elements
+            if (!matched.elements?.length && matched.frameImage && matched.slotsLayout?.length) {
+              const els: any[] = [];
+              els.push({
+                id: 'bg', type: 'background',
+                x: 0, y: 0, width: cw, height: ch,
+                rotation: 0, zIndex: 0, visible: true,
+                props: { stickerUrl: getHighResUrl(matched.frameImage, cw, ch), opacity: 1 },
+              });
+              (matched.slotsLayout || []).forEach((slot: any, i: number) => {
+                els.push({
+                  id: `slot-${i}`, type: 'photo-slot',
+                  x: (slot.x / 100) * cw, y: (slot.y / 100) * ch,
+                  width: (slot.w / 100) * cw, height: (slot.h / 100) * ch,
+                  rotation: 0, zIndex: 1, visible: true,
+                  props: { borderWidth: 2, borderColor: '#ffffff', borderRadius: 8, shape: 'rounded', opacity: 1 },
+                });
+              });
+              matched.elements = els;
+              matched.type = 'strip';
+            }
+
+            if (matched.elements?.length) {
+              // Override background stickerUrl with high-res frameImage
               if (matched.frameImage) {
                 matched.elements = matched.elements.map((el: any) =>
                   el.type === 'background' && el.props?.stickerUrl
-                    ? { ...el, props: { ...el.props, stickerUrl: matched.frameImage } }
+                    ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(matched.frameImage, cw, ch) } }
                     : el
                 );
               }
@@ -243,7 +268,7 @@ export default function ResultPage() {
                 img.src = bgFrameDataUrl;
               } catch {}
             } else if (matched.frameImage) {
-              removeGreenScreen(matched.frameImage).then((keyed) => {
+              removeGreenScreen(getHighResUrl(matched.frameImage, cw, ch)).then((keyed) => {
                 setKeyedFrameImage(keyed);
                 const img = new window.Image();
                 img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
@@ -280,11 +305,11 @@ export default function ResultPage() {
     if (!imagesReady || compositedImage || !dbTemplate) return;
     if (!dbTemplate.slotsLayout || dbTemplate.slotsLayout.length === 0) return;
     setRendering(true);
-    const doComposite = dbTemplate.type === 'strip' && dbTemplate.elements?.length && dbTemplate.canvasWidth && dbTemplate.canvasHeight
+    const doComposite = dbTemplate.type === 'strip' && dbTemplate.elements?.length && dbTemplate.slotsLayout?.length
       ? composeStripImage(
           dbTemplate.elements, dbTemplate.color || '#ffffff',
           captures, photoAdjust,
-          dbTemplate.canvasWidth, dbTemplate.canvasHeight,
+          dbTemplate.canvasWidth || 1000, dbTemplate.canvasHeight || 3000,
         )
       : (() => {
           const frameSrc = keyedFrameImage || dbTemplate.frameImage || '';

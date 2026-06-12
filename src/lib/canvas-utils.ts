@@ -137,6 +137,7 @@ export function removeGreenScreen(base64: string): Promise<string> {
       canvas.height = Math.round((img.naturalHeight || img.height) * scale);
       const ctx = canvas.getContext('2d');
       if (!ctx) { resolve(base64); return; }
+      ctx.imageSmoothingQuality = 'high';
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       let imgData;
       try { imgData = ctx.getImageData(0, 0, canvas.width, canvas.height); }
@@ -180,6 +181,7 @@ export function renderStripFrame(
     canvas.height = canvasHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) { reject(new Error('No context')); return; }
+    ctx.imageSmoothingQuality = 'high';
 
     // Fill background color first
     ctx.fillStyle = bgColor || '#ffffff';
@@ -381,6 +383,7 @@ export async function composeStripImage(
   canvas.height = ch;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('No context');
+  ctx.imageSmoothingQuality = 'high';
 
   ctx.fillStyle = bgColor || '#ffffff';
   ctx.fillRect(0, 0, cw, ch);

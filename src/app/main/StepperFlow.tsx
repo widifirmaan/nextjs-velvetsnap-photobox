@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
+import { getHighResUrl } from '@/lib/cloudinary';
 import { TEMPLATE_CONFIGS, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';
@@ -44,17 +45,40 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
         setTemplateData(matched);
         setPrice(matched.price ?? 35000);
 
-        if (matched.type === 'strip' && matched.elements?.length) {
-          const cw = matched.canvasWidth || 1000;
-          const ch = matched.canvasHeight || 3000;
+        const cw = matched.canvasWidth || 1000;
+        const ch = matched.canvasHeight || 3000;
+
+        // Convert legacy (frameImage + slotsLayout) to elements
+        if (!matched.elements?.length && matched.frameImage && matched.slotsLayout?.length) {
+          const els: any[] = [];
+          els.push({
+            id: 'bg', type: 'background',
+            x: 0, y: 0, width: cw, height: ch,
+            rotation: 0, zIndex: 0, visible: true,
+            props: { stickerUrl: getHighResUrl(matched.frameImage, cw, ch), opacity: 1 },
+          });
+          (matched.slotsLayout || []).forEach((slot: any, i: number) => {
+            els.push({
+              id: `slot-${i}`, type: 'photo-slot',
+              x: (slot.x / 100) * cw, y: (slot.y / 100) * ch,
+              width: (slot.w / 100) * cw, height: (slot.h / 100) * ch,
+              rotation: 0, zIndex: 1, visible: true,
+              props: { borderWidth: 2, borderColor: '#ffffff', borderRadius: 8, shape: 'rounded', opacity: 1 },
+            });
+          });
+          matched.elements = els;
+          matched.type = 'strip';
+        }
+
+        if (matched.elements?.length) {
           const slotsLayout = stripElementsToSlotsLayout(matched.elements, cw, ch);
           matched.slotsLayout = slotsLayout;
           if (!matched.slots) matched.slots = slotsLayout.length;
-          // Override background stickerUrl with latest frameImage (high-res)
+          // Override background stickerUrl with high-res frameImage
           if (matched.frameImage) {
             matched.elements = matched.elements.map((el) =>
               el.type === 'background' && el.props.stickerUrl
-                ? { ...el, props: { ...el.props, stickerUrl: matched.frameImage } }
+                ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(matched.frameImage, cw, ch) } }
                 : el
             );
           }
@@ -67,7 +91,7 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
             setKeyedFrameImage(bgFrameDataUrl);
           } catch {}
         } else if (matched.frameImage) {
-          removeGreenScreen(matched.frameImage).then((keyed) => {
+          removeGreenScreen(getHighResUrl(matched.frameImage, cw, ch)).then((keyed) => {
             setKeyedFrameImage(keyed);
             const img = new window.Image();
             img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
@@ -105,11 +129,11 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
 
   useEffect(() => {
     if (!captures.length || !templateData?.slotsLayout?.length) return;
-    if (templateData.type === 'strip' && templateData.elements?.length && templateData.canvasWidth && templateData.canvasHeight) {
+    if (templateData.type === 'strip' && templateData.elements?.length && templateData.slotsLayout?.length) {
       composeStripImage(
         templateData.elements, templateData.color || '#ffffff',
         captures, photoAdjust,
-        templateData.canvasWidth, templateData.canvasHeight,
+        templateData.canvasWidth || 1000, templateData.canvasHeight || 3000,
       ).then(setCompositedImage).catch(() => {});
     } else {
       const frameSrc = keyedFrameImage || templateData.frameImage || '';
