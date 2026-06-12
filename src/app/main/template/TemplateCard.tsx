@@ -6,7 +6,7 @@ import styles from '@/app/main/page.module.css';
 
 interface TemplateCardProps {
   template: {
-    _id: string;
+    _id?: string;
     templateId: string;
     templateName: string;
     templatePrice: number;
