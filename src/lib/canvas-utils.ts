@@ -551,5 +551,5 @@ export async function composeStripImage(
     }
   }
 
-  return canvas.toDataURL('image/jpeg', 0.95);
+  return canvas.toDataURL('image/jpeg', 0.85);
 }

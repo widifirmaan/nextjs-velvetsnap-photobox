@@ -26,13 +26,42 @@ export default function BoothPreview({
     fileRefs.current[idx]?.click();
   };
 
-  const handleFileChange = (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+  const MAX_DIM = 1200;
+  const JPEG_QUALITY = 0.82;
+
+  const compressImage = (dataUrl: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const scale = Math.min(MAX_DIM / width, MAX_DIM / height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const c = document.createElement('canvas');
+        c.width = width;
+        c.height = height;
+        const ctx = c.getContext('2d');
+        if (!ctx) { resolve(dataUrl); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(c.toDataURL('image/jpeg', JPEG_QUALITY));
+      };
+      img.onerror = () => resolve(dataUrl);
+      img.src = dataUrl;
+    });
+  };
+
+  const handleFileChange = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const dataUrl = reader.result as string;
-      if (dataUrl) onAddCapture(dataUrl, idx);
+      if (dataUrl) {
+        const compressed = await compressImage(dataUrl);
+        onAddCapture(compressed, idx);
+      }
     };
     reader.readAsDataURL(file);
     e.target.value = '';
