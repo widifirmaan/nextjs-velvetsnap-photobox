@@ -10,7 +10,6 @@ interface TemplateCardProps {
     templateId: string;
     templateName: string;
     templatePrice: number;
-    templateThumb?: string;
     templateData?: {
       color: string;
       slots: number;
@@ -21,12 +20,11 @@ interface TemplateCardProps {
 }
 
 export default function TemplateCard({ template, onSelect, keyedFrameUrl }: TemplateCardProps) {
-  const src = keyedFrameUrl || template.templateThumb || '';
   return (
     <button className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
       <div className={styles.templateCardThumb}>
-        {src ? (
-          <img src={src} alt={template.templateName} loading="lazy" />
+        {keyedFrameUrl ? (
+          <img src={keyedFrameUrl} alt={template.templateName} loading="lazy" />
         ) : (
           <Loader2 className="spin" size={32} />
         )}

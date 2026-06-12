@@ -29,7 +29,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
         const active = res.data.filter((t: TemplateData) => t.isActive !== false);
         setTemplates(active);
 
-        // Fetch full detail + chroma-key thumbnails in parallel batches
+        // Fetch full detail + chroma-key templateFull in parallel batches
         const batchSize = 4;
         for (let i = 0; i < active.length; i += batchSize) {
           if (cancelledRef.current) return;
@@ -41,8 +41,9 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
               if (cancelledRef.current || !fullRes.success || !fullRes.data?.length) return;
               const full = fullRes.data[0];
               setTemplates((prev) => prev.map((p) => p.templateId === full.templateId ? { ...p, ...full } : p));
-              if (full.templateThumb || full.templateFull) {
-                const keyed = await removeGreenScreen(full.templateThumb || full.templateFull);
+              const imgUrl = full.templateFull || full.templateThumb || '';
+              if (imgUrl) {
+                const keyed = await removeGreenScreen(imgUrl);
                 if (!cancelledRef.current) {
                   setKeyedUrls((prev) => ({ ...prev, [full.templateId]: keyed }));
                 }
