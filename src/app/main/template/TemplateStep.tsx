@@ -83,7 +83,7 @@ export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
         if (!keyed || !slots?.length) return null;
         const arr = Array(slots.length).fill(frame);
         const adjusts = Array(slots.length).fill({ scale: 1, x: 0, y: 0 });
-        const url = await composeFrameImage(keyed, slots, arr, adjusts, t.color || '#ffffff');
+        const url = await composeFrameImage(keyed, slots, arr, adjusts, t.color || '#ffffff', 320);
         return { id: t.templateId, url };
       }));
       const map: Record<string, string> = {};
