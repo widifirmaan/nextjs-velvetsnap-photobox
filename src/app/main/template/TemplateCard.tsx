@@ -1,6 +1,6 @@
 'use client';
 
-import { LayoutTemplate } from 'lucide-react';
+import { LayoutTemplate, Loader2 } from 'lucide-react';
 import { SlotDots } from '../StepperBar';
 import styles from '@/app/main/page.module.css';
 
@@ -20,15 +20,18 @@ interface TemplateCardProps {
 }
 
 export default function TemplateCard({ template, onSelect, livePreviewUrl }: TemplateCardProps) {
-  const thumbSrc = template.thumbnail || template.frameImage;
-  const displaySrc = livePreviewUrl || thumbSrc;
+  const hasFrame = !!livePreviewUrl;
   return (
     <button key={template._id} className={styles.templateCard} onClick={() => onSelect(template.templateId)}>
       <div className={styles.templateCardThumb}>
-        {displaySrc ? (
-          <img src={displaySrc} alt={template.name} loading="lazy" />
+        {!hasFrame ? (
+          <Loader2 className="spin" size={32} />
         ) : (
-          <LayoutTemplate size={48} style={{ color: template.color }} />
+          livePreviewUrl ? (
+            <img src={livePreviewUrl} alt={template.name} loading="lazy" />
+          ) : (
+            <LayoutTemplate size={48} style={{ color: template.color }} />
+          )
         )}
       </div>
       <div className={styles.templateCardBody}>
