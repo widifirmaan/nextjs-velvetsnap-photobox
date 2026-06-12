@@ -136,16 +136,17 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
 
   useEffect(() => {
     if (!captures.length || !templateData?.slotsLayout?.length) return;
+    const outW = templateData.canvasWidth || 1000;
     if (templateData.type === 'strip' && templateData.elements?.length && templateData.slotsLayout?.length) {
       composeStripImage(
         templateData.elements, templateData.color || '#ffffff',
         captures, photoAdjust,
-        templateData.canvasWidth || 1000, templateData.canvasHeight || 3000,
+        outW, templateData.canvasHeight || 3000, outW,
       ).then(setCompositedImage).catch(() => {});
     } else {
       const frameSrc = keyedFrameImage || templateData.fullresUrl || '';
       if (frameSrc) {
-        composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff')
+        composeFrameImage(frameSrc, templateData.slotsLayout, captures, photoAdjust, templateData.color || '#ffffff', outW)
           .then(setCompositedImage)
           .catch(() => {});
       }

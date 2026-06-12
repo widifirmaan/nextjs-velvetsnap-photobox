@@ -304,16 +304,17 @@ export default function ResultPage() {
     if (!imagesReady || compositedImage || !dbTemplate) return;
     if (!dbTemplate.slotsLayout || dbTemplate.slotsLayout.length === 0) return;
     setRendering(true);
+    const outW = dbTemplate.canvasWidth || 1000;
     const doComposite = dbTemplate.type === 'strip' && dbTemplate.elements?.length && dbTemplate.slotsLayout?.length
       ? composeStripImage(
           dbTemplate.elements, dbTemplate.color || '#ffffff',
           captures, photoAdjust,
-          dbTemplate.canvasWidth || 1000, dbTemplate.canvasHeight || 3000,
+          outW, dbTemplate.canvasHeight || 3000, outW,
         )
       : (() => {
           const frameSrc = keyedFrameImage || dbTemplate.fullresUrl || '';
           if (!frameSrc) return Promise.reject('No frame');
-          return composeFrameImage(frameSrc, dbTemplate.slotsLayout!, captures, photoAdjust, dbTemplate.color || '#ffffff');
+          return composeFrameImage(frameSrc, dbTemplate.slotsLayout!, captures, photoAdjust, dbTemplate.color || '#ffffff', outW);
         })();
     doComposite.then((dataUrl) => {
       setCompositedImage(dataUrl);

@@ -434,6 +434,7 @@ function BoothContent() {
         captures,
         photoAdjust,
         dbTemplate.color || '#ffffff',
+        dbTemplate.canvasWidth || 1000,
       ).then((dataUrl) => {
         sessionStorage.setItem('photobooth_composited', dataUrl);
         router.push('/payment');
