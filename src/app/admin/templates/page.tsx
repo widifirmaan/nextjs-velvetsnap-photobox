@@ -117,9 +117,9 @@ export default function TemplatesAdmin() {
                   </td>
                   <td>{t.templateId}</td>
                   <td>{t.templateName}</td>
-                  <td>{t.slots}</td>
+                  <td>{t.templateData?.slots || 1}</td>
                   <td>Rp {(t.templatePrice || 0).toLocaleString('id-ID')}</td>
-                  <td><span className={styles.colorSwatch} style={{ backgroundColor: t.color || '#000000' }} /></td>
+                  <td><span className={styles.colorSwatch} style={{ backgroundColor: t.templateData?.color || '#000000' }} /></td>
                   <td>
                     <div className={styles.statusToggle}>
                       <button className={`${styles.toggleSwitch} ${t.isActive !== false ? styles.active : styles.inactive}`} onClick={() => handleToggleActive(t)} type="button">

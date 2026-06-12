@@ -28,7 +28,7 @@ export default function TemplateCard({ template, onSelect, livePreviewUrl }: Tem
           livePreviewUrl ? (
             <img src={livePreviewUrl} alt={template.templateName} loading="lazy" />
           ) : (
-            <LayoutTemplate size={48} style={{ color: template.color }} />
+            <LayoutTemplate size={48} style={{ color: template.templateData?.color || '#007aff' }} />
           )
         )}
       </div>
@@ -36,7 +36,7 @@ export default function TemplateCard({ template, onSelect, livePreviewUrl }: Tem
         <div className={styles.templateCardName}>{template.templateName}</div>
         <div className={styles.templateCardMeta}>
           <span className={styles.templateCardPrice}>Rp{(template.templatePrice || 0).toLocaleString('id-ID')}</span>
-          <SlotDots count={template.slots} />
+          <SlotDots count={template.templateData?.slots || 1} />
         </div>
       </div>
     </button>

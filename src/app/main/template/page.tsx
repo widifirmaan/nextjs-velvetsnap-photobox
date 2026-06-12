@@ -95,14 +95,14 @@ export default function TemplatesPage() {
                 {t.templateThumb ? (
                   <img src={t.templateThumb} alt={t.templateName} loading="lazy" decoding="async" />
                 ) : (
-                  <LayoutTemplate size={48} style={{ color: t.color }} />
+                  <LayoutTemplate size={48} style={{ color: t.templateData?.color || '#007aff' }} />
                 )}
               </div>
               <div className={styles.cardBody}>
                 <div className={styles.cardName}>{t.templateName}</div>
                 <div className={styles.cardMeta}>
                   <span className={styles.cardPrice}>Rp{(t.templatePrice || 0).toLocaleString('id-ID')}</span>
-                  <SlotDots count={t.slots} />
+                  <SlotDots count={t.templateData?.slots || 1} />
                 </div>
               </div>
             </button>
