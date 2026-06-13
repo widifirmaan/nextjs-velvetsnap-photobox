@@ -16,7 +16,7 @@ interface SettingsData {
 
 const defaults: SettingsData = {
   footerText: 'VelvetSnap Photobooth Platform',
-  footerHtml: '',
+  footerHtml: '<footer class="text-center py-3">\n  <nav class="d-flex justify-content-center gap-3 mb-2">\n    <a href="https://instagram.com" target="_blank" class="text-decoration-none">Instagram</a>\n    <a href="https://wa.me/628123456789" target="_blank" class="text-decoration-none">WhatsApp</a>\n    <a href="/templates" class="text-decoration-none">Templates</a>\n    <a href="/strips-studio" class="text-decoration-none">Studio</a>\n  </nav>\n  <p class="mb-0">VelvetSnap Photobooth Platform</p>\n</footer>',
   primaryColor: '#262626',
   accentColor: '#C5D89D',
   showPreloader: true,
@@ -146,7 +146,7 @@ export default function SettingsPage() {
               <textarea style={{ ...inputStyle, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }}
                 value={form.footerHtml}
                 onChange={(e) => update('footerHtml', e.target.value)}
-                placeholder={'<footer class="text-center py-4 bg-dark text-white">\n  <p>&copy; 2025 VelvetSnap. All rights reserved.</p>\n  <div class="d-flex gap-3 justify-content-center">\n    <a href="#">Instagram</a>\n    <a href="#">WhatsApp</a>\n  </div>\n</footer>'}
+                placeholder={'<footer class="text-center py-3">\n  <nav class="d-flex justify-content-center gap-3 mb-2">\n    <a href="https://instagram.com" target="_blank">Instagram</a>\n    <a href="https://wa.me/628123456789" target="_blank">WhatsApp</a>\n    <a href="/templates">Templates</a>\n    <a href="/strips-studio">Studio</a>\n  </nav>\n  <p class="mb-0">VelvetSnap Photobooth Platform</p>\n</footer>'}
                 {...focusProps} />
             </div>
             <div>
