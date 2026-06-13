@@ -10,7 +10,9 @@ export async function GET() {
       .select('templateId templateName name templateThumb thumbUrl thumbnail templateFull templateDesc description templatePrice price templateData.color templateData.type templateData.slots templateData.slotsLayout isActive createdAt')
       .lean();
     const data = docs.map(normalizeTemplate);
-    return NextResponse.json({ success: true, data });
+    return NextResponse.json({ success: true, data }, {
+      headers: { 'Cache-Control': 'public, max-age=60' },
+    });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

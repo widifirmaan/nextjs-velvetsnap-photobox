@@ -19,6 +19,8 @@ export async function GET(req: Request) {
       return NextResponse.json({
         success: true,
         data: [normalizeTemplate(template)],
+      }, {
+        headers: { 'Cache-Control': 'public, max-age=60' },
       });
     }
 

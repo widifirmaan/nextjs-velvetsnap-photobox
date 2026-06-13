@@ -61,14 +61,36 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     };
   }, [step, sessionTimer, startOver]);
 
-  const handleSelectTemplate = useCallback((id: string) => {
+  const handleSelectTemplate = useCallback((id: string, data?: TemplateData, keyedUrl?: string) => {
     setTemplateId(id);
     setStripLoading(true);
     setStep(2);
+    if (keyedUrl) {
+      setKeyedFrameImage(keyedUrl);
+      const img = new window.Image();
+      img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+      img.src = keyedUrl;
+      setStripLoading(false);
+      return;
+    }
+    if (data) {
+      setTemplateData(data);
+      setPrice(data.templatePrice ?? 35000);
+      const fullUrl = data.templateFull || '';
+      if (fullUrl) {
+        setKeyedFrameImage(fullUrl);
+        const img = new window.Image();
+        img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+        img.src = fullUrl;
+        setStripLoading(false);
+        return;
+      }
+    }
+    setStripLoading(false);
   }, [setStep]);
 
   useEffect(() => {
-    if (!templateId) return;
+    if (!templateId || templateData) return;
     const loadTemplate = async () => {
       setStripLoading(true);
       let matched: TemplateData | undefined;
@@ -106,6 +128,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
           matched.templateData.type = 'strip';
         }
 
+        // Always process elements (needed for editor/result compositing)
         if (matched.templateData.elements?.length) {
           const slotsLayout = stripElementsToSlotsLayout(matched.templateData.elements, cw, ch);
           matched.templateData.slotsLayout = slotsLayout;
@@ -115,6 +138,16 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
               ? { ...el, props: { ...el.props, stickerUrl: getHighResUrl(el.props.stickerUrl, cw, ch) } }
               : el
           );
+        }
+
+        // Keyed frame: templateFull is already chroma-keyed from studio save
+        if (matched.templateFull) {
+          setKeyedFrameImage(matched.templateFull);
+          const img = new window.Image();
+          img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+          img.src = matched.templateFull;
+          setStripLoading(false);
+        } else if (matched.templateData.elements?.length) {
           try {
             const frameDataUrl = await renderStripFrame(matched.templateData.elements, cw, ch, matched.templateData.color || '#ffffff', 720);
             const bgFrameDataUrl = await removeGreenScreen(frameDataUrl, 720);
@@ -124,14 +157,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
             setKeyedFrameImage(bgFrameDataUrl);
           } catch {}
           setStripLoading(false);
-        } else if (matched.templateFull) {
-          removeGreenScreen(matched.templateFull).then((keyed) => {
-            setKeyedFrameImage(keyed);
-            const img = new window.Image();
-            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-            img.src = keyed;
-            setStripLoading(false);
-          });
         } else {
           setStripLoading(false);
         }
@@ -170,19 +195,18 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   useEffect(() => {
     if (!captures.length || !templateData?.templateData?.slotsLayout?.length) return;
     const outW = templateData.templateData?.canvasWidth || 1000;
-    if (templateData.templateData?.type === 'strip' && templateData.templateData?.elements?.length && templateData.templateData?.slotsLayout?.length) {
+    const frameSrc = keyedFrameImage || templateData.templateFull || '';
+    const hasPreComposed = !!frameSrc;
+    if (!hasPreComposed && templateData.templateData?.type === 'strip' && templateData.templateData?.elements?.length) {
       composeStripImage(
         templateData.templateData?.elements, templateData.templateData?.color || '#ffffff',
         captures, photoAdjust,
         outW, templateData.templateData?.canvasHeight || 3000, outW,
       ).then(setCompositedImage).catch(() => {});
-    } else {
-      const frameSrc = keyedFrameImage || templateData.templateFull || '';
-      if (frameSrc) {
-        composeFrameImage(frameSrc, templateData.templateData?.slotsLayout, captures, photoAdjust, templateData.templateData?.color || '#ffffff', outW)
-          .then(setCompositedImage)
-          .catch(() => {});
-      }
+    } else if (frameSrc) {
+      composeFrameImage(frameSrc, templateData.templateData?.slotsLayout, captures, photoAdjust, templateData.templateData?.color || '#ffffff', outW)
+        .then(setCompositedImage)
+        .catch(() => {});
     }
   }, [captures, photoAdjust, templateData, keyedFrameImage]);
 
