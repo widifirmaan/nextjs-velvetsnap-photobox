@@ -2,11 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Settings from '@/models/Settings';
 import { hashPassword } from '@/lib/auth';
-import { requireAdmin } from '@/lib/require-admin';
-
 export async function PUT(req: Request) {
-  const u = await requireAdmin(req);
-  if (u) return u;
   try {
     const { password } = await req.json();
     if (!password || password.length < 4) {

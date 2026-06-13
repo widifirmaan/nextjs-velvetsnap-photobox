@@ -1,12 +1,8 @@
 import { NextResponse } from 'next/server';
 import { uploadBase64, isBase64 } from '@/lib/cloudinary';
-import { requireAdmin } from '@/lib/require-admin';
-
 export const runtime = 'nodejs';
 
 export async function POST(req: Request) {
-  const u = await requireAdmin(req);
-  if (u) return u;
   try {
     const { dataUri, folder } = await req.json();
     if (!dataUri || !isBase64(dataUri)) {

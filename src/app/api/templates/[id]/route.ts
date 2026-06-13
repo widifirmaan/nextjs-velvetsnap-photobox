@@ -3,11 +3,7 @@ import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import { uploadBase64, isBase64, deleteImages } from '@/lib/cloudinary';
 import { normalizeTemplate } from '@/lib/normalize-template';
-import { requireAdmin } from '@/lib/require-admin';
-
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const u = await requireAdmin(req);
-  if (u) return u;
   try {
     const { id } = await params;
     await connectDB();
@@ -70,8 +66,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const u = await requireAdmin(req);
-  if (u) return u;
   try {
     const { id } = await params;
     await connectDB();

@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/cloudinary';
-import { requireAdmin } from '@/lib/require-admin';
-
 async function runMigration() {
   await connectDB();
 
@@ -54,8 +52,6 @@ async function runMigration() {
 }
 
 export async function GET(req: Request) {
-  const u = await requireAdmin(req);
-  if (u) return u;
   try {
     const result = await runMigration();
     return NextResponse.json({ success: true, ...result });
@@ -65,8 +61,6 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const u = await requireAdmin(req);
-  if (u) return u;
   try {
     const result = await runMigration();
     return NextResponse.json({ success: true, ...result });
