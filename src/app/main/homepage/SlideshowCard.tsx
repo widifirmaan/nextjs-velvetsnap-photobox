@@ -1,4 +1,5 @@
 'use client';
+import { useMemo } from 'react';
 import styles from '@/app/main/page.module.css';
 import { SAMPLE_IMAGES } from '../types';
 
@@ -6,6 +7,13 @@ export default function SlideshowCard({ slideIdx, images, onStart }: {
   slideIdx: number; images?: string[]; onStart: (e: React.MouseEvent) => void;
 }) {
   const imgs = images?.length ? images : SAMPLE_IMAGES;
+  const loaded = useMemo(() => {
+    const set = new Set<number>();
+    for (let offset = 0; offset < Math.min(3, imgs.length); offset++) {
+      set.add((slideIdx + offset) % imgs.length);
+    }
+    return set;
+  }, [slideIdx, imgs.length]);
   return (
     <a className={styles.cardWedding} onClick={onStart} style={{ cursor: 'pointer' }}>
       <div className={styles.slideshow}>
@@ -14,7 +22,7 @@ export default function SlideshowCard({ slideIdx, images, onStart }: {
             key={i}
             className={styles.slide}
             style={{
-              backgroundImage: `url(${src})`,
+              backgroundImage: loaded.has(i) ? `url(${src})` : undefined,
               opacity: i === slideIdx ? 0.85 : 0,
             }}
           />
