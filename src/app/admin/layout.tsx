@@ -14,7 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
-    fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    fetch('/api/admin/session')
       .then((r) => { if (r.ok) setAuthed(true); else router.replace('/admin/login'); })
       .catch(() => router.replace('/admin/login'));
   }, [pathname, router]);

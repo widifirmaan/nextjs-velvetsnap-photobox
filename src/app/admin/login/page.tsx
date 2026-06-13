@@ -12,7 +12,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+    fetch('/api/admin/session')
       .then((r) => {
         if (r.status === 200) router.replace('/admin');
       })

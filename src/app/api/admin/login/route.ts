@@ -9,11 +9,6 @@ export async function POST(req: Request) {
     await connectDB();
     let settings = await Settings.findOne({});
 
-    const existing = getAdminToken(req);
-    if (existing && settings?.adminSession === existing && settings?.adminSessionExpires && new Date(settings.adminSessionExpires) > new Date()) {
-      return NextResponse.json({ success: true });
-    }
-
     if (!settings) {
       settings = await Settings.create({});
     }
@@ -40,7 +35,7 @@ export async function POST(req: Request) {
     settings.adminSessionExpires = expires;
     await settings.save();
 
-    const res = NextResponse.json({ success: true });
+    const res = NextResponse.json({ success: true, token });
     res.cookies.set('admin_session', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
