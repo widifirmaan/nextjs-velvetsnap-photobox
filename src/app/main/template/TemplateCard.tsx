@@ -30,10 +30,14 @@ export default function TemplateCard({ template, onSelect, keyedFrameUrl }: Temp
     <button className={styles.templateCard} onClick={() => onSelect(template)}>
       <div className={styles.templateCardThumb}>
         {thumbSrc ? (
-          <>
-            {!loaded && <Loader2 className="spin" size={32} />}
-            <img src={thumbSrc} alt={template.templateName} loading="lazy" onLoad={() => setLoaded(true)} style={loaded ? {} : { display: 'none' }} />
-          </>
+          <div style={{ position:'relative', width:'100%', height:'100%' }}>
+            {!loaded && (
+              <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', zIndex:1, background:'#f8f8f8' }}>
+                <Loader2 className="spin" size={32} />
+              </div>
+            )}
+            <img src={thumbSrc} alt={template.templateName} loading="lazy" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} />
+          </div>
         ) : (
           <Loader2 className="spin" size={32} />
         )}
