@@ -12,7 +12,8 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch('/api/admin/session')
+    const t = sessionStorage.getItem('admin_session_token');
+    fetch('/api/admin/session', { headers: t ? { 'Authorization': 'Bearer ' + t } : {} })
       .then((r) => {
         if (r.status === 200) router.replace('/admin');
       })
@@ -31,6 +32,8 @@ export default function AdminLoginPage() {
         body: JSON.stringify({ password }),
       });
       if (res.ok) {
+        const data = await res.json();
+        if (data.token) sessionStorage.setItem('admin_session_token', data.token);
         router.replace('/admin');
       } else {
         const data = await res.json();

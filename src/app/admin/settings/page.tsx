@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, Loader2, Image, Timer, Lock, Check } from 'lucide-react';
+import { adminFetch } from '@/lib/admin-fetch';
 
 interface SettingsData {
   footerText: string;
@@ -38,12 +39,12 @@ export default function SettingsPage() {
 
   const handleAuthFail = () => {
     setAuthErr(true);
-    fetch('/api/admin/login', { method: 'DELETE' });
+    adminFetch('/api/admin/login', { method: 'DELETE' });
     setTimeout(() => router.push('/admin/login'), 1500);
   };
 
   useEffect(() => {
-    fetch('/api/settings')
+    adminFetch('/api/settings')
       .then((r) => {
         if (r.status === 401) { handleAuthFail(); return null; }
         return r.json();
@@ -74,7 +75,7 @@ export default function SettingsPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/settings', {
+      const res = await adminFetch('/api/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -91,7 +92,7 @@ export default function SettingsPage() {
     setPassSaving(true);
     setPassErr('');
     try {
-      const res = await fetch('/api/admin/password', {
+      const res = await adminFetch('/api/admin/password', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: newPass }),

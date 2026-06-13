@@ -3,6 +3,8 @@ import connectDB from '@/lib/db';
 import Settings from '@/models/Settings';
 
 export function getAdminToken(req: Request): string | null {
+  const auth = req.headers.get('authorization') || '';
+  if (auth.startsWith('Bearer ')) return auth.slice(7);
   const cookie = req.headers.get('cookie') || '';
   const match = cookie.match(/(?:^|;\s*)admin_session=([^;]*)/);
   return match ? match[1] : null;

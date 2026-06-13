@@ -14,9 +14,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
-    fetch('/api/admin/session')
-      .then((r) => { if (r.ok) setAuthed(true); else router.replace('/admin/login'); })
-      .catch(() => router.replace('/admin/login'));
+    const token = sessionStorage.getItem('admin_session_token');
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    fetch('/api/admin/session', { headers })
+      .then((r) => { if (r.ok) setAuthed(true); else { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); } })
+      .catch(() => { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); });
   }, [pathname, router]);
 
   useEffect(() => {
@@ -112,7 +115,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             &larr; Return to App
           </Link>
           <button
-            onClick={() => { fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login')); }}
+            onClick={() => { sessionStorage.removeItem('admin_session_token'); fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login')); }}
             className={styles.navLink}
             style={{ color:'var(--text-secondary)', border:'none', background:'none', cursor:'pointer', textAlign:'left', fontSize:14, padding:'10px 12px', width:'100%', display:'flex', alignItems:'center', gap:10 }}
           >
