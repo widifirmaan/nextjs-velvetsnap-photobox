@@ -7,6 +7,21 @@ import type { StripResult } from './types';
 import HomePage from './homepage/HomePage';
 import StepperFlow from './StepperFlow';
 
+interface Branding {
+  appName: string; appTagline: string; heroTitle: string; heroSubtitle: string;
+  footerText: string; primaryColor: string; accentColor: string;
+  showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
+}
+
+const defaultBranding: Branding = {
+  appName: 'VelvetSnap', appTagline: 'AI-Powered Photobooth Experience',
+  heroTitle: 'Abadikan Momen Spesialmu',
+  heroSubtitle: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
+  footerText: 'VelvetSnap Photobooth Platform',
+  primaryColor: '#262626', accentColor: '#C5D89D',
+  showPreloader: true, showStrips: true, slideshowInterval: 3000,
+};
+
 export default function Home() {
   const [step, setStep] = useState(0);
   const [showPreloader, setShowPreloader] = useState(true);
@@ -15,6 +30,7 @@ export default function Home() {
   const [strips, setStrips] = useState<StripResult[]>([]);
   const [txCount, setTxCount] = useState(0);
   const [tmplCount, setTmplCount] = useState(0);
+  const [branding, setBranding] = useState<Branding>(defaultBranding);
   const [refreshKey, setRefreshKey] = useState(0);
   const [morphOrigin, setMorphOrigin] = useState<{x: number; y: number} | null>(null);
   const [btnMorph, setBtnMorph] = useState<{
@@ -25,6 +41,26 @@ export default function Home() {
   const handleRefresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
   useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          const d = res.data;
+          setBranding({
+            appName: d.appName || defaultBranding.appName,
+            appTagline: d.appTagline || defaultBranding.appTagline,
+            heroTitle: d.heroTitle || defaultBranding.heroTitle,
+            heroSubtitle: d.heroSubtitle || defaultBranding.heroSubtitle,
+            footerText: d.footerText || defaultBranding.footerText,
+            primaryColor: d.primaryColor || defaultBranding.primaryColor,
+            accentColor: d.accentColor || defaultBranding.accentColor,
+            showPreloader: d.showPreloader ?? defaultBranding.showPreloader,
+            showStrips: d.showStrips ?? defaultBranding.showStrips,
+            slideshowInterval: d.slideshowInterval || defaultBranding.slideshowInterval,
+          });
+        }
+      })
+      .catch(() => {});
     fetch('/api/transactions/strips')
       .then((r) => r.json())
       .then((res) => {
@@ -42,6 +78,7 @@ export default function Home() {
   }, [refreshKey]);
 
   useEffect(() => {
+    if (!branding.showPreloader) { setShowPreloader(false); return; }
     const skipPreloader = sessionStorage.getItem('skipPreloader');
     if (skipPreloader) {
       setShowPreloader(false);
@@ -53,7 +90,7 @@ export default function Home() {
       }, 4000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [branding.showPreloader]);
 
   useEffect(() => {
     if (!carouselReady) return;
@@ -99,16 +136,16 @@ export default function Home() {
         <div className={`${styles.preloader} ${preloaderFade ? styles.preloaderHidden : ''}`}>
           <div className={styles.preloaderInner}>
             <svg width="64" height="64" viewBox="0 0 56 56" fill="none" className={styles.preloaderLogo}>
-              <rect x="4" y="12" width="48" height="34" rx="8" fill="#262626" />
+              <rect x="4" y="12" width="48" height="34" rx="8" fill={branding.primaryColor} />
               <circle cx="28" cy="29" r="11" fill="#fff" />
-              <circle cx="28" cy="29" r="7" fill="#262626" />
-              <rect x="39" y="8" width="12" height="4" rx="2" fill="#262626" />
-              <path d="M48 18l4-2" stroke="#262626" strokeWidth="2" strokeLinecap="round" />
-              <path d="M18 8l-3 4" stroke="#262626" strokeWidth="2.5" strokeLinecap="round" />
-              <circle cx="18" cy="6" r="1.5" fill="#262626" />
+              <circle cx="28" cy="29" r="7" fill={branding.primaryColor} />
+              <rect x="39" y="8" width="12" height="4" rx="2" fill={branding.primaryColor} />
+              <path d="M48 18l4-2" stroke={branding.primaryColor} strokeWidth="2" strokeLinecap="round" />
+              <path d="M18 8l-3 4" stroke={branding.accentColor} strokeWidth="2.5" strokeLinecap="round" />
+              <circle cx="18" cy="6" r="1.5" fill={branding.accentColor} />
             </svg>
-            <span className={styles.preloaderTitle}>VelvetSnap</span>
-            <span className={styles.preloaderSub}>Photo Booth Jakarta</span>
+            <span className={styles.preloaderTitle}>{branding.appName}</span>
+            <span className={styles.preloaderSub}>{branding.appTagline}</span>
             <div className={styles.preloaderSpinner} />
             <span className={styles.preloaderWait}>Mohon tunggu...</span>
           </div>
@@ -146,7 +183,7 @@ export default function Home() {
       )}
 
       <div className={styles.stepTransition} style={{ display: step !== 0 ? 'none' : undefined }}>
-        <HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} onStart={handleStart} onCarouselReady={() => setCarouselReady(true)} />
+        <HomePage strips={strips} txCount={txCount} tmplCount={tmplCount} branding={branding} onStart={handleStart} onCarouselReady={() => setCarouselReady(true)} />
       </div>
       {step !== 0 && (
         <div key="flow" style={clipStyle} className={clipStage ? styles.clipReveal : styles.stepContent}>

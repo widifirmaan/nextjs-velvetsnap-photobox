@@ -1,0 +1,29 @@
+import mongoose, { Schema, Document } from 'mongoose';
+
+export interface ISettings extends Document {
+  appName: string;
+  appTagline: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  footerText: string;
+  primaryColor: string;
+  accentColor: string;
+  showPreloader: boolean;
+  showStrips: boolean;
+  slideshowInterval: number;
+}
+
+const SettingsSchema = new Schema<ISettings>({
+  appName: { type: String, default: 'VelvetSnap' },
+  appTagline: { type: String, default: 'AI-Powered Photobooth Experience' },
+  heroTitle: { type: String, default: 'Abadikan Momen Spesialmu' },
+  heroSubtitle: { type: String, default: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit' },
+  footerText: { type: String, default: 'VelvetSnap Photobooth Platform' },
+  primaryColor: { type: String, default: '#262626' },
+  accentColor: { type: String, default: '#C5D89D' },
+  showPreloader: { type: Boolean, default: true },
+  showStrips: { type: Boolean, default: true },
+  slideshowInterval: { type: Number, default: 3000 },
+}, { timestamps: true });
+
+export default mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);

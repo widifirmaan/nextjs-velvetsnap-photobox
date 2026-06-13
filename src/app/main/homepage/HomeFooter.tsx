@@ -2,7 +2,7 @@
 import { Camera as CameraIcon, MessageCircle, Sparkles } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 
-export default function HomeFooter() {
+export default function HomeFooter({ branding }: { branding: { appName: string; footerText: string } }) {
   return (
     <footer className={styles.footer}>
       <nav className={styles.nav}>
@@ -21,7 +21,7 @@ export default function HomeFooter() {
         </a>
       </nav>
       <p className={styles.footerText}>
-        Abadikan momen spesialmu bersama VelvetSnap ✨
+        {branding.footerText}
       </p>
     </footer>
   );

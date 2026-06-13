@@ -42,6 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/templates', label: 'Templates', icon: Layers },
     { href: '/admin/devices', label: 'Devices', icon: Server },
     { href: '/admin/template-studio', label: 'Strips Studio', icon: Image },
+    { href: '/admin/settings', label: 'Settings', icon: Settings2 },
   ];
 
   const bottomLinks = [

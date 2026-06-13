@@ -2,8 +2,10 @@
 import { ExternalLink } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 
-export default function IntroCard({ txCount, tmplCount, onStart }: {
-  txCount: number; tmplCount: number; onStart: (e: React.MouseEvent) => void;
+export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
+  txCount: number; tmplCount: number;
+  branding: { appName: string; heroTitle: string; heroSubtitle: string };
+  onStart: (e: React.MouseEvent) => void;
 }) {
   return (
     <div className={styles.introCard}>
@@ -19,13 +21,11 @@ export default function IntroCard({ txCount, tmplCount, onStart }: {
             <circle cx="18" cy="6" r="1.5" fill="var(--accent-color)" />
           </svg>
           <div className={styles.logoText}>
-            <h1 className={styles.logoTitle}>VelvetSnap</h1>
-            <span className={styles.logoSub}>Photo Booth Jakarta</span>
+            <h1 className={styles.logoTitle}>{branding.appName}</h1>
+            <span className={styles.logoSub}>{branding.appName} Jakarta</span>
           </div>
         </div>
-        <p className={styles.introDesc}>
-          Cetak langsung, template kustom, hasil siap dalam hitungan detik.
-        </p>
+        <p className={styles.introDesc}>{branding.heroSubtitle}</p>
         <div className={styles.introStats}>
           <div className={styles.statItem}>
             <span className={styles.statNum}>{txCount || 0}+</span>
