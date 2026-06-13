@@ -3,9 +3,11 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface ISettings extends Document {
   appName: string;
   appTagline: string;
-  heroTitle: string;
   heroSubtitle: string;
   logo: string;
+  cardSmallHtml: string;
+  cardPromoHtml: string;
+  slideshowImages: string[];
   header: { location: string; navItems: string };
   footer: { text: string };
   system: { primaryColor: string; accentColor: string; showPreloader: boolean; showStrips: boolean; slideshowInterval: number; sessionTimer: number };
@@ -15,9 +17,17 @@ export interface ISettings extends Document {
 const SettingsSchema = new Schema<ISettings>({
   appName: { type: String, default: 'VelvetSnap' },
   appTagline: { type: String, default: 'AI-Powered Photobooth Experience' },
-  heroTitle: { type: String, default: 'Abadikan Momen Spesialmu' },
   heroSubtitle: { type: String, default: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit' },
   logo: { type: String, default: '' },
+  cardSmallHtml: { type: String, default: '' },
+  cardPromoHtml: { type: String, default: '' },
+  slideshowImages: { type: [String], default: [
+    'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
+    'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80',
+    'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=400&q=80',
+  ] },
   header: {
     type: {
       location: { type: String, default: 'Jakarta' },

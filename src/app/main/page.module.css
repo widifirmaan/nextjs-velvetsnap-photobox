@@ -211,13 +211,11 @@
 
 .tooltip {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 10px);
   left: 0;
   opacity: 0;
-  translate: 0 8px;
-  rotate: -3deg;
-  scale: 0.96;
-  transition: all 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  translate: 0 6px;
+  transition: all 200ms ease;
   pointer-events: none;
   z-index: 20;
 }
@@ -225,28 +223,18 @@
 .tooltipVisible {
   opacity: 1;
   translate: 0 0;
-  rotate: 0deg;
-  scale: 1;
 }
 
-.tooltipImage {
-  width: 160px;
-  height: 90px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 2px solid rgba(255,245,235,0.80);
-  box-shadow: 0 14px 40px rgba(0,0,0,0.18);
-  background: #f0f0f0;
-}
-
-.tooltipPlaceholder {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  background: linear-gradient(135deg, #f7f7f7, #e8e8e8);
+.tooltipContent {
+  padding: 12px 16px;
+  background: var(--mn-card);
+  border: 1px solid var(--mn-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+  font-size: 13px;
+  color: var(--mn-text-secondary);
+  white-space: nowrap;
+  max-width: 280px;
 }
 
 .nav {
@@ -309,6 +297,18 @@
   min-height: 0;
 }
 
+.cardSmallDesktop {
+  display: block;
+}
+
+.cardSmallMobile {
+  display: none;
+}
+
+.cardSmallRow {
+  display: none;
+}
+
 
 
 
@@ -365,6 +365,17 @@
   text-transform: uppercase;
 }
 
+.logoSubMobile {
+  display: none;
+}
+
+/* ── Desktop only: hide mobile duplicate ── */
+@media (min-width: 1101px) {
+  .logoSubMobile {
+    display: none !important;
+  }
+}
+
 .introDesc {
   font-size: 14px;
   line-height: 1.5;
@@ -387,6 +398,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  text-align: center;
 }
 
 .statNum {
@@ -446,6 +458,12 @@
 .introCta:hover {
   opacity: 0.85;
   scale: 0.97;
+}
+
+.introActions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* ── Small card (left bottom / center) ── */
@@ -584,7 +602,7 @@
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
-  min-height: 0;
+  min-height: 400px;
   height: 100%;
   perspective: 800px;
   perspective-origin: center center;
@@ -611,7 +629,7 @@
 }
 
 .fanSlide {
-  max-height: 50dvh;
+  max-height: 75dvh;
   width: auto;
   height: auto;
   display: block;
@@ -658,33 +676,112 @@
 }
 
 /* ── Responsive ── */
-@media (max-width: 1100px) {
-  .page {
-    padding: 16px 20px 12px;
-    gap: 10px;
+@media (max-width: 768px) {
+
+  .stepTransition {
+    height: auto;
+    min-height: 100dvh;
+  }
+  .header {
+    min-height: 32px;
+  }
+  .nav {
+    gap: 0;
+  }
+  .navLink {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+  .navSep {
+    display: none;
   }
   .main {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
   }
   .colLeft {
-    grid-row: 1 / 3;
-  }
-  .colRight {
-    grid-column: 2;
-    grid-row: 2;
+    grid-row: 1;
   }
   .colCenter {
-    grid-column: 2;
-    grid-row: 1;
+    display: none;
+  }
+  /* .cardSmallDesktop {
+    display: none;
+  }
+  .cardSmallRow {
+    display: flex;
+    grid-row: 2;
+    gap: 10px;
+  }
+  .cardSmallRow > * {
+    flex: 1;
+    min-width: 0;
+  } */
+  .colRight {
+    grid-column: 1;
+    grid-row: 3;
+    /* 
+    min-height: 0;
+    overflow: visible;
+    justify-content: flex-start; */
+    max-height: none;
+    min-height: 0;
+  }
+  .introContent {
+    /* display: grid; */
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+    
+
+    /* padding: 16px 16px; */
+  }
+  /* .logoWrap {
+    grid-column: 1 / -1;
+  } */
+  .logoSub {
+    display: none;
+  }
+  .logoSubMobile {
+    display: block;
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--mn-text-secondary);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .introDesc {
+    /* grid-column: 1 / -1; */
+    text-align: justify;
+    font-size: 13px;
+  }
+  .introStats {
+    grid-column: 1;
+    padding: 4px 6px;
+    gap: 6px;
+    border: none;
+    text-align: center;
+  }
+  .introActions {
+    display: flex;
     flex-direction: row;
   }
-  .colCenter .cardWedding {
-    flex: 1;
+  
+  .statNum {
+    font-size: 12px;
   }
-  .colCenter .cardPromo {
-    flex: 1;
+  .statLabel {
+    font-size: 8px;
   }
+  /* .logo {
+    width: 40px;
+    height: 40px;
+  }
+  .logoTitle {
+    font-size: 16px;
+  } */
   .stripFront {
     max-width: 70%;
   }
@@ -694,86 +791,8 @@
   .stripBackR {
     right: 5%;
   }
-}
-
-@media (max-width: 768px) {
-  .page {
-    padding: 8px 8px 4px;
-    gap: 4px;
-  }
-  .header {
-    min-height: 32px;
-  }
-  .nav {
-    gap: 0;
-  }
-  .navLink {
-    display: none;
-  }
-  .navSep {
-    display: none;
-  }
-  .main {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
-  }
-  .colLeft {
-    grid-row: 1;
-  }
-  .colCenter {
-    display: none;
-  }
-  .colRight {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .introContent {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 12px;
-  }
-  .logoWrap {
-    gap: 8px;
-  }
-  .logo {
-    width: 32px;
-    height: 32px;
-  }
-  .logoTitle {
-    font-size: 14px;
-  }
-  .logoSub {
-    font-size: 9px;
-  }
-  .introDesc {
-    display: none;
-  }
-  .introStats {
-    padding: 4px 6px;
-    gap: 6px;
-    flex: 1;
-    min-width: 120px;
-  }
-  .statNum {
-    font-size: 12px;
-  }
-  .statLabel {
-    font-size: 8px;
-  }
-  .introCta {
-    min-height: 36px;
-    font-size: 12px;
-    padding: 8px 14px;
-    flex: 0;
-    margin-top: 0;
-  }
-  .cardSmall {
-    display: none;
-  }
   .footerText {
-    font-size: 8px;
+    font-size: 9px;
     padding-bottom: 0;
   }
   .fanTrack {
@@ -783,55 +802,7 @@
   .fanSlide {
     margin-left: 0;
     height: auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .page {
-    padding: 8px 10px 6px;
-    gap: 6px;
-  }
-  .navSep {
-    display: none;
-  }
-  .nav {
-    gap: 2px;
-  }
-  .navLink {
-    padding: 5px 8px;
-    font-size: 11px;
-    gap: 4px;
-  }
-  .introContent {
-    gap: 8px;
-    padding: 14px;
-  }
-  .logo {
-    width: 40px;
-    height: 40px;
-  }
-  .logoTitle {
-    font-size: 14px;
-  }
-  .introDesc {
-    font-size: 12px;
-  }
-  .statNum {
-    font-size: 14px;
-  }
-  .introCta {
-    min-height: 42px;
-    font-size: 14px;
-    padding: 10px 16px;
-  }
-  .footerText {
-    font-size: 10px;
-  }
-  .cardSmall {
-    padding: 12px 14px;
-  }
-  .cardSmallTitle {
-    font-size: 14px;
+    max-height: 40dvh;
   }
 }
 

@@ -14,9 +14,6 @@ export async function GET(req: Request) {
     if (!settings || !settings.adminSession || settings.adminSession !== token) {
       return NextResponse.json({ success: false, error: 'Invalid session' }, { status: 401 });
     }
-    if (settings.adminSessionExpires && new Date(settings.adminSessionExpires) < new Date()) {
-      return NextResponse.json({ success: false, error: 'Session expired' }, { status: 401 });
-    }
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });

@@ -30,9 +30,7 @@ export async function POST(req: Request) {
     }
 
     const token = generateSessionToken();
-    const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
     settings.adminSession = token;
-    settings.adminSessionExpires = expires;
     await settings.save();
 
     const res = NextResponse.json({ success: true, token });
@@ -41,7 +39,6 @@ export async function POST(req: Request) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      expires,
     });
     return res;
   } catch (error: any) {
@@ -56,7 +53,6 @@ export async function DELETE(req: Request) {
     const settings = await Settings.findOne({});
     if (settings && token && settings.adminSession === token) {
       settings.adminSession = '';
-      settings.adminSessionExpires = null;
       await settings.save();
     }
     const res = NextResponse.json({ success: true });

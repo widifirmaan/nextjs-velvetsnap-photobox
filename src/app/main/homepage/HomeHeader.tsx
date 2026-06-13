@@ -21,9 +21,7 @@ export default function HomeHeader({ tooltipVisible, setTooltipVisible, branding
         <MapPin size={16} />
         <span>{branding.header.location}</span>
         <div className={`${styles.tooltip} ${tooltipVisible ? styles.tooltipVisible : ''}`}>
-          <div className={styles.tooltipImage}>
-            <div className={styles.tooltipPlaceholder}>📍 {branding.header.location}</div>
-          </div>
+          <div className={styles.tooltipContent}>{branding.header.location}</div>
         </div>
       </div>
       <nav className={styles.nav}>

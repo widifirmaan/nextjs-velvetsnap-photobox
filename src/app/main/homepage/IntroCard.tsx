@@ -1,12 +1,21 @@
 'use client';
+import { useEffect, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 
 export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
   txCount: number; tmplCount: number;
-  branding: { appName: string; appTagline: string; heroTitle: string; heroSubtitle: string; logo: string; header: { location: string } };
+  branding: { appName: string; appTagline: string; heroSubtitle: string; logo: string; header: { location: string } };
   onStart: (e: React.MouseEvent) => void;
 }) {
+  const [showLogin, setShowLogin] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/admin/session')
+      .then((r) => { if (!r.ok) setShowLogin(true); })
+      .catch(() => setShowLogin(true));
+  }, []);
+
   return (
     <div className={styles.introCard}>
       <div className={styles.introContent}>
@@ -29,6 +38,7 @@ export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
             <span className={styles.logoSub}>{branding.appTagline}</span>
           </div>
         </div>
+        <span className={styles.logoSubMobile}>{branding.appTagline}</span>
         <p className={styles.introDesc}>{branding.heroSubtitle}</p>
         <div className={styles.introStats}>
           <div className={styles.statItem}>
@@ -41,9 +51,19 @@ export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
             <span className={styles.statLabel}>Template</span>
           </div>
         </div>
-        <button className={styles.introCta} onClick={onStart}>
-          Mulai Sekarang <ExternalLink size={14} />
-        </button>
+        <div className={styles.introActions}>
+          <button className={styles.introCta} onClick={onStart}>
+            Mulai <ExternalLink size={14} />
+          </button>
+          {showLogin && (
+            <a href="/admin/login" className={styles.introCta} style={{
+              background:'transparent', color:'var(--accent-color)',
+              border:'1.5px solid var(--accent-color)', marginTop:0,
+            }}>
+              Login
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );

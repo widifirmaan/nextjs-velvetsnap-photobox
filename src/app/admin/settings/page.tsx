@@ -13,22 +13,26 @@ interface SettingsData {
   header: { location: string; navItems: string };
   footer: { text: string };
   system: { primaryColor: string; accentColor: string; showPreloader: boolean; showStrips: boolean; slideshowInterval: number; sessionTimer: number };
-  heroTitle: string;
   heroSubtitle: string;
   appName: string;
   appTagline: string;
   logo: string;
+  cardSmallHtml: string;
+  cardPromoHtml: string;
+  slideshowImages: string[];
 }
 
 const defaults: SettingsData = {
   header: { location: 'Jakarta', navItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]' },
   footer: { text: 'VelvetSnap Photobooth Platform' },
   system: { primaryColor: '#262626', accentColor: '#C5D89D', showPreloader: true, showStrips: true, slideshowInterval: 3000, sessionTimer: 600 },
-  heroTitle: 'Abadikan Momen Spesialmu',
   heroSubtitle: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
   appName: 'VelvetSnap',
   appTagline: 'AI-Powered Photobooth Experience',
   logo: '',
+  cardSmallHtml: '',
+  cardPromoHtml: '',
+  slideshowImages: [],
 };
 
 export default function SettingsPage() {
@@ -47,6 +51,55 @@ export default function SettingsPage() {
   const [passSaving, setPassSaving] = useState(false);
   const [passSaved, setPassSaved] = useState(false);
   const [passErr, setPassErr] = useState('');
+  const slideUrlRef = useRef<HTMLInputElement>(null);
+  const slideUploadRef = useRef<HTMLInputElement>(null);
+
+  const addSlideUrl = () => {
+    const url = slideUrlRef.current?.value?.trim();
+    if (!url) return;
+    setForm((prev) => ({ ...prev, slideshowImages: [...prev.slideshowImages, url] }));
+    setSaved(false);
+    if (slideUrlRef.current) slideUrlRef.current.value = '';
+  };
+
+  const handleSlideUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUri = reader.result as string;
+      adminFetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dataUri, folder: 'velvetsnap/settings' }),
+      })
+        .then((r) => r.json())
+        .then((res) => {
+          if (res.success) {
+            setForm((prev) => ({ ...prev, slideshowImages: [...prev.slideshowImages, res.url] }));
+            setSaved(false);
+          }
+        })
+        .catch(() => {})
+        .finally(() => { if (slideUploadRef.current) slideUploadRef.current.value = ''; });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const moveSlide = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= form.slideshowImages.length) return;
+    setForm((prev) => {
+      const arr = [...prev.slideshowImages];
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+      return { ...prev, slideshowImages: arr };
+    });
+    setSaved(false);
+  };
+
+  const removeSlide = (i: number) => {
+    setForm((prev) => ({ ...prev, slideshowImages: prev.slideshowImages.filter((_, idx) => idx !== i) }));
+    setSaved(false);
+  };
 
   const handleAuthFail = () => {
     setAuthErr(true);
@@ -79,11 +132,13 @@ export default function SettingsPage() {
               slideshowInterval: d.system?.slideshowInterval || defaults.system.slideshowInterval,
               sessionTimer: d.system?.sessionTimer ?? defaults.system.sessionTimer,
             },
-            heroTitle: d.heroTitle || defaults.heroTitle,
             heroSubtitle: d.heroSubtitle || defaults.heroSubtitle,
             appName: d.appName || defaults.appName,
             appTagline: d.appTagline || defaults.appTagline,
             logo: d.logo || '',
+            cardSmallHtml: d.cardSmallHtml || '',
+            cardPromoHtml: d.cardPromoHtml || '',
+            slideshowImages: Array.isArray(d.slideshowImages) && d.slideshowImages.length ? d.slideshowImages : defaults.slideshowImages,
           });
         }
       })
@@ -309,17 +364,105 @@ export default function SettingsPage() {
                 placeholder="AI-Powered Photobooth Experience" {...focusProps} />
             </div>
             <div>
-              <label style={labelStyle}>Hero Title</label>
-              <input style={inputStyle} value={form.heroTitle} onChange={(e) => setRootField('heroTitle', e.target.value)}
-                placeholder="Abadikan Momen Spesialmu" {...focusProps} />
-            </div>
-            <div>
               <label style={labelStyle}>Hero Subtitle</label>
               <input style={inputStyle} value={form.heroSubtitle} onChange={(e) => setRootField('heroSubtitle', e.target.value)}
                 placeholder="Pilih frame, foto, edit..." {...focusProps} />
             </div>
             <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20 }}>
               <LogoUpload label="Logo" value={form.logo} onChange={(url) => setRootField('logo', url)} uploadImage={uploadImage} />
+            </div>
+            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20 }}>
+              <label style={labelStyle}>Card Small HTML</label>
+              <textarea style={{ ...inputStyle, minHeight:80, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.cardSmallHtml}
+                onChange={(e) => setRootField('cardSmallHtml', e.target.value)}
+                placeholder="&lt;div&gt;... custom HTML untuk card kecil (akan ganti default)&lt;/div&gt;" {...focusProps} />
+            </div>
+            <div>
+              <label style={labelStyle}>Card Promo HTML</label>
+              <textarea style={{ ...inputStyle, minHeight:80, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.cardPromoHtml}
+                onChange={(e) => setRootField('cardPromoHtml', e.target.value)}
+                placeholder="&lt;div&gt;... custom HTML untuk card promo&lt;/div&gt;" {...focusProps} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Slideshow */}
+      <div style={card}>
+        <div style={cardHeader}><Image size={18} /> Homepage Slideshow</div>
+        <div style={cardBody}>
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div>
+              <label style={labelStyle}>Add Slide Image</label>
+              <div style={{ display:'flex', gap:8, marginBottom:8 }}>
+                <input
+                  ref={slideUrlRef}
+                  style={{ ...inputStyle, flex:1 }}
+                  placeholder="Image URL"
+                  {...focusProps}
+                />
+                <button onClick={addSlideUrl}
+                  style={{
+                    display:'inline-flex', alignItems:'center', gap:4,
+                    padding:'8px 16px', borderRadius:8, border:'1px solid #d1d5db',
+                    fontSize:13, fontWeight:600, cursor:'pointer',
+                    background:'#f9fafb', color:'#374151', whiteSpace:'nowrap',
+                  }}><Plus size={14} /> URL</button>
+                <button onClick={() => slideUploadRef.current?.click()}
+                  style={{
+                    display:'inline-flex', alignItems:'center', gap:4,
+                    padding:'8px 16px', borderRadius:8, border:'1px solid #d1d5db',
+                    fontSize:13, fontWeight:600, cursor:'pointer',
+                    background:'#f9fafb', color:'#374151', whiteSpace:'nowrap',
+                  }}><Upload size={14} /> Upload</button>
+                <input ref={slideUploadRef} type="file" accept="image/*" style={{ display:'none' }}
+                  onChange={handleSlideUpload} />
+              </div>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              <label style={labelStyle}>Slides ({form.slideshowImages.length})</label>
+              {form.slideshowImages.length === 0 && (
+                <p style={{ fontSize:13, color:'#9ca3af', margin:0 }}>No slides yet. Add one above.</p>
+              )}
+              {form.slideshowImages.map((src, i) => (
+                <div key={i} style={{
+                  display:'flex', alignItems:'center', gap:10,
+                  padding:'8px 12px', borderRadius:10, border:'1px solid #e5e7eb',
+                  background:'#fafafa',
+                }}>
+                  <img src={src} alt="" style={{
+                    width:48, height:48, borderRadius:8, objectFit:'cover',
+                    border:'1px solid #e5e7eb', flexShrink:0,
+                  }} />
+                  <span style={{
+                    flex:1, fontSize:12, color:'#6b7280', overflow:'hidden',
+                    textOverflow:'ellipsis', whiteSpace:'nowrap', minWidth:0,
+                  }}>{src}</span>
+                  <div style={{ display:'flex', gap:4, flexShrink:0 }}>
+                    <button onClick={() => moveSlide(i, -1)} disabled={i === 0} title="Move up"
+                      style={{
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        width:30, height:30, border:'1px solid #e5e7eb', borderRadius:6,
+                        cursor:i === 0 ? 'default' : 'pointer', background:'#fff', color:'#6b7280',
+                        opacity:i === 0 ? 0.4 : 1, padding:0, fontSize:14,
+                      }}>↑</button>
+                    <button onClick={() => moveSlide(i, 1)} disabled={i === form.slideshowImages.length - 1} title="Move down"
+                      style={{
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        width:30, height:30, border:'1px solid #e5e7eb', borderRadius:6,
+                        cursor:i === form.slideshowImages.length - 1 ? 'default' : 'pointer', background:'#fff',
+                        color:'#6b7280', opacity:i === form.slideshowImages.length - 1 ? 0.4 : 1,
+                        padding:0, fontSize:14,
+                      }}>↓</button>
+                    <button onClick={() => removeSlide(i)} title="Remove"
+                      style={{
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        width:30, height:30, border:'1px solid #fee2e2', borderRadius:6,
+                        cursor:'pointer', background:'#fff', color:'#ef4444', padding:0,
+                      }}><Trash2 size={14} /></button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>

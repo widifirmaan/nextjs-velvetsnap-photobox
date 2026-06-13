@@ -21,9 +21,6 @@ export async function requireAdmin(req: Request): Promise<NextResponse | null> {
     if (!settings || !settings.adminSession || settings.adminSession !== token) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-    if (settings.adminSessionExpires && new Date(settings.adminSessionExpires) < new Date()) {
-      return NextResponse.json({ success: false, error: 'Session expired' }, { status: 401 });
-    }
     return null;
   } catch {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });

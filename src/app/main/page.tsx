@@ -8,8 +8,9 @@ import HomePage from './homepage/HomePage';
 import StepperFlow from './StepperFlow';
 
 interface Branding {
-  appName: string; appTagline: string; heroTitle: string; heroSubtitle: string;
-  logo: string;
+  appName: string; appTagline: string; heroSubtitle: string;
+  logo: string; cardSmallHtml: string; cardPromoHtml: string;
+  slideshowImages: string[];
   header: { location: string; navItems: string };
   footer: { text: string };
   system: { primaryColor: string; accentColor: string; showPreloader: boolean; showStrips: boolean; slideshowInterval: number; sessionTimer: number };
@@ -17,9 +18,9 @@ interface Branding {
 
 const defaultBranding: Branding = {
   appName: 'VelvetSnap', appTagline: 'AI-Powered Photobooth Experience',
-  heroTitle: 'Abadikan Momen Spesialmu',
   heroSubtitle: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
-  logo: '',
+  logo: '', cardSmallHtml: '', cardPromoHtml: '',
+  slideshowImages: [],
   header: { location: 'Jakarta', navItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]' },
   footer: { text: 'VelvetSnap Photobooth Platform' },
   system: { primaryColor: '#262626', accentColor: '#C5D89D', showPreloader: true, showStrips: true, slideshowInterval: 3000, sessionTimer: 600 },
@@ -52,9 +53,11 @@ export default function Home() {
           setBranding({
             appName: d.appName || defaultBranding.appName,
             appTagline: d.appTagline || defaultBranding.appTagline,
-            heroTitle: d.heroTitle || defaultBranding.heroTitle,
             heroSubtitle: d.heroSubtitle || defaultBranding.heroSubtitle,
             logo: d.logo || '',
+            cardSmallHtml: d.cardSmallHtml || '',
+            cardPromoHtml: d.cardPromoHtml || '',
+            slideshowImages: Array.isArray(d.slideshowImages) && d.slideshowImages.length ? d.slideshowImages : [],
             header: {
               location: d.header?.location || defaultBranding.header.location,
               navItems: d.header?.navItems || defaultBranding.header.navItems,
@@ -101,6 +104,10 @@ export default function Home() {
       return () => bc.close();
     } catch {}
   }, [fetchSettings]);
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--accent-color', branding.system.accentColor);
+  }, [branding.system.accentColor]);
 
   useEffect(() => {
     if (!branding.system.showPreloader) { setShowPreloader(false); return; }
