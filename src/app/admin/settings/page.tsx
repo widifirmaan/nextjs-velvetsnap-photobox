@@ -1,16 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Type, Image, RotateCcw, Timer } from 'lucide-react';
+import { Save, Loader2, Image, Timer } from 'lucide-react';
 
 interface SettingsData {
-  appName: string;
-  appTagline: string;
-  heroTitle: string;
-  heroSubtitle: string;
   footerText: string;
-  introCardHtml: string;
-  heroCardHtml: string;
   footerHtml: string;
   primaryColor: string;
   accentColor: string;
@@ -21,13 +15,7 @@ interface SettingsData {
 }
 
 const defaults: SettingsData = {
-  appName: 'VelvetSnap',
-  appTagline: 'AI-Powered Photobooth Experience',
-  heroTitle: 'Abadikan Momen Spesialmu',
-  heroSubtitle: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
   footerText: 'VelvetSnap Photobooth Platform',
-  introCardHtml: '',
-  heroCardHtml: '',
   footerHtml: '',
   primaryColor: '#262626',
   accentColor: '#C5D89D',
@@ -50,18 +38,12 @@ export default function SettingsPage() {
         if (res.success && res.data) {
           const d = res.data;
           setForm({
-            appName: d.appName || defaults.appName,
-            appTagline: d.appTagline || defaults.appTagline,
-            heroTitle: d.heroTitle || defaults.heroTitle,
-            heroSubtitle: d.heroSubtitle || defaults.heroSubtitle,
             footerText: d.footerText || defaults.footerText,
             primaryColor: d.primaryColor || defaults.primaryColor,
             accentColor: d.accentColor || defaults.accentColor,
             showPreloader: d.showPreloader ?? defaults.showPreloader,
             showStrips: d.showStrips ?? defaults.showStrips,
             slideshowInterval: d.slideshowInterval || defaults.slideshowInterval,
-            introCardHtml: d.introCardHtml ?? defaults.introCardHtml,
-            heroCardHtml: d.heroCardHtml ?? defaults.heroCardHtml,
             footerHtml: d.footerHtml ?? defaults.footerHtml,
             sessionTimer: d.sessionTimer ?? defaults.sessionTimer,
           });
@@ -177,62 +159,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Intro Card */}
-      <div style={card}>
-        <div style={cardHeader}><Type size={18} /> Intro Card</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div style={row}>
-              <div>
-                <label style={labelStyle}>App Name</label>
-                <input style={inputStyle} value={form.appName} onChange={(e) => update('appName', e.target.value)}
-                  {...focusProps} />
-              </div>
-              <div>
-                <label style={labelStyle}>Tagline</label>
-                <input style={inputStyle} value={form.appTagline} onChange={(e) => update('appTagline', e.target.value)}
-                  {...focusProps} />
-              </div>
-            </div>
-            <div>
-              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
-              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }}
-                value={form.introCardHtml}
-                onChange={(e) => update('introCardHtml', e.target.value)}
-                placeholder='<div class="d-flex align-items-center gap-3"><h1 class="mb-0 fw-bold">VelvetSnap</h1><span class="badge bg-secondary">Jakarta</span></div>'
-                {...focusProps} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Hero Card */}
-      <div style={card}>
-        <div style={cardHeader}><Type size={18} /> Hero Card</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div>
-              <label style={labelStyle}>Hero Title</label>
-              <input style={inputStyle} value={form.heroTitle} onChange={(e) => update('heroTitle', e.target.value)}
-                {...focusProps} />
-            </div>
-            <div>
-              <label style={labelStyle}>Hero Subtitle</label>
-              <textarea style={{ ...inputStyle, minHeight:72, resize:'vertical' }} value={form.heroSubtitle} onChange={(e) => update('heroSubtitle', e.target.value)}
-                {...focusProps} />
-            </div>
-            <div>
-              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
-              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }}
-                value={form.heroCardHtml}
-                onChange={(e) => update('heroCardHtml', e.target.value)}
-                placeholder='<div class="p-3 bg-light rounded"><h2 class="fw-bold">Abadikan Momen Spesialmu</h2><p class="text-muted mb-0">Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi</p></div>'
-                {...focusProps} />
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Timer & Accent */}
       <div style={card}>
         <div style={cardHeader}><Timer size={18} /> Timer &amp; Accent</div>
@@ -292,18 +218,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Reset */}
-      <div style={{ display:'flex', justifyContent:'center', padding:'8px 0 32px' }}>
-        <button onClick={() => { setForm({ ...defaults }); setSaved(false); }}
-          style={{
-            display:'inline-flex', alignItems:'center', gap:8,
-            padding:'10px 24px', borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:500,
-            border:'1.5px solid #ef4444', background:'transparent', color:'#ef4444',
-            transition:'all 0.15s',
-          }}>
-          <RotateCcw size={16} /> Reset ke Default
-        </button>
-      </div>
+
     </div>
   );
 }
