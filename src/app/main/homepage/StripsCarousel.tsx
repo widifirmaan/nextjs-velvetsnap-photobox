@@ -216,6 +216,8 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
                 alt=""
                 className={styles.fanSlide}
                 draggable={false}
+                loading="lazy"
+                decoding="async"
                 onLoad={() => { updateTransforms(); handleLoad(); }}
                 onError={() => { updateTransforms(); handleLoad(); }}
               />
