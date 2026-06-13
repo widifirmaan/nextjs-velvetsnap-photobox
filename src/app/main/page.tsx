@@ -13,6 +13,7 @@ interface Branding {
   showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
   sessionTimer: number;
   introCardHtml: string; heroCardHtml: string; footerHtml: string;
+  headerLocation: string; headerNavItems: string;
 }
 
 const defaultBranding: Branding = {
@@ -24,6 +25,8 @@ const defaultBranding: Branding = {
   showPreloader: true, showStrips: true, slideshowInterval: 3000,
   sessionTimer: 600,
   introCardHtml: '', heroCardHtml: '', footerHtml: '',
+  headerLocation: 'Jakarta',
+  headerNavItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]',
 };
 
 export default function Home() {
@@ -65,6 +68,8 @@ export default function Home() {
             introCardHtml: d.introCardHtml || defaultBranding.introCardHtml,
             heroCardHtml: d.heroCardHtml || defaultBranding.heroCardHtml,
             footerHtml: d.footerHtml || defaultBranding.footerHtml,
+            headerLocation: d.headerLocation || defaultBranding.headerLocation,
+            headerNavItems: d.headerNavItems || defaultBranding.headerNavItems,
           });
         }
       })

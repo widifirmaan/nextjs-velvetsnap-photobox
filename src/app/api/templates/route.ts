@@ -6,7 +6,9 @@ import { normalizeTemplate } from '@/lib/normalize-template';
 export async function GET(req: Request) {
   try {
     await connectDB();
-    const docs = await Template.find({}).lean();
+    const docs = await Template.find({})
+      .select('templateId templateName name templateDesc description templatePrice price templateData templateFull fullresUrl frameImage templateThumb thumbUrl thumbnail canvasWidth canvasHeight color type slots elements slotsLayout isActive createdAt')
+      .lean();
     return NextResponse.json({ success: true, data: docs.map(normalizeTemplate) });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

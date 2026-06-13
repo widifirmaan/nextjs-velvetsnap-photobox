@@ -10,7 +10,9 @@ export async function GET(req: Request) {
     const id = searchParams.get('id');
 
     if (id) {
-      const template = await Template.findOne({ templateId: id }).lean();
+      const template = await Template.findOne({ templateId: id })
+        .select('templateId templateName templateDesc templatePrice templateFull templateThumb templateData isActive')
+        .lean();
       if (!template) {
         return NextResponse.json({ success: false, error: 'Template not found' }, { status: 404 });
       }
@@ -20,7 +22,9 @@ export async function GET(req: Request) {
       });
     }
 
-    const templates = await Template.find({}).lean();
+    const templates = await Template.find({})
+      .select('templateId templateName templateDesc templatePrice templateThumb templateData templateFull isActive')
+      .lean();
     const data = templates.map(normalizeTemplate);
     return NextResponse.json({ success: true, data });
   } catch (error: any) {

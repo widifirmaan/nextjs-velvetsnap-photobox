@@ -16,6 +16,7 @@ interface Branding {
   footerText: string; primaryColor: string; accentColor: string;
   showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
   introCardHtml: string; heroCardHtml: string; footerHtml: string;
+  headerLocation: string; headerNavItems: string;
 }
 
 export default function HomePage({ strips, txCount, tmplCount, branding, onStart, onCarouselReady }: {
@@ -50,7 +51,7 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
 
   return (
     <div className={styles.page} style={style}>
-      <HomeHeader tooltipVisible={tooltipVisible} setTooltipVisible={setTooltipVisible} />
+      <HomeHeader tooltipVisible={tooltipVisible} setTooltipVisible={setTooltipVisible} branding={branding} />
 
       <main className={styles.main}>
         <div className={styles.colLeft}>

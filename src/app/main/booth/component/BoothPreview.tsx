@@ -28,7 +28,7 @@ export default function BoothPreview({
   };
 
   const MAX_DIM = 1200;
-  const JPEG_QUALITY = 0.82;
+  const JPEG_QUALITY = 0.75;
 
   const compressImage = (dataUrl: string): Promise<string> => {
     return new Promise((resolve) => {

@@ -15,6 +15,8 @@ export interface ISettings extends Document {
   showStrips: boolean;
   slideshowInterval: number;
   sessionTimer: number;
+  headerLocation: string;
+  headerNavItems: string;
   adminPassword: string;
   adminPasswordSalt: string;
   adminSession: string;
@@ -36,6 +38,8 @@ const SettingsSchema = new Schema<ISettings>({
   showStrips: { type: Boolean, default: true },
   slideshowInterval: { type: Number, default: 3000 },
   sessionTimer: { type: Number, default: 600 },
+  headerLocation: { type: String, default: 'Jakarta' },
+  headerNavItems: { type: String, default: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]' },
   adminPassword: { type: String, default: '' },
   adminPasswordSalt: { type: String, default: '' },
   adminSession: { type: String, default: '' },

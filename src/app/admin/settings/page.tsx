@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, Loader2, Image, Timer, Lock, Check } from 'lucide-react';
+import { Save, Loader2, Image, Timer, Lock, Check, MapPin, Plus, Trash2 } from 'lucide-react';
 import { adminFetch } from '@/lib/admin-fetch';
+
+interface NavItem { label: string; url: string; }
 
 interface SettingsData {
   footerText: string;
@@ -13,6 +15,8 @@ interface SettingsData {
   showStrips: boolean;
   slideshowInterval: number;
   sessionTimer: number;
+  headerLocation: string;
+  headerNavItems: string;
 }
 
 const defaults: SettingsData = {
@@ -23,6 +27,8 @@ const defaults: SettingsData = {
   showStrips: true,
   slideshowInterval: 3000,
   sessionTimer: 600,
+  headerLocation: 'Jakarta',
+  headerNavItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]',
 };
 
 export default function SettingsPage() {
@@ -60,6 +66,8 @@ export default function SettingsPage() {
             showStrips: d.showStrips ?? defaults.showStrips,
             slideshowInterval: d.slideshowInterval || defaults.slideshowInterval,
             sessionTimer: d.sessionTimer ?? defaults.sessionTimer,
+            headerLocation: d.headerLocation || defaults.headerLocation,
+            headerNavItems: d.headerNavItems || defaults.headerNavItems,
           });
         }
       })
@@ -155,6 +163,27 @@ export default function SettingsPage() {
     display:'grid', gridTemplateColumns:'1fr 1fr', gap:20,
   };
 
+  const navItems: NavItem[] = (() => { try { return JSON.parse(form.headerNavItems); } catch { return []; } })();
+
+  const updateNavItem = (i: number, field: keyof NavItem, value: string) => {
+    const items = [...navItems];
+    items[i] = { ...items[i], [field]: value };
+    update('headerNavItems', JSON.stringify(items));
+  };
+
+  const addNavItem = () => {
+    update('headerNavItems', JSON.stringify([...navItems, { label: '', url: '' }]));
+  };
+
+  const removeNavItem = (i: number) => {
+    const items = navItems.filter((_, idx) => idx !== i);
+    update('headerNavItems', JSON.stringify(items));
+  };
+
+  const smallInput: React.CSSProperties = {
+    ...inputStyle, width: '100%', boxSizing: 'border-box' as const,
+  };
+
   const focusProps = {
     onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = '#111827'; },
     onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = '#d1d5db'; },
@@ -178,6 +207,46 @@ export default function SettingsPage() {
           {saving ? <Loader2 className="spin" size={16} /> : saved ? null : <Save size={16} />}
           {saving ? 'Menyimpan...' : saved ? 'Tersimpan' : 'Simpan'}
         </button>
+      </div>
+
+      {/* Header */}
+      <div style={card}>
+        <div style={cardHeader}><MapPin size={18} /> Page Header</div>
+        <div style={cardBody}>
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div>
+              <label style={labelStyle}>Location Name</label>
+              <input style={inputStyle} value={form.headerLocation} onChange={(e) => update('headerLocation', e.target.value)}
+                placeholder="Jakarta" {...focusProps} />
+            </div>
+            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:16 }}>
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
+                <label style={{ ...labelStyle, margin:0 }}>Navigation Items</label>
+                <button onClick={addNavItem} style={{
+                  display:'inline-flex', alignItems:'center', gap:4,
+                  padding:'5px 12px', borderRadius:8, border:'1px solid #d1d5db',
+                  fontSize:12, fontWeight:600, cursor:'pointer',
+                  background:'#f9fafb', color:'#374151',
+                }}><Plus size={14} /> Add Item</button>
+              </div>
+              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                {navItems.map((item, i) => (
+                  <div key={i} style={{ display:'flex', gap:8, alignItems:'center' }}>
+                    <input style={smallInput} value={item.label} onChange={(e) => updateNavItem(i, 'label', e.target.value)}
+                      placeholder="Label" {...focusProps} />
+                    <input style={smallInput} value={item.url} onChange={(e) => updateNavItem(i, 'url', e.target.value)}
+                      placeholder="URL" {...focusProps} />
+                    <button onClick={() => removeNavItem(i)} style={{
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      width:36, height:36, border:'1px solid #e5e7eb', borderRadius:8,
+                      cursor:'pointer', background:'#fff', color:'#ef4444', flexShrink:0,
+                    }}><Trash2 size={14} /></button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Footer */}

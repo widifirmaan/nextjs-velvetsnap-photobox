@@ -4,6 +4,7 @@ import type { IStripElement } from '@/models/Template';
 
 interface ElementToolbarProps {
   onAdd: (type: IStripElement['type']) => void;
+  disabled?: boolean;
 }
 
 const TOOLS: { type: IStripElement['type']; label: string; icon: string }[] = [
@@ -11,7 +12,7 @@ const TOOLS: { type: IStripElement['type']; label: string; icon: string }[] = [
   { type: 'sticker', label: 'Image', icon: '🖼' },
 ];
 
-export default function ElementToolbar({ onAdd }: ElementToolbarProps) {
+export default function ElementToolbar({ onAdd, disabled }: ElementToolbarProps) {
   return (
     <aside className="toolbar">
       <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 12 }}>Elements</h3>
@@ -20,6 +21,7 @@ export default function ElementToolbar({ onAdd }: ElementToolbarProps) {
           <button
             key={t.type}
             onClick={() => onAdd(t.type)}
+            disabled={disabled}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -27,15 +29,16 @@ export default function ElementToolbar({ onAdd }: ElementToolbarProps) {
               padding: '10px 14px',
               borderRadius: 12,
               border: '1px solid var(--mn-border)',
-              background: 'var(--clay-bg)',
-              cursor: 'pointer',
+              background: disabled ? '#eee' : 'var(--clay-bg)',
+              cursor: disabled ? 'not-allowed' : 'pointer',
               fontSize: 14,
               fontWeight: 600,
               color: 'var(--text-primary)',
+              opacity: disabled ? 0.5 : 1,
               transition: 'all 0.15s',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent-color)'; e.currentTarget.style.background = 'var(--accent-bg)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--mn-border)'; e.currentTarget.style.background = 'var(--clay-bg)'; }}
+            onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.borderColor = 'var(--accent-color)'; e.currentTarget.style.background = 'var(--accent-bg)'; } }}
+            onMouseLeave={(e) => { if (!disabled) { e.currentTarget.style.borderColor = 'var(--mn-border)'; e.currentTarget.style.background = 'var(--clay-bg)'; } }}
           >
             <span style={{
               width: 28,

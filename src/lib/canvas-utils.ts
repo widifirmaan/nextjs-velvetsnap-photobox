@@ -173,18 +173,23 @@ export function renderStripFrame(
   canvasWidth: number,
   canvasHeight: number,
   bgColor: string,
+  maxW?: number,
 ): Promise<string> {
   return new Promise((resolve, reject) => {
+    const scale = maxW ? maxW / canvasWidth : 1;
+    const cw = maxW || canvasWidth;
+    const ch = Math.round(canvasHeight * scale);
+
     const canvas = document.createElement('canvas');
-    canvas.width = canvasWidth;
-    canvas.height = canvasHeight;
+    canvas.width = cw;
+    canvas.height = ch;
     const ctx = canvas.getContext('2d');
     if (!ctx) { reject(new Error('No context')); return; }
     ctx.imageSmoothingQuality = 'high';
 
     // Fill background color first
     ctx.fillStyle = bgColor || '#ffffff';
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+    ctx.fillRect(0, 0, cw, ch);
 
     const sorted = [...elements]
       .filter((el) => el.visible)
@@ -199,16 +204,24 @@ export function renderStripFrame(
         img.src = url;
       });
 
+    const scaleEl = (el: IStripElement) => ({
+      ...el,
+      x: el.x * scale,
+      y: el.y * scale,
+      width: el.width * scale,
+      height: el.height * scale,
+      props: { ...el.props },
+    });
+
     const drawPhotoSlot = (el: IStripElement) => {
-      const bw = el.props.borderWidth ?? 2;
+      const bw = (el.props.borderWidth ?? 2) * scale;
       const bc = el.props.borderColor || '#ffffff';
-      const br = el.props.borderRadius ?? 8;
+      const br = (el.props.borderRadius ?? 8) * scale;
       const shape = el.props.shape || 'rounded';
 
       ctx.save();
       ctx.globalAlpha = el.props.opacity ?? 1;
 
-      // Draw green fill (will be removed by removeGreenScreen)
       ctx.fillStyle = '#00bf63';
       ctx.strokeStyle = bc;
       ctx.lineWidth = bw;
@@ -271,9 +284,8 @@ export function renderStripFrame(
         ctx.fillRect(el.x, el.y, el.width, el.height);
         ctx.strokeRect(el.x, el.y, el.width, el.height);
         ctx.fillStyle = bc;
-        ctx.fillRect(el.x + el.width * 0.2, el.y + el.height - 14, el.width * 0.6, 8);
+        ctx.fillRect(el.x + el.width * 0.2, el.y + el.height - 14 * scale, el.width * 0.6, 8 * scale);
       } else {
-        // rounded rect (default)
         const r = Math.min(br, el.width / 2, el.height / 2);
         ctx.beginPath();
         ctx.moveTo(el.x + r, el.y);
@@ -290,24 +302,23 @@ export function renderStripFrame(
       ctx.restore();
     };
 
-    const drawNonPhotoElement = async (el: IStripElement): Promise<void> => {
+    const drawNonPhotoElement = (el: IStripElement, imageCache: Map<string, HTMLImageElement>) => {
       ctx.save();
       ctx.globalAlpha = el.props.opacity ?? 1;
 
       if (el.type === 'background') {
         if (el.props.stickerUrl) {
-          try {
-            const img = await loadImage(el.props.stickerUrl);
-            const scale = Math.max(el.width / img.naturalWidth, el.height / img.naturalHeight);
-            const dw = img.naturalWidth * scale;
-            const dh = img.naturalHeight * scale;
-            const dx = (el.width - dw) / 2;
-            const dy = (el.height - dh) / 2;
-            ctx.drawImage(img, el.x + dx, el.y + dy, dw, dh);
-          } catch {}
+          const img = imageCache.get(el.props.stickerUrl);
+          if (img) {
+            const sc = Math.max(el.width / img.naturalWidth, el.height / img.naturalHeight);
+            const dw = img.naturalWidth * sc;
+            const dh = img.naturalHeight * sc;
+            ctx.drawImage(img, el.x + (el.width - dw) / 2, el.y + (el.height - dh) / 2, dw, dh);
+          }
         }
       } else if (el.type === 'text') {
-        ctx.font = `${el.props.fontWeight === '700' ? 'bold ' : ''}${el.props.fontSize || 24}px ${el.props.fontFamily || 'Inter'}`;
+        const fs = Math.round((el.props.fontSize || 24) * scale);
+        ctx.font = `${el.props.fontWeight === '700' ? 'bold ' : ''}${fs}px ${el.props.fontFamily || 'Inter'}`;
         ctx.fillStyle = el.props.color || '#3d2c2c';
         const ta = el.props.textAlign || 'left';
         ctx.textAlign = ta as CanvasTextAlign;
@@ -316,21 +327,19 @@ export function renderStripFrame(
         ctx.fillText(el.props.content || 'Text', tx, el.y + el.height / 2, el.width);
       } else if (el.type === 'sticker') {
         if (el.props.stickerUrl) {
-          try {
-            const img = await loadImage(el.props.stickerUrl);
-            const scale = Math.min(el.width / img.naturalWidth, el.height / img.naturalHeight);
-            const dw = img.naturalWidth * scale;
-            const dh = img.naturalHeight * scale;
-            const dx = (el.width - dw) / 2;
-            const dy = (el.height - dh) / 2;
-            ctx.drawImage(img, el.x + dx, el.y + dy, dw, dh);
-          } catch {}
+          const img = imageCache.get(el.props.stickerUrl);
+          if (img) {
+            const sc = Math.min(el.width / img.naturalWidth, el.height / img.naturalHeight);
+            const dw = img.naturalWidth * sc;
+            const dh = img.naturalHeight * sc;
+            ctx.drawImage(img, el.x + (el.width - dw) / 2, el.y + (el.height - dh) / 2, dw, dh);
+          }
         }
       } else if (el.type === 'shape') {
         const sx = el.props.shapeType || 'rect';
         const fill = el.props.fillColor || '#C5D89D';
         const stroke = el.props.strokeColor || '#9CAB84';
-        const sw = el.props.strokeWidth || 2;
+        const sw = (el.props.strokeWidth || 2) * scale;
         ctx.fillStyle = fill;
         ctx.strokeStyle = stroke;
         ctx.lineWidth = sw;
@@ -349,11 +358,30 @@ export function renderStripFrame(
 
     (async () => {
       try {
-        for (const el of sorted) {
+        const scaledElements = sorted.map(scaleEl);
+
+        // Collect and preload all images in parallel
+        const imageUrls = new Set<string>();
+        for (const el of scaledElements) {
+          if ((el.type === 'background' || el.type === 'sticker') && el.props.stickerUrl) {
+            imageUrls.add(el.props.stickerUrl);
+          }
+        }
+        const imageEntries = await Promise.all(
+          Array.from(imageUrls).map(async (url) => {
+            try { return [url, await loadImage(url)] as const; } catch { return null; }
+          })
+        );
+        const imageCache = new Map<string, HTMLImageElement>();
+        for (const entry of imageEntries) {
+          if (entry) imageCache.set(entry[0], entry[1]);
+        }
+
+        for (const el of scaledElements) {
           if (el.type === 'photo-slot') {
             drawPhotoSlot(el);
           } else {
-            await drawNonPhotoElement(el);
+            drawNonPhotoElement(el, imageCache);
           }
         }
         resolve(canvas.toDataURL('image/png'));

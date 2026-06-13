@@ -116,8 +116,8 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
               : el
           );
           try {
-            const frameDataUrl = await renderStripFrame(matched.templateData.elements, cw, ch, matched.templateData.color || '#ffffff');
-            const bgFrameDataUrl = await removeGreenScreen(frameDataUrl);
+            const frameDataUrl = await renderStripFrame(matched.templateData.elements, cw, ch, matched.templateData.color || '#ffffff', 720);
+            const bgFrameDataUrl = await removeGreenScreen(frameDataUrl, 720);
             const img = new window.Image();
             img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
             img.src = bgFrameDataUrl;

@@ -1,11 +1,16 @@
 'use client';
 import { MapPin } from 'lucide-react';
-import { Camera as CameraIcon, MessageCircle, Sparkles } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 
-export default function HomeHeader({ tooltipVisible, setTooltipVisible }: {
+const ICON_MAP: Record<string, React.ReactNode> = {};
+
+export default function HomeHeader({ tooltipVisible, setTooltipVisible, branding }: {
   tooltipVisible: boolean; setTooltipVisible: (v: boolean) => void;
+  branding: { headerLocation: string; headerNavItems: string };
 }) {
+  let navItems: { label: string; url: string }[] = [];
+  try { navItems = JSON.parse(branding.headerNavItems); } catch {}
+
   return (
     <header className={styles.header}>
       <div
@@ -14,27 +19,24 @@ export default function HomeHeader({ tooltipVisible, setTooltipVisible }: {
         onMouseLeave={() => setTooltipVisible(false)}
       >
         <MapPin size={16} />
-        <span>Jakarta</span>
+        <span>{branding.headerLocation}</span>
         <div className={`${styles.tooltip} ${tooltipVisible ? styles.tooltipVisible : ''}`}>
           <div className={styles.tooltipImage}>
-            <div className={styles.tooltipPlaceholder}>📍 VelvetSnap Booth</div>
+            <div className={styles.tooltipPlaceholder}>📍 {branding.headerLocation}</div>
           </div>
         </div>
       </div>
       <nav className={styles.nav}>
-        <a href="https://instagram.com" target="_blank" rel="noopener" className={styles.navLink}>
-          <CameraIcon size={16} /> Instagram
-        </a>
-        <span className={styles.navSep} />
-        <a href="https://wa.me/628123456789" target="_blank" rel="noopener" className={styles.navLink}>
-          <MessageCircle size={16} /> WhatsApp
-        </a>
-        <span className={styles.navSep} />
-        <a href="/templates" className={styles.navLink}>Templates</a>
-        <span className={styles.navSep} />
-        <a href="/strips-studio" className={styles.navLink}>
-          <Sparkles size={14} /> Studio
-        </a>
+        {navItems.map((item, i) => (
+          <span key={item.url}>
+            {i > 0 && <span className={styles.navSep} />}
+            <a href={item.url} target={item.url.startsWith('http') ? '_blank' : undefined}
+              rel={item.url.startsWith('http') ? 'noopener' : undefined}
+              className={styles.navLink}>
+              {item.label}
+            </a>
+          </span>
+        ))}
       </nav>
     </header>
   );

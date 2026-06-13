@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
+import { Loader2 } from 'lucide-react';
 import { AdminPageHeader } from '@/app/admin/components';
 import { useModel } from '@/lib/ModelContext';
 import { useRouter } from 'next/navigation';
@@ -18,20 +19,12 @@ import styles from './page.module.css';
 const DEFAULT_CANVAS_W = 1000;
 const DEFAULT_CANVAS_H = 3000;
 
-function generateTempId(existing: string[]): string {
+function makeId(): string {
   const now = new Date();
   const y = String(now.getFullYear()).slice(-2);
   const m = String(now.getMonth() + 1).padStart(2, '0');
   const d = String(now.getDate()).padStart(2, '0');
-  const prefix = `${y}${m}${d}`;
-  let max = 0;
-  for (const id of existing) {
-    if (id.startsWith(prefix)) {
-      const n = parseInt(id.slice(-4), 10);
-      if (!isNaN(n) && n > max) max = n;
-    }
-  }
-  return `${prefix}${String(max + 1).padStart(4, '0')}`;
+  return `${y}${m}${d}_${uuid().slice(0, 6)}`;
 }
 
 interface ISlot {
@@ -197,16 +190,7 @@ export default function StripsStudioPage() {
     loaded.current = true;
     const params = new URLSearchParams(window.location.search);
     const editId = params.get('edit');
-    // Generate template ID based on existing templates
-    const proceed = (templateList: any[] = []) => {
-      const existingIds = (templateList || []).map((t: any) => t.templateId || '').filter(Boolean);
-      setTemplateIdField(generateTempId(existingIds));
-      if (editId) {
-        const matched = templateList?.find((t: any) => t._id === editId || t.templateId === editId);
-        if (matched) applyData(matched);
-      }
-      setPageLoading(false);
-    };
+
     const applyData = (data: any) => {
       setEditingTemplateId(data._id || editId);
       setTemplateName(data.templateName || data.name || '');
@@ -225,7 +209,6 @@ export default function StripsStudioPage() {
         const slotEls = elementsData.filter((el: any) => el.id?.startsWith('slot-'));
         if (slotEls?.length) setSlotCount(slotEls.length);
       } else if ((data.templateFull || data.fullresUrl) && (data.templateData?.slotsLayout || data.slotsLayout)?.length) {
-        // Legacy template: convert fullresUrl + slotsLayout to elements
         const legacyUrl = data.templateFull || data.fullresUrl;
         const legacySlots = data.templateData?.slotsLayout || data.slotsLayout;
         const bgEl: IStripElement = {
@@ -243,29 +226,34 @@ export default function StripsStudioPage() {
         setSlotCount(photoSlots.length);
       }
     };
-    // Always fetch template list first for correct ID increment
-    fetch('/api/templates')
+
+    if (!editId) {
+      setTemplateIdField(makeId());
+      setPageLoading(false);
+      return;
+    }
+
+    const raw = sessionStorage.getItem('stripTemplateData');
+    if (raw) {
+      try {
+        const data = JSON.parse(raw);
+        applyData(data);
+        setTemplateIdField(makeId());
+        setPageLoading(false);
+        return;
+      } catch {}
+    }
+
+    fetch('/api/templates/list')
       .then((r) => r.json())
       .then((res) => {
         const list = res.success ? res.data : [];
-        if (editId) {
-          const raw = sessionStorage.getItem('stripTemplateData');
-          if (raw) {
-            try {
-              const data = JSON.parse(raw);
-              applyData(data);
-              proceed(list);
-              return;
-            } catch (e) {
-              console.error('Failed to parse sessionStorage data', e);
-            }
-          }
-          const matched = list.find((t: any) => t._id === editId || t.templateId === editId);
-          if (matched) { applyData(matched); }
-        }
-        proceed(list);
+        const matched = list.find((t: any) => t._id === editId || t.templateId === editId);
+        if (matched) { applyData(matched); }
+        setTemplateIdField(makeId());
+        setPageLoading(false);
       })
-      .catch(() => proceed());
+      .catch(() => setPageLoading(false));
   }, []);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
@@ -423,10 +411,7 @@ export default function StripsStudioPage() {
           body: JSON.stringify(body),
         });
       } else {
-        const listRes = await fetch('/api/templates');
-        const listData = await listRes.json();
-        const existingIds = (listData.data || []).map((t: any) => t.templateId || '').filter(Boolean);
-        const freshId = generateTempId(existingIds);
+        const freshId = makeId();
         setTemplateIdField(freshId);
         body.templateId = freshId;
         res = await fetch('/api/templates', {
@@ -558,53 +543,55 @@ export default function StripsStudioPage() {
   };
 
   const renderBackgroundSection = () => (
-    <aside style={{
-      background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
-      border: '1px solid var(--mn-border)',
-    }}>
-      <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
-        Background
-      </h3>
-      <div style={{
-        width: '100%', aspectRatio: '3/1', borderRadius: 8, overflow: 'hidden',
-        marginBottom: 10, background: '#f0f0f0',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      <aside style={{
+        background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
         border: '1px solid var(--mn-border)',
       }}>
-        {(elements.find((el) => el.id === 'bg-image')?.props as any)?.stickerUrl ? (
-          <img
-            src={(elements.find((el) => el.id === 'bg-image')!.props as any).stickerUrl}
-            alt="Background"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>No background</span>
-        )}
-      </div>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button
-          onClick={openBgSearch}
-          style={{
-            flex: 1, padding: '8px', borderRadius: 8,
-            border: '1px solid var(--mn-border)', background: '#fff',
-            cursor: 'pointer', fontSize: 12, fontWeight: 600,
-          }}
-        >
-          🔍 Search
-        </button>
-        <button
-          onClick={() => fileInputRef.current?.click()}
-          disabled={importProcessing}
-          style={{
-            flex: 1, padding: '8px', borderRadius: 8,
-            border: '1px solid var(--mn-border)', background: '#fff',
-            cursor: 'pointer', fontSize: 12, fontWeight: 600,
-            opacity: importProcessing ? 0.6 : 1,
-          }}
-        >
-          {importProcessing ? '⏳...' : '📁 Import'}
-        </button>
-      </div>
+        <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
+          Background
+        </h3>
+        <div style={{
+          width: '100%', aspectRatio: '3/1', borderRadius: 8, overflow: 'hidden',
+          marginBottom: 10, background: '#f0f0f0',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '1px solid var(--mn-border)',
+        }}>
+          {(elements.find((el) => el.id === 'bg-image')?.props as any)?.stickerUrl ? (
+            <img
+              src={(elements.find((el) => el.id === 'bg-image')!.props as any).stickerUrl}
+              alt="Background"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          ) : (
+            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>No background</span>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            onClick={openBgSearch}
+            disabled={pageLoading}
+            style={{
+              flex: 1, padding: '8px', borderRadius: 8,
+              border: '1px solid var(--mn-border)', background: pageLoading ? '#eee' : '#fff',
+              cursor: pageLoading ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600,
+              opacity: pageLoading ? 0.5 : 1,
+            }}
+          >
+            🔍 Search
+          </button>
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={importProcessing || pageLoading}
+            style={{
+              flex: 1, padding: '8px', borderRadius: 8,
+              border: '1px solid var(--mn-border)', background: pageLoading ? '#eee' : '#fff',
+              cursor: importProcessing || pageLoading ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600,
+              opacity: importProcessing || pageLoading ? 0.6 : 1,
+            }}
+          >
+            {importProcessing ? '⏳...' : '📁 Import'}
+          </button>
+        </div>
       <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
         onChange={async (e) => {
           const file = e.target.files?.[0];
@@ -703,6 +690,7 @@ export default function StripsStudioPage() {
             onBringForward={() => selected && bringForward(selected.id)}
             onSendBackward={() => selected && sendBackward(selected.id)}
             onBrowseStickers={() => selected && openStickerGallery(selected.id)}
+            disabled={pageLoading}
           />
         ) : (
           <p style={{ padding: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
@@ -768,7 +756,7 @@ export default function StripsStudioPage() {
             </button>
           </aside>
 
-          <ElementToolbar onAdd={addElement} />
+          <ElementToolbar onAdd={addElement} disabled={pageLoading} />
 
           {renderBackgroundSection()}
 
@@ -780,10 +768,16 @@ export default function StripsStudioPage() {
             onBringForward={bringForward}
             onSendBackward={sendBackward}
             onDelete={deleteElement}
+            disabled={pageLoading}
           />
         </div>
 
-        <div className={styles.canvasArea}>
+        <div className={styles.canvasArea} style={{ position: 'relative' }}>
+          {pageLoading && (
+            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.7)', zIndex: 10, borderRadius: 12 }}>
+              <Loader2 className="spin" size={36} />
+            </div>
+          )}
           <EditorCanvas
             ref={editorRef}
             elements={elements}
@@ -806,6 +800,7 @@ export default function StripsStudioPage() {
             onBringForward={() => selected && bringForward(selected.id)}
             onSendBackward={() => selected && sendBackward(selected.id)}
             onBrowseStickers={() => selected && openStickerGallery(selected.id)}
+            disabled={pageLoading}
           />
         </div>
       </div>
@@ -813,25 +808,29 @@ export default function StripsStudioPage() {
       <div className={styles.mobileToolbar}>
         <button
           onClick={() => setActiveMobilePanel(activeMobilePanel === 'elements' ? null : 'elements')}
-          data-active={activeMobilePanel === 'elements'}
+          disabled={pageLoading}
+          style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
           <span>📦</span> Elements
         </button>
         <button
           onClick={() => setActiveMobilePanel(activeMobilePanel === 'background' ? null : 'background')}
-          data-active={activeMobilePanel === 'background'}
+          disabled={pageLoading}
+          style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
           <span>🖼</span> Bg
         </button>
         <button
           onClick={() => setActiveMobilePanel(activeMobilePanel === 'layers' ? null : 'layers')}
-          data-active={activeMobilePanel === 'layers'}
+          disabled={pageLoading}
+          style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
           <span>🧩</span> Layers
         </button>
         <button
           onClick={() => setActiveMobilePanel(activeMobilePanel === 'properties' ? null : 'properties')}
-          data-active={activeMobilePanel === 'properties'}
+          disabled={pageLoading}
+          style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
           <span>⚙</span> Props
         </button>

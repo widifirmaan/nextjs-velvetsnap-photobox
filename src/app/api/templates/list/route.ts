@@ -7,7 +7,7 @@ export async function GET() {
   try {
     await connectDB();
     const docs = await Template.find({}).sort({ createdAt: -1 })
-      .select('templateId templateName name templateThumb thumbUrl thumbnail templateFull fullresUrl frameImage templateDesc description templatePrice price isActive createdAt')
+      .select('templateId templateName name templateThumb thumbUrl thumbnail templateFull fullresUrl frameImage templateDesc description templatePrice price templateData canvasWidth canvasHeight color type slots elements slotsLayout isActive createdAt')
       .lean();
     const data = docs.map(normalizeTemplate);
     return NextResponse.json({ success: true, data });

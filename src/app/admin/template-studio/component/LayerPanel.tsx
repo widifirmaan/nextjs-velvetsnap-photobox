@@ -10,6 +10,7 @@ interface LayerPanelProps {
   onBringForward: (id: string) => void;
   onSendBackward: (id: string) => void;
   onDelete: (id: string) => void;
+  disabled?: boolean;
 }
 
 const TYPE_ICONS: Record<string, string> = {
@@ -28,6 +29,7 @@ export default function LayerPanel({
   onBringForward,
   onSendBackward,
   onDelete,
+  disabled,
 }: LayerPanelProps) {
   const sorted = [...elements]
     .filter((el) => el.type !== 'background')
@@ -66,29 +68,31 @@ export default function LayerPanel({
             return (
               <div
                 key={el.id}
-                onClick={() => onSelect(el.id)}
+                onClick={() => { if (!disabled) onSelect(el.id); }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
                   padding: '8px 14px',
-                  cursor: 'pointer',
+                  cursor: disabled ? 'default' : 'pointer',
                   background: isSelected ? 'var(--accent-bg)' : 'transparent',
                   borderLeft: isSelected ? '3px solid var(--accent-color)' : '3px solid transparent',
                   transition: 'all 0.1s',
                   userSelect: 'none',
                   fontSize: 13,
+                  opacity: disabled ? 0.5 : 1,
                 }}
-                onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
-                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = 'transparent'; }}
+                onMouseEnter={(e) => { if (!isSelected && !disabled) e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
+                onMouseLeave={(e) => { if (!isSelected && !disabled) e.currentTarget.style.background = 'transparent'; }}
               >
                 <button
-                  onClick={(e) => { e.stopPropagation(); onToggleVisibility(el.id); }}
+                  onClick={(e) => { e.stopPropagation(); if (!disabled) onToggleVisibility(el.id); }}
+                  disabled={disabled}
                   style={{
                     width: 22, height: 22, borderRadius: 6, border: 'none',
-                    background: 'transparent', cursor: 'pointer', fontSize: 14,
+                    background: 'transparent', cursor: disabled ? 'default' : 'pointer', fontSize: 14,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    opacity: el.visible ? 0.6 : 0.25, padding: 0,
+                    opacity: disabled ? 0.2 : el.visible ? 0.6 : 0.25, padding: 0,
                   }}
                   title={el.visible ? 'Hide' : 'Show'}
                 >
@@ -126,16 +130,16 @@ export default function LayerPanel({
                 <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
                   <button
                     onClick={(e) => { e.stopPropagation(); onBringForward(el.id); }}
-                    disabled={isLast}
-                    style={arrowBtnStyle(isLast)}
+                    disabled={isLast || disabled}
+                    style={arrowBtnStyle(isLast || !!disabled)}
                     title="Bring forward"
                   >
                     ▲
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); onSendBackward(el.id); }}
-                    disabled={isFirst}
-                    style={arrowBtnStyle(isFirst)}
+                    disabled={isFirst || disabled}
+                    style={arrowBtnStyle(isFirst || !!disabled)}
                     title="Send backward"
                   >
                     ▼
@@ -143,15 +147,16 @@ export default function LayerPanel({
                 </div>
 
                 <button
-                  onClick={(e) => { e.stopPropagation(); onDelete(el.id); }}
+                  onClick={(e) => { e.stopPropagation(); if (!disabled) onDelete(el.id); }}
+                  disabled={disabled}
                   style={{
                     width: 20, height: 20, borderRadius: 4, border: 'none',
-                    background: 'transparent', cursor: 'pointer', fontSize: 12,
+                    background: 'transparent', cursor: disabled ? 'default' : 'pointer', fontSize: 12,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                    color: '#999', opacity: 0.5,
+                    color: disabled ? '#ddd' : '#999', opacity: disabled ? 0.2 : 0.5,
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.color = '#e74c3c'; e.currentTarget.style.opacity = '1'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.color = '#999'; e.currentTarget.style.opacity = '0.5'; }}
+                  onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.color = '#e74c3c'; e.currentTarget.style.opacity = '1'; } }}
+                  onMouseLeave={(e) => { if (!disabled) { e.currentTarget.style.color = '#999'; e.currentTarget.style.opacity = '0.5'; } }}
                   title="Delete"
                 >
                   ✕

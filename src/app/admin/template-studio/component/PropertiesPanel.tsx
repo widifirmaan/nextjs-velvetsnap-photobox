@@ -69,6 +69,7 @@ interface PropertiesPanelProps {
   onBringForward: () => void;
   onSendBackward: () => void;
   onBrowseStickers?: () => void;
+  disabled?: boolean;
 }
 
 const SHAPES = ['rectangle', 'rounded', 'circle', 'heart', 'star', 'diamond', 'polaroid', 'hexagon'] as const;
@@ -78,6 +79,7 @@ export default function PropertiesPanel({
   selected,
   slotCount,
   onSetSlotCount,
+  disabled,
   onUpdateProps,
   onUpdate,
   onDelete,
@@ -260,7 +262,8 @@ export default function PropertiesPanel({
               />
               <button
                 onClick={onBrowseStickers}
-                style={{ width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--accent-color)', background: 'var(--accent-bg)', color: 'var(--accent-color)', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}
+                disabled={disabled}
+                style={{ width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--accent-color)', background: disabled ? '#eee' : 'var(--accent-bg)', color: disabled ? '#999' : 'var(--accent-color)', fontWeight: 600, fontSize: 13, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}
               >
                 🎨 Browse Gallery
               </button>
@@ -292,13 +295,13 @@ export default function PropertiesPanel({
 
 
       <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <button onClick={onBringForward} style={{ ...btnStyle }}>
+        <button onClick={onBringForward} disabled={disabled} style={{ ...btnStyle, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
           ↑ Bring Forward
         </button>
-        <button onClick={onSendBackward} style={{ ...btnStyle }}>
+        <button onClick={onSendBackward} disabled={disabled} style={{ ...btnStyle, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
           ↓ Send Backward
         </button>
-        <button onClick={onDelete} style={{ ...btnStyle, borderColor: '#e74c3c', color: '#e74c3c' }}>
+        <button onClick={onDelete} disabled={disabled} style={{ ...btnStyle, borderColor: disabled ? '#ddd' : '#e74c3c', color: disabled ? '#ccc' : '#e74c3c', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
           ✕ Delete Element
         </button>
       </div>

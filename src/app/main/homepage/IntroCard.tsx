@@ -4,7 +4,7 @@ import styles from '@/app/main/page.module.css';
 
 export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
   txCount: number; tmplCount: number;
-  branding: { appName: string; heroTitle: string; heroSubtitle: string; introCardHtml: string };
+  branding: { appName: string; heroTitle: string; heroSubtitle: string; introCardHtml: string; headerLocation: string };
   onStart: (e: React.MouseEvent) => void;
 }) {
   return (
@@ -31,7 +31,7 @@ export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
               </svg>
               <div className={styles.logoText}>
                 <h1 className={styles.logoTitle}>{branding.appName}</h1>
-                <span className={styles.logoSub}>{branding.appName} Jakarta</span>
+                <span className={styles.logoSub}>{branding.appName} {branding.headerLocation}</span>
               </div>
             </div>
             <p className={styles.introDesc}>{branding.heroSubtitle}</p>
