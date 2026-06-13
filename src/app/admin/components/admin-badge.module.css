@@ -9,16 +9,16 @@
 }
 
 .success {
-  background: rgba(197, 216, 157, 0.12);
-  color: #9CAB84;
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  color: var(--accent-color);
 }
 
 .warning {
-  background: rgba(137, 144, 109, 0.15);
-  color: #89986D;
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
+  color: var(--accent-color);
 }
 
 .info {
-  background: rgba(137, 144, 109, 0.12);
-  color: #89986D;
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  color: var(--accent-color);
 }

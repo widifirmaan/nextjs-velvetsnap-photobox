@@ -142,7 +142,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(197, 216, 157, 0.08);
+  background: color-mix(in srgb, var(--accent-color) 8%, transparent);
 }
 
 /* Template Preview Thumbnail */
@@ -187,7 +187,7 @@
 }
 
 .toggleSwitch.active {
-  background: #9CAB84;
+  background: var(--accent-color);
 }
 
 .toggleSwitch.inactive {
@@ -220,7 +220,7 @@
 }
 
 .statusLabel.active {
-  color: #9CAB84;
+  color: var(--accent-color);
 }
 
 .statusLabel.inactive {
@@ -254,11 +254,11 @@
 }
 
 .iconBtn:hover {
-  background: rgba(197, 216, 157, 0.15);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
 }
 
 .iconBtn.danger:hover {
-  background: rgba(137, 144, 109, 0.15);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
 }
 
 /* Loading */
@@ -432,18 +432,18 @@
 .slotHighlight {
   position: absolute;
   border: 2px solid var(--accent-color);
-  background: rgba(197, 216, 157, 0.15);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 10px rgba(197, 216, 157, 0.3);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color) 30%, transparent);
   transition: background var(--transition-fast);
 }
 
 .slotHighlight:hover {
-  background: rgba(197, 216, 157, 0.3);
-  border-color: #9CAB84;
+  background: color-mix(in srgb, var(--accent-color) 30%, transparent);
+  border-color: var(--accent-color);
 }
 
 .slotBadge {
@@ -501,8 +501,8 @@
 
 .activeSelection {
   position: absolute;
-  border: 2px dashed #9CAB84;
-  background: rgba(154, 171, 132, 0.15);
+  border: 2px dashed var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   border-radius: 4px;
   pointer-events: none;
 }

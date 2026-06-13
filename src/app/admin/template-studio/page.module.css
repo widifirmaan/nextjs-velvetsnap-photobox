@@ -31,7 +31,7 @@
 .nameField input:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(197, 216, 157, 0.2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
 .editorLayout {
@@ -189,7 +189,7 @@
 
 .mobileToolbar button[data-active="true"] {
   color: var(--accent-color, #C5D89D);
-  background: rgba(197, 216, 157, 0.1);
+  background: color-mix(in srgb, var(--accent-color) 10%, transparent);
 }
 
 .mobileToolbarDivider {

@@ -6,8 +6,8 @@
   --text-primary: #262626;
   --text-secondary: #4C4C4C;
   --accent-color: #C5D89D;
-  --accent-hover: #9CAB84;
-  --danger-color: #89986D;
+  --accent-hover: color-mix(in srgb, var(--accent-color) 80%, #000);
+  --danger-color: var(--accent-color);
 
   --clay-bg: #f7f7f7;
   --clay-shadow-outer: 0 1px 3px rgba(0,0,0,0.06);
@@ -315,7 +315,7 @@ label {
   color: #fff;
 }
 .btn-danger:not(:disabled):hover {
-  background: #7a8863;
+  filter: brightness(0.9);
 }
 .btn-primary {
   background: var(--accent-color);

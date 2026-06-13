@@ -1,3 +1,5 @@
+'use client';
+import { useEffect, useState } from 'react';
 import styles from './admin-bar-chart.module.css';
 
 interface DataPoint {
@@ -14,7 +16,12 @@ interface Props {
   color?: string;
 }
 
-export default function AdminBarChart({ data, maxValue, height = 160, color = '#C5D89D' }: Props) {
+export default function AdminBarChart({ data, maxValue, height = 160, color }: Props) {
+  const [accent, setAccent] = useState('#C5D89D');
+  useEffect(() => {
+    setAccent(getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#C5D89D');
+  }, []);
+  const barColor = color || accent;
   return (
     <div className={styles.chart} style={{ height }}>
       {data.map((point, i) => {
@@ -26,7 +33,7 @@ export default function AdminBarChart({ data, maxValue, height = 160, color = '#
               className={styles.bar}
               style={{
                 height: `${Math.max(barHeight, 4)}%`,
-                background: color,
+                background: barColor,
               }}
             >
               {point.tooltip && <span className={styles.tooltip}>{point.tooltip}</span>}

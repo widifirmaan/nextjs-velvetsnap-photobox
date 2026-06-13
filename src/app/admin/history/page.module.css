@@ -59,7 +59,7 @@
 .filterGroup select:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(197, 216, 157, 0.2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
 .filterActions {
@@ -105,7 +105,7 @@
 }
 
 .table tbody tr:hover {
-  background: rgba(197, 216, 157, 0.08);
+  background: color-mix(in srgb, var(--accent-color) 8%, transparent);
 }
 
 .table tbody tr + tr {
@@ -122,7 +122,7 @@
   font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 12px;
   color: var(--text-secondary);
-  background: rgba(197, 216, 157, 0.12);
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
   padding: 3px 8px;
   border-radius: 6px;
 }
@@ -174,13 +174,13 @@
 }
 
 .actionBtn:hover {
-  background: rgba(197, 216, 157, 0.15);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   color: var(--accent-color);
 }
 
 .actionDanger:hover {
   background: rgba(137, 144, 109, 0.15);
-  color: #89986D;
+  color: var(--accent-color);
 }
 
 /* Pagination */
@@ -230,7 +230,7 @@
 }
 
 .modalInfo span {
-  background: rgba(197, 216, 157, 0.1);
+  background: color-mix(in srgb, var(--accent-color) 10%, transparent);
   padding: 6px 12px;
   border-radius: 8px;
 }

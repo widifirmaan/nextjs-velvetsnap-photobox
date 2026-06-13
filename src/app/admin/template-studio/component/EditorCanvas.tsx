@@ -7,11 +7,10 @@ import type { IStripElement } from '@/models/Template';
 import { useImage } from './useImage';
 
 const SNAP_THRESHOLD = 6;
-const GUIDE_COLOR = '#C5D89D';
+const GUIDE_WIDTH = 1;
 const GRID_STEP = 10;
 
 const snapToGrid = (v: number) => Math.round(v / GRID_STEP) * GRID_STEP;
-const GUIDE_WIDTH = 1;
 
 interface GuideLine {
   x1: number; y1: number; x2: number; y2: number;
@@ -125,6 +124,11 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
   const trRef = useRef<Konva.Transformer>(null);
   const [guides, setGuides] = useState<GuideLine[]>([]);
   const [scale, setScale] = useState(0);
+  const accentRef = useRef('#C5D89D');
+
+  useEffect(() => {
+    accentRef.current = getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim() || '#C5D89D';
+  }, []);
 
   useImperativeHandle(ref, () => ({
     getThumbnail: () => stageRef.current?.toDataURL({ mimeType: 'image/png', pixelRatio: 0.3 }) || '',
@@ -334,6 +338,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
             onDragEnd={(e) => handleDragEnd(el.id, e)}
             onDragMove={(e) => handleDragMove(el.id, e)}
             onTransformEnd={(e) => handleTransformEnd(el.id, e)}
+            accentColor={accentRef.current}
           />
         ))}
         <Transformer
@@ -351,10 +356,10 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
           }}
           rotateEnabled={true}
           enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right', 'top-center', 'bottom-center', 'middle-left', 'middle-right']}
-          borderStroke="#C5D89D"
+          borderStroke={accentRef.current}
           borderStrokeWidth={2}
           anchorFill="#fff"
-          anchorStroke="#C5D89D"
+          anchorStroke={accentRef.current}
           anchorSize={10}
           rotationSnaps={[0, 45, 90, 135, 180, 225, 270, 315]}
           onTransform={handleTransformMove}
@@ -367,7 +372,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
             x={0}
             y={0}
             points={[g.x1, g.y1, g.x2, g.y2]}
-            stroke={GUIDE_COLOR}
+            stroke={accentRef.current}
             strokeWidth={GUIDE_WIDTH}
             dash={[4, 3]}
           />
@@ -387,6 +392,7 @@ function CanvasElement({
   onDragEnd,
   onDragMove,
   onTransformEnd,
+  accentColor = '#C5D89D',
 }: {
   element: IStripElement;
   isSelected: boolean;
@@ -394,6 +400,7 @@ function CanvasElement({
   onDragEnd: (e: Konva.KonvaEventObject<DragEvent>) => void;
   onDragMove: (e: Konva.KonvaEventObject<DragEvent>) => void;
   onTransformEnd: (e: Konva.KonvaEventObject<Event>) => void;
+  accentColor?: string;
 }) {
   const p = element.props;
   const common = {
@@ -443,7 +450,7 @@ function CanvasElement({
       return <StickerElement el={element} common={common} />;
     case 'shape': {
       const shape = p.shapeType || 'rect';
-      const fill = p.fillColor || '#C5D89D';
+      const fill = p.fillColor || accentColor;
       const stroke = p.strokeColor || '#9CAB84';
       const sw = p.strokeWidth || 2;
       if (shape === 'circle') {

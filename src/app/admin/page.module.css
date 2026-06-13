@@ -65,7 +65,7 @@
   width: 100%;
   max-width: 48px;
   border-radius: 8px 8px 0 0;
-  background: linear-gradient(180deg, #C5D89D, rgba(197, 216, 157, 0.4));
+  background: linear-gradient(180deg, var(--accent-color), color-mix(in srgb, var(--accent-color) 40%, transparent));
   min-height: 4px;
   transition: all var(--transition-normal);
   position: relative;
@@ -143,10 +143,10 @@
   flex-shrink: 0;
 }
 
-.quickLinkIcon.blue { background: rgba(197, 216, 157, 0.12); color: #C5D89D; }
-.quickLinkIcon.green { background: rgba(154, 171, 132, 0.12); color: #9CAB84; }
-.quickLinkIcon.orange { background: rgba(137, 144, 109, 0.12); color: #89986D; }
-.quickLinkIcon.purple { background: rgba(197, 216, 157, 0.12); color: #C5D89D; }
+.quickLinkIcon.blue { background: color-mix(in srgb, var(--accent-color) 12%, transparent); color: var(--accent-color); }
+.quickLinkIcon.green { background: color-mix(in srgb, var(--accent-color) 18%, transparent); color: var(--accent-color); }
+.quickLinkIcon.orange { background: color-mix(in srgb, var(--accent-color) 24%, transparent); color: var(--accent-color); }
+.quickLinkIcon.purple { background: color-mix(in srgb, var(--accent-color) 30%, transparent); color: var(--accent-color); }
 
 .quickLinkText {
   font-weight: 600;

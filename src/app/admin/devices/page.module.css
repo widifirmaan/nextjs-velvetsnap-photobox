@@ -52,7 +52,7 @@
   width: 36px;
   height: 36px;
   border-radius: 12px;
-  background: rgba(197, 216, 157, 0.15);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   color: var(--accent-color);
   display: flex;
   align-items: center;
@@ -89,12 +89,12 @@
 .typeCard input { display: none; }
 
 .typeCard:hover {
-  border-color: rgba(197,216,157,0.5);
+  border-color: color-mix(in srgb, var(--accent-color) 50%, transparent);
 }
 
 .typeCardActive {
   border-color: var(--accent-color);
-  background: rgba(197,216,157,0.08);
+  background: color-mix(in srgb, var(--accent-color) 8%, transparent);
 }
 
 .typeLabel {
@@ -136,12 +136,12 @@
 .radioCard input { display: none; }
 
 .radioCard:hover {
-  border-color: rgba(197, 216, 157, 0.5);
+  border-color: color-mix(in srgb, var(--accent-color) 50%, transparent);
 }
 
 .radioCardActive {
   border-color: var(--accent-color);
-  background: rgba(197, 216, 157, 0.08);
+  background: color-mix(in srgb, var(--accent-color) 8%, transparent);
 }
 
 .checked {
@@ -186,7 +186,7 @@
 .field input[type='number']:focus {
   outline: none;
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(197, 216, 157, 0.2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);
 }
 
 .rangeRow {
@@ -223,7 +223,7 @@
   gap: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: #9CAB84;
+  color: var(--accent-color);
 }
 
 .storageBadge {
