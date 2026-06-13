@@ -85,7 +85,7 @@
 }
 
 .navLinkActive {
-  background: rgba(197, 216, 157, 0.15);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   color: var(--accent-color);
   font-weight: 600;
 }

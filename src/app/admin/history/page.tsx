@@ -32,6 +32,7 @@ export default function HistoryPage() {
   const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
   const [selectedTx, setSelectedTx] = useState<Transaction | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -205,7 +206,16 @@ export default function HistoryPage() {
               </thead>
               <tbody>
                 {transactions.map((tx) => (
-                  <tr key={tx._id} className={styles.tableRow} onClick={() => setSelectedTx(tx)}>
+                  <tr key={tx._id} className={styles.tableRow} onClick={async () => {
+                    setSelectedTx(null);
+                    setModalLoading(true);
+                    try {
+                      const res = await fetch(`/api/transactions/${tx._id}`);
+                      const data = await res.json();
+                      if (data.success) setSelectedTx(data.data);
+                    } catch {}
+                    setModalLoading(false);
+                  }}>
                     <td>
                       {tx.finalImage ? (
                         <img src={tx.finalImage} alt="" className={styles.tableThumb} />
@@ -269,6 +279,11 @@ export default function HistoryPage() {
       />
 
       <AdminModal open={!!selectedTx} onClose={() => setSelectedTx(null)} title={`Transaction #${selectedTx?.sessionId || ''}`}>
+        {modalLoading && (
+          <div className={styles.loader}>
+            <Loader2 className="spin" size={24} />
+          </div>
+        )}
         {selectedTx && (
           <div className={styles.modalBody}>
             <div className={styles.modalInfo}>

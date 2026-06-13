@@ -9,24 +9,20 @@ import StepperFlow from './StepperFlow';
 
 interface Branding {
   appName: string; appTagline: string; heroTitle: string; heroSubtitle: string;
-  footerText: string; primaryColor: string; accentColor: string;
-  showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
-  sessionTimer: number;
-  introCardHtml: string; heroCardHtml: string; footerHtml: string;
-  headerLocation: string; headerNavItems: string;
+  logo: string;
+  header: { location: string; navItems: string };
+  footer: { text: string };
+  system: { primaryColor: string; accentColor: string; showPreloader: boolean; showStrips: boolean; slideshowInterval: number; sessionTimer: number };
 }
 
 const defaultBranding: Branding = {
   appName: 'VelvetSnap', appTagline: 'AI-Powered Photobooth Experience',
   heroTitle: 'Abadikan Momen Spesialmu',
   heroSubtitle: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
-  footerText: 'VelvetSnap Photobooth Platform',
-  primaryColor: '#262626', accentColor: '#C5D89D',
-  showPreloader: true, showStrips: true, slideshowInterval: 3000,
-  sessionTimer: 600,
-  introCardHtml: '', heroCardHtml: '', footerHtml: '',
-  headerLocation: 'Jakarta',
-  headerNavItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]',
+  logo: '',
+  header: { location: 'Jakarta', navItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]' },
+  footer: { text: 'VelvetSnap Photobooth Platform' },
+  system: { primaryColor: '#262626', accentColor: '#C5D89D', showPreloader: true, showStrips: true, slideshowInterval: 3000, sessionTimer: 600 },
 };
 
 export default function Home() {
@@ -47,7 +43,7 @@ export default function Home() {
 
   const handleRefresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
-  useEffect(() => {
+  const fetchSettings = useCallback(() => {
     fetch('/api/settings')
       .then((r) => r.json())
       .then((res) => {
@@ -58,22 +54,30 @@ export default function Home() {
             appTagline: d.appTagline || defaultBranding.appTagline,
             heroTitle: d.heroTitle || defaultBranding.heroTitle,
             heroSubtitle: d.heroSubtitle || defaultBranding.heroSubtitle,
-            footerText: d.footerText || defaultBranding.footerText,
-            primaryColor: d.primaryColor || defaultBranding.primaryColor,
-            accentColor: d.accentColor || defaultBranding.accentColor,
-            showPreloader: d.showPreloader ?? defaultBranding.showPreloader,
-            showStrips: d.showStrips ?? defaultBranding.showStrips,
-            slideshowInterval: d.slideshowInterval || defaultBranding.slideshowInterval,
-            sessionTimer: d.sessionTimer ?? defaultBranding.sessionTimer,
-            introCardHtml: d.introCardHtml || defaultBranding.introCardHtml,
-            heroCardHtml: d.heroCardHtml || defaultBranding.heroCardHtml,
-            footerHtml: d.footerHtml || defaultBranding.footerHtml,
-            headerLocation: d.headerLocation || defaultBranding.headerLocation,
-            headerNavItems: d.headerNavItems || defaultBranding.headerNavItems,
+            logo: d.logo || '',
+            header: {
+              location: d.header?.location || defaultBranding.header.location,
+              navItems: d.header?.navItems || defaultBranding.header.navItems,
+            },
+            footer: {
+              text: d.footer?.text || defaultBranding.footer.text,
+            },
+            system: {
+              primaryColor: d.system?.primaryColor || defaultBranding.system.primaryColor,
+              accentColor: d.system?.accentColor || defaultBranding.system.accentColor,
+              showPreloader: d.system?.showPreloader ?? defaultBranding.system.showPreloader,
+              showStrips: d.system?.showStrips ?? defaultBranding.system.showStrips,
+              slideshowInterval: d.system?.slideshowInterval || defaultBranding.system.slideshowInterval,
+              sessionTimer: d.system?.sessionTimer ?? defaultBranding.system.sessionTimer,
+            },
           });
         }
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetchSettings();
     fetch('/api/transactions/strips')
       .then((r) => r.json())
       .then((res) => {
@@ -91,7 +95,15 @@ export default function Home() {
   }, [refreshKey]);
 
   useEffect(() => {
-    if (!branding.showPreloader) { setShowPreloader(false); return; }
+    try {
+      const bc = new BroadcastChannel('velvetsnap');
+      bc.onmessage = (e) => { if (e.data === 'settings-updated') fetchSettings(); };
+      return () => bc.close();
+    } catch {}
+  }, [fetchSettings]);
+
+  useEffect(() => {
+    if (!branding.system.showPreloader) { setShowPreloader(false); return; }
     const skipPreloader = sessionStorage.getItem('skipPreloader');
     if (skipPreloader) {
       setShowPreloader(false);
@@ -103,7 +115,7 @@ export default function Home() {
       }, 4000);
       return () => clearTimeout(timer);
     }
-  }, [branding.showPreloader]);
+  }, [branding.system.showPreloader]);
 
   useEffect(() => {
     if (!carouselReady) return;
@@ -148,15 +160,19 @@ export default function Home() {
       {showPreloader && (
         <div className={`${styles.preloader} ${preloaderFade ? styles.preloaderHidden : ''}`}>
           <div className={styles.preloaderInner}>
-            <svg width="64" height="64" viewBox="0 0 56 56" fill="none" className={styles.preloaderLogo}>
-              <rect x="4" y="12" width="48" height="34" rx="8" fill={branding.primaryColor} />
-              <circle cx="28" cy="29" r="11" fill="#fff" />
-              <circle cx="28" cy="29" r="7" fill={branding.primaryColor} />
-              <rect x="39" y="8" width="12" height="4" rx="2" fill={branding.primaryColor} />
-              <path d="M48 18l4-2" stroke={branding.primaryColor} strokeWidth="2" strokeLinecap="round" />
-              <path d="M18 8l-3 4" stroke={branding.accentColor} strokeWidth="2.5" strokeLinecap="round" />
-              <circle cx="18" cy="6" r="1.5" fill={branding.accentColor} />
-            </svg>
+            {branding.logo ? (
+              <img src={branding.logo} alt="" className={styles.preloaderLogo} style={{ width:64, height:64, objectFit:'contain' }} />
+            ) : (
+              <svg width="64" height="64" viewBox="0 0 56 56" fill="none" className={styles.preloaderLogo}>
+                <rect x="4" y="12" width="48" height="34" rx="8" fill={branding.system.primaryColor} />
+                <circle cx="28" cy="29" r="11" fill="#fff" />
+                <circle cx="28" cy="29" r="7" fill={branding.system.primaryColor} />
+                <rect x="39" y="8" width="12" height="4" rx="2" fill={branding.system.primaryColor} />
+                <path d="M48 18l4-2" stroke={branding.system.primaryColor} strokeWidth="2" strokeLinecap="round" />
+                <path d="M18 8l-3 4" stroke={branding.system.accentColor} strokeWidth="2.5" strokeLinecap="round" />
+                <circle cx="18" cy="6" r="1.5" fill={branding.system.accentColor} />
+              </svg>
+            )}
             <span className={styles.preloaderTitle}>{branding.appName}</span>
             <span className={styles.preloaderSub}>{branding.appTagline}</span>
             <div className={styles.preloaderSpinner} />
@@ -200,7 +216,7 @@ export default function Home() {
       </div>
       {step !== 0 && (
         <div key="flow" style={clipStyle} className={clipStage ? styles.clipReveal : styles.stepContent}>
-          <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh} sessionTimer={branding.sessionTimer} />
+          <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh} sessionTimer={branding.system.sessionTimer} />
         </div>
       )}
     </>

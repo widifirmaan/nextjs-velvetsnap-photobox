@@ -23,6 +23,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [pathname, router]);
 
   useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data?.system?.accentColor) {
+          document.documentElement.style.setProperty('--accent-color', res.data.system.accentColor);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
     setNavigating(false);
   }, [pathname]);
 

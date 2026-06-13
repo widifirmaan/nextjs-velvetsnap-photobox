@@ -1,0 +1,27 @@
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.navItem {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.navItem input {
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .navItem {
+    flex-wrap: wrap;
+  }
+  .navItem input {
+    min-width: 120px;
+    flex: 1 1 calc(50% - 36px);
+  }
+}

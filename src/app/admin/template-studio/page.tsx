@@ -173,7 +173,7 @@ export default function StripsStudioPage() {
   const [saving, setSaving] = useState(false);
   const [templateName, setTemplateName] = useState('');
   const [templateDesc, setTemplateDesc] = useState('Designed in Strips Studio');
-  const [templatePrice, setTemplatePrice] = useState(35000);
+  const [templatePrice, setTemplatePrice] = useState(0);
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [showNewConfirm, setShowNewConfirm] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);

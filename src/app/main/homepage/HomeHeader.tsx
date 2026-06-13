@@ -6,10 +6,10 @@ const ICON_MAP: Record<string, React.ReactNode> = {};
 
 export default function HomeHeader({ tooltipVisible, setTooltipVisible, branding }: {
   tooltipVisible: boolean; setTooltipVisible: (v: boolean) => void;
-  branding: { headerLocation: string; headerNavItems: string };
+  branding: { header: { location: string; navItems: string } };
 }) {
   let navItems: { label: string; url: string }[] = [];
-  try { navItems = JSON.parse(branding.headerNavItems); } catch {}
+  try { navItems = JSON.parse(branding.header.navItems); } catch {}
 
   return (
     <header className={styles.header}>
@@ -19,10 +19,10 @@ export default function HomeHeader({ tooltipVisible, setTooltipVisible, branding
         onMouseLeave={() => setTooltipVisible(false)}
       >
         <MapPin size={16} />
-        <span>{branding.headerLocation}</span>
+        <span>{branding.header.location}</span>
         <div className={`${styles.tooltip} ${tooltipVisible ? styles.tooltipVisible : ''}`}>
           <div className={styles.tooltipImage}>
-            <div className={styles.tooltipPlaceholder}>📍 {branding.headerLocation}</div>
+            <div className={styles.tooltipPlaceholder}>📍 {branding.header.location}</div>
           </div>
         </div>
       </div>

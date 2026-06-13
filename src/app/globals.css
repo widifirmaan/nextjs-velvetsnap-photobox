@@ -317,3 +317,10 @@ label {
 .btn-danger:not(:disabled):hover {
   background: #7a8863;
 }
+.btn-primary {
+  background: var(--accent-color);
+  color: #fff;
+}
+.btn-primary:not(:disabled):hover {
+  filter: brightness(0.9);
+}

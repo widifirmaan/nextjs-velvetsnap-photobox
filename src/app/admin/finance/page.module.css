@@ -61,7 +61,7 @@
   width: 100%;
   max-width: 56px;
   border-radius: 8px 8px 0 0;
-  background: linear-gradient(180deg, #C5D89D, rgba(197, 216, 157, 0.4));
+  background: linear-gradient(180deg, var(--accent-color), color-mix(in srgb, var(--accent-color) 40%, transparent));
   min-height: 4px;
   transition: all var(--transition-normal);
   animation: barGrow 0.8s ease-out backwards;
@@ -137,7 +137,7 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: rgba(197, 216, 157, 0.15);
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
   color: var(--accent-color);
   display: flex;
   align-items: center;
@@ -166,7 +166,7 @@
 
 .breakdownBarFill {
   height: 100%;
-  background: linear-gradient(90deg, #C5D89D, rgba(197, 216, 157, 0.5));
+  background: linear-gradient(90deg, var(--accent-color), color-mix(in srgb, var(--accent-color) 50%, transparent));
   border-radius: 3px;
   transition: width 1s ease;
 }

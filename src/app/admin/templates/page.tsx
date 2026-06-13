@@ -36,7 +36,7 @@ export default function TemplatesAdmin() {
   const fetchTemplates = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/templates');
+      const res = await fetch('/api/templates/list');
       const data = await res.json();
       if (data.success) setTemplates(data.data || []);
     } catch (err) {
@@ -46,8 +46,14 @@ export default function TemplatesAdmin() {
     }
   };
 
-  const handleEdit = (t: TemplateData) => {
-    sessionStorage.setItem('stripTemplateData', JSON.stringify(t));
+  const handleEdit = async (t: TemplateData) => {
+    try {
+      const res = await fetch(`/api/templates/thumbnails?id=${t.templateId}`);
+      const data = await res.json();
+      if (data.success && data.data?.length) {
+        sessionStorage.setItem('stripTemplateData', JSON.stringify(data.data[0]));
+      }
+    } catch {}
     router.push(`/admin/template-studio?edit=${t._id}`);
   };
 

@@ -13,10 +13,10 @@ import HomeFooter from './HomeFooter';
 
 interface Branding {
   appName: string; appTagline: string; heroTitle: string; heroSubtitle: string;
-  footerText: string; primaryColor: string; accentColor: string;
-  showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
-  introCardHtml: string; heroCardHtml: string; footerHtml: string;
-  headerLocation: string; headerNavItems: string;
+  logo: string;
+  header: { location: string; navItems: string };
+  footer: { text: string };
+  system: { primaryColor: string; accentColor: string; showPreloader: boolean; showStrips: boolean; slideshowInterval: number; sessionTimer: number };
 }
 
 export default function HomePage({ strips, txCount, tmplCount, branding, onStart, onCarouselReady }: {
@@ -43,9 +43,9 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       setSlideIdx((i) => (i + 1) % SAMPLE_IMAGES.length);
-    }, branding.slideshowInterval);
+    }, branding.system.slideshowInterval);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [branding.slideshowInterval]);
+  }, [branding.system.slideshowInterval]);
 
   const style = {} as React.CSSProperties;
 
@@ -56,9 +56,6 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
       <main className={styles.main}>
         <div className={styles.colLeft}>
           <IntroCard txCount={txCount} tmplCount={tmplCount} branding={branding} onStart={onStart} />
-          {branding.heroCardHtml && (
-            <div className={styles.heroCard} dangerouslySetInnerHTML={{ __html: branding.heroCardHtml }} />
-          )}
           <CardSmall />
         </div>
 
@@ -67,7 +64,7 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
           <PromoCard />
         </div>
 
-        {branding.showStrips && <StripsCarousel strips={strips} smallVpRef={smallVpRef} onReady={onCarouselReady} />}
+        {branding.system.showStrips && <StripsCarousel strips={strips} smallVpRef={smallVpRef} onReady={onCarouselReady} />}
       </main>
 
       <HomeFooter branding={branding} />
