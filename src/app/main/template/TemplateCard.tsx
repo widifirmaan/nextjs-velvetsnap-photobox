@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { SlotDots } from '../StepperBar';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
@@ -24,11 +25,15 @@ interface TemplateCardProps {
 
 export default function TemplateCard({ template, onSelect, keyedFrameUrl }: TemplateCardProps) {
   const thumbSrc = keyedFrameUrl || (template.templateFull ? getOptimizedUrl(template.templateFull, 200, 600) : '') || template.templateThumb || '';
+  const [loaded, setLoaded] = useState(false);
   return (
     <button className={styles.templateCard} onClick={() => onSelect(template)}>
       <div className={styles.templateCardThumb}>
         {thumbSrc ? (
-          <img src={thumbSrc} alt={template.templateName} loading="lazy" />
+          <>
+            {!loaded && <Loader2 className="spin" size={32} />}
+            <img src={thumbSrc} alt={template.templateName} loading="lazy" onLoad={() => setLoaded(true)} style={loaded ? {} : { display: 'none' }} />
+          </>
         ) : (
           <Loader2 className="spin" size={32} />
         )}
