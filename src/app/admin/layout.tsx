@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image, Loader2, LogOut } from 'lucide-react';
+import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image, Loader2, LogOut, Settings2 } from 'lucide-react';
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback } from 'react';
 
