@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Type, ToggleLeft, Image, RotateCcw, Timer, Palette } from 'lucide-react';
+import { Save, Loader2, Type, Image, RotateCcw, Timer } from 'lucide-react';
 
 interface SettingsData {
   appName: string;
@@ -233,55 +233,12 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Colors */}
+      {/* Timer & Accent */}
       <div style={card}>
-        <div style={cardHeader}><Palette size={18} /> Colors</div>
+        <div style={cardHeader}><Timer size={18} /> Timer &amp; Accent</div>
         <div style={cardBody}>
-          <div style={row}>
-            <div>
-              <label style={labelStyle}>Primary Color</label>
-              <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-                <input type="color" value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
-                  style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
-                <input style={inputStyle} value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
-                  {...focusProps} />
-              </div>
-            </div>
-            <div>
-              <label style={labelStyle}>Accent Color</label>
-              <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-                <input type="color" value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
-                  style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
-                <input style={inputStyle} value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
-                  {...focusProps} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Toggles */}
-      <div style={card}>
-        <div style={cardHeader}><ToggleLeft size={18} /> Toggles</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <input type="checkbox" checked={form.showPreloader} onChange={(e) => update('showPreloader', e.target.checked)}
-                style={{ width:18, height:18, accentColor:'#111827' }} />
-              <span style={{ fontSize:14, color:'#374151' }}>Show Preloader Animation</span>
-            </div>
-            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-              <input type="checkbox" checked={form.showStrips} onChange={(e) => update('showStrips', e.target.checked)}
-                style={{ width:18, height:18, accentColor:'#111827' }} />
-              <span style={{ fontSize:14, color:'#374151' }}>Show Recent Strips Carousel</span>
-            </div>
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
             <div style={row}>
-              <div>
-                <label style={labelStyle}>Slideshow Interval (ms)</label>
-                <input type="number" value={form.slideshowInterval} onChange={(e) => update('slideshowInterval', Number(e.target.value))}
-                  style={inputStyle} min={1000} step={500}
-                  {...focusProps} />
-              </div>
               <div>
                 <label style={{ ...labelStyle, display:'flex', alignItems:'center', gap:6 }}>
                   <Timer size={14} /> Session Timer (menit)
@@ -289,6 +246,46 @@ export default function SettingsPage() {
                 <input type="number" value={Math.round(form.sessionTimer / 60)} onChange={(e) => update('sessionTimer', Math.max(1, Number(e.target.value)) * 60)}
                   style={inputStyle} min={1} step={1}
                   {...focusProps} />
+              </div>
+              <div>
+                <label style={labelStyle}>Slideshow Interval (ms)</label>
+                <input type="number" value={form.slideshowInterval} onChange={(e) => update('slideshowInterval', Number(e.target.value))}
+                  style={inputStyle} min={1000} step={500}
+                  {...focusProps} />
+              </div>
+            </div>
+            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20 }}>
+              <div style={row}>
+                <div>
+                  <label style={labelStyle}>Primary Color</label>
+                  <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+                    <input type="color" value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
+                      style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
+                    <input style={inputStyle} value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
+                      {...focusProps} />
+                  </div>
+                </div>
+                <div>
+                  <label style={labelStyle}>Accent Color</label>
+                  <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+                    <input type="color" value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
+                      style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
+                    <input style={inputStyle} value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
+                      {...focusProps} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20, display:'flex', flexDirection:'column', gap:12 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                <input type="checkbox" checked={form.showPreloader} onChange={(e) => update('showPreloader', e.target.checked)}
+                  style={{ width:18, height:18, accentColor:'#111827' }} />
+                <span style={{ fontSize:14, color:'#374151' }}>Show Preloader Animation</span>
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+                <input type="checkbox" checked={form.showStrips} onChange={(e) => update('showStrips', e.target.checked)}
+                  style={{ width:18, height:18, accentColor:'#111827' }} />
+                <span style={{ fontSize:14, color:'#374151' }}>Show Recent Strips Carousel</span>
               </div>
             </div>
           </div>
