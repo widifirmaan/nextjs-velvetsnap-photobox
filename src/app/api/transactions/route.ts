@@ -3,8 +3,11 @@ import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import mongoose from 'mongoose';
 import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/cloudinary';
+import { requireAdmin } from '@/lib/require-admin';
 
 export async function GET(req: Request) {
+  const u = await requireAdmin(req);
+  if (u) return u;
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);
@@ -47,6 +50,8 @@ export async function GET(req: Request) {
 }
 
 export async function DELETE(req: Request) {
+  const u = await requireAdmin(req);
+  if (u) return u;
   try {
     await connectDB();
     const { searchParams } = new URL(req.url);

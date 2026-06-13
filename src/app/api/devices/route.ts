@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Device from '@/models/Device';
+import { requireAdmin } from '@/lib/require-admin';
 
-export async function GET() {
+export async function GET(req: Request) {
+  const u = await requireAdmin(req);
+  if (u) return u;
   try {
     await connectDB();
     const devices = await Device.find({});
@@ -13,6 +16,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const u = await requireAdmin(req);
+  if (u) return u;
   try {
     await connectDB();
     const body = await req.json();

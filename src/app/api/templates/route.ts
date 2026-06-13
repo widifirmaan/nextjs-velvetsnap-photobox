@@ -3,8 +3,11 @@ import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import { uploadBase64, isBase64 } from '@/lib/cloudinary';
 import { normalizeTemplate } from '@/lib/normalize-template';
+import { requireAdmin } from '@/lib/require-admin';
 
-export async function GET() {
+export async function GET(req: Request) {
+  const u = await requireAdmin(req);
+  if (u) return u;
   try {
     await connectDB();
     const docs = await Template.find({}).lean();
@@ -15,6 +18,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const u = await requireAdmin(req);
+  if (u) return u;
   try {
     await connectDB();
     const body = await req.json();

@@ -54,11 +54,12 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE() {
+export async function DELETE(req: Request) {
   try {
+    const token = getAdminToken(req);
     await connectDB();
     const settings = await Settings.findOne({});
-    if (settings) {
+    if (settings && token && settings.adminSession === token) {
       settings.adminSession = '';
       settings.adminSessionExpires = null;
       await settings.save();
