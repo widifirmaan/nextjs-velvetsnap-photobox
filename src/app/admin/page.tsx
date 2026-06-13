@@ -11,37 +11,41 @@ export const revalidate = 0;
 export default async function AdminDashboard() {
   await connectDB();
 
-  const templates = await Template.find({}).lean();
-  const activeTemplates = templates.filter((t: any) => t.isActive !== false);
-  const totalSessions = await Transaction.countDocuments();
-
-  const totalRevenueAgg = await Transaction.aggregate([
-    { $match: { status: 'PAID' } },
-    { $group: { _id: null, total: { $sum: '$price' } } },
-  ]);
-  const revenue = totalRevenueAgg[0]?.total || 0;
-
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
-  const todayRevenueAgg = await Transaction.aggregate([
-    { $match: { status: 'PAID', createdAt: { $gte: todayStart } } },
-    { $group: { _id: null, total: { $sum: '$price' } } },
-  ]);
-  const todayRevenue = todayRevenueAgg[0]?.total || 0;
-
   const weekStart = new Date(todayStart);
   weekStart.setDate(weekStart.getDate() - 6);
-  const dailyRevenueAgg = await Transaction.aggregate([
-    { $match: { status: 'PAID', createdAt: { $gte: weekStart } } },
-    {
-      $group: {
-        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-        total: { $sum: '$price' },
-        count: { $sum: 1 },
+
+  const [templateCount, activeCount, totalSessions, aggResult] = await Promise.all([
+    Template.countDocuments(),
+    Template.countDocuments({ isActive: { $ne: false } }),
+    Transaction.countDocuments(),
+    Transaction.aggregate([
+      { $match: { status: 'PAID' } },
+      {
+        $facet: {
+          allTime: [{ $group: { _id: null, total: { $sum: '$price' } } }],
+          last7Days: [
+            { $match: { createdAt: { $gte: weekStart } } },
+            {
+              $group: {
+                _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+                total: { $sum: '$price' },
+                count: { $sum: 1 },
+              },
+            },
+            { $sort: { _id: 1 } },
+          ],
+        },
       },
-    },
-    { $sort: { _id: 1 } },
+    ]),
   ]);
+
+  const todayStr = todayStart.toISOString().split('T')[0];
+  const revenue = aggResult[0]?.allTime?.[0]?.total || 0;
+  const dailyRevenueAgg = aggResult[0]?.last7Days || [];
+  const todayAgg = dailyRevenueAgg.find((r: any) => r._id === todayStr);
+  const todayRevenue = todayAgg?.total || 0;
 
   const dailyData = [];
   let maxRevenue = 0;
@@ -49,7 +53,7 @@ export default async function AdminDashboard() {
     const d = new Date(todayStart);
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().split('T')[0];
-    const found = dailyRevenueAgg.find((r: any) => r._id === dateStr);
+    const found = dailyRevenueAgg.find((r: any) => (r._id || r.k) === dateStr);
     const total = found?.total || 0;
     if (total > maxRevenue) maxRevenue = total;
     dailyData.push({
@@ -72,7 +76,7 @@ export default async function AdminDashboard() {
         <AdminStatCard icon={<Camera size={22} />} label="Total Sessions" value={totalSessions.toLocaleString('id-ID')} color="blue" delay={0.05} />
         <AdminStatCard icon={<DollarSign size={22} />} label="Total Revenue" value={`Rp ${revenue.toLocaleString('id-ID')}`} color="green" delay={0.1} />
         <AdminStatCard icon={<TrendingUp size={22} />} label="Today&apos;s Revenue" value={`Rp ${todayRevenue.toLocaleString('id-ID')}`} color="orange" delay={0.15} />
-        <AdminStatCard icon={<Layers size={22} />} label="Active Templates" value={`${activeTemplates.length}`} color="purple" delay={0.2} subtext={`${templates.length} total`} />
+        <AdminStatCard icon={<Layers size={22} />} label="Active Templates" value={`${activeCount}`} color="purple" delay={0.2} subtext={`${templateCount} total`} />
       </AdminStatGrid>
 
       {/* Revenue Chart */}

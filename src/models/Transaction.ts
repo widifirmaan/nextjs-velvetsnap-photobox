@@ -21,5 +21,7 @@ const TransactionSchema = new Schema<ITransaction>({
 
 TransactionSchema.index({ sessionId: 1 }, { unique: true });
 TransactionSchema.index({ createdAt: -1 });
+TransactionSchema.index({ status: 1 });
+TransactionSchema.index({ status: 1, createdAt: -1 });
 
 export default mongoose.models.Transaction || mongoose.model<ITransaction>('Transaction', TransactionSchema);
