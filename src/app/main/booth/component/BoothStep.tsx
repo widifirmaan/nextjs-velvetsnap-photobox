@@ -61,6 +61,12 @@ export default function BoothStep({
           };
           return score(a.label) - score(b.label);
         });
+        if (sorted.length) {
+          const savedId = (() => { try { const r = localStorage.getItem('velvetsnap_device_settings'); if (r) { const s = JSON.parse(r); return s.camera; } } catch {} return null; })();
+          if (!savedId || !sorted.some((c) => c.deviceId === savedId)) {
+            handleSwitchCamera(sorted[0].deviceId);
+          }
+        }
         setAvailableCams(sorted);
       } catch {}
     })();
