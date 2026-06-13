@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Type, ToggleLeft, Image, RotateCcw, Timer } from 'lucide-react';
+import { Save, Loader2, Type, ToggleLeft, Image, RotateCcw, Timer, Palette } from 'lucide-react';
 
 interface SettingsData {
   appName: string;
@@ -129,8 +129,9 @@ export default function SettingsPage() {
     display:'grid', gridTemplateColumns:'1fr 1fr', gap:20,
   };
 
-  const fullRow: React.CSSProperties = {
-    gridColumn:'1 / -1',
+  const focusProps = {
+    onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = '#111827'; },
+    onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = '#d1d5db'; },
   };
 
   return (
@@ -138,7 +139,7 @@ export default function SettingsPage() {
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 4px 0' }}>
         <div>
           <h1 style={{ fontSize:24, fontWeight:700, margin:0, color:'#111' }}>Settings</h1>
-          <p style={{ fontSize:14, color:'#6b7280', margin:'4px 0 0' }}>Customize branding and homepage appearance</p>
+          <p style={{ fontSize:14, color:'#6b7280', margin:'4px 0 0' }}>Customize homepage appearance</p>
         </div>
         <button onClick={handleSave} disabled={saving || saved}
           style={{
@@ -153,31 +154,53 @@ export default function SettingsPage() {
         </button>
       </div>
 
+      {/* Footer */}
+      <div style={card}>
+        <div style={cardHeader}><Image size={18} /> Footer</div>
+        <div style={cardBody}>
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div>
+              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(ganti seluruh konten footer)</span></label>
+              <textarea style={{ ...inputStyle, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }}
+                value={form.footerHtml}
+                onChange={(e) => update('footerHtml', e.target.value)}
+                placeholder={'<footer class="text-center py-4 bg-dark text-white">\n  <p>&copy; 2025 VelvetSnap. All rights reserved.</p>\n  <div class="d-flex gap-3 justify-content-center">\n    <a href="#">Instagram</a>\n    <a href="#">WhatsApp</a>\n  </div>\n</footer>'}
+                {...focusProps} />
+            </div>
+            <div>
+              <label style={labelStyle}>Fallback Text <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(dipakai jika HTML kosong)</span></label>
+              <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)}
+                placeholder="VelvetSnap Photobooth Platform"
+                {...focusProps} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Intro Card */}
       <div style={card}>
         <div style={cardHeader}><Type size={18} /> Intro Card</div>
         <div style={cardBody}>
           <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+            <div style={row}>
               <div>
                 <label style={labelStyle}>App Name</label>
                 <input style={inputStyle} value={form.appName} onChange={(e) => update('appName', e.target.value)}
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                  {...focusProps} />
               </div>
               <div>
                 <label style={labelStyle}>Tagline</label>
                 <input style={inputStyle} value={form.appTagline} onChange={(e) => update('appTagline', e.target.value)}
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                  {...focusProps} />
               </div>
             </div>
             <div>
               <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
-              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.introCardHtml} onChange={(e) => update('introCardHtml', e.target.value)}
-                placeholder='<div class="card"><h1>VelvetSnap</h1><p>Selamat datang!</p></div>'
-                onFocus={(e) => e.target.style.borderColor='#111827'}
-                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }}
+                value={form.introCardHtml}
+                onChange={(e) => update('introCardHtml', e.target.value)}
+                placeholder='<div class="d-flex align-items-center gap-3"><h1 class="mb-0 fw-bold">VelvetSnap</h1><span class="badge bg-secondary">Jakarta</span></div>'
+                {...focusProps} />
             </div>
           </div>
         </div>
@@ -191,21 +214,20 @@ export default function SettingsPage() {
             <div>
               <label style={labelStyle}>Hero Title</label>
               <input style={inputStyle} value={form.heroTitle} onChange={(e) => update('heroTitle', e.target.value)}
-                onFocus={(e) => e.target.style.borderColor='#111827'}
-                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                {...focusProps} />
             </div>
             <div>
               <label style={labelStyle}>Hero Subtitle</label>
               <textarea style={{ ...inputStyle, minHeight:72, resize:'vertical' }} value={form.heroSubtitle} onChange={(e) => update('heroSubtitle', e.target.value)}
-                onFocus={(e) => e.target.style.borderColor='#111827'}
-                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                {...focusProps} />
             </div>
             <div>
               <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
-              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.heroCardHtml} onChange={(e) => update('heroCardHtml', e.target.value)}
-                placeholder='<div class="card"><h2>Abadikan Momen</h2><p>Spesialmu</p></div>'
-                onFocus={(e) => e.target.style.borderColor='#111827'}
-                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }}
+                value={form.heroCardHtml}
+                onChange={(e) => update('heroCardHtml', e.target.value)}
+                placeholder='<div class="p-3 bg-light rounded"><h2 class="fw-bold">Abadikan Momen Spesialmu</h2><p class="text-muted mb-0">Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi</p></div>'
+                {...focusProps} />
             </div>
           </div>
         </div>
@@ -213,7 +235,7 @@ export default function SettingsPage() {
 
       {/* Colors */}
       <div style={card}>
-        <div style={cardHeader}><div style={{ width:18, height:18, borderRadius:4, background:'linear-gradient(135deg,#667eea,#764ba2)' }} /> Colors</div>
+        <div style={cardHeader}><Palette size={18} /> Colors</div>
         <div style={cardBody}>
           <div style={row}>
             <div>
@@ -222,8 +244,7 @@ export default function SettingsPage() {
                 <input type="color" value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
                   style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
                 <input style={inputStyle} value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                  {...focusProps} />
               </div>
             </div>
             <div>
@@ -232,8 +253,7 @@ export default function SettingsPage() {
                 <input type="color" value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
                   style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
                 <input style={inputStyle} value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                  {...focusProps} />
               </div>
             </div>
           </div>
@@ -255,45 +275,21 @@ export default function SettingsPage() {
                 style={{ width:18, height:18, accentColor:'#111827' }} />
               <span style={{ fontSize:14, color:'#374151' }}>Show Recent Strips Carousel</span>
             </div>
-            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+            <div style={row}>
               <div>
                 <label style={labelStyle}>Slideshow Interval (ms)</label>
                 <input type="number" value={form.slideshowInterval} onChange={(e) => update('slideshowInterval', Number(e.target.value))}
-                  style={{ ...inputStyle }} min={1000} step={500}
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                  style={inputStyle} min={1000} step={500}
+                  {...focusProps} />
               </div>
               <div>
                 <label style={{ ...labelStyle, display:'flex', alignItems:'center', gap:6 }}>
                   <Timer size={14} /> Session Timer (menit)
                 </label>
                 <input type="number" value={Math.round(form.sessionTimer / 60)} onChange={(e) => update('sessionTimer', Math.max(1, Number(e.target.value)) * 60)}
-                  style={{ ...inputStyle }} min={1} step={1}
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+                  style={inputStyle} min={1} step={1}
+                  {...focusProps} />
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div style={card}>
-        <div style={cardHeader}><Image size={18} /> Footer</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div>
-              <label style={labelStyle}>Footer Text</label>
-              <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)}
-                onFocus={(e) => e.target.style.borderColor='#111827'}
-                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
-            </div>
-            <div>
-              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
-              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.footerHtml} onChange={(e) => update('footerHtml', e.target.value)}
-                placeholder='<footer class="text-center"><p>VelvetSnap 2025</p></footer>'
-                onFocus={(e) => e.target.style.borderColor='#111827'}
-                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
             </div>
           </div>
         </div>
