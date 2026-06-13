@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useCallback } from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import StepperBar from '../StepperBar';
 import styles from '@/app/main/page.module.css';
@@ -8,33 +8,16 @@ import type { TemplateData } from '../types';
 import TemplateCard from './TemplateCard';
 
 interface TemplateStepProps {
-  onSelect: (id: string, data?: TemplateData, keyedUrl?: string) => void;
+  templates: TemplateData[];
+  loading: boolean;
+  onSelect: (id: string, data?: TemplateData) => void;
   onBack: () => void;
 }
 
-export default function TemplateStep({ onSelect, onBack }: TemplateStepProps) {
-  const [templates, setTemplates] = useState<TemplateData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const cancelledRef = useRef(false);
-
+export default function TemplateStep({ templates, loading, onSelect, onBack }: TemplateStepProps) {
   const handleCardClick = useCallback((t: TemplateData) => {
     onSelect(t.templateId, t);
   }, [onSelect]);
-
-  useEffect(() => {
-    cancelledRef.current = false;
-    fetch('/api/templates/list')
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelledRef.current) return;
-        if (!res.success || !res.data?.length) { setLoading(false); return; }
-        const active = res.data.filter((t: TemplateData) => t.isActive !== false);
-        setTemplates(active);
-        setLoading(false);
-      })
-      .catch(() => { if (!cancelledRef.current) setLoading(false); });
-    return () => { cancelledRef.current = true; };
-  }, []);
 
   return (
     <div className={`${styles.stepPage} ${styles.stepPageTemplates}`}>

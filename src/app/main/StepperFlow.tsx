@@ -28,6 +28,8 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   const [paid, setPaid] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [txId, setTxId] = useState<string | null>(null);
+  const [cachedTemplates, setCachedTemplates] = useState<TemplateData[] | null>(null);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(sessionTimer);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -60,6 +62,18 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
     };
   }, [step, sessionTimer, startOver]);
+
+  useEffect(() => {
+    if (cachedTemplates) { setTemplatesLoading(false); return; }
+    fetch('/api/templates/list')
+      .then((r) => r.json())
+      .then((res) => {
+        if (!res.success || !res.data?.length) { setTemplatesLoading(false); return; }
+        setCachedTemplates(res.data.filter((t: TemplateData) => t.isActive !== false));
+        setTemplatesLoading(false);
+      })
+      .catch(() => setTemplatesLoading(false));
+  }, []);
 
   const handleSelectTemplate = useCallback((id: string, data?: TemplateData, keyedUrl?: string) => {
     setTemplateId(id);
@@ -229,7 +243,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   let content: React.ReactNode = null;
 
-  if (step === 1) content = <TemplateStep onSelect={handleSelectTemplate} onBack={() => setStep(0)} />;
+  if (step === 1) content = <TemplateStep templates={cachedTemplates || []} loading={templatesLoading} onSelect={handleSelectTemplate} onBack={() => setStep(0)} />;
 
   if (step === 2) content = (
     <BoothStep
