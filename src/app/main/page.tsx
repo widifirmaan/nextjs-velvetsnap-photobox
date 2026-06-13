@@ -79,9 +79,9 @@ export default function Home() {
         if (res.success && res.data?.length) setStrips(res.data);
       })
       .catch(() => {});
-    fetch('/api/transactions')
+    fetch('/api/transactions/count')
       .then((r) => r.json())
-      .then((res) => { if (res.success) setTxCount(res.pagination.total); })
+      .then((res) => { if (res.success) setTxCount(res.total); })
       .catch(() => {});
     fetch('/api/templates/list')
       .then((r) => r.json())
