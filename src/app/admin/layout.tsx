@@ -14,11 +14,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
-    try {
-      const raw = localStorage.getItem('velvetsnap_admin');
-      if (raw && JSON.parse(raw).u === 'admin') { setAuthed(true); return; }
-    } catch {}
-    router.replace('/admin/login');
+    fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+      .then((r) => { if (r.ok) setAuthed(true); else router.replace('/admin/login'); })
+      .catch(() => router.replace('/admin/login'));
   }, [pathname, router]);
 
   useEffect(() => {
@@ -114,7 +112,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             &larr; Return to App
           </Link>
           <button
-            onClick={() => { localStorage.removeItem('velvetsnap_admin'); document.cookie = 'admin_token=;path=/;max-age=0'; router.push('/admin/login'); }}
+            onClick={() => { fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login')); }}
             className={styles.navLink}
             style={{ color:'var(--text-secondary)', border:'none', background:'none', cursor:'pointer', textAlign:'left', fontSize:14, padding:'10px 12px', width:'100%', display:'flex', alignItems:'center', gap:10 }}
           >

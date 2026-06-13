@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, Loader2, Image, Timer } from 'lucide-react';
+import { Save, Loader2, Image, Timer, Lock, Check } from 'lucide-react';
 
 interface SettingsData {
   footerText: string;
@@ -31,11 +31,14 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [authErr, setAuthErr] = useState(false);
+  const [newPass, setNewPass] = useState('');
+  const [passSaving, setPassSaving] = useState(false);
+  const [passSaved, setPassSaved] = useState(false);
+  const [passErr, setPassErr] = useState('');
 
   const handleAuthFail = () => {
     setAuthErr(true);
-    localStorage.removeItem('velvetsnap_admin');
-    document.cookie = 'admin_token=;path=/;max-age=0';
+    fetch('/api/admin/login', { method: 'DELETE' });
     setTimeout(() => router.push('/admin/login'), 1500);
   };
 
@@ -81,6 +84,24 @@ export default function SettingsPage() {
       if (json.success) setSaved(true);
     } catch {}
     setSaving(false);
+  };
+
+  const handleSavePass = async () => {
+    if (newPass.length < 4) { setPassErr('Minimal 4 karakter'); return; }
+    setPassSaving(true);
+    setPassErr('');
+    try {
+      const res = await fetch('/api/admin/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPass }),
+      });
+      if (res.status === 401) { handleAuthFail(); setPassSaving(false); return; }
+      const json = await res.json();
+      if (json.success) { setPassSaved(true); setNewPass(''); setTimeout(() => setPassSaved(false), 3000); }
+      else setPassErr(json.error || 'Gagal');
+    } catch { setPassErr('Network error'); }
+    setPassSaving(false);
   };
 
   if (authErr) {
@@ -230,6 +251,34 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Admin Password */}
+      <div style={card}>
+        <div style={cardHeader}><Lock size={18} /> Admin Password</div>
+        <div style={cardBody}>
+          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+            <div>
+              <label style={labelStyle}>New Password</label>
+              <div style={{ display:'flex', gap:10 }}>
+                <input type="password" value={newPass} onChange={(e) => { setNewPass(e.target.value); setPassSaved(false); setPassErr(''); }}
+                  style={{ ...inputStyle, flex:1 }} placeholder="Minimal 4 karakter"
+                  {...focusProps} />
+                <button onClick={handleSavePass} disabled={passSaving || passSaved || !newPass}
+                  style={{
+                    display:'inline-flex', alignItems:'center', gap:6,
+                    padding:'10px 20px', borderRadius:10, border:'none',
+                    fontSize:14, fontWeight:600, cursor:passSaving || passSaved || !newPass ? 'default' : 'pointer',
+                    background:passSaved ? '#10b981' : '#111827', color:'#fff',
+                    opacity:passSaving ? 0.6 : 1, whiteSpace:'nowrap', transition:'all 0.15s',
+                  }}>
+                  {passSaving ? <Loader2 className="spin" size={16} /> : passSaved ? <Check size={16} /> : <Save size={16} />}
+                  {passSaving ? '...' : passSaved ? 'Tersimpan' : 'Simpan'}
+                </button>
+              </div>
+              {passErr && <p style={{ color:'#ef4444', fontSize:12, marginTop:4 }}>{passErr}</p>}
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
   );

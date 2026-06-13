@@ -5,33 +5,41 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('velvetsnap_admin');
-      if (raw) {
-        const data = JSON.parse(raw);
-        if (data.u === 'admin') router.replace('/admin');
-      }
-    } catch {}
-    setLoading(false);
+    fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+      .then((r) => {
+        if (r.status === 200) router.replace('/admin');
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (username !== 'admin' || password !== 'root') {
-      setError('Username atau password salah');
-      return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        router.replace('/admin');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Invalid password');
+      }
+    } catch {
+      setError('Network error');
     }
-    localStorage.setItem('velvetsnap_admin', JSON.stringify({ u: username, t: Date.now() }));
-    document.cookie = 'admin_token=' + btoa('admin:root') + ';path=/;max-age=86400;SameSite=Lax';
-    router.replace('/admin');
+    setSubmitting(false);
   };
 
   if (loading) {
@@ -56,17 +64,7 @@ export default function AdminLoginPage() {
         <div style={{ color:'var(--text-secondary)', marginBottom:28, fontSize:14 }}>Admin Panel</div>
 
         <input
-          type="text" placeholder="Username" autoFocus
-          value={username} onChange={(e) => setUsername(e.target.value)}
-          style={{
-            width:'100%', padding:'12px 14px',
-            border:'1.5px solid var(--mn-border)', borderRadius:12,
-            fontSize:16, marginBottom:12, outline:'none',
-            background:'var(--clay-bg)', boxSizing:'border-box',
-          }}
-        />
-        <input
-          type="password" placeholder="Password"
+          type="password" placeholder="Password" autoFocus
           value={password} onChange={(e) => setPassword(e.target.value)}
           style={{
             width:'100%', padding:'12px 14px',
@@ -78,16 +76,13 @@ export default function AdminLoginPage() {
 
         {error && <p style={{ color:'#e74c3c', fontSize:13, marginBottom:16 }}>{error}</p>}
 
-        <button type="submit" style={{
-          width:'100%', padding:'12px', background:'var(--text-primary)',
+        <button type="submit" disabled={submitting} style={{
+          width:'100%', padding:'12px', background:submitting ? '#9ca3af' : 'var(--text-primary)',
           color:'#fff', border:'none', borderRadius:12,
-          fontSize:16, fontWeight:600, cursor:'pointer',
+          fontSize:16, fontWeight:600, cursor:submitting ? 'default' : 'pointer',
           transition:'opacity var(--transition-fast)',
-        }}
-          onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
-          onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
-        >
-          Masuk
+        }}>
+          {submitting ? 'Memeriksa...' : 'Masuk'}
         </button>
       </form>
     </div>

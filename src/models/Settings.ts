@@ -15,6 +15,10 @@ export interface ISettings extends Document {
   showStrips: boolean;
   slideshowInterval: number;
   sessionTimer: number;
+  adminPassword: string;
+  adminPasswordSalt: string;
+  adminSession: string;
+  adminSessionExpires: Date | null;
 }
 
 const SettingsSchema = new Schema<ISettings>({
@@ -32,6 +36,10 @@ const SettingsSchema = new Schema<ISettings>({
   showStrips: { type: Boolean, default: true },
   slideshowInterval: { type: Number, default: 3000 },
   sessionTimer: { type: Number, default: 600 },
+  adminPassword: { type: String, default: '' },
+  adminPasswordSalt: { type: String, default: '' },
+  adminSession: { type: String, default: '' },
+  adminSessionExpires: { type: Date, default: null },
 }, { timestamps: true });
 
 export default mongoose.models.Settings || mongoose.model<ISettings>('Settings', SettingsSchema);
