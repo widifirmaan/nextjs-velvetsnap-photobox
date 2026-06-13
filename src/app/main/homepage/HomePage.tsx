@@ -17,6 +17,7 @@ interface Branding {
   showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
   fontFamily: string; headingFontFamily: string;
   headingFontSize: number; bodyFontSize: number; textAlign: string;
+  introCardHtml: string; heroCardHtml: string; footerHtml: string;
 }
 
 export default function HomePage({ strips, txCount, tmplCount, branding, onStart, onCarouselReady }: {
@@ -62,6 +63,9 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
       <main className={styles.main}>
         <div className={styles.colLeft}>
           <IntroCard txCount={txCount} tmplCount={tmplCount} branding={branding} onStart={onStart} />
+          {branding.heroCardHtml && (
+            <div className={styles.heroCard} dangerouslySetInnerHTML={{ __html: branding.heroCardHtml }} />
+          )}
           <CardSmall />
         </div>
 

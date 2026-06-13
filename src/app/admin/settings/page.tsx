@@ -9,6 +9,9 @@ interface SettingsData {
   heroTitle: string;
   heroSubtitle: string;
   footerText: string;
+  introCardHtml: string;
+  heroCardHtml: string;
+  footerHtml: string;
   primaryColor: string;
   accentColor: string;
   showPreloader: boolean;
@@ -28,6 +31,9 @@ const defaults: SettingsData = {
   heroTitle: 'Abadikan Momen Spesialmu',
   heroSubtitle: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
   footerText: 'VelvetSnap Photobooth Platform',
+  introCardHtml: '',
+  heroCardHtml: '',
+  footerHtml: '',
   primaryColor: '#262626',
   accentColor: '#C5D89D',
   showPreloader: true,
@@ -68,6 +74,9 @@ export default function SettingsPage() {
             headingFontFamily: d.headingFontFamily ?? defaults.headingFontFamily,
             headingFontSize: d.headingFontSize ?? defaults.headingFontSize,
             bodyFontSize: d.bodyFontSize ?? defaults.bodyFontSize,
+            introCardHtml: d.introCardHtml ?? defaults.introCardHtml,
+            heroCardHtml: d.heroCardHtml ?? defaults.heroCardHtml,
+            footerHtml: d.footerHtml ?? defaults.footerHtml,
             textAlign: d.textAlign ?? defaults.textAlign,
             sessionTimer: d.sessionTimer ?? defaults.sessionTimer,
           });
@@ -159,20 +168,29 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {/* Branding */}
+      {/* Intro Card */}
       <div style={card}>
-        <div style={cardHeader}><Type size={18} /> Branding</div>
+        <div style={cardHeader}><Type size={18} /> Intro Card</div>
         <div style={cardBody}>
-          <div style={row}>
-            <div>
-              <label style={labelStyle}>App Name</label>
-              <input style={inputStyle} value={form.appName} onChange={(e) => update('appName', e.target.value)}
-                onFocus={(e) => e.target.style.borderColor='#111827'}
-                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+              <div>
+                <label style={labelStyle}>App Name</label>
+                <input style={inputStyle} value={form.appName} onChange={(e) => update('appName', e.target.value)}
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+              <div>
+                <label style={labelStyle}>Tagline</label>
+                <input style={inputStyle} value={form.appTagline} onChange={(e) => update('appTagline', e.target.value)}
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
             </div>
             <div>
-              <label style={labelStyle}>Tagline</label>
-              <input style={inputStyle} value={form.appTagline} onChange={(e) => update('appTagline', e.target.value)}
+              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
+              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.introCardHtml} onChange={(e) => update('introCardHtml', e.target.value)}
+                placeholder='<div class="card"><h1>VelvetSnap</h1><p>Selamat datang!</p></div>'
                 onFocus={(e) => e.target.style.borderColor='#111827'}
                 onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
             </div>
@@ -180,11 +198,11 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Homepage Hero */}
+      {/* Hero Card */}
       <div style={card}>
-        <div style={cardHeader}><Palette size={18} /> Homepage Hero</div>
+        <div style={cardHeader}><Type size={18} /> Hero Card</div>
         <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
             <div>
               <label style={labelStyle}>Hero Title</label>
               <input style={inputStyle} value={form.heroTitle} onChange={(e) => update('heroTitle', e.target.value)}
@@ -194,6 +212,13 @@ export default function SettingsPage() {
             <div>
               <label style={labelStyle}>Hero Subtitle</label>
               <textarea style={{ ...inputStyle, minHeight:72, resize:'vertical' }} value={form.heroSubtitle} onChange={(e) => update('heroSubtitle', e.target.value)}
+                onFocus={(e) => e.target.style.borderColor='#111827'}
+                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+            </div>
+            <div>
+              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
+              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.heroCardHtml} onChange={(e) => update('heroCardHtml', e.target.value)}
+                placeholder='<div class="card"><h2>Abadikan Momen</h2><p>Spesialmu</p></div>'
                 onFocus={(e) => e.target.style.borderColor='#111827'}
                 onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
             </div>
@@ -271,10 +296,21 @@ export default function SettingsPage() {
       <div style={card}>
         <div style={cardHeader}><Image size={18} /> Footer</div>
         <div style={cardBody}>
-          <label style={labelStyle}>Footer Text</label>
-          <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)}
-            onFocus={(e) => e.target.style.borderColor='#111827'}
-            onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div>
+              <label style={labelStyle}>Footer Text</label>
+              <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)}
+                onFocus={(e) => e.target.style.borderColor='#111827'}
+                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+            </div>
+            <div>
+              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(opsional — ganti konten di atas)</span></label>
+              <textarea style={{ ...inputStyle, minHeight:120, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.footerHtml} onChange={(e) => update('footerHtml', e.target.value)}
+                placeholder='<footer class="text-center"><p>VelvetSnap 2025</p></footer>'
+                onFocus={(e) => e.target.style.borderColor='#111827'}
+                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+            </div>
+          </div>
         </div>
       </div>
 

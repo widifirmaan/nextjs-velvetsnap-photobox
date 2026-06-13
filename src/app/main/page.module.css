@@ -411,6 +411,18 @@
   flex-shrink: 0;
 }
 
+.heroCard {
+  background: var(--mn-card);
+  border-radius: var(--mn-radius);
+  padding: 24px 20px;
+}
+
+.heroCard :global(img) {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
 .introCta {
   display: inline-flex;
   align-items: center;

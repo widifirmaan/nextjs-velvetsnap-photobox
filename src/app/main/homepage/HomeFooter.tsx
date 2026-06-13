@@ -2,7 +2,10 @@
 import { Camera as CameraIcon, MessageCircle, Sparkles } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 
-export default function HomeFooter({ branding }: { branding: { appName: string; footerText: string } }) {
+export default function HomeFooter({ branding }: { branding: { appName: string; footerText: string; footerHtml: string } }) {
+  if (branding.footerHtml) {
+    return <footer className={styles.footer} dangerouslySetInnerHTML={{ __html: branding.footerHtml }} />;
+  }
   return (
     <footer className={styles.footer}>
       <nav className={styles.nav}>

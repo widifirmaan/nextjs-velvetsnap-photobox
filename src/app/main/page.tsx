@@ -14,6 +14,7 @@ interface Branding {
   fontFamily: string; headingFontFamily: string;
   headingFontSize: number; bodyFontSize: number; textAlign: string;
   sessionTimer: number;
+  introCardHtml: string; heroCardHtml: string; footerHtml: string;
 }
 
 const defaultBranding: Branding = {
@@ -26,6 +27,7 @@ const defaultBranding: Branding = {
   fontFamily: '', headingFontFamily: '',
   headingFontSize: 0, bodyFontSize: 0, textAlign: '',
   sessionTimer: 600,
+  introCardHtml: '', heroCardHtml: '', footerHtml: '',
 };
 
 export default function Home() {
@@ -69,6 +71,9 @@ export default function Home() {
             bodyFontSize: d.bodyFontSize ?? defaultBranding.bodyFontSize,
             textAlign: d.textAlign ?? defaultBranding.textAlign,
             sessionTimer: d.sessionTimer ?? defaultBranding.sessionTimer,
+            introCardHtml: d.introCardHtml || defaultBranding.introCardHtml,
+            heroCardHtml: d.heroCardHtml || defaultBranding.heroCardHtml,
+            footerHtml: d.footerHtml || defaultBranding.footerHtml,
           });
         }
       })

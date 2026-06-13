@@ -6,6 +6,9 @@ export interface ISettings extends Document {
   heroTitle: string;
   heroSubtitle: string;
   footerText: string;
+  introCardHtml: string;
+  heroCardHtml: string;
+  footerHtml: string;
   primaryColor: string;
   accentColor: string;
   showPreloader: boolean;
@@ -25,6 +28,9 @@ const SettingsSchema = new Schema<ISettings>({
   heroTitle: { type: String, default: 'Abadikan Momen Spesialmu' },
   heroSubtitle: { type: String, default: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit' },
   footerText: { type: String, default: 'VelvetSnap Photobooth Platform' },
+  introCardHtml: { type: String, default: '' },
+  heroCardHtml: { type: String, default: '' },
+  footerHtml: { type: String, default: '' },
   primaryColor: { type: String, default: '#262626' },
   accentColor: { type: String, default: '#C5D89D' },
   showPreloader: { type: Boolean, default: true },
