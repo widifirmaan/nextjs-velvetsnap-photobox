@@ -174,6 +174,7 @@ export default function BoothStep({
           webcamRef={webcamRef}
           mirrored={mirrored}
           deviceId={deviceId}
+          stripLoading={stripLoading}
         />
         <BoothPreview
           templateData={templateData}
@@ -192,6 +193,7 @@ export default function BoothStep({
         taking={taking}
         dslrCapturing={dslrCapturing}
         busy={busy}
+        stripLoading={stripLoading}
         captureMode={captureMode}
         filledCount={filledCount}
         slotsCount={slotsCount}

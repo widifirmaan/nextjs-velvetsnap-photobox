@@ -6,6 +6,7 @@ import styles from '@/app/main/page.module.css';
 
 export default function Viewfinder({
   cameraType, countdown, flash, dslrCapturing, webcamRef, mirrored, deviceId,
+  stripLoading,
 }: {
   cameraType: 'webcam' | 'dslr';
   countdown: number | null;
@@ -14,9 +15,15 @@ export default function Viewfinder({
   webcamRef: React.RefObject<Webcam | null>;
   mirrored: boolean;
   deviceId: string | undefined;
+  stripLoading: boolean;
 }) {
   return (
     <div className={styles.boothViewfinder}>
+      {stripLoading && (
+        <div className={styles.boothCountdown}>
+          <span style={{ fontSize: 18, fontWeight: 500 }}>Menyiapkan kamera...</span>
+        </div>
+      )}
       {cameraType === 'dslr' ? (
         <div className={styles.boothDslrPlaceholder}>
           <CameraIcon size={64} style={{ opacity: 0.5 }} />

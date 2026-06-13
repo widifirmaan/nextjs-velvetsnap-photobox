@@ -147,8 +147,11 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   const handleAddCapture = useCallback((url: string, slotIdx?: number) => {
     setCaptures((prev) => {
-      if (slotIdx !== undefined && slotIdx >= 0 && slotIdx < prev.length) {
-        const n = [...prev]; n[slotIdx] = url; return n;
+      if (slotIdx !== undefined && slotIdx >= 0) {
+        const n = [...prev];
+        while (n.length <= slotIdx) n.push('');
+        n[slotIdx] = url;
+        return n;
       }
       const idx = prev.findIndex((c) => c === '');
       if (idx !== -1) { const n = [...prev]; n[idx] = url; return n; }
