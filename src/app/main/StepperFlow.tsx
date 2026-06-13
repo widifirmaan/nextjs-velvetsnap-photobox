@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { Timer } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
-import { getHighResUrl, getFullQualityUrl } from '@/lib/cloudinary-url';
+import { getHighResUrl } from '@/lib/cloudinary-url';
 import { TEMPLATE_CONFIGS, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';
@@ -92,7 +92,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       setPrice(data.templatePrice ?? 35000);
       const fullUrl = data.templateFull || '';
       if (fullUrl) {
-        setKeyedFrameImage(getFullQualityUrl(fullUrl));
+        setKeyedFrameImage(fullUrl);
         setStripLoading(false);
         return;
       }
@@ -153,7 +153,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
         // Keyed frame: templateFull is already chroma-keyed from studio save
         if (matched.templateFull) {
-          setKeyedFrameImage(getFullQualityUrl(matched.templateFull));
+          setKeyedFrameImage(matched.templateFull);
           setStripLoading(false);
         } else if (matched.templateData.elements?.length) {
           try {
