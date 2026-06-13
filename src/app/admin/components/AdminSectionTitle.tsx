@@ -1,5 +1,16 @@
 import styles from './admin-section-title.module.css';
+import type { LucideIcon } from 'lucide-react';
 
-export default function AdminSectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className={styles.sectionTitle}>{children}</h2>;
+interface Props {
+  icon?: LucideIcon;
+  title: string;
+}
+
+export default function AdminSectionTitle({ icon: Icon, title }: Props) {
+  return (
+    <h2 className={styles.sectionTitle}>
+      {Icon && <Icon size={18} style={{ flexShrink: 0 }} />}
+      {title}
+    </h2>
+  );
 }

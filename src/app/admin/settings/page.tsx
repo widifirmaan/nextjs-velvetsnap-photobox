@@ -121,7 +121,20 @@ export default function SettingsPage() {
       <AdminPageHeader
         title="Settings"
         subtitle="Customize branding and homepage appearance"
-        action={{ label: saved ? 'Tersimpan' : 'Simpan', icon: saved ? undefined : Save, onClick: handleSave, disabled: saving || saved }}
+        action={
+          <button onClick={handleSave} disabled={saving || saved}
+            style={{
+              display:'inline-flex', alignItems:'center', gap:8,
+              padding:'10px 24px', borderRadius:10, cursor:saving || saved ? 'default' : 'pointer',
+              fontSize:14, fontWeight:600, border:'none',
+              background:saved ? 'var(--accent-color)' : 'var(--text-primary)',
+              color:saved ? '#fff' : 'var(--mn-card)',
+              opacity:saving ? 0.6 : 1, transition:'all 0.15s',
+            }}>
+            {saved ? null : <Save size={16} />}
+            {saved ? 'Tersimpan' : 'Simpan'}
+          </button>
+        }
       />
 
       <div className="glass-panel" style={{ padding:28 }}>
