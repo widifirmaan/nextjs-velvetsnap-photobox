@@ -114,7 +114,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             &larr; Return to App
           </Link>
           <button
-            onClick={() => { localStorage.removeItem('velvetsnap_admin'); router.push('/admin/login'); }}
+            onClick={() => { localStorage.removeItem('velvetsnap_admin'); document.cookie = 'admin_token=;path=/;max-age=0'; router.push('/admin/login'); }}
             className={styles.navLink}
             style={{ color:'var(--text-secondary)', border:'none', background:'none', cursor:'pointer', textAlign:'left', fontSize:14, padding:'10px 12px', width:'100%', display:'flex', alignItems:'center', gap:10 }}
           >

@@ -30,6 +30,7 @@ export default function AdminLoginPage() {
       return;
     }
     localStorage.setItem('velvetsnap_admin', JSON.stringify({ u: username, t: Date.now() }));
+    document.cookie = 'admin_token=' + btoa('admin:root') + ';path=/;max-age=86400;SameSite=Lax';
     router.replace('/admin');
   };
 
