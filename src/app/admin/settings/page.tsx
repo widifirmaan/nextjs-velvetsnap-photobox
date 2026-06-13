@@ -117,7 +117,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:24, paddingBottom:40 }}>
+    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:24, paddingBottom:40, overflowY:'auto', minHeight:0 }}>
       <AdminPageHeader
         title="Settings"
         subtitle="Customize branding and homepage appearance"
