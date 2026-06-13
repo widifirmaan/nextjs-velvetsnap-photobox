@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { Edit2, Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { AdminPageHeader, AdminTableCard } from '@/app/admin/components';
-import { useRouter } from 'next/navigation';
 import styles from './page.module.css';
 
 interface TemplateData {
@@ -27,8 +26,6 @@ interface TemplateData {
 export default function TemplatesAdmin() {
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
-
   useEffect(() => {
     fetchTemplates();
   }, []);
@@ -44,17 +41,6 @@ export default function TemplatesAdmin() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleEdit = async (t: TemplateData) => {
-    try {
-      const res = await fetch(`/api/templates/thumbnails?id=${t.templateId}`);
-      const data = await res.json();
-      if (data.success && data.data?.length) {
-        sessionStorage.setItem('stripTemplateData', JSON.stringify(data.data[0]));
-      }
-    } catch {}
-    router.push(`/admin/template-studio?edit=${t._id}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -137,9 +123,9 @@ export default function TemplatesAdmin() {
                   </td>
                   <td>
                     <div className={styles.actionBtns}>
-                      <button className={styles.iconBtn} onClick={() => handleEdit(t)} title="Edit in Strips Studio">
+                      <a href={`/admin/template-studio?edit=${t._id}`} className={styles.iconBtn} title="Edit in Strips Studio">
                         <ExternalLink size={18} color="var(--accent-color)" />
-                      </button>
+                      </a>
                       <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => handleDelete(t._id)} title="Delete template">
                         <Trash2 size={18} color="var(--danger-color)" />
                       </button>
