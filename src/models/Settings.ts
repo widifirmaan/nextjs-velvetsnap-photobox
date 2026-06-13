@@ -14,11 +14,6 @@ export interface ISettings extends Document {
   showPreloader: boolean;
   showStrips: boolean;
   slideshowInterval: number;
-  fontFamily: string;
-  headingFontFamily: string;
-  headingFontSize: number;
-  bodyFontSize: number;
-  textAlign: string;
   sessionTimer: number;
 }
 
@@ -36,11 +31,6 @@ const SettingsSchema = new Schema<ISettings>({
   showPreloader: { type: Boolean, default: true },
   showStrips: { type: Boolean, default: true },
   slideshowInterval: { type: Number, default: 3000 },
-  fontFamily: { type: String, default: '' },
-  headingFontFamily: { type: String, default: '' },
-  headingFontSize: { type: Number, default: 0 },
-  bodyFontSize: { type: Number, default: 0 },
-  textAlign: { type: String, default: '' },
   sessionTimer: { type: Number, default: 600 },
 }, { timestamps: true });
 

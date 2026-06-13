@@ -15,8 +15,6 @@ interface Branding {
   appName: string; appTagline: string; heroTitle: string; heroSubtitle: string;
   footerText: string; primaryColor: string; accentColor: string;
   showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
-  fontFamily: string; headingFontFamily: string;
-  headingFontSize: number; bodyFontSize: number; textAlign: string;
   introCardHtml: string; heroCardHtml: string; footerHtml: string;
 }
 
@@ -48,13 +46,7 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [branding.slideshowInterval]);
 
-  const style = {
-    '--brand-font-family': branding.fontFamily || undefined,
-    '--brand-heading-font-family': branding.headingFontFamily || undefined,
-    '--brand-heading-font-size': branding.headingFontSize ? `${branding.headingFontSize}px` : undefined,
-    '--brand-body-font-size': branding.bodyFontSize ? `${branding.bodyFontSize}px` : undefined,
-    '--brand-text-align': branding.textAlign || undefined,
-  } as React.CSSProperties;
+  const style = {} as React.CSSProperties;
 
   return (
     <div className={styles.page} style={style}>

@@ -11,8 +11,6 @@ interface Branding {
   appName: string; appTagline: string; heroTitle: string; heroSubtitle: string;
   footerText: string; primaryColor: string; accentColor: string;
   showPreloader: boolean; showStrips: boolean; slideshowInterval: number;
-  fontFamily: string; headingFontFamily: string;
-  headingFontSize: number; bodyFontSize: number; textAlign: string;
   sessionTimer: number;
   introCardHtml: string; heroCardHtml: string; footerHtml: string;
 }
@@ -24,8 +22,6 @@ const defaultBranding: Branding = {
   footerText: 'VelvetSnap Photobooth Platform',
   primaryColor: '#262626', accentColor: '#C5D89D',
   showPreloader: true, showStrips: true, slideshowInterval: 3000,
-  fontFamily: '', headingFontFamily: '',
-  headingFontSize: 0, bodyFontSize: 0, textAlign: '',
   sessionTimer: 600,
   introCardHtml: '', heroCardHtml: '', footerHtml: '',
 };
@@ -65,11 +61,6 @@ export default function Home() {
             showPreloader: d.showPreloader ?? defaultBranding.showPreloader,
             showStrips: d.showStrips ?? defaultBranding.showStrips,
             slideshowInterval: d.slideshowInterval || defaultBranding.slideshowInterval,
-            fontFamily: d.fontFamily ?? defaultBranding.fontFamily,
-            headingFontFamily: d.headingFontFamily ?? defaultBranding.headingFontFamily,
-            headingFontSize: d.headingFontSize ?? defaultBranding.headingFontSize,
-            bodyFontSize: d.bodyFontSize ?? defaultBranding.bodyFontSize,
-            textAlign: d.textAlign ?? defaultBranding.textAlign,
             sessionTimer: d.sessionTimer ?? defaultBranding.sessionTimer,
             introCardHtml: d.introCardHtml || defaultBranding.introCardHtml,
             heroCardHtml: d.heroCardHtml || defaultBranding.heroCardHtml,

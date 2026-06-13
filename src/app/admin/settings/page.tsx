@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Type, ToggleLeft, Image, AlignLeft, AlignCenter, AlignRight, Check, RotateCcw, Timer } from 'lucide-react';
+import { Save, Loader2, Type, ToggleLeft, Image, RotateCcw, Timer } from 'lucide-react';
 
 interface SettingsData {
   appName: string;
@@ -17,11 +17,6 @@ interface SettingsData {
   showPreloader: boolean;
   showStrips: boolean;
   slideshowInterval: number;
-  fontFamily: string;
-  headingFontFamily: string;
-  headingFontSize: number;
-  bodyFontSize: number;
-  textAlign: string;
   sessionTimer: number;
 }
 
@@ -39,11 +34,6 @@ const defaults: SettingsData = {
   showPreloader: true,
   showStrips: true,
   slideshowInterval: 3000,
-  fontFamily: '',
-  headingFontFamily: '',
-  headingFontSize: 0,
-  bodyFontSize: 0,
-  textAlign: '',
   sessionTimer: 600,
 };
 
@@ -70,14 +60,9 @@ export default function SettingsPage() {
             showPreloader: d.showPreloader ?? defaults.showPreloader,
             showStrips: d.showStrips ?? defaults.showStrips,
             slideshowInterval: d.slideshowInterval || defaults.slideshowInterval,
-            fontFamily: d.fontFamily ?? defaults.fontFamily,
-            headingFontFamily: d.headingFontFamily ?? defaults.headingFontFamily,
-            headingFontSize: d.headingFontSize ?? defaults.headingFontSize,
-            bodyFontSize: d.bodyFontSize ?? defaults.bodyFontSize,
             introCardHtml: d.introCardHtml ?? defaults.introCardHtml,
             heroCardHtml: d.heroCardHtml ?? defaults.heroCardHtml,
             footerHtml: d.footerHtml ?? defaults.footerHtml,
-            textAlign: d.textAlign ?? defaults.textAlign,
             sessionTimer: d.sessionTimer ?? defaults.sessionTimer,
           });
         }
@@ -309,67 +294,6 @@ export default function SettingsPage() {
                 placeholder='<footer class="text-center"><p>VelvetSnap 2025</p></footer>'
                 onFocus={(e) => e.target.style.borderColor='#111827'}
                 onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Typography */}
-      <div style={card}>
-        <div style={cardHeader}><Type size={18} /> Typography</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-            <div style={row}>
-              <div>
-                <label style={labelStyle}>Body Font Family</label>
-                <input style={inputStyle} value={form.fontFamily} onChange={(e) => update('fontFamily', e.target.value)} placeholder="e.g. Inter, sans-serif"
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
-              </div>
-              <div>
-                <label style={labelStyle}>Heading Font Family</label>
-                <input style={inputStyle} value={form.headingFontFamily} onChange={(e) => update('headingFontFamily', e.target.value)} placeholder="e.g. Playfair Display, serif"
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
-              </div>
-            </div>
-            <div style={row}>
-              <div>
-                <label style={labelStyle}>Heading Font Size (px)</label>
-                <input type="number" style={inputStyle} value={form.headingFontSize || ''} onChange={(e) => update('headingFontSize', Number(e.target.value))} min={0} placeholder="0 = use default"
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
-              </div>
-              <div>
-                <label style={labelStyle}>Body Font Size (px)</label>
-                <input type="number" style={inputStyle} value={form.bodyFontSize || ''} onChange={(e) => update('bodyFontSize', Number(e.target.value))} min={0} placeholder="0 = use default"
-                  onFocus={(e) => e.target.style.borderColor='#111827'}
-                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
-              </div>
-            </div>
-            <div>
-              <label style={labelStyle}>Text Alignment</label>
-              <div style={{ display:'flex', gap:8 }}>
-                {(['left', 'center', 'right'] as const).map((align) => {
-                  const Icon = align === 'left' ? AlignLeft : align === 'center' ? AlignCenter : AlignRight;
-                  const active = form.textAlign === align;
-                  return (
-                    <button key={align} onClick={() => update('textAlign', active ? '' : align)}
-                      style={{
-                        display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-                        padding:'10px 18px', borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:500,
-                        border: active ? '2px solid #111827' : '1.5px solid #d1d5db',
-                        background: active ? '#f3f4f6' : '#fff',
-                        color: active ? '#111827' : '#6b7280',
-                        transition:'all 0.15s', minWidth:90,
-                      }}>
-                      {active && <Check size={14} />}
-                      <Icon size={16} />
-                      {align.charAt(0).toUpperCase() + align.slice(1)}
-                    </button>
-                  );
-                })}
-              </div>
             </div>
           </div>
         </div>
