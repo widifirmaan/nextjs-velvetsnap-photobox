@@ -25,14 +25,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setNavigating(false);
   }, [pathname]);
 
-  if (!authed) return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100dvh', background:'var(--clay-bg)' }}>
-      <Loader2 className="spin" size={32} />
-    </div>
-  );
-
-  if (pathname === '/admin/login') return <>{children}</>;
-
   const handleNavClick = useCallback(() => {
     setNavigating(true);
   }, []);
@@ -85,6 +77,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </Link>
     );
   };
+
+  if (!authed) return (
+    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100dvh', background:'var(--clay-bg)' }}>
+      <Loader2 className="spin" size={32} />
+    </div>
+  );
+
+  if (pathname === '/admin/login') return <>{children}</>;
 
   return (
     <div className={styles.adminLayout}>
