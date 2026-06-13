@@ -79,11 +79,11 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     setTemplateId(id);
     setStripLoading(true);
     setStep(2);
+    const cw = data?.templateData?.canvasWidth || 1000;
+    const ch = data?.templateData?.canvasHeight || 3000;
+    setFrameRatio(cw / ch);
     if (keyedUrl) {
       setKeyedFrameImage(keyedUrl);
-      const img = new window.Image();
-      img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-      img.src = keyedUrl;
       setStripLoading(false);
       return;
     }
@@ -93,9 +93,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       const fullUrl = data.templateFull || '';
       if (fullUrl) {
         setKeyedFrameImage(fullUrl);
-        const img = new window.Image();
-        img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-        img.src = fullUrl;
         setStripLoading(false);
         return;
       }
