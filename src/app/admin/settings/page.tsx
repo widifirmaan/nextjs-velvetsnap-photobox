@@ -5,7 +5,6 @@ import { Save, Loader2, Image, Timer } from 'lucide-react';
 
 interface SettingsData {
   footerText: string;
-  footerHtml: string;
   primaryColor: string;
   accentColor: string;
   showPreloader: boolean;
@@ -16,7 +15,6 @@ interface SettingsData {
 
 const defaults: SettingsData = {
   footerText: 'VelvetSnap Photobooth Platform',
-  footerHtml: '<footer class="text-center py-3">\n  <nav class="d-flex justify-content-center gap-3 mb-2">\n    <a href="https://instagram.com" target="_blank" class="text-decoration-none">Instagram</a>\n    <a href="https://wa.me/628123456789" target="_blank" class="text-decoration-none">WhatsApp</a>\n    <a href="/templates" class="text-decoration-none">Templates</a>\n    <a href="/strips-studio" class="text-decoration-none">Studio</a>\n  </nav>\n  <p class="mb-0">VelvetSnap Photobooth Platform</p>\n</footer>',
   primaryColor: '#262626',
   accentColor: '#C5D89D',
   showPreloader: true,
@@ -44,7 +42,6 @@ export default function SettingsPage() {
             showPreloader: d.showPreloader ?? defaults.showPreloader,
             showStrips: d.showStrips ?? defaults.showStrips,
             slideshowInterval: d.slideshowInterval || defaults.slideshowInterval,
-            footerHtml: d.footerHtml ?? defaults.footerHtml,
             sessionTimer: d.sessionTimer ?? defaults.sessionTimer,
           });
         }
@@ -140,21 +137,11 @@ export default function SettingsPage() {
       <div style={card}>
         <div style={cardHeader}><Image size={18} /> Footer</div>
         <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div>
-              <label style={labelStyle}>Custom HTML <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(ganti seluruh konten footer)</span></label>
-              <textarea style={{ ...inputStyle, minHeight:200, resize:'vertical', fontFamily:'monospace', fontSize:13, lineHeight:1.6 }}
-                value={form.footerHtml}
-                onChange={(e) => update('footerHtml', e.target.value)}
-                placeholder={'<footer class="text-center py-3">\n  <nav class="d-flex justify-content-center gap-3 mb-2">\n    <a href="https://instagram.com" target="_blank">Instagram</a>\n    <a href="https://wa.me/628123456789" target="_blank">WhatsApp</a>\n    <a href="/templates">Templates</a>\n    <a href="/strips-studio">Studio</a>\n  </nav>\n  <p class="mb-0">VelvetSnap Photobooth Platform</p>\n</footer>'}
-                {...focusProps} />
-            </div>
-            <div>
-              <label style={labelStyle}>Fallback Text <span style={{ fontSize:11, fontWeight:400, color:'#9ca3af' }}>(dipakai jika HTML kosong)</span></label>
-              <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)}
-                placeholder="VelvetSnap Photobooth Platform"
-                {...focusProps} />
-            </div>
+          <div>
+            <label style={labelStyle}>Footer Text</label>
+            <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)}
+              placeholder="VelvetSnap Photobooth Platform"
+              {...focusProps} />
           </div>
         </div>
       </div>
