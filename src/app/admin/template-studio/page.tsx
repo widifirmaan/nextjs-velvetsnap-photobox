@@ -244,12 +244,12 @@ export default function StripsStudioPage() {
       } catch {}
     }
 
-    fetch('/api/templates/list')
+    fetch(`/api/templates/thumbnails?id=${editId}`)
       .then((r) => r.json())
       .then((res) => {
-        const list = res.success ? res.data : [];
-        const matched = list.find((t: any) => t._id === editId || t.templateId === editId);
-        if (matched) { applyData(matched); }
+        if (res.success && res.data?.length) {
+          applyData(res.data[0]);
+        }
         setTemplateIdField(makeId());
         setPageLoading(false);
       })

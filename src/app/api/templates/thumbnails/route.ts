@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Template from '@/models/Template';
+import mongoose from 'mongoose';
 import { normalizeTemplate } from '@/lib/normalize-template';
 
 export async function GET(req: Request) {
@@ -10,7 +11,10 @@ export async function GET(req: Request) {
     const id = searchParams.get('id');
 
     if (id) {
-      const template = await Template.findOne({ templateId: id })
+      const query = mongoose.Types.ObjectId.isValid(id)
+        ? { $or: [{ _id: id }, { templateId: id }] }
+        : { templateId: id };
+      const template = await Template.findOne(query)
         .select('templateId templateName templateDesc templatePrice templateFull templateThumb templateData isActive')
         .lean();
       if (!template) {
