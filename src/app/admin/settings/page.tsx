@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Save, Loader2, Image, Timer } from 'lucide-react';
 
 interface SettingsData {
@@ -24,16 +25,28 @@ const defaults: SettingsData = {
 };
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [form, setForm] = useState<SettingsData>(defaults);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [authErr, setAuthErr] = useState(false);
+
+  const handleAuthFail = () => {
+    setAuthErr(true);
+    localStorage.removeItem('velvetsnap_admin');
+    document.cookie = 'admin_token=;path=/;max-age=0';
+    setTimeout(() => router.push('/admin/login'), 1500);
+  };
 
   useEffect(() => {
     fetch('/api/settings')
-      .then((r) => r.json())
+      .then((r) => {
+        if (r.status === 401) { handleAuthFail(); return null; }
+        return r.json();
+      })
       .then((res) => {
-        if (res.success && res.data) {
+        if (res && res.success && res.data) {
           const d = res.data;
           setForm({
             footerText: d.footerText || defaults.footerText,
@@ -63,11 +76,23 @@ export default function SettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
+      if (res.status === 401) { handleAuthFail(); setSaving(false); return; }
       const json = await res.json();
       if (json.success) setSaved(true);
     } catch {}
     setSaving(false);
   };
+
+  if (authErr) {
+    return (
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flex:1, minHeight:200 }}>
+        <div style={{ textAlign:'center' }}>
+          <p style={{ color:'#ef4444', fontSize:15, fontWeight:600 }}>Session expired</p>
+          <p style={{ color:'#6b7280', fontSize:13, marginTop:4 }}>Redirecting to login...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
