@@ -18,7 +18,8 @@ export async function requireAdmin(req: Request): Promise<NextResponse | null> {
   try {
     await connectDB();
     const settings = await Settings.findOne({}).lean();
-    if (!settings || !settings.adminSession || settings.adminSession !== token) {
+    const storedToken = settings?.security?.session || settings?.adminSession;
+    if (!storedToken || storedToken !== token) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
     return null;

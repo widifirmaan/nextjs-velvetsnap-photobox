@@ -11,7 +11,8 @@ export async function GET(req: Request) {
     }
     await connectDB();
     const settings = await Settings.findOne({}).lean();
-    if (!settings || !settings.adminSession || settings.adminSession !== token) {
+    const storedToken = settings?.security?.session || settings?.adminSession;
+    if (!storedToken || storedToken !== token) {
       return NextResponse.json({ success: false, error: 'Invalid session' }, { status: 401 });
     }
     return NextResponse.json({ success: true });

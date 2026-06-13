@@ -13,24 +13,28 @@ export async function POST(req: Request) {
       settings = await Settings.create({});
     }
 
-    if (!settings.adminPassword) {
+    // migrate old top-level fields to security nested object
+    if (settings.adminPassword && !settings.security?.password) {
+      settings.security = { password: settings.adminPassword, passwordSalt: settings.adminPasswordSalt, session: settings.adminSession || '', sessionExpires: null };
+    } else if (!settings.security?.password) {
       const { hash, salt } = hashPassword('root');
-      settings.adminPassword = hash;
-      settings.adminPasswordSalt = salt;
-      await settings.save();
+      settings.security = { ...settings.security, password: hash, passwordSalt: salt };
     }
+    await settings.save();
 
     const { password } = await req.json();
     if (!password) {
       return NextResponse.json({ success: false, error: 'Password required' }, { status: 400 });
     }
 
-    if (!verifyPassword(password, settings.adminPassword, settings.adminPasswordSalt)) {
+    const pwHash = settings.security?.password;
+    const pwSalt = settings.security?.passwordSalt;
+    if (!verifyPassword(password, pwHash, pwSalt)) {
       return NextResponse.json({ success: false, error: 'Invalid password' }, { status: 401 });
     }
 
     const token = generateSessionToken();
-    settings.adminSession = token;
+    settings.security = { ...settings.security, session: token };
     await settings.save();
 
     const res = NextResponse.json({ success: true, token });
@@ -51,9 +55,12 @@ export async function DELETE(req: Request) {
     const token = getAdminToken(req);
     await connectDB();
     const settings = await Settings.findOne({});
-    if (settings && token && settings.adminSession === token) {
-      settings.adminSession = '';
-      await settings.save();
+    if (settings && token) {
+      const existingToken = settings.security?.session || settings.adminSession;
+      if (existingToken === token) {
+        settings.security = { ...settings.security, session: '' };
+        await settings.save();
+      }
     }
     const res = NextResponse.json({ success: true });
     res.cookies.set('admin_session', '', {
