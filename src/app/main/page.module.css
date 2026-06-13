@@ -958,17 +958,20 @@
 
 .stepPageTemplates {
   align-items: center;
+  min-height: 0;
 }
 
 .templateGrid {
   display: grid;
-  grid-template-rows: repeat(2, auto);
+  grid-template-rows: 1fr 1fr;
   grid-auto-columns: 140px;
   grid-auto-flow: column;
   gap: 12px;
   overflow-x: auto;
   overflow-y: hidden;
   width: 100%;
+  flex: 1;
+  min-height: 0;
   padding: 8px 0 16px;
   scrollbar-width: thin;
 }
@@ -992,6 +995,8 @@
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
+  height: 100%;
+  min-height: 0;
 }
 
 .templateCard:active {
@@ -1000,7 +1005,8 @@
 
 .templateCardThumb {
   width: 100%;
-  aspect-ratio: 9 / 16;
+  flex: 1;
+  min-height: 0;
   background: #f8f8f8;
   display: flex;
   align-items: center;
