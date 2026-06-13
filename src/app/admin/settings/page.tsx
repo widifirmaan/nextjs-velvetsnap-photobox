@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Palette, Type, ToggleLeft, Image, Settings2 } from 'lucide-react';
+import { Save, Loader2, Palette, Type, ToggleLeft, Image, AlignLeft, AlignCenter, AlignRight, Check, RotateCcw, Timer } from 'lucide-react';
 import { AdminPageHeader, AdminSectionTitle } from '@/app/admin/components';
 
 interface SettingsData {
@@ -15,6 +15,12 @@ interface SettingsData {
   showPreloader: boolean;
   showStrips: boolean;
   slideshowInterval: number;
+  fontFamily: string;
+  headingFontFamily: string;
+  headingFontSize: number;
+  bodyFontSize: number;
+  textAlign: string;
+  sessionTimer: number;
 }
 
 const defaults: SettingsData = {
@@ -28,6 +34,12 @@ const defaults: SettingsData = {
   showPreloader: true,
   showStrips: true,
   slideshowInterval: 3000,
+  fontFamily: '',
+  headingFontFamily: '',
+  headingFontSize: 0,
+  bodyFontSize: 0,
+  textAlign: '',
+  sessionTimer: 600,
 };
 
 export default function SettingsPage() {
@@ -53,6 +65,12 @@ export default function SettingsPage() {
             showPreloader: d.showPreloader ?? defaults.showPreloader,
             showStrips: d.showStrips ?? defaults.showStrips,
             slideshowInterval: d.slideshowInterval || defaults.slideshowInterval,
+            fontFamily: d.fontFamily ?? defaults.fontFamily,
+            headingFontFamily: d.headingFontFamily ?? defaults.headingFontFamily,
+            headingFontSize: d.headingFontSize ?? defaults.headingFontSize,
+            bodyFontSize: d.bodyFontSize ?? defaults.bodyFontSize,
+            textAlign: d.textAlign ?? defaults.textAlign,
+            sessionTimer: d.sessionTimer ?? defaults.sessionTimer,
           });
         }
       })
@@ -174,6 +192,12 @@ export default function SettingsPage() {
             <input type="number" value={form.slideshowInterval} onChange={(e) => update('slideshowInterval', Number(e.target.value))}
               style={{ ...inputStyle, width:120 }} min={1000} step={500} />
           </div>
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <Timer size={16} />
+            <label style={{ fontSize:14, whiteSpace:'nowrap' }}>Session Timer (menit)</label>
+            <input type="number" value={Math.round(form.sessionTimer / 60)} onChange={(e) => update('sessionTimer', Math.max(1, Number(e.target.value)) * 60)}
+              style={{ ...inputStyle, width:80 }} min={1} step={1} />
+          </div>
         </div>
       </div>
 
@@ -183,6 +207,64 @@ export default function SettingsPage() {
           <label style={labelStyle}>Footer Text</label>
           <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)} />
         </div>
+      </div>
+
+      <div className="glass-panel" style={{ padding:28 }}>
+        <AdminSectionTitle icon={Type} title="Typography" />
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginTop:16 }}>
+          <div>
+            <label style={labelStyle}>Body Font Family</label>
+            <input style={inputStyle} value={form.fontFamily} onChange={(e) => update('fontFamily', e.target.value)} placeholder="e.g. Inter, sans-serif" />
+          </div>
+          <div>
+            <label style={labelStyle}>Heading Font Family</label>
+            <input style={inputStyle} value={form.headingFontFamily} onChange={(e) => update('headingFontFamily', e.target.value)} placeholder="e.g. Playfair Display, serif" />
+          </div>
+          <div>
+            <label style={labelStyle}>Heading Font Size (px)</label>
+            <input type="number" style={inputStyle} value={form.headingFontSize || ''} onChange={(e) => update('headingFontSize', Number(e.target.value))} min={0} placeholder="0 = use default" />
+          </div>
+          <div>
+            <label style={labelStyle}>Body Font Size (px)</label>
+            <input type="number" style={inputStyle} value={form.bodyFontSize || ''} onChange={(e) => update('bodyFontSize', Number(e.target.value))} min={0} placeholder="0 = use default" />
+          </div>
+        </div>
+        <div style={{ marginTop:16 }}>
+          <label style={labelStyle}>Text Alignment</label>
+          <div style={{ display:'flex', gap:8 }}>
+            {(['left', 'center', 'right'] as const).map((align) => {
+              const Icon = align === 'left' ? AlignLeft : align === 'center' ? AlignCenter : AlignRight;
+              const active = form.textAlign === align;
+              return (
+                <button key={align} onClick={() => update('textAlign', active ? '' : align)}
+                  style={{
+                    display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+                    padding:'10px 18px', borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:500,
+                    border: active ? '2px solid var(--accent-color)' : '1.5px solid var(--mn-border)',
+                    background: active ? 'color-mix(in srgb, var(--accent-color) 15%, transparent)' : 'var(--clay-bg)',
+                    color: active ? 'var(--accent-color)' : 'var(--text-primary)',
+                    transition:'all 0.15s', minWidth:90,
+                  }}>
+                  {active && <Check size={14} />}
+                  <Icon size={16} />
+                  {align.charAt(0).toUpperCase() + align.slice(1)}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display:'flex', justifyContent:'center', marginTop:8 }}>
+        <button onClick={() => { setForm({ ...defaults }); setSaved(false); }}
+          style={{
+            display:'inline-flex', alignItems:'center', gap:8,
+            padding:'10px 24px', borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:500,
+            border:'1.5px solid #e74c3c', background:'transparent', color:'#e74c3c',
+            transition:'all 0.15s',
+          }}>
+          <RotateCcw size={16} /> Reset ke Default
+        </button>
       </div>
     </div>
   );

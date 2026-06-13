@@ -170,6 +170,17 @@
   overflow: hidden;
   padding: 20px 24px 16px;
   gap: 12px;
+  font-family: var(--brand-font-family, inherit);
+  text-align: var(--brand-text-align, inherit);
+}
+.page :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--brand-heading-font-family, inherit);
+}
+.page :where(h1, h2, h3, h4, h5, h6) {
+  font-size: var(--brand-heading-font-size, inherit);
+}
+.page {
+  font-size: var(--brand-body-font-size, inherit);
 }
 
 /* ── Header / Navigation ── */

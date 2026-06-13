@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { Timer } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
 import { getHighResUrl } from '@/lib/cloudinary-url';
@@ -10,8 +11,8 @@ import EditorStep from './editor/EditorStep';
 import PaymentStep from './payment/component/PaymentStep';
 import ResultStep from './result/component/ResultStep';
 
-export default function StepperFlow({ step, setStep, onRefresh }: {
-  step: number; setStep: (s: number) => void; onRefresh?: () => void;
+export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: {
+  step: number; setStep: (s: number) => void; onRefresh?: () => void; sessionTimer: number;
 }) {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
@@ -27,6 +28,38 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
   const [paid, setPaid] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [txId, setTxId] = useState<string | null>(null);
+  const [timeLeft, setTimeLeft] = useState(sessionTimer);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, '0')}`;
+  };
+
+  const startOver = useCallback(() => { onRefresh?.(); setStep(0); setCaptures([]); setTemplateId(null); setTemplateData(null); setCompositedImage(null); setPaid(false); setErrMsg(null); setKeyedFrameImage(''); setStripLoading(false); }, [onRefresh, setStep]);
+
+  useEffect(() => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    if (step === 0 || sessionTimer <= 0) {
+      setTimeLeft(sessionTimer);
+      return;
+    }
+    setTimeLeft(sessionTimer);
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+          startOver();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => {
+      if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    };
+  }, [step, sessionTimer, startOver]);
 
   const handleSelectTemplate = useCallback((id: string) => {
     setTemplateId(id);
@@ -153,12 +186,25 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
   const slotsCount = templateData?.templateData?.slots || TEMPLATE_CONFIGS[templateId || '']?.slots || 3;
   const filledCount = useMemo(() => captures.filter((c) => c !== '').length, [captures]);
 
-  const startOver = () => { onRefresh?.(); setStep(0); setCaptures([]); setTemplateId(null); setTemplateData(null); setCompositedImage(null); setPaid(false); setErrMsg(null); setKeyedFrameImage(''); setStripLoading(false); };
+  const timerBadge = (step >= 1 && step <= 5 && sessionTimer > 0 && timeLeft > 0) ? (
+    <div style={{
+      position:'fixed', top:12, right:16, zIndex:100,
+      display:'flex', alignItems:'center', gap:6,
+      padding:'6px 14px', borderRadius:8,
+      background:'rgba(0,0,0,0.6)', color:'#fff',
+      fontSize:13, fontWeight:600, fontFamily:'monospace',
+      letterSpacing:0.5, backdropFilter:'blur(4px)',
+    }}>
+      <Timer size={14} />
+      {formatTime(timeLeft)}
+    </div>
+  ) : null;
 
-  if (step === 1) return <div className={styles.stepTransition}><TemplateStep onSelect={handleSelectTemplate} onBack={() => setStep(0)} /></div>;
+  let content: React.ReactNode = null;
 
-  if (step === 2) return (
-    <div className={styles.stepTransition}>
+  if (step === 1) content = <TemplateStep onSelect={handleSelectTemplate} onBack={() => setStep(0)} />;
+
+  if (step === 2) content = (
     <BoothStep
       templateId={templateId || 't1'}
       templateName={templateData?.templateName || TEMPLATE_CONFIGS[templateId || '']?.name || ''}
@@ -174,11 +220,9 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       onNext={() => setStep(3)}
       onBack={() => { setStep(1); setCaptures([]); setKeyedFrameImage(''); setStripLoading(false); }}
     />
-    </div>
   );
 
-  if (step === 3) return (
-    <div className={styles.stepTransition}>
+  if (step === 3) content = (
     <EditorStep
       captures={captures}
       templateData={templateData}
@@ -193,11 +237,9 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       onNext={() => setStep(4)}
       onBack={() => setStep(2)}
     />
-    </div>
   );
 
-  if (step === 4) return (
-    <div className={styles.stepTransition}>
+  if (step === 4) content = (
     <PaymentStep
       price={price}
       paid={paid}
@@ -210,17 +252,21 @@ export default function StepperFlow({ step, setStep, onRefresh }: {
       onSuccess={(id) => { setTxId(id); setStep(5); }}
       onBack={() => setStep(3)}
     />
-    </div>
   );
 
-  if (step === 5) return (
-    <div className={styles.stepTransition}>
-      <ResultStep
-        compositedImage={compositedImage}
-        onHome={startOver}
-      />
-    </div>
+  if (step === 5) content = (
+    <ResultStep
+      compositedImage={compositedImage}
+      onHome={startOver}
+    />
   );
 
-  return null;
+  if (!content) return null;
+
+  return (
+    <>
+      {timerBadge}
+      <div className={styles.stepTransition}>{content}</div>
+    </>
+  );
 }
