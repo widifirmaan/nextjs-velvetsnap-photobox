@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Save, Loader2, Palette, Type, ToggleLeft, Image, AlignLeft, AlignCenter, AlignRight, Check, RotateCcw, Timer } from 'lucide-react';
-import { AdminPageHeader, AdminSectionTitle } from '@/app/admin/components';
+import { Save, Loader2, Type, ToggleLeft, Image, AlignLeft, AlignCenter, AlignRight, Check, RotateCcw, Timer } from 'lucide-react';
 
 interface SettingsData {
   appName: string;
@@ -105,175 +104,248 @@ export default function SettingsPage() {
     );
   }
 
+  const card: React.CSSProperties = {
+    background:'#fff', borderRadius:16, border:'1px solid #e5e7eb',
+    boxShadow:'0 1px 3px rgba(0,0,0,0.06)', overflow:'hidden',
+  };
+
+  const cardHeader: React.CSSProperties = {
+    padding:'16px 20px', borderBottom:'1px solid #e5e7eb',
+    display:'flex', alignItems:'center', gap:10,
+    fontSize:15, fontWeight:700, color:'#111',
+  };
+
+  const cardBody: React.CSSProperties = {
+    padding:'20px',
+  };
+
   const inputStyle: React.CSSProperties = {
     width:'100%', padding:'10px 14px',
-    border:'1.5px solid var(--mn-border)', borderRadius:12,
-    fontSize:14, background:'var(--clay-bg)', outline:'none',
+    border:'1.5px solid #d1d5db', borderRadius:10,
+    fontSize:14, background:'#f9fafb', outline:'none',
     boxSizing:'border-box', fontFamily:'inherit',
+    transition:'border-color 0.15s',
   };
 
   const labelStyle: React.CSSProperties = {
-    fontSize:13, fontWeight:600, marginBottom:6, display:'block', color:'var(--text-primary)',
+    fontSize:13, fontWeight:600, marginBottom:6, display:'block', color:'#374151',
+  };
+
+  const row: React.CSSProperties = {
+    display:'grid', gridTemplateColumns:'1fr 1fr', gap:20,
+  };
+
+  const fullRow: React.CSSProperties = {
+    gridColumn:'1 / -1',
   };
 
   return (
-    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:24, paddingBottom:40, overflowY:'auto', minHeight:0 }}>
-      <AdminPageHeader
-        title="Settings"
-        subtitle="Customize branding and homepage appearance"
-        action={
-          <button onClick={handleSave} disabled={saving || saved}
-            style={{
-              display:'inline-flex', alignItems:'center', gap:8,
-              padding:'10px 24px', borderRadius:10, cursor:saving || saved ? 'default' : 'pointer',
-              fontSize:14, fontWeight:600, border:'none',
-              background:saved ? 'var(--accent-color)' : 'var(--text-primary)',
-              color:saved ? '#fff' : 'var(--mn-card)',
-              opacity:saving ? 0.6 : 1, transition:'all 0.15s',
-            }}>
-            {saved ? null : <Save size={16} />}
-            {saved ? 'Tersimpan' : 'Simpan'}
-          </button>
-        }
-      />
-
-      <div className="glass-panel" style={{ padding:28 }}>
-        <AdminSectionTitle icon={Type} title="Branding" />
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginTop:16 }}>
-          <div>
-            <label style={labelStyle}>App Name</label>
-            <input style={inputStyle} value={form.appName} onChange={(e) => update('appName', e.target.value)} />
-          </div>
-          <div>
-            <label style={labelStyle}>Tagline</label>
-            <input style={inputStyle} value={form.appTagline} onChange={(e) => update('appTagline', e.target.value)} />
-          </div>
+    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:20, padding:'0 0 60px', overflowY:'auto', minHeight:0 }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 4px 0' }}>
+        <div>
+          <h1 style={{ fontSize:24, fontWeight:700, margin:0, color:'#111' }}>Settings</h1>
+          <p style={{ fontSize:14, color:'#6b7280', margin:'4px 0 0' }}>Customize branding and homepage appearance</p>
         </div>
+        <button onClick={handleSave} disabled={saving || saved}
+          style={{
+            display:'inline-flex', alignItems:'center', gap:8,
+            padding:'10px 24px', borderRadius:10, border:'none',
+            fontSize:14, fontWeight:600, cursor:saving || saved ? 'default' : 'pointer',
+            background:saved ? '#10b981' : '#111827', color:'#fff',
+            opacity:saving ? 0.6 : 1, transition:'all 0.15s',
+          }}>
+          {saving ? <Loader2 className="spin" size={16} /> : saved ? null : <Save size={16} />}
+          {saving ? 'Menyimpan...' : saved ? 'Tersimpan' : 'Simpan'}
+        </button>
       </div>
 
-      <div className="glass-panel" style={{ padding:28 }}>
-        <AdminSectionTitle icon={Palette} title="Homepage Hero" />
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginTop:16 }}>
-          <div style={{ gridColumn:'1 / -1' }}>
-            <label style={labelStyle}>Hero Title</label>
-            <input style={inputStyle} value={form.heroTitle} onChange={(e) => update('heroTitle', e.target.value)} />
-          </div>
-          <div style={{ gridColumn:'1 / -1' }}>
-            <label style={labelStyle}>Hero Subtitle</label>
-            <textarea style={{ ...inputStyle, minHeight:72, resize:'vertical' }} value={form.heroSubtitle} onChange={(e) => update('heroSubtitle', e.target.value)} />
-          </div>
-        </div>
-      </div>
-
-      <div className="glass-panel" style={{ padding:28 }}>
-        <AdminSectionTitle icon={Palette} title="Colors" />
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginTop:16 }}>
-          <div>
-            <label style={labelStyle}>Primary Color</label>
-            <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-              <input type="color" value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
-                style={{ width:44, height:44, border:'1.5px solid var(--mn-border)', borderRadius:12, padding:3, cursor:'pointer', background:'none' }} />
-              <input style={inputStyle} value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)} />
+      {/* Branding */}
+      <div style={card}>
+        <div style={cardHeader}><Type size={18} /> Branding</div>
+        <div style={cardBody}>
+          <div style={row}>
+            <div>
+              <label style={labelStyle}>App Name</label>
+              <input style={inputStyle} value={form.appName} onChange={(e) => update('appName', e.target.value)}
+                onFocus={(e) => e.target.style.borderColor='#111827'}
+                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
             </div>
-          </div>
-          <div>
-            <label style={labelStyle}>Accent Color</label>
-            <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-              <input type="color" value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
-                style={{ width:44, height:44, border:'1.5px solid var(--mn-border)', borderRadius:12, padding:3, cursor:'pointer', background:'none' }} />
-              <input style={inputStyle} value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)} />
+            <div>
+              <label style={labelStyle}>Tagline</label>
+              <input style={inputStyle} value={form.appTagline} onChange={(e) => update('appTagline', e.target.value)}
+                onFocus={(e) => e.target.style.borderColor='#111827'}
+                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding:28 }}>
-        <AdminSectionTitle icon={ToggleLeft} title="Toggles" />
-        <div style={{ display:'flex', gap:32, marginTop:16, flexWrap:'wrap' }}>
-          <label style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', fontSize:14 }}>
-            <input type="checkbox" checked={form.showPreloader} onChange={(e) => update('showPreloader', e.target.checked)}
-              style={{ width:18, height:18, accentColor:'var(--accent-color)' }} />
-            Show Preloader Animation
-          </label>
-          <label style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', fontSize:14 }}>
-            <input type="checkbox" checked={form.showStrips} onChange={(e) => update('showStrips', e.target.checked)}
-              style={{ width:18, height:18, accentColor:'var(--accent-color)' }} />
-            Show Recent Strips Carousel
-          </label>
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <label style={{ fontSize:14, whiteSpace:'nowrap' }}>Slideshow Interval (ms)</label>
-            <input type="number" value={form.slideshowInterval} onChange={(e) => update('slideshowInterval', Number(e.target.value))}
-              style={{ ...inputStyle, width:120 }} min={1000} step={500} />
-          </div>
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <Timer size={16} />
-            <label style={{ fontSize:14, whiteSpace:'nowrap' }}>Session Timer (menit)</label>
-            <input type="number" value={Math.round(form.sessionTimer / 60)} onChange={(e) => update('sessionTimer', Math.max(1, Number(e.target.value)) * 60)}
-              style={{ ...inputStyle, width:80 }} min={1} step={1} />
+      {/* Homepage Hero */}
+      <div style={card}>
+        <div style={cardHeader}><Palette size={18} /> Homepage Hero</div>
+        <div style={cardBody}>
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            <div>
+              <label style={labelStyle}>Hero Title</label>
+              <input style={inputStyle} value={form.heroTitle} onChange={(e) => update('heroTitle', e.target.value)}
+                onFocus={(e) => e.target.style.borderColor='#111827'}
+                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+            </div>
+            <div>
+              <label style={labelStyle}>Hero Subtitle</label>
+              <textarea style={{ ...inputStyle, minHeight:72, resize:'vertical' }} value={form.heroSubtitle} onChange={(e) => update('heroSubtitle', e.target.value)}
+                onFocus={(e) => e.target.style.borderColor='#111827'}
+                onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding:28 }}>
-        <AdminSectionTitle icon={Image} title="Footer" />
-        <div style={{ marginTop:16 }}>
+      {/* Colors */}
+      <div style={card}>
+        <div style={cardHeader}><div style={{ width:18, height:18, borderRadius:4, background:'linear-gradient(135deg,#667eea,#764ba2)' }} /> Colors</div>
+        <div style={cardBody}>
+          <div style={row}>
+            <div>
+              <label style={labelStyle}>Primary Color</label>
+              <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+                <input type="color" value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
+                  style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
+                <input style={inputStyle} value={form.primaryColor} onChange={(e) => update('primaryColor', e.target.value)}
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Accent Color</label>
+              <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+                <input type="color" value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
+                  style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
+                <input style={inputStyle} value={form.accentColor} onChange={(e) => update('accentColor', e.target.value)}
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Toggles */}
+      <div style={card}>
+        <div style={cardHeader}><ToggleLeft size={18} /> Toggles</div>
+        <div style={cardBody}>
+          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+              <input type="checkbox" checked={form.showPreloader} onChange={(e) => update('showPreloader', e.target.checked)}
+                style={{ width:18, height:18, accentColor:'#111827' }} />
+              <span style={{ fontSize:14, color:'#374151' }}>Show Preloader Animation</span>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+              <input type="checkbox" checked={form.showStrips} onChange={(e) => update('showStrips', e.target.checked)}
+                style={{ width:18, height:18, accentColor:'#111827' }} />
+              <span style={{ fontSize:14, color:'#374151' }}>Show Recent Strips Carousel</span>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
+              <div>
+                <label style={labelStyle}>Slideshow Interval (ms)</label>
+                <input type="number" value={form.slideshowInterval} onChange={(e) => update('slideshowInterval', Number(e.target.value))}
+                  style={{ ...inputStyle }} min={1000} step={500}
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+              <div>
+                <label style={{ ...labelStyle, display:'flex', alignItems:'center', gap:6 }}>
+                  <Timer size={14} /> Session Timer (menit)
+                </label>
+                <input type="number" value={Math.round(form.sessionTimer / 60)} onChange={(e) => update('sessionTimer', Math.max(1, Number(e.target.value)) * 60)}
+                  style={{ ...inputStyle }} min={1} step={1}
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={card}>
+        <div style={cardHeader}><Image size={18} /> Footer</div>
+        <div style={cardBody}>
           <label style={labelStyle}>Footer Text</label>
-          <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)} />
+          <input style={inputStyle} value={form.footerText} onChange={(e) => update('footerText', e.target.value)}
+            onFocus={(e) => e.target.style.borderColor='#111827'}
+            onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
         </div>
       </div>
 
-      <div className="glass-panel" style={{ padding:28 }}>
-        <AdminSectionTitle icon={Type} title="Typography" />
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginTop:16 }}>
-          <div>
-            <label style={labelStyle}>Body Font Family</label>
-            <input style={inputStyle} value={form.fontFamily} onChange={(e) => update('fontFamily', e.target.value)} placeholder="e.g. Inter, sans-serif" />
-          </div>
-          <div>
-            <label style={labelStyle}>Heading Font Family</label>
-            <input style={inputStyle} value={form.headingFontFamily} onChange={(e) => update('headingFontFamily', e.target.value)} placeholder="e.g. Playfair Display, serif" />
-          </div>
-          <div>
-            <label style={labelStyle}>Heading Font Size (px)</label>
-            <input type="number" style={inputStyle} value={form.headingFontSize || ''} onChange={(e) => update('headingFontSize', Number(e.target.value))} min={0} placeholder="0 = use default" />
-          </div>
-          <div>
-            <label style={labelStyle}>Body Font Size (px)</label>
-            <input type="number" style={inputStyle} value={form.bodyFontSize || ''} onChange={(e) => update('bodyFontSize', Number(e.target.value))} min={0} placeholder="0 = use default" />
-          </div>
-        </div>
-        <div style={{ marginTop:16 }}>
-          <label style={labelStyle}>Text Alignment</label>
-          <div style={{ display:'flex', gap:8 }}>
-            {(['left', 'center', 'right'] as const).map((align) => {
-              const Icon = align === 'left' ? AlignLeft : align === 'center' ? AlignCenter : AlignRight;
-              const active = form.textAlign === align;
-              return (
-                <button key={align} onClick={() => update('textAlign', active ? '' : align)}
-                  style={{
-                    display:'flex', alignItems:'center', justifyContent:'center', gap:6,
-                    padding:'10px 18px', borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:500,
-                    border: active ? '2px solid var(--accent-color)' : '1.5px solid var(--mn-border)',
-                    background: active ? 'color-mix(in srgb, var(--accent-color) 15%, transparent)' : 'var(--clay-bg)',
-                    color: active ? 'var(--accent-color)' : 'var(--text-primary)',
-                    transition:'all 0.15s', minWidth:90,
-                  }}>
-                  {active && <Check size={14} />}
-                  <Icon size={16} />
-                  {align.charAt(0).toUpperCase() + align.slice(1)}
-                </button>
-              );
-            })}
+      {/* Typography */}
+      <div style={card}>
+        <div style={cardHeader}><Type size={18} /> Typography</div>
+        <div style={cardBody}>
+          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+            <div style={row}>
+              <div>
+                <label style={labelStyle}>Body Font Family</label>
+                <input style={inputStyle} value={form.fontFamily} onChange={(e) => update('fontFamily', e.target.value)} placeholder="e.g. Inter, sans-serif"
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+              <div>
+                <label style={labelStyle}>Heading Font Family</label>
+                <input style={inputStyle} value={form.headingFontFamily} onChange={(e) => update('headingFontFamily', e.target.value)} placeholder="e.g. Playfair Display, serif"
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+            </div>
+            <div style={row}>
+              <div>
+                <label style={labelStyle}>Heading Font Size (px)</label>
+                <input type="number" style={inputStyle} value={form.headingFontSize || ''} onChange={(e) => update('headingFontSize', Number(e.target.value))} min={0} placeholder="0 = use default"
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+              <div>
+                <label style={labelStyle}>Body Font Size (px)</label>
+                <input type="number" style={inputStyle} value={form.bodyFontSize || ''} onChange={(e) => update('bodyFontSize', Number(e.target.value))} min={0} placeholder="0 = use default"
+                  onFocus={(e) => e.target.style.borderColor='#111827'}
+                  onBlur={(e) => e.target.style.borderColor='#d1d5db'} />
+              </div>
+            </div>
+            <div>
+              <label style={labelStyle}>Text Alignment</label>
+              <div style={{ display:'flex', gap:8 }}>
+                {(['left', 'center', 'right'] as const).map((align) => {
+                  const Icon = align === 'left' ? AlignLeft : align === 'center' ? AlignCenter : AlignRight;
+                  const active = form.textAlign === align;
+                  return (
+                    <button key={align} onClick={() => update('textAlign', active ? '' : align)}
+                      style={{
+                        display:'flex', alignItems:'center', justifyContent:'center', gap:6,
+                        padding:'10px 18px', borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:500,
+                        border: active ? '2px solid #111827' : '1.5px solid #d1d5db',
+                        background: active ? '#f3f4f6' : '#fff',
+                        color: active ? '#111827' : '#6b7280',
+                        transition:'all 0.15s', minWidth:90,
+                      }}>
+                      {active && <Check size={14} />}
+                      <Icon size={16} />
+                      {align.charAt(0).toUpperCase() + align.slice(1)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style={{ display:'flex', justifyContent:'center', marginTop:8 }}>
+      {/* Reset */}
+      <div style={{ display:'flex', justifyContent:'center', padding:'8px 0 32px' }}>
         <button onClick={() => { setForm({ ...defaults }); setSaved(false); }}
           style={{
             display:'inline-flex', alignItems:'center', gap:8,
             padding:'10px 24px', borderRadius:10, cursor:'pointer', fontSize:14, fontWeight:500,
-            border:'1.5px solid #e74c3c', background:'transparent', color:'#e74c3c',
+            border:'1.5px solid #ef4444', background:'transparent', color:'#ef4444',
             transition:'all 0.15s',
           }}>
           <RotateCcw size={16} /> Reset ke Default
