@@ -1,78 +1,12 @@
-.pageWrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.pageWrapper > * {
-  min-height: 0;
-  flex-shrink: 1;
-}
-
 /* Filters */
 .filters {
-  background: var(--clay-bg);
-  border-radius: var(--clay-radius);
-  box-shadow: var(--clay-shadow);
-  padding: 20px;
   margin-bottom: 20px;
   animation: fadeInUp 0.4s ease backwards;
   animation-delay: 0.1s;
 }
 
-.filterRow {
-  display: flex;
-  gap: 16px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-.filterGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.filterGroup label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.filterGroup input,
-.filterGroup select {
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid var(--mn-border);
-  background: #fff;
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 14px;
-  transition: border-color var(--transition-fast);
-}
-
-.filterGroup input:focus,
-.filterGroup select:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);
-}
-
-.filterActions {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-}
-
 /* Table */
 .tableContainer {
-  background: var(--clay-bg);
-  border-radius: var(--clay-radius);
-  box-shadow: var(--clay-shadow);
   padding: 0;
   overflow: auto;
   min-width: 0;
@@ -81,41 +15,12 @@
   margin-bottom: 24px;
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.table thead th {
-  text-align: left;
-  padding: 10px 12px;
-  font-weight: 600;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-secondary);
-  border-bottom: 1px solid var(--mn-border);
-  white-space: nowrap;
-}
-
-.table tbody tr {
+.tableRow {
   cursor: pointer;
   transition: background var(--transition-fast);
 }
-
-.table tbody tr:hover {
+.tableRow:hover {
   background: color-mix(in srgb, var(--accent-color) 8%, transparent);
-}
-
-.table tbody tr + tr {
-  border-top: 1px solid var(--mn-border);
-}
-
-.table tbody td {
-  padding: 10px 12px;
-  white-space: nowrap;
-  font-size: 12px;
 }
 
 .sessionId {
@@ -154,51 +59,9 @@
   background: var(--clay-bg);
 }
 
-.actionBtns {
-  display: flex;
-  gap: 6px;
-}
 
-.actionBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  border-radius: 6px;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.actionBtn:hover {
-  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
-  color: var(--accent-color);
-}
-
-.actionDanger:hover {
-  background: rgba(137, 144, 109, 0.15);
-  color: var(--accent-color);
-}
 
 /* Pagination */
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
-  flex-shrink: 0;
-}
-
-.pageInfo {
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-/* Loading & empty */
 .loader {
   display: flex;
   flex-direction: column;
@@ -207,12 +70,6 @@
   padding: 80px 20px;
   gap: 16px;
   color: var(--text-secondary);
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Modal body (shared between modals) */
@@ -312,36 +169,20 @@
 }
 
 @media (max-width: 640px) {
-  .filterRow {
-    gap: 10px;
-  }
-  .filterGroup {
-    flex: 1;
-    min-width: 0;
-  }
-  .filterActions {
-    width: auto;
-    flex-shrink: 0;
-  }
-  .filterActions button {
-    flex: 0;
-    padding: 8px 14px;
-    font-size: 12px;
-  }
   .modalGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-  .table tbody td:nth-child(3),
-  .table thead th:nth-child(3),
-  .table tbody td:nth-child(6),
-  .table thead th:nth-child(6) {
+  :global(.admin-table) tbody td:nth-child(3),
+  :global(.admin-table) thead th:nth-child(3),
+  :global(.admin-table) tbody td:nth-child(6),
+  :global(.admin-table) thead th:nth-child(6) {
     display: none;
   }
   .tableContainer {
     overflow: auto;
     margin-bottom: 16px;
   }
-  .table {
+  :global(.admin-table) {
     min-width: 400px;
   }
   .pagination {
@@ -361,11 +202,11 @@
     font-size: 16px;
     padding: 8px 10px;
   }
-  .table thead th {
+  :global(.admin-table) thead th {
     font-size: 10px;
     padding: 8px 6px;
   }
-  .table tbody td {
+  :global(.admin-table) tbody td {
     padding: 8px 6px;
     font-size: 11px;
   }
@@ -397,14 +238,14 @@
   .tableContainer {
     margin-bottom: 12px;
   }
-  .table {
+  :global(.admin-table) {
     min-width: 340px;
   }
-  .table thead th {
+  :global(.admin-table) thead th {
     font-size: 8px;
     padding: 6px 4px;
   }
-  .table tbody td {
+  :global(.admin-table) tbody td {
     padding: 6px 4px;
     font-size: 10px;
   }

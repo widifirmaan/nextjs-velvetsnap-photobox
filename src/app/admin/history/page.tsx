@@ -145,36 +145,36 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className="page-stack">
       <AdminPageHeader
         title="Photo History"
         subtitle="Browse and filter past photobooth sessions"
       />
 
-      <div className={`glass-panel ${styles.filters}`}>
-        <div className={styles.filterRow}>
-          <div className={styles.filterGroup}>
-            <label>Status</label>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+      <div className={`card card-md ${styles.filters}`}>
+        <div className="flex-row">
+          <div className="form-group">
+            <label className="form-label">Status</label>
+            <select className="form-input" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="ALL">All Statuses</option>
               <option value="PAID">Paid</option>
               <option value="PENDING">Pending</option>
               <option value="COMPLETED">Completed</option>
             </select>
           </div>
-          <div className={styles.filterGroup}>
-            <label>From Date</label>
-            <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
+          <div className="form-group">
+            <label className="form-label">From Date</label>
+            <input className="form-input" type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} />
           </div>
-          <div className={styles.filterGroup}>
-            <label>To Date</label>
-            <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
+          <div className="form-group">
+            <label className="form-label">To Date</label>
+            <input className="form-input" type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
           </div>
-          <div className={styles.filterActions}>
-            <button className="mac-button" onClick={handleSearch} style={{ padding: '10px 20px' }}>
+          <div className="flex-row flex-row-sm">
+            <button className="mac-button" onClick={handleSearch}>
               <Search size={16} /> Search
             </button>
-            <button className="mac-button secondary" onClick={handleClear} style={{ padding: '10px 20px' }}>
+            <button className="mac-button secondary" onClick={handleClear}>
               <X size={16} /> Clear
             </button>
           </div>
@@ -190,8 +190,8 @@ export default function HistoryPage() {
         <AdminEmptyState icon={<Camera size={28} />} title="No sessions found" description="Try adjusting your filters or check back later." />
       ) : (
         <>
-          <div className={`glass-panel ${styles.tableContainer}`}>
-            <table className={styles.table}>
+          <div className={`card card-md ${styles.tableContainer}`}>
+            <table className="admin-table">
               <thead>
                 <tr>
                   <th>Preview</th>
@@ -235,14 +235,14 @@ export default function HistoryPage() {
                       })}
                     </td>
                     <td>
-                      <div className={styles.actionBtns}>
-                        <button className={styles.actionBtn} title="Cetak Nota" onClick={(e) => handlePrintNota(tx, e)}>
+                      <div className="flex-row flex-row-sm">
+                        <button className="icon-btn" title="Cetak Nota" onClick={(e) => handlePrintNota(tx, e)}>
                           <Printer size={15} />
                         </button>
-                        <button className={styles.actionBtn} title="Cetak Foto" onClick={(e) => handlePrintFoto(tx, e)}>
+                        <button className="icon-btn" title="Cetak Foto" onClick={(e) => handlePrintFoto(tx, e)}>
                           <ImageIcon size={15} />
                         </button>
-                        <button className={`${styles.actionBtn} ${styles.actionDanger}`} title="Hapus" onClick={(e) => { e.stopPropagation(); setDeleteTarget(tx._id); }}>
+                        <button className="icon-btn icon-btn-danger" title="Hapus" onClick={(e) => { e.stopPropagation(); setDeleteTarget(tx._id); }}>
                           <Trash2 size={15} />
                         </button>
                       </div>
@@ -254,14 +254,14 @@ export default function HistoryPage() {
           </div>
 
           {pagination.totalPages > 1 && (
-            <div className={styles.pagination}>
-              <button className="mac-button secondary" disabled={pagination.page <= 1} onClick={() => fetchData(pagination.page - 1)} style={{ padding: '8px 16px', fontSize: '14px' }}>
+            <div className="flex-row" style={{ justifyContent: 'center', marginTop: 12 }}>
+              <button className="mac-button secondary" disabled={pagination.page <= 1} onClick={() => fetchData(pagination.page - 1)}>
                 ← Previous
               </button>
-              <span className={styles.pageInfo}>
+              <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
                 Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
               </span>
-              <button className="mac-button secondary" disabled={pagination.page >= pagination.totalPages} onClick={() => fetchData(pagination.page + 1)} style={{ padding: '8px 16px', fontSize: '14px' }}>
+              <button className="mac-button secondary" disabled={pagination.page >= pagination.totalPages} onClick={() => fetchData(pagination.page + 1)}>
                 Next →
               </button>
             </div>

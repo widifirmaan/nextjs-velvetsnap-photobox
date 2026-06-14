@@ -80,7 +80,7 @@ export default function FinancePage() {
   const maxTemplate = Math.max(...data.templateRevenue.map((t) => t.total), 1);
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className="page-stack">
       <AdminPageHeader
         title="Finance"
         subtitle="Revenue analytics and financial overview"
@@ -99,7 +99,7 @@ export default function FinancePage() {
       </AdminStatGrid>
 
       {/* Daily Revenue Chart */}
-      <div className={`glass-panel ${styles.chartSection}`}>
+      <div className={`card card-lg ${styles.chartSection}`}>
         <div className={styles.chartHeader}>
           <div>
             <h2 className={styles.chartTitle}>Daily Revenue — Last 7 Days</h2>
@@ -133,7 +133,7 @@ export default function FinancePage() {
 
       {/* Two Column: Template Breakdown + Monthly */}
       <div className={styles.twoCol}>
-        <div className={`glass-panel ${styles.breakdownSection}`}>
+        <div className={`card card-lg ${styles.breakdownSection}`}>
           <h3 className={styles.breakdownTitle}>Revenue by Template</h3>
           {data.templateRevenue.length === 0 ? (
             <p className={styles.emptyBreakdown}>No template data yet.</p>
@@ -158,7 +158,7 @@ export default function FinancePage() {
           )}
         </div>
 
-        <div className={`glass-panel ${styles.breakdownSection}`}>
+        <div className={`card card-lg ${styles.breakdownSection}`}>
           <h3 className={styles.breakdownTitle}>Monthly Revenue</h3>
           {data.monthlyRevenue.length === 0 ? (
             <p className={styles.emptyBreakdown}>No monthly data yet.</p>

@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
   }
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className="page-stack">
       <AdminPageHeader
         title="Dashboard"
         subtitle="VelvetSnap Co. — Admin Dashboard"
@@ -83,7 +83,7 @@ export default async function AdminDashboard() {
       </AdminStatGrid>
 
       {/* Revenue Chart */}
-      <div className={`glass-panel ${styles.chartSection}`}>
+      <div className={`card card-md ${styles.chartSection}`}>
         <div className={styles.chartHeader}>
           <div>
             <h2 className={styles.chartTitle}>Revenue — Last 7 Days</h2>

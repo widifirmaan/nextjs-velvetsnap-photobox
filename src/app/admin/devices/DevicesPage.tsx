@@ -110,14 +110,14 @@ export default function DevicesPage() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className="page-stack">
       <AdminPageHeader
         title="Device Settings"
         subtitle="Semua pengaturan disimpan di browser (localStorage) — setiap perangkat punya pengaturannya sendiri."
       />
 
       <div className={styles.sections}>
-        <div className={`glass-panel ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}><Camera size={20} /></span>
             <h2>Camera Type</h2>
@@ -169,23 +169,23 @@ export default function DevicesPage() {
           )}
         </div>
 
-        <div className={`glass-panel ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}><Camera size={20} /></span>
             <h2>Capture</h2>
           </div>
           <div className={styles.fieldGroup}>
-            <div className={styles.field}>
-              <label>Resolution (width)</label>
-              <select value={settings.captureWidth} onChange={(e) => update('captureWidth', Number(e.target.value))}>
+            <div className="form-group">
+              <label className="form-label">Resolution (width)</label>
+              <select className="form-input" value={settings.captureWidth} onChange={(e) => update('captureWidth', Number(e.target.value))}>
                 <option value="1280">1280 px</option>
                 <option value="1920">1920 px</option>
                 <option value="2560">2560 px</option>
                 <option value="3840">3840 px</option>
               </select>
             </div>
-            <div className={styles.field}>
-              <label>JPEG Quality</label>
+            <div className="form-group">
+              <label className="form-label">JPEG Quality</label>
               <div className={styles.rangeRow}>
                 <input type="range" min="50" max="100" value={settings.captureQuality} onChange={(e) => update('captureQuality', Number(e.target.value))} />
                 <span className={styles.rangeVal}>{settings.captureQuality}%</span>
@@ -194,26 +194,26 @@ export default function DevicesPage() {
           </div>
         </div>
 
-        <div className={`glass-panel ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}><Printer size={20} /></span>
             <h2>Print</h2>
           </div>
           <div className={styles.fieldGroup}>
-            <div className={styles.field}>
-              <label>Copies</label>
-              <input type="number" min="1" max="99" value={settings.printCopies} onChange={(e) => update('printCopies', Math.max(1, Math.min(99, Number(e.target.value))))} />
+            <div className="form-group">
+              <label className="form-label">Copies</label>
+              <input className="form-input" type="number" min="1" max="99" value={settings.printCopies} onChange={(e) => update('printCopies', Math.max(1, Math.min(99, Number(e.target.value))))} />
             </div>
-            <div className={styles.field}>
-              <label>Orientation</label>
-              <select value={settings.printOrientation} onChange={(e) => update('printOrientation', e.target.value as 'portrait' | 'landscape')}>
+            <div className="form-group">
+              <label className="form-label">Orientation</label>
+              <select className="form-input" value={settings.printOrientation} onChange={(e) => update('printOrientation', e.target.value as 'portrait' | 'landscape')}>
                 <option value="portrait">Portrait</option>
                 <option value="landscape">Landscape</option>
               </select>
             </div>
-            <div className={styles.field}>
-              <label>DPI</label>
-              <select value={settings.printDpi} onChange={(e) => update('printDpi', Number(e.target.value))}>
+            <div className="form-group">
+              <label className="form-label">DPI</label>
+              <select className="form-input" value={settings.printDpi} onChange={(e) => update('printDpi', Number(e.target.value))}>
                 <option value="150">150 DPI</option>
                 <option value="300">300 DPI</option>
                 <option value="600">600 DPI</option>

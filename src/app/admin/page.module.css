@@ -1,22 +1,5 @@
-.pageWrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.pageWrapper > * {
-  min-height: 0;
-  flex-shrink: 1;
-}
-
 /* Chart Section */
 .chartSection {
-  background: var(--clay-bg);
-  border-radius: var(--clay-radius);
-  box-shadow: var(--clay-shadow);
-  padding: 20px;
   margin-bottom: 24px;
   min-width: 0;
   animation: fadeInUp 0.5s ease backwards 0.25s;
@@ -221,11 +204,6 @@
 }
 
 /* Animations */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes barGrow {
   from { transform: scaleY(0); transform-origin: bottom; }
   to { transform: scaleY(1); transform-origin: bottom; }

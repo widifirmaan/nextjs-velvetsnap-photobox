@@ -12,7 +12,7 @@ interface Props {
 export default function AdminStatCard({ icon, label, value, color, subtext, delay = 0 }: Props) {
   return (
     <div
-      className={styles.card}
+      className={`card card-sm ${styles.card}`}
       style={{ animationDelay: `${delay}s` }}
     >
       <div className={`${styles.icon} ${styles[color]}`}>

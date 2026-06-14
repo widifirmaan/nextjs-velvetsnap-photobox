@@ -80,7 +80,7 @@ export default function TemplatesAdmin() {
   };
 
   return (
-    <div className={styles.pageWrapper}>
+    <div className="page-stack">
       <AdminPageHeader
         title="Templates"
         subtitle="Manage photobooth templates and frames"
@@ -90,7 +90,7 @@ export default function TemplatesAdmin() {
         {loading ? (
           <div className={styles.loader}><Loader2 className="spin" size={32} /></div>
         ) : (
-          <table className={styles.table}>
+          <table className="admin-table">
             <thead>
               <tr>
                 <th>Preview</th>
@@ -135,12 +135,12 @@ export default function TemplatesAdmin() {
                     </div>
                   </td>
                   <td>
-                    <div className={styles.actionBtns}>
-                      <a href={`/admin/template-studio?edit=${t._id}`} className={styles.iconBtn} title="Edit in Strips Studio">
+                    <div className="flex-row flex-row-sm">
+                      <a href={`/admin/template-studio?edit=${t._id}`} className="icon-btn" title="Edit in Strips Studio">
                         <ExternalLink size={18} color="var(--accent-color)" />
                       </a>
-                      <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => handleDelete(t._id)} title="Delete template">
-                        <Trash2 size={18} color="var(--danger-color)" />
+                      <button className="icon-btn icon-btn-danger" onClick={() => handleDelete(t._id)} title="Delete template">
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </td>

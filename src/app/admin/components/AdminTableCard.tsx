@@ -8,7 +8,7 @@ interface Props {
 
 export default function AdminTableCard({ title, action, children }: Props) {
   return (
-    <div className={`glass-panel ${styles.card}`}>
+    <div className={`card card-md ${styles.card}`}>
       {(title || action) && (
         <div className={styles.header}>
           {title && <h2 className={styles.title}>{title}</h2>}

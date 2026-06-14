@@ -1,22 +1,9 @@
-.pageWrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.pageWrapper > * {
-  min-height: 0;
-  flex-shrink: 1;
-}
-
 /* Form */
 .formCard {
   background: var(--clay-bg);
   border-radius: var(--clay-radius);
   box-shadow: var(--clay-shadow);
-  padding: 28px;
+  padding: 24px;
   margin-bottom: 32px;
   animation: slideDown 0.3s ease;
 }
@@ -118,32 +105,7 @@
 }
 
 /* Table */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
 
-.table th, .table td {
-  text-align: left;
-  padding: 14px 12px;
-  border-bottom: 1px solid var(--mn-border);
-}
-
-.table th {
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-.table tbody tr {
-  transition: background var(--transition-fast);
-}
-
-.table tbody tr:hover {
-  background: color-mix(in srgb, var(--accent-color) 8%, transparent);
-}
 
 /* Template Preview Thumbnail */
 .templateThumb {
@@ -238,30 +200,6 @@
 }
 
 /* Actions */
-.actionBtns {
-  display: flex;
-  gap: 4px;
-}
-
-.iconBtn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  display: inline-flex;
-  transition: all var(--transition-fast);
-}
-
-.iconBtn:hover {
-  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
-}
-
-.iconBtn.danger:hover {
-  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
-}
-
-/* Loading */
 .loader {
   display: flex;
   justify-content: center;
@@ -274,10 +212,7 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+
 
 @media (max-width: 768px) {
   .formLayout {
@@ -305,12 +240,12 @@
     max-width: 100%;
   }
 
-  .table th, .table td {
+  :global(.admin-table) th, :global(.admin-table) td {
     padding: 10px 8px;
     font-size: 12px;
   }
 
-  .table {
+  :global(.admin-table) {
     min-width: 600px;
   }
   
@@ -344,12 +279,12 @@
     gap: 16px;
   }
   
-  .table {
+  :global(.admin-table) {
     min-width: 520px;
     font-size: 12px;
   }
   
-  .table th, .table td {
+  :global(.admin-table) th, :global(.admin-table) td {
     padding: 8px 6px;
     font-size: 11px;
   }
@@ -384,12 +319,12 @@
     gap: 8px;
   }
   
-  .table th, .table td {
+  :global(.admin-table) th, :global(.admin-table) td {
     padding: 6px 4px;
     font-size: 10px;
   }
 
-  .table {
+  :global(.admin-table) {
     min-width: 520px;
   }
 }

@@ -1,17 +1,5 @@
-.pageWrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
 /* Chart Section */
 .chartSection {
-  background: var(--clay-bg);
-  border-radius: var(--clay-radius);
-  box-shadow: var(--clay-shadow);
-  padding: 28px;
   margin-bottom: 32px;
   min-width: 0;
   animation: fadeInUp 0.5s ease backwards;
@@ -104,10 +92,6 @@
 
 /* Template Breakdown */
 .breakdownSection {
-  background: var(--clay-bg);
-  border-radius: var(--clay-radius);
-  box-shadow: var(--clay-shadow);
-  padding: 28px;
   min-width: 0;
   animation: fadeInUp 0.5s ease backwards;
   animation-delay: 0.3s;
@@ -204,12 +188,6 @@
   padding: 80px 20px;
   gap: 16px;
   color: var(--text-secondary);
-}
-
-/* Animations */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes barGrow {
