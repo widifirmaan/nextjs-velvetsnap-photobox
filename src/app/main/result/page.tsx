@@ -269,12 +269,10 @@ export default function ResultPage() {
                 img.src = bgFrameDataUrl;
               } catch {}
             } else if (matched.templateFull) {
-              removeGreenScreen(matched.templateFull).then((keyed) => {
-                setKeyedFrameImage(keyed);
-                const img = new window.Image();
-                img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-                img.src = keyed;
-              });
+              setKeyedFrameImage(matched.templateFull);
+              const img = new window.Image();
+              img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+              img.src = matched.templateFull;
             }
           }
         }

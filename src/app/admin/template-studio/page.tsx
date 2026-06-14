@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
 import { Loader2 } from 'lucide-react';
 import { AdminPageHeader } from '@/app/admin/components';
-import { useModel } from '@/lib/ModelContext';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import EditorCanvas from './component/EditorCanvas';
 import type { EditorCanvasHandle } from './component/EditorCanvas';
@@ -180,7 +180,6 @@ function StripsStudioPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [canvasSize, setCanvasSize] = useState({ w: DEFAULT_CANVAS_W, h: DEFAULT_CANVAS_H });
   const [canvasBg, setCanvasBg] = useState('#ffffff');
-  const model = useModel();
   const router = useRouter();
   const [importProcessing, setImportProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -34,6 +34,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .catch(() => {});
   }, []);
 
+
+
   const clearNav = useCallback(() => {
     setNavigating(false);
     if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);

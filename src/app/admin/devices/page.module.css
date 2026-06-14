@@ -1,3 +1,16 @@
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.pageWrapper > * {
+  min-height: 0;
+  flex-shrink: 1;
+}
+
 .header {
   display: flex;
   justify-content: space-between;

@@ -35,7 +35,7 @@ export default function TemplatesAdmin() {
   const fetchTemplates = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/templates/list');
+      const res = await fetch('/api/templates/list', { cache: 'no-store' });
       const data = await res.json();
       if (data.success) setTemplates(data.data || []);
     } catch (err) {
@@ -53,8 +53,11 @@ export default function TemplatesAdmin() {
     if (!deleteTarget) return;
     setDeleteLoading(true);
     try {
-      await fetch(`/api/templates/${deleteTarget}`, { method: 'DELETE' });
+      const res = await fetch(`/api/templates/${deleteTarget}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(res.statusText);
       setDeleteTarget(null);
+      const removedId = deleteTarget;
+      setTemplates((prev) => prev.filter((t) => t._id !== removedId));
       fetchTemplates();
     } catch (err) {
       console.error('Delete failed:', err);

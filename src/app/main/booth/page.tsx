@@ -269,12 +269,11 @@ function BoothContent() {
             setSlotsCount(matched.templateData?.slots || 3);
             setTemplateName(matched.templateName);
             if (matched.templateThumb || matched.templateFull) {
-              removeGreenScreen(matched.templateThumb || matched.templateFull, 400).then((keyed) => {
-                setKeyedFrameImage(keyed);
-                const img = new window.Image();
-                img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-                img.src = keyed;
-              });
+              const url = matched.templateThumb || matched.templateFull;
+              setKeyedFrameImage(url);
+              const img = new window.Image();
+              img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+              img.src = url;
             }
           } else {
             const staticConf = TEMPLATE_CONFIGS[templateId as keyof typeof TEMPLATE_CONFIGS];
