@@ -13,7 +13,6 @@ import ElementToolbar from './component/ElementToolbar';
 import LayerPanel from './component/LayerPanel';
 import PropertiesPanel from './component/PropertiesPanel';
 import AssetSearch from './component/AssetSearch';
-import { removeGreenScreen } from '@/lib/canvas-utils';
 import styles from './page.module.css';
 
 const DEFAULT_CANVAS_W = 1000;
@@ -364,14 +363,13 @@ function StripsStudioPage() {
 
       const rawFrame = editorRef.current?.getFrameImage() || '';
       if (!rawFrame) { alert('Failed to capture frame'); setSaving(false); return; }
-      const frameB64 = await removeGreenScreen(rawFrame);
-      // Derive thumbnail from cleaned frame (resize)
+      // Derive thumbnail from frame (resize)
       const thumbnailB64 = await (async () => {
         const img = await new Promise<HTMLImageElement>((resolve, reject) => {
           const i = new window.Image();
           i.onload = () => resolve(i);
           i.onerror = reject;
-          i.src = frameB64;
+          i.src = rawFrame;
         });
         const c = document.createElement('canvas');
         const scale = 300 / (img.naturalWidth || img.width);
@@ -381,7 +379,7 @@ function StripsStudioPage() {
         return c.toDataURL('image/png');
       })();
       const toUpload: { key: string; b64: string; folder: string; publicId: string }[] = [];
-      if (frameB64) toUpload.push({ key: 'templateFull', b64: frameB64, folder: baseFolder, publicId: 'templateFull' });
+      if (rawFrame) toUpload.push({ key: 'templateFull', b64: rawFrame, folder: baseFolder, publicId: 'templateFull' });
       if (thumbnailB64) toUpload.push({ key: 'templateThumb', b64: thumbnailB64, folder: baseFolder, publicId: 'templateThumb' });
 
       const savedElements = await Promise.all(elements.map(async (el) => {

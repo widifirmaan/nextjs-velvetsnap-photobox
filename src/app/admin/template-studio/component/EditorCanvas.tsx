@@ -138,31 +138,21 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
       if (trRef.current) trRef.current.nodes([]);
       const groups = (stage as any).find('.photo-slot-group');
       const bgs = (stage as any).find('.bg-element');
-      const saved: any[] = [];
+      const saved: { node: any; visible: boolean }[] = [];
       groups.forEach((g: any) => {
         g.getChildren().forEach((child: any) => {
-          saved.push({ node: child, visible: child.visible(), opacity: child.opacity(), fill: child.fill(), stroke: child.stroke(), strokeWidth: child.strokeWidth() });
-          if (child.getClassName() === 'Text') {
-            child.visible(false);
-          } else {
-            child.fill('#00bf63');
-            child.opacity(1);
-            child.stroke('rgba(0,0,0,0)');
-            child.strokeWidth(0);
-          }
+          saved.push({ node: child, visible: child.visible() });
+          child.visible(false);
         });
       });
       bgs.forEach((g: any) => {
-        saved.push({ node: g, visible: g.visible(), opacity: null, fill: null, stroke: null, strokeWidth: null });
+        saved.push({ node: g, visible: g.visible() });
         g.visible(false);
       });
       stage.batchDraw();
       const pr = scale > 0 ? 1 / scale : 1;
       const url = stage.toDataURL({ mimeType: 'image/png', pixelRatio: pr });
-      saved.forEach(({ node, visible, opacity, fill, stroke, strokeWidth }) => {
-        if (opacity === null) { node.visible(visible); return; }
-        node.setAttrs({ visible, opacity, fill, stroke, strokeWidth });
-      });
+      saved.forEach(({ node, visible }) => { node.visible(visible); });
       stage.batchDraw();
       return url;
     },
