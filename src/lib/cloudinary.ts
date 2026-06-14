@@ -5,12 +5,18 @@ cloudinary.config({
   secure: true,
 });
 
-export async function uploadBase64(dataUri: string, folder = 'velvetsnap'): Promise<string> {
+export async function uploadBase64(dataUri: string, folder = 'velvetsnap', publicId?: string): Promise<string> {
   const base64data = dataUri.replace(/^data:[\w\/-]+;base64,/, '');
   const buffer = Buffer.from(base64data, 'base64');
   return new Promise((resolve, reject) => {
+    const options: Record<string, any> = { folder, resource_type: 'image' };
+    if (publicId) {
+      options.public_id = publicId;
+      options.overwrite = true;
+      options.invalidate = true;
+    }
     const uploadStream = cloudinary.uploader.upload_stream(
-      { folder, resource_type: 'image' },
+      options,
       (error, result) => {
         if (error) reject(error);
         else if (result) resolve(result.secure_url);

@@ -323,11 +323,13 @@ export default function StripsStudioPage() {
     setCanvasBg('#ffffff');
   };
 
-  const uploadBase64Client = async (dataUri: string, folder = 'velvetsnap/templates'): Promise<string> => {
+  const uploadBase64Client = async (dataUri: string, folder: string, publicId?: string): Promise<string> => {
+    const body: Record<string, any> = { dataUri, folder };
+    if (publicId) body.publicId = publicId;
     const res = await fetch('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dataUri, folder }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Upload failed');
@@ -340,12 +342,18 @@ export default function StripsStudioPage() {
     setSelectedId(null);
     await new Promise((r) => setTimeout(r, 50));
     try {
+      // Determine folder — use editingTemplateId for update, generate new ID for create
+      const isNew = !editingTemplateId;
+      const folderId = isNew ? makeId() : editingTemplateId;
+      if (isNew) setTemplateIdField(folderId);
+      const baseFolder = `velvetsnap/templates/${folderId}`;
+
       const thumbnailB64 = editorRef.current?.getThumbnail() || '';
       const rawFrame = editorRef.current?.getFrameImage() || '';
       const frameB64 = await removeGreenScreen(rawFrame);
-      const toUpload: { key: string; b64: string; folder?: string }[] = [];
-      if (frameB64) toUpload.push({ key: 'templateFull', b64: frameB64 });
-      if (thumbnailB64) toUpload.push({ key: 'templateThumb', b64: thumbnailB64 });
+      const toUpload: { key: string; b64: string; folder: string; publicId: string }[] = [];
+      if (frameB64) toUpload.push({ key: 'templateFull', b64: frameB64, folder: baseFolder, publicId: 'templateFull' });
+      if (thumbnailB64) toUpload.push({ key: 'templateThumb', b64: thumbnailB64, folder: baseFolder, publicId: 'templateThumb' });
 
       const savedElements = await Promise.all(elements.map(async (el) => {
         const copy = { ...el, props: { ...el.props } };
@@ -354,7 +362,7 @@ export default function StripsStudioPage() {
           const b64 = await blobToBase64(url);
           if (b64 !== url) {
             const key = 'el_' + el.id;
-            toUpload.push({ key, b64 });
+            toUpload.push({ key, b64, folder: baseFolder, publicId: key });
           }
         }
         return copy;
@@ -362,7 +370,7 @@ export default function StripsStudioPage() {
 
       // Upload all images to Cloudinary first
       const uploaded = await Promise.all(toUpload.map(async (item) => {
-        const url = await uploadBase64Client(item.b64, item.folder || 'velvetsnap/templates');
+        const url = await uploadBase64Client(item.b64, item.folder, item.publicId);
         return { key: item.key, url };
       }));
 
@@ -411,9 +419,7 @@ export default function StripsStudioPage() {
           body: JSON.stringify(body),
         });
       } else {
-        const freshId = makeId();
-        setTemplateIdField(freshId);
-        body.templateId = freshId;
+        body.templateId = folderId;
         res = await fetch('/api/templates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

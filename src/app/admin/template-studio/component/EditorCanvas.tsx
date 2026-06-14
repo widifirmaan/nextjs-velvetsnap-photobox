@@ -402,7 +402,7 @@ function CanvasElement({
   onTransformEnd: (e: Konva.KonvaEventObject<Event>) => void;
   accentColor?: string;
 }) {
-  const p = element.props;
+  const p = element.props || {};
   const common = {
     id: element.id,
     x: element.x,
@@ -410,7 +410,7 @@ function CanvasElement({
     width: element.width,
     height: element.height,
     rotation: element.rotation,
-    draggable: element.type === 'background' ? element.props?.searchBg === true : true,
+    draggable: element.type === 'background' ? p.searchBg === true : true,
     onClick: onSelect,
     onTap: onSelect,
     onDragEnd,
@@ -422,7 +422,7 @@ function CanvasElement({
   const elCommon = element.type === 'photo-slot'
     ? { ...common, name: 'photo-slot-group' }
     : element.type === 'background'
-      ? { ...common, name: 'bg-element', listening: element.props?.searchBg !== true }
+      ? { ...common, name: 'bg-element', listening: p.searchBg !== true }
       : common;
 
   switch (element.type) {
@@ -474,7 +474,7 @@ function CanvasElement({
 }
 
 function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
-  const p = el.props;
+  const p = el.props || {};
   const shape = p.shape || 'rounded';
   const bw = p.borderWidth ?? 2;
   const bc = p.borderColor || '#ffffff';
@@ -587,9 +587,10 @@ function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
 }
 
 function BgElement({ el, common }: { el: IStripElement; common: any }) {
-  const [image] = useImage(el.props.stickerUrl || '');
-  if (!image || !el.props.stickerUrl) return null;
-  if (el.props.searchBg) {
+  const p = el.props || {};
+  const [image] = useImage(p.stickerUrl || '');
+  if (!image || !p.stickerUrl) return null;
+  if (p.searchBg) {
     const imgW = image.width;
     const imgH = image.height;
     const scale = Math.max(el.width / imgW, el.height / imgH);
@@ -611,8 +612,9 @@ function BgElement({ el, common }: { el: IStripElement; common: any }) {
 }
 
 function StickerElement({ el, common }: { el: IStripElement; common: any }) {
-  const [image] = useImage(el.props.stickerUrl || '');
-  if (!image || !el.props.stickerUrl) {
+  const p = el.props || {};
+  const [image] = useImage(p.stickerUrl || '');
+  if (!image || !p.stickerUrl) {
     return (
       <Group {...common}>
         <Rect width={el.width} height={el.height} fill="rgba(200,200,200,0.3)" stroke="#999" strokeWidth={1} dash={[4, 4]} cornerRadius={8} />

@@ -37,10 +37,11 @@ export async function POST(req: Request) {
       }
     }
 
+    const folder = body.templateId ? `velvetsnap/templates/${body.templateId}` : 'velvetsnap/templates';
     let templateFullUrl = templateFull;
     let templateThumbUrl = templateThumb;
     for (const u of toUpload) {
-      const url = await uploadBase64(u.b64, 'velvetsnap/templates').catch(
+      const url = await uploadBase64(u.b64, folder, u.key).catch(
         (e: any) => { throw new Error(`${u.key} upload failed: ${e.message}`); }
       );
       if (u.key === 'templateFull') templateFullUrl = url;

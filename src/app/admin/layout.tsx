@@ -4,21 +4,22 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image, Loader2, LogOut, Settings2 } from 'lucide-react';
 import styles from './layout.module.css';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const navTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
     const token = sessionStorage.getItem('admin_session_token');
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = 'Bearer ' + token;
-    fetch('/api/admin/session', { headers })
-      .then((r) => { if (r.ok) setAuthed(true); else { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); } })
+    if (token) setAuthed(true);
+    if (!token) { router.replace('/admin/login'); return; }
+    fetch('/api/admin/session', { headers: { Authorization: 'Bearer ' + token } })
+      .then((r) => { if (!r.ok) { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); } })
       .catch(() => { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); });
   }, [pathname, router]);
 
@@ -33,12 +34,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .catch(() => {});
   }, []);
 
-  useEffect(() => {
+  const clearNav = useCallback(() => {
     setNavigating(false);
-  }, [pathname]);
+    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
+  }, []);
+
+  useEffect(() => {
+    clearNav();
+  }, [pathname, clearNav]);
 
   const handleNavClick = useCallback(() => {
     setNavigating(true);
+    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
+    navTimeoutRef.current = setTimeout(() => setNavigating(false), 5000);
   }, []);
 
   const navLinks = [
