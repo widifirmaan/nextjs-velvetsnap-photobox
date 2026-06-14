@@ -385,11 +385,9 @@ function StripsStudioPage() {
         const copy = { ...el, props: { ...el.props } };
         const url = copy.props.stickerUrl;
         if (url && (url.startsWith('blob:') || url.startsWith('data:image/'))) {
-          const b64 = await blobToBase64(url);
-          if (b64 !== url) {
-            const key = 'el_' + el.id;
-            toUpload.push({ key, b64, folder: baseFolder, publicId: key });
-          }
+          const b64 = url.startsWith('data:') ? url : await blobToBase64(url);
+          const key = 'el_' + el.id;
+          toUpload.push({ key, b64, folder: baseFolder, publicId: key });
         }
         return copy;
       }));

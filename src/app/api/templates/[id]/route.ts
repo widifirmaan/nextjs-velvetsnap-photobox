@@ -59,7 +59,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     };
     if (body.isActive !== undefined) update.isActive = body.isActive;
 
-    const doc = await Template.findByIdAndUpdate(id, update, { new: true }).lean();
+    const doc = await Template.findByIdAndUpdate(id, update, { returnDocument: 'after' }).lean();
     return NextResponse.json({ success: true, data: normalizeTemplate(doc) });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
