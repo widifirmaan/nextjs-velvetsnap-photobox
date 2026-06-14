@@ -221,9 +221,10 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   const slotsCount = templateData?.templateData?.slots || TEMPLATE_CONFIGS[templateId || '']?.slots || 3;
   const filledCount = useMemo(() => captures.filter((c) => c !== '').length, [captures]);
 
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   const timerBadge = (step >= 1 && step <= 5 && sessionTimer > 0 && timeLeft > 0) ? (
     <div style={{
-      position:'fixed', top:12, right:16, zIndex:100,
+      position:'fixed', top:12, [isMobile ? 'left' : 'right']: 16, zIndex:100,
       display:'flex', alignItems:'center', gap:6,
       padding:'6px 14px', borderRadius:8,
       background:'rgba(0,0,0,0.6)', color:'#fff',
