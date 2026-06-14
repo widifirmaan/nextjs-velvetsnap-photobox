@@ -11,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
   const [authed, setAuthed] = useState(false);
-  const navTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
@@ -43,12 +43,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     clearNav();
   }, [pathname, clearNav]);
 
-  const handleNavClick = useCallback(() => {
-    setNavigating(true);
-    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
-    navTimeoutRef.current = setTimeout(() => setNavigating(false), 5000);
-  }, []);
-
   const navLinks = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/templates', label: 'Templates', icon: Layers },
@@ -64,9 +58,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const isActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
-    if (href === '/admin/templates') return pathname.startsWith('/admin/templates');
-    return pathname.startsWith(href);
+    return pathname === href || pathname.startsWith(href + '/');
   };
+
+  const handleNavClick = useCallback((href: string) => {
+    if (isActive(href)) return;
+    setNavigating(true);
+    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
+    navTimeoutRef.current = setTimeout(() => setNavigating(false), 5000);
+  }, [isActive]);
 
   const renderNavLink = (link: { href: string; label: string; icon: any }) => {
     const Icon = link.icon;
@@ -74,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <Link
         key={link.href}
         href={link.href}
-        onClick={handleNavClick}
+        onClick={() => handleNavClick(link.href)}
         className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
       >
         <Icon size={20} /> {link.label}
@@ -88,7 +88,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <Link
         key={link.href}
         href={link.href}
-        onClick={handleNavClick}
+        onClick={() => handleNavClick(link.href)}
         className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
         title={link.label}
       >
