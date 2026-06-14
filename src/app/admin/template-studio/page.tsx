@@ -308,17 +308,21 @@ function StripsStudioPage() {
     setSelectedId(id);
   }, [elements.length]);
 
-  const blobToBase64 = async (blobUrl: string): Promise<string> => {
+  const blobToBase64 = async (url: string): Promise<string> => {
+    if (url.startsWith('data:')) return url;
     try {
-      const res = await fetch(blobUrl);
-      const blob = await res.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(blob);
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const i = new window.Image();
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = url;
       });
-    } catch { return blobUrl; }
+      const c = document.createElement('canvas');
+      c.width = img.width;
+      c.height = img.height;
+      c.getContext('2d')!.drawImage(img, 0, 0);
+      return c.toDataURL('image/png');
+    } catch { return url; }
   };
 
   const handleNewTemplate = () => {
@@ -351,7 +355,6 @@ function StripsStudioPage() {
     if (!templateName.trim()) return;
     setSaving(true);
     setSelectedId(null);
-    await new Promise((r) => setTimeout(r, 50));
     try {
       // Determine folder — reuse templateId from doc for updates, generate new ID for create
       const isNew = !editingTemplateId;

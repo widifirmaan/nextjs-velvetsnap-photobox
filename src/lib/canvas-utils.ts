@@ -143,10 +143,13 @@ export function removeGreenScreen(base64: string, maxW: number = 1000): Promise<
       catch { resolve(base64); return; }
       const d = imgData.data;
       const targetR = 0, targetG = 191, targetB = 99;
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i + 1], b = d[i + 2];
-        const dr = r - targetR, dg = g - targetG, db = b - targetB;
-        if (dr * dr + dg * dg + db * db < 5000) { d[i + 3] = 0; }
+      const threshold2 = 5000;
+      const len = d.length;
+      for (let i = 0; i < len; i += 4) {
+        const dr = d[i] - targetR;
+        const dg = d[i + 1] - targetG;
+        const db = d[i + 2] - targetB;
+        if (dr * dr + dg * dg + db * db < threshold2) { d[i + 3] = 0; }
       }
       ctx.putImageData(imgData, 0, 0);
       resolve(canvas.toDataURL('image/png'));
