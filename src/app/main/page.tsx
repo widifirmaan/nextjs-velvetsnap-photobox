@@ -80,6 +80,20 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const onRefresh = () => handleRefresh();
+    const onPageShow = (e: PageTransitionEvent) => { if (e.persisted) handleRefresh(); };
+    const onVisible = () => { if (document.visibilityState === 'visible') handleRefresh(); };
+    window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', onRefresh);
+    return () => {
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', onRefresh);
+    };
+  }, [handleRefresh]);
+
+  useEffect(() => {
     fetchSettings();
     fetch('/api/transactions/strips')
       .then((r) => r.json())
