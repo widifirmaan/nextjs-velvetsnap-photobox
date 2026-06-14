@@ -362,9 +362,24 @@ function StripsStudioPage() {
       setTemplateIdField(folderId);
       const baseFolder = `velvetsnap/templates/${folderId}`;
 
-      const thumbnailB64 = editorRef.current?.getThumbnail() || '';
       const rawFrame = editorRef.current?.getFrameImage() || '';
+      if (!rawFrame) { alert('Failed to capture frame'); setSaving(false); return; }
       const frameB64 = await removeGreenScreen(rawFrame);
+      // Derive thumbnail from cleaned frame (resize)
+      const thumbnailB64 = await (async () => {
+        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+          const i = new window.Image();
+          i.onload = () => resolve(i);
+          i.onerror = reject;
+          i.src = frameB64;
+        });
+        const c = document.createElement('canvas');
+        const scale = 300 / (img.naturalWidth || img.width);
+        c.width = 300;
+        c.height = Math.round((img.naturalHeight || img.height) * scale);
+        c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+        return c.toDataURL('image/png');
+      })();
       const toUpload: { key: string; b64: string; folder: string; publicId: string }[] = [];
       if (frameB64) toUpload.push({ key: 'templateFull', b64: frameB64, folder: baseFolder, publicId: 'templateFull' });
       if (thumbnailB64) toUpload.push({ key: 'templateThumb', b64: thumbnailB64, folder: baseFolder, publicId: 'templateThumb' });
