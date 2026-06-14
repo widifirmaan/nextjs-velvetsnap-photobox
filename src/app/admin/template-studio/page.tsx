@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
 import { Loader2 } from 'lucide-react';
 import { AdminPageHeader } from '@/app/admin/components';
 import { useModel } from '@/lib/ModelContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import EditorCanvas from './component/EditorCanvas';
 import type { EditorCanvasHandle } from './component/EditorCanvas';
 import ElementToolbar from './component/ElementToolbar';
@@ -158,7 +158,24 @@ function generateSlotLayout(slotCount: number): IStripElement[] {
   return elements;
 }
 
-export default function StripsStudioPage() {
+export default function StripsStudioPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className={styles.page}>
+        <AdminPageHeader title="Strips Studio" subtitle="Loading..." />
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:200 }}>
+          <Loader2 className="spin" size={32} />
+        </div>
+      </div>
+    }>
+      <StripsStudioPage />
+    </Suspense>
+  );
+}
+
+function StripsStudioPage() {
+  const searchParams = useSearchParams();
+  const editIdParam = searchParams.get('edit');
   const [slotCount, setSlotCount] = useState(3);
   const [elements, setElements] = useState<IStripElement[]>(() => generateSlotLayout(3));
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -166,7 +183,6 @@ export default function StripsStudioPage() {
   const [canvasBg, setCanvasBg] = useState('#ffffff');
   const model = useModel();
   const router = useRouter();
-  const loaded = useRef(false);
   const [importProcessing, setImportProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -186,77 +202,70 @@ export default function StripsStudioPage() {
   const [stickerTargetId, setStickerTargetId] = useState<string | null>(null);
   const [activeMobilePanel, setActiveMobilePanel] = useState<'elements' | 'background' | 'layers' | 'properties' | null>(null);
 
+  const resetEditor = useCallback(() => {
+    setEditingTemplateId(null);
+    setTemplateFolderId(null);
+    setTemplateName('');
+    setTemplateDesc('Designed in Strips Studio');
+    setTemplatePrice(0);
+    setElements(generateSlotLayout(3));
+    setSlotCount(3);
+    setSelectedId(null);
+    setCanvasSize({ w: DEFAULT_CANVAS_W, h: DEFAULT_CANVAS_H });
+    setCanvasBg('#ffffff');
+  }, []);
+
   useEffect(() => {
-    if (loaded.current) return;
-    loaded.current = true;
-    const params = new URLSearchParams(window.location.search);
-    const editId = params.get('edit');
+    setPageLoading(true);
 
-    const applyData = (data: any) => {
-      setEditingTemplateId(data._id || editId);
-      setTemplateFolderId(data.templateId || null);
-      setTemplateName(data.templateName || data.name || '');
-      if (typeof data.templatePrice === 'number') {
-        setTemplatePrice(data.templatePrice);
-      }
-      if (data.templateData?.color || data.color) {
-        setCanvasBg(data.templateData?.color || data.color);
-      }
-      const cw = data.templateData?.canvasWidth || data.canvasWidth || 600;
-      const ch = data.templateData?.canvasHeight || data.canvasHeight || 900;
-      setCanvasSize({ w: cw, h: ch });
-      const elementsData = data.templateData?.elements || data.elements;
-      if (elementsData?.length) {
-        setElements(elementsData);
-        const slotEls = elementsData.filter((el: any) => el.id?.startsWith('slot-'));
-        if (slotEls?.length) setSlotCount(slotEls.length);
-      } else if ((data.templateFull || data.fullresUrl) && (data.templateData?.slotsLayout || data.slotsLayout)?.length) {
-        const legacyUrl = data.templateFull || data.fullresUrl;
-        const legacySlots = data.templateData?.slotsLayout || data.slotsLayout;
-        const bgEl: IStripElement = {
-          id: uuid(), type: 'background', x: 0, y: 0,
-          width: cw, height: ch, rotation: 0, zIndex: 0,
-          visible: true, props: { stickerUrl: legacyUrl },
-        };
-        const photoSlots: IStripElement[] = legacySlots.map((s: any, i: number) => ({
-          id: 'slot-' + uuid(), type: 'photo-slot' as const,
-          x: (s.x / 100) * cw, y: (s.y / 100) * ch,
-          width: (s.w / 100) * cw, height: (s.h / 100) * ch,
-          rotation: 0, zIndex: i + 1, visible: true, props: {},
-        }));
-        setElements([bgEl, ...photoSlots, ...generateSlotLayout(0)]);
-        setSlotCount(photoSlots.length);
-      }
-    };
-
-    if (!editId) {
+    if (!editIdParam) {
+      resetEditor();
       setTemplateIdField(makeId());
       setPageLoading(false);
       return;
     }
 
-    const raw = sessionStorage.getItem('stripTemplateData');
-    if (raw) {
-      try {
-        const data = JSON.parse(raw);
-        applyData(data);
-        setTemplateIdField(makeId());
-        setPageLoading(false);
-        return;
-      } catch {}
-    }
-
-    fetch(`/api/templates/thumbnails?id=${editId}`)
+    fetch(`/api/templates/thumbnails?id=${editIdParam}`)
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data?.length) {
-          applyData(res.data[0]);
+          const data = res.data[0];
+          setEditingTemplateId(data._id || editIdParam);
+          setTemplateFolderId(data.templateId || null);
+          setTemplateName(data.templateName || data.name || '');
+          if (typeof data.templatePrice === 'number') setTemplatePrice(data.templatePrice);
+          if (data.templateData?.color || data.color) setCanvasBg(data.templateData?.color || data.color);
+          const cw = data.templateData?.canvasWidth || data.canvasWidth || 600;
+          const ch = data.templateData?.canvasHeight || data.canvasHeight || 900;
+          setCanvasSize({ w: cw, h: ch });
+          const elementsData = data.templateData?.elements || data.elements;
+          if (elementsData?.length) {
+            setElements(elementsData);
+            const slotEls = elementsData.filter((el: any) => el.id?.startsWith('slot-'));
+            if (slotEls?.length) setSlotCount(slotEls.length);
+          } else if ((data.templateFull || data.fullresUrl) && (data.templateData?.slotsLayout || data.slotsLayout)?.length) {
+            const legacyUrl = data.templateFull || data.fullresUrl;
+            const legacySlots = data.templateData?.slotsLayout || data.slotsLayout;
+            const bgEl: IStripElement = {
+              id: uuid(), type: 'background', x: 0, y: 0,
+              width: cw, height: ch, rotation: 0, zIndex: 0,
+              visible: true, props: { stickerUrl: legacyUrl },
+            };
+            const photoSlots: IStripElement[] = legacySlots.map((s: any, i: number) => ({
+              id: 'slot-' + uuid(), type: 'photo-slot' as const,
+              x: (s.x / 100) * cw, y: (s.y / 100) * ch,
+              width: (s.w / 100) * cw, height: (s.h / 100) * ch,
+              rotation: 0, zIndex: i + 1, visible: true, props: {},
+            }));
+            setElements([bgEl, ...photoSlots, ...generateSlotLayout(0)]);
+            setSlotCount(photoSlots.length);
+          }
         }
         setTemplateIdField(makeId());
         setPageLoading(false);
       })
       .catch(() => setPageLoading(false));
-  }, []);
+  }, [editIdParam, resetEditor]);
 
   const selected = elements.find((el) => el.id === selectedId) || null;
 
