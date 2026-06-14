@@ -103,13 +103,7 @@
   gap: 12px;
   text-decoration: none;
   color: var(--text-primary);
-  transition: all var(--transition-fast);
   cursor: pointer;
-}
-
-.quickLink:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
 }
 
 .quickLinkIcon {
@@ -170,20 +164,13 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 16px;
-  background: var(--clay-bg);
-  border: 1px solid var(--mn-border);
-  border-radius: 12px;
+  text-decoration: none;
   color: var(--text-primary);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  text-decoration: none;
-  transition: all var(--transition-fast);
-}
-
-.mobileActionBtn:active {
-  background: var(--mn-border);
+  font-family: inherit;
+  border: none;
 }
 
 @media (max-width: 768px) {

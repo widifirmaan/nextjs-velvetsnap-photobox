@@ -10,7 +10,7 @@ export default function MobileActions() {
 
   return (
     <div className={styles.mobileActions}>
-      <Link href="/" className={styles.mobileActionBtn}>
+      <Link href="/" className={`card card-sm ${styles.mobileActionBtn}`}>
         <ExternalLink size={18} />
         Go to App
       </Link>
@@ -19,7 +19,7 @@ export default function MobileActions() {
           sessionStorage.removeItem('admin_session_token');
           fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
         }}
-        className={styles.mobileActionBtn}
+        className={`card card-sm ${styles.mobileActionBtn}`}
       >
         <LogOut size={18} />
         Logout

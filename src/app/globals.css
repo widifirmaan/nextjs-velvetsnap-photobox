@@ -516,3 +516,16 @@ label {
 .card-border {
   border: 1px solid var(--mn-border);
 }
+
+/* ── Section Icon ── */
+.section-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
+  color: var(--accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

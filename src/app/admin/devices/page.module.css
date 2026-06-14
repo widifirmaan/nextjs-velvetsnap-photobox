@@ -35,18 +35,6 @@
   margin: 0;
 }
 
-.sectionIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--accent-color) 15%, transparent);
-  color: var(--accent-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
 .emptyText {
   color: var(--text-secondary);
   font-size: 14px;

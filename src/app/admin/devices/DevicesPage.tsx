@@ -119,7 +119,7 @@ export default function DevicesPage() {
       <div className={styles.sections}>
         <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}><Camera size={20} /></span>
+            <span className="section-icon"><Camera size={20} /></span>
             <h2>Camera Type</h2>
           </div>
           <div className={styles.cameraTypeRow}>
@@ -171,7 +171,7 @@ export default function DevicesPage() {
 
         <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}><Camera size={20} /></span>
+            <span className="section-icon"><Camera size={20} /></span>
             <h2>Capture</h2>
           </div>
           <div className={styles.fieldGroup}>
@@ -196,7 +196,7 @@ export default function DevicesPage() {
 
         <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
-            <span className={styles.sectionIcon}><Printer size={20} /></span>
+            <span className="section-icon"><Printer size={20} /></span>
             <h2>Print</h2>
           </div>
           <div className={styles.fieldGroup}>
