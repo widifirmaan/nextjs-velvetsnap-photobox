@@ -259,202 +259,174 @@ export default function SettingsPage() {
       />
 
       <div className={styles.sections}>
-        {/* Header */}
-        <section className={`card card-md ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className="section-icon"><MapPin size={20} /></span>
             <h2>Page Header</h2>
           </div>
-          <div className={styles.sectionBody}>
+          <div className="form-group">
+            <label className="form-label">Location Name</label>
+            <input className="form-input" value={form.header.location} onChange={(e) => updateSection('header', 'location', e.target.value)} placeholder="Jakarta" />
+          </div>
+          <div className={styles.divider}>
+            <div className={`flex-row ${styles.navHeader}`}>
+              <label className={`form-label ${styles.navLabel}`}>Navigation Items</label>
+              <button onClick={addNavItem} className={`btn btn-ghost ${styles.addNavBtn}`}><Plus size={14} /> Add Item</button>
+            </div>
             <div className="flex-col">
-              <div className="form-group">
-                <label className="form-label">Location Name</label>
-                <input className="form-input" value={form.header.location} onChange={(e) => updateSection('header', 'location', e.target.value)} placeholder="Jakarta" />
-              </div>
-              <div className={styles.divider}>
-                <div className={`flex-row ${styles.navHeader}`}>
-                  <label className={`form-label ${styles.navLabel}`}>Navigation Items</label>
-                  <button onClick={addNavItem} className={`btn btn-ghost ${styles.addNavBtn}`}><Plus size={14} /> Add Item</button>
+              {navItems.map((item, i) => (
+                <div key={i} className={styles.navItem}>
+                  <input className="form-input" value={item.label} onChange={(e) => updateNavItem(i, 'label', e.target.value)} placeholder="Label" />
+                  <input className="form-input" value={item.url} onChange={(e) => updateNavItem(i, 'url', e.target.value)} placeholder="URL" />
+                  <button onClick={() => removeNavItem(i)} className={styles.navDelBtn}><Trash2 size={14} /></button>
                 </div>
-                <div className="flex-col">
-                  {navItems.map((item, i) => (
-                    <div key={i} className={styles.navItem}>
-                      <input className="form-input" value={item.label} onChange={(e) => updateNavItem(i, 'label', e.target.value)} placeholder="Label" />
-                      <input className="form-input" value={item.url} onChange={(e) => updateNavItem(i, 'url', e.target.value)} placeholder="URL" />
-                      <button onClick={() => removeNavItem(i)} className={styles.navDelBtn}><Trash2 size={14} /></button>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
-        </section>
+        </div>
 
-        {/* Page Content */}
-        <section className={`card card-md ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className="section-icon"><FileText size={20} /></span>
             <h2>Page Content</h2>
           </div>
-          <div className={styles.sectionBody}>
-            <div className="flex-col">
-              <div className="form-group">
-                <label className="form-label">App Name</label>
-                <input className="form-input" value={form.appName} onChange={(e) => setRootField('appName', e.target.value)} placeholder="VelvetSnap" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Tagline</label>
-                <input className="form-input" value={form.appTagline} onChange={(e) => setRootField('appTagline', e.target.value)} placeholder="AI-Powered Photobooth Experience" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Hero Subtitle</label>
-                <input className="form-input" value={form.heroSubtitle} onChange={(e) => setRootField('heroSubtitle', e.target.value)} placeholder="Pilih frame, foto, edit..." />
-              </div>
-              <div className={styles.divider}>
-                <LogoUpload label="Logo" value={form.logo} onChange={(url) => setRootField('logo', url)} uploadImage={uploadImage} />
-              </div>
-              <div className={styles.divider}>
-                <div className="form-group">
-                  <label className="form-label">Card Small HTML</label>
-                  <textarea className={styles.textareaField} value={form.cardSmallHtml}
-                    onChange={(e) => setRootField('cardSmallHtml', e.target.value)}
-                    placeholder="&lt;div&gt;... custom HTML untuk card kecil (akan ganti default)&lt;/div&gt;" />
-                </div>
-              </div>
-              <div className="form-group">
-                <label className="form-label">Card Promo HTML</label>
-                <textarea className={styles.textareaField} value={form.cardPromoHtml}
-                  onChange={(e) => setRootField('cardPromoHtml', e.target.value)}
-                  placeholder="&lt;div&gt;... custom HTML untuk card promo&lt;/div&gt;" />
-              </div>
+          <div className="form-group">
+            <label className="form-label">App Name</label>
+            <input className="form-input" value={form.appName} onChange={(e) => setRootField('appName', e.target.value)} placeholder="VelvetSnap" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Tagline</label>
+            <input className="form-input" value={form.appTagline} onChange={(e) => setRootField('appTagline', e.target.value)} placeholder="AI-Powered Photobooth Experience" />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Hero Subtitle</label>
+            <input className="form-input" value={form.heroSubtitle} onChange={(e) => setRootField('heroSubtitle', e.target.value)} placeholder="Pilih frame, foto, edit..." />
+          </div>
+          <div className={styles.divider}>
+            <LogoUpload label="Logo" value={form.logo} onChange={(url) => setRootField('logo', url)} uploadImage={uploadImage} />
+          </div>
+          <div className={styles.divider}>
+            <div className="form-group">
+              <label className="form-label">Card Small HTML</label>
+              <textarea className={styles.textareaField} value={form.cardSmallHtml}
+                onChange={(e) => setRootField('cardSmallHtml', e.target.value)}
+                placeholder="&lt;div&gt;... custom HTML untuk card kecil (akan ganti default)&lt;/div&gt;" />
             </div>
           </div>
-        </section>
+          <div className="form-group">
+            <label className="form-label">Card Promo HTML</label>
+            <textarea className={styles.textareaField} value={form.cardPromoHtml}
+              onChange={(e) => setRootField('cardPromoHtml', e.target.value)}
+              placeholder="&lt;div&gt;... custom HTML untuk card promo&lt;/div&gt;" />
+          </div>
+        </div>
 
-        {/* Slideshow */}
-        <section className={`card card-md ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className="section-icon"><Image size={20} /></span>
             <h2>Homepage Slideshow</h2>
           </div>
-          <div className={styles.sectionBody}>
-            <div className="flex-col">
-              <div className="form-group">
-                <label className="form-label">Add Slide Image</label>
-                <div className={`flex-row ${styles.slideRow}`}>
-                  <input ref={slideUrlRef} className="form-input grow" placeholder="Image URL" />
-                  <button onClick={addSlideUrl} className={`btn btn-ghost ${styles.slideBtn}`}><Plus size={14} /> URL</button>
-                  <button onClick={() => slideUploadRef.current?.click()} className={`btn btn-ghost ${styles.slideBtn}`}><Upload size={14} /> Upload</button>
-                  <input ref={slideUploadRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleSlideUpload} />
-                </div>
-              </div>
-              <div className="flex-col">
-                <label className="form-label">Slides ({form.slideshowImages.length})</label>
-                {form.slideshowImages.length === 0 && <p className={styles.emptySlides}>No slides yet. Add one above.</p>}
-                {form.slideshowImages.map((src, i) => (
-                  <div key={i} className={styles.slideItem}>
-                    <img src={src} alt="" className={styles.slideThumb} />
-                    <span className={`grow text-ellipsis ${styles.slideName}`}>{src}</span>
-                    <div className={`flex-row ${styles.slideActions}`}>
-                      <button onClick={() => moveSlide(i, -1)} disabled={i === 0} className={styles.slideArrow}>↑</button>
-                      <button onClick={() => moveSlide(i, 1)} disabled={i === form.slideshowImages.length - 1} className={styles.slideArrow}>↓</button>
-                      <button onClick={() => removeSlide(i)} className={`${styles.slideArrow} ${styles.slideDel}`}><Trash2 size={14} /></button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+          <div className="form-group">
+            <label className="form-label">Add Slide Image</label>
+            <div className={`flex-row ${styles.slideRow}`}>
+              <input ref={slideUrlRef} className="form-input grow" placeholder="Image URL" />
+              <button onClick={addSlideUrl} className={`btn btn-ghost ${styles.slideBtn}`}><Plus size={14} /> URL</button>
+              <button onClick={() => slideUploadRef.current?.click()} className={`btn btn-ghost ${styles.slideBtn}`}><Upload size={14} /> Upload</button>
+              <input ref={slideUploadRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleSlideUpload} />
             </div>
           </div>
-        </section>
+          <div className="flex-col">
+            <label className="form-label">Slides ({form.slideshowImages.length})</label>
+            {form.slideshowImages.length === 0 && <p className={styles.emptySlides}>No slides yet. Add one above.</p>}
+            {form.slideshowImages.map((src, i) => (
+              <div key={i} className={styles.slideItem}>
+                <img src={src} alt="" className={styles.slideThumb} />
+                <span className={`grow text-ellipsis ${styles.slideName}`}>{src}</span>
+                <div className={`flex-row ${styles.slideActions}`}>
+                  <button onClick={() => moveSlide(i, -1)} disabled={i === 0} className={styles.slideArrow}>↑</button>
+                  <button onClick={() => moveSlide(i, 1)} disabled={i === form.slideshowImages.length - 1} className={styles.slideArrow}>↓</button>
+                  <button onClick={() => removeSlide(i)} className={`${styles.slideArrow} ${styles.slideDel}`}><Trash2 size={14} /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
-        {/* Footer */}
-        <section className={`card card-md ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className="section-icon"><Image size={20} /></span>
             <h2>Footer</h2>
           </div>
-          <div className={styles.sectionBody}>
-            <div className="form-group">
-              <label className="form-label">Footer Text</label>
-              <input className="form-input" value={form.footer.text} onChange={(e) => updateSection('footer', 'text', e.target.value)} placeholder="VelvetSnap Photobooth Platform" />
-            </div>
+          <div className="form-group">
+            <label className="form-label">Footer Text</label>
+            <input className="form-input" value={form.footer.text} onChange={(e) => updateSection('footer', 'text', e.target.value)} placeholder="VelvetSnap Photobooth Platform" />
           </div>
-        </section>
+        </div>
 
-        {/* System */}
-        <section className={`card card-md ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className="section-icon"><Timer size={20} /></span>
             <h2>System</h2>
           </div>
-          <div className={styles.sectionBody}>
-            <div className="flex-col">
-              <div className={styles.row}>
-                <div className="form-group">
-                  <label className={`form-label ${styles.rowLabel}`}><Timer size={14} /> Session Timer (menit)</label>
-                  <input type="number" className="form-input" value={Math.round(form.system.sessionTimer / 60)} onChange={(e) => updateSection('system', 'sessionTimer', Math.max(1, Number(e.target.value)) * 60)} min={1} step={1} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">Slideshow Interval (ms)</label>
-                  <input type="number" className="form-input" value={form.system.slideshowInterval} onChange={(e) => updateSection('system', 'slideshowInterval', Number(e.target.value))} min={1000} step={500} />
-                </div>
-              </div>
-              <div className={styles.divider}>
-                <div className={styles.row}>
-                  <div>
-                    <label className="form-label">Primary Color</label>
-                    <div className={`flex-row ${styles.colorRow}`}>
-                      <input type="color" value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)} className={styles.colorPicker} />
-                      <input className={`form-input ${styles.colorInput}`} value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)} />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="form-label">Accent Color</label>
-                    <div className={`flex-row ${styles.colorRow}`}>
-                      <input type="color" value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} className={styles.colorPicker} />
-                      <input className={`form-input ${styles.colorInput}`} value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} />
-                    </div>
-                  </div>
+          <div className={styles.row}>
+            <div className="form-group">
+              <label className={`form-label ${styles.rowLabel}`}><Timer size={14} /> Session Timer (menit)</label>
+              <input type="number" className="form-input" value={Math.round(form.system.sessionTimer / 60)} onChange={(e) => updateSection('system', 'sessionTimer', Math.max(1, Number(e.target.value)) * 60)} min={1} step={1} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Slideshow Interval (ms)</label>
+              <input type="number" className="form-input" value={form.system.slideshowInterval} onChange={(e) => updateSection('system', 'slideshowInterval', Number(e.target.value))} min={1000} step={500} />
+            </div>
+          </div>
+          <div className={styles.divider}>
+            <div className={styles.row}>
+              <div>
+                <label className="form-label">Primary Color</label>
+                <div className={`flex-row ${styles.colorRow}`}>
+                  <input type="color" value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)} className={styles.colorPicker} />
+                  <input className={`form-input ${styles.colorInput}`} value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)} />
                 </div>
               </div>
-              <div className={styles.divider}>
-                <div className="flex-col">
-                  <label className={`flex-row ${styles.checkRow}`}>
-                    <input type="checkbox" checked={form.system.showPreloader} onChange={(e) => updateSection('system', 'showPreloader', e.target.checked)} className={styles.checkbox} />
-                    <span className={styles.checkLabel}>Show Preloader Animation</span>
-                  </label>
-                  <label className={`flex-row ${styles.checkRow}`}>
-                    <input type="checkbox" checked={form.system.showStrips} onChange={(e) => updateSection('system', 'showStrips', e.target.checked)} className={styles.checkbox} />
-                    <span className={styles.checkLabel}>Show Recent Strips Carousel</span>
-                  </label>
+              <div>
+                <label className="form-label">Accent Color</label>
+                <div className={`flex-row ${styles.colorRow}`}>
+                  <input type="color" value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} className={styles.colorPicker} />
+                  <input className={`form-input ${styles.colorInput}`} value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} />
                 </div>
               </div>
             </div>
           </div>
-        </section>
+          <div className={styles.divider}>
+            <div className="flex-col">
+              <label className={`flex-row ${styles.checkRow}`}>
+                <input type="checkbox" checked={form.system.showPreloader} onChange={(e) => updateSection('system', 'showPreloader', e.target.checked)} className={styles.checkbox} />
+                <span className={styles.checkLabel}>Show Preloader Animation</span>
+              </label>
+              <label className={`flex-row ${styles.checkRow}`}>
+                <input type="checkbox" checked={form.system.showStrips} onChange={(e) => updateSection('system', 'showStrips', e.target.checked)} className={styles.checkbox} />
+                <span className={styles.checkLabel}>Show Recent Strips Carousel</span>
+              </label>
+            </div>
+          </div>
+        </div>
 
-        {/* Security */}
-        <section className={`card card-md ${styles.section}`}>
+        <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
             <span className="section-icon"><Lock size={20} /></span>
             <h2>Security</h2>
           </div>
-          <div className={styles.sectionBody}>
-            <div className="flex-col">
-              <div className="form-group">
-                <label className="form-label">New Password</label>
-                <div className={`flex-row ${styles.passRow}`}>
-                  <input type="password" className="form-input grow" value={newPass} onChange={(e) => { setNewPass(e.target.value); setPassSaved(false); setPassErr(''); }} placeholder="Minimal 4 karakter" />
-                  <button onClick={handleSavePass} disabled={passSaving || passSaved || !newPass} className={`mac-button ${passSaved ? styles.saveBtnDone : ''}`}>
-                    {passSaving ? <Loader2 className="spin" size={16} /> : passSaved ? <Check size={16} /> : <Save size={16} />}
-                    {passSaving ? '...' : passSaved ? 'Tersimpan' : 'Simpan'}
-                  </button>
-                </div>
-                {passErr && <p className={styles.passErr}>{passErr}</p>}
-              </div>
+          <div className="form-group">
+            <label className="form-label">New Password</label>
+            <div className={`flex-row ${styles.passRow}`}>
+              <input type="password" className="form-input grow" value={newPass} onChange={(e) => { setNewPass(e.target.value); setPassSaved(false); setPassErr(''); }} placeholder="Minimal 4 karakter" />
+              <button onClick={handleSavePass} disabled={passSaving || passSaved || !newPass} className={`mac-button ${passSaved ? styles.saveBtnDone : ''}`}>
+                {passSaving ? <Loader2 className="spin" size={16} /> : passSaved ? <Check size={16} /> : <Save size={16} />}
+                {passSaving ? '...' : passSaved ? 'Tersimpan' : 'Simpan'}
+              </button>
             </div>
+            {passErr && <p className={styles.passErr}>{passErr}</p>}
           </div>
-        </section>
+        </div>
       </div>
 
       <div className={styles.saveBar}>

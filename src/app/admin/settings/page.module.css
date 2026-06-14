@@ -34,10 +34,6 @@
   margin: 0;
 }
 
-.sectionBody {
-  padding: 0;
-}
-
 .saveBar {
   display: flex;
   align-items: center;
@@ -345,6 +341,9 @@
     grid-template-columns: 1fr;
     gap: 14px;
   }
+  .section {
+    padding: 16px;
+  }
   .sectionHeader {
     margin-bottom: 12px;
   }
@@ -366,6 +365,9 @@
   .sections {
     gap: 12px;
   }
+  .section {
+    padding: 14px;
+  }
   .sectionHeader {
     margin-bottom: 10px;
     padding-bottom: 8px;
@@ -381,6 +383,9 @@
 @media (max-width: 480px) {
   .sections {
     gap: 10px;
+  }
+  .section {
+    padding: 10px;
   }
   .sectionHeader h2 {
     font-size: 13px;
