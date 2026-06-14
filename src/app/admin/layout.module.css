@@ -207,7 +207,9 @@
     left: 0;
     right: 0;
     z-index: 50;
-    height: 40px;
+    height: auto;
+    min-height: 40px;
+    padding-top: env(safe-area-inset-top);
     background: #fff;
     border-bottom: 1px solid var(--mn-border);
     font-size: 12px;
@@ -217,7 +219,7 @@
   
   .content {
     padding: 16px;
-    padding-top: 56px;
+    padding-top: calc(56px + env(safe-area-inset-top));
     padding-bottom: calc(70px + env(safe-area-inset-bottom) + 16px);
   }
 }
@@ -225,12 +227,12 @@
 @media (max-width: 480px) {
   .content {
     padding: 12px;
-    padding-top: 52px;
+    padding-top: calc(52px + env(safe-area-inset-top));
     padding-bottom: calc(65px + env(safe-area-inset-bottom) + 12px);
   }
   
   .mobileTopBar {
-    height: 36px;
+    min-height: 36px;
     font-size: 11px;
   }
   

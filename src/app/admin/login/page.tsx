@@ -31,18 +31,19 @@ export default function AdminLoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
       });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.token) sessionStorage.setItem('admin_session_token', data.token);
-        router.replace('/admin');
-      } else {
+      if (!res.ok) {
         const data = await res.json();
         setError(data.error || 'Invalid password');
+        setSubmitting(false);
+        return;
       }
+      const data = await res.json();
+      if (data.token) sessionStorage.setItem('admin_session_token', data.token);
+      router.replace('/admin');
     } catch {
       setError('Network error');
+      setSubmitting(false);
     }
-    setSubmitting(false);
   };
 
   if (loading) {

@@ -4,6 +4,7 @@ import Transaction from '@/models/Transaction';
 import Link from 'next/link';
 import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'lucide-react';
 import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
+import MobileActions from './MobileActions';
 import styles from './page.module.css';
 
 export const revalidate = 0;
@@ -71,6 +72,8 @@ export default async function AdminDashboard() {
         title="Dashboard"
         subtitle="VelvetSnap Co. — Admin Dashboard"
       />
+
+      <MobileActions />
 
       <AdminStatGrid>
         <AdminStatCard icon={<Camera size={22} />} label="Total Sessions" value={totalSessions.toLocaleString('id-ID')} color="blue" delay={0.05} />
