@@ -178,6 +178,7 @@ export default function StripsStudioPage() {
   const [showNewConfirm, setShowNewConfirm] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   const [templateIdField, setTemplateIdField] = useState('');
+  const [templateFolderId, setTemplateFolderId] = useState<string | null>(null);
 
   const editorRef = useRef<EditorCanvasHandle>(null);
   const stickerTargetRef = useRef<string | null>(null);
@@ -193,6 +194,7 @@ export default function StripsStudioPage() {
 
     const applyData = (data: any) => {
       setEditingTemplateId(data._id || editId);
+      setTemplateFolderId(data.templateId || null);
       setTemplateName(data.templateName || data.name || '');
       if (typeof data.templatePrice === 'number') {
         setTemplatePrice(data.templatePrice);
@@ -342,10 +344,10 @@ export default function StripsStudioPage() {
     setSelectedId(null);
     await new Promise((r) => setTimeout(r, 50));
     try {
-      // Determine folder — use editingTemplateId for update, generate new ID for create
+      // Determine folder — reuse templateId from doc for updates, generate new ID for create
       const isNew = !editingTemplateId;
-      const folderId = isNew ? makeId() : editingTemplateId;
-      if (isNew) setTemplateIdField(folderId);
+      const folderId = isNew ? makeId() : (templateFolderId || editingTemplateId);
+      setTemplateIdField(folderId);
       const baseFolder = `velvetsnap/templates/${folderId}`;
 
       const thumbnailB64 = editorRef.current?.getThumbnail() || '';
