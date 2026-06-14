@@ -24,7 +24,7 @@ export async function GET(req: Request) {
         success: true,
         data: [normalizeTemplate(template)],
       }, {
-        headers: { 'Cache-Control': 'public, max-age=60' },
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
       });
     }
 
