@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Edit2, Trash2, Loader2, ExternalLink } from 'lucide-react';
-import { AdminPageHeader, AdminTableCard } from '@/app/admin/components';
+import { AdminPageHeader, AdminTableCard, AdminConfirmModal } from '@/app/admin/components';
 import styles from './page.module.css';
 
 interface TemplateData {
@@ -26,6 +26,8 @@ interface TemplateData {
 export default function TemplatesAdmin() {
   const [templates, setTemplates] = useState<TemplateData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   useEffect(() => {
     fetchTemplates();
   }, []);
@@ -43,13 +45,21 @@ export default function TemplatesAdmin() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this template?')) return;
+  const handleDelete = (id: string) => {
+    setDeleteTarget(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
-      await fetch(`/api/templates/${id}`, { method: 'DELETE' });
+      await fetch(`/api/templates/${deleteTarget}`, { method: 'DELETE' });
+      setDeleteTarget(null);
       fetchTemplates();
     } catch (err) {
       console.error('Delete failed:', err);
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -144,6 +154,17 @@ export default function TemplatesAdmin() {
           </table>
         )}
       </AdminTableCard>
+
+      <AdminConfirmModal
+        open={deleteTarget !== null}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleConfirmDelete}
+        title="Hapus Template?"
+        message="Apakah anda yakin ingin menghapus template ini?"
+        confirmLabel="Hapus"
+        loading={deleteLoading}
+        variant="danger"
+      />
     </div>
   );
 }
