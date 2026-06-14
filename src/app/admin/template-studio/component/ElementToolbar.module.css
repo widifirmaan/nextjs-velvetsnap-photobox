@@ -1,0 +1,57 @@
+.toolBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--mn-border);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: all 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.toolBtnDisabled {
+  background: #eee;
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.toolBtnEnabled {
+  background: var(--clay-bg);
+  cursor: pointer;
+}
+
+.toolBtnEnabled:hover {
+  border-color: var(--accent-color);
+  background: var(--accent-bg);
+}
+
+.toolWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toolBtnIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--accent-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--accent-color);
+  flex-shrink: 0;
+}
+
+.iconText {
+  font-size: 12px;
+}
+
+.iconImage {
+  font-size: 16px;
+}

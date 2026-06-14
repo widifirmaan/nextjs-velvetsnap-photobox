@@ -1,4 +1,5 @@
 import AdminModal from './AdminModal';
+import styles from './admin-modal.module.css';
 
 interface Props {
   open: boolean;
@@ -17,8 +18,8 @@ export default function AdminConfirmModal({
 }: Props) {
   return (
     <AdminModal open={open} onClose={onClose} title={title}>
-      <p style={{ marginBottom: 24, color: 'var(--text-secondary)' }}>{message}</p>
-      <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
+      <p className={styles.confirmMessage}>{message}</p>
+      <div className={styles.confirmActions}>
         <button className="btn btn-ghost" onClick={onClose} disabled={loading}>Batal</button>
         <button className={`btn ${variant === 'primary' ? 'btn-primary' : 'btn-danger'}`} onClick={onConfirm} disabled={loading}>
           {loading ? (variant === 'primary' ? 'Menyimpan...' : 'Menghapus...') : confirmLabel}

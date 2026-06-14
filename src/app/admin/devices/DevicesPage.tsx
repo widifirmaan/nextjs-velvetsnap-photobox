@@ -138,7 +138,7 @@ export default function DevicesPage() {
           </div>
 
           {settings.cameraType === 'webcam' && (
-            <div style={{ marginTop: '20px' }}>
+            <div className={styles.sectionBody}>
               {cameras.length === 0 ? (
                 <p className={styles.emptyText}>Mencari kamera atau izin belum diberikan...</p>
               ) : (
@@ -157,11 +157,11 @@ export default function DevicesPage() {
           )}
 
           {settings.cameraType === 'dslr' && (
-            <div style={{ marginTop: '20px' }}>
-              <p className={styles.emptyText} style={{ marginBottom: '12px' }}>
+            <div className={styles.sectionBody}>
+              <p className={`${styles.emptyText} ${styles.sectionBodyMb}`}>
                 Gunakan kamera DSLR/mirrorless yang terhubung via USB. Membutuhkan <strong>gphoto2</strong> (Linux/macOS) atau <strong>DigiCamControl</strong> (Windows) di server.
               </p>
-              <button className="mac-button secondary" onClick={testDslr} disabled={dslrTesting} style={{ padding: '10px 20px', fontSize: '13px' }}>
+              <button className={`mac-button secondary ${styles.macBtnSm}`} onClick={testDslr} disabled={dslrTesting}>
                 <RefreshCw size={16} className={dslrTesting ? 'spin' : ''} /> {dslrTesting ? 'Memeriksa...' : 'Deteksi Kamera USB'}
               </button>
               {dslrStatus && <p className={styles.dslrStatus}>{dslrStatus}</p>}

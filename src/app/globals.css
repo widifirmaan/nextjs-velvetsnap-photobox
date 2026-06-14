@@ -5,6 +5,7 @@
   --bg-secondary: #f7f7f7;
   --text-primary: #262626;
   --text-secondary: #4C4C4C;
+  --text-muted: #8e8e93;
   --accent-color: #C5D89D;
   --accent-hover: color-mix(in srgb, var(--accent-color) 80%, #000);
   --danger-color: var(--accent-color);
@@ -449,4 +450,69 @@ label {
 }
 .btn-primary:not(:disabled):hover {
   filter: brightness(0.9);
+}
+
+/* ── Section Heading (uppercase label pattern) ── */
+.section-heading {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+/* ── Compact Form Input ── */
+.form-input-compact {
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid var(--mn-border);
+  background: #fff;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 12px;
+  outline: none;
+  transition: border-color var(--transition-fast);
+  box-sizing: border-box;
+}
+.form-input-compact:focus {
+  border-color: var(--accent-color);
+}
+
+/* ── Flex/Grow Utilities ── */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+.scroll-y {
+  overflow-y: auto;
+  min-height: 0;
+}
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+/* ── Text Utilities ── */
+.text-muted-sm {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.text-center {
+  text-align: center;
+}
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Card Border Modifier ── */
+.card-border {
+  border: 1px solid var(--mn-border);
 }

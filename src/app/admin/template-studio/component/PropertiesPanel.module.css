@@ -1,0 +1,103 @@
+.sectionWrapper {
+  margin-bottom: 16px;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.fieldRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.fieldLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.flexRowSm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.textareaField {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.stickerInput {
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.08);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.browseGalleryBtn {
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--accent-color);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.colorPicker {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.actionButtons {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emptyState {
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.actionBtn {
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--mn-border);
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.selectedType {
+  color: var(--text-primary);
+}

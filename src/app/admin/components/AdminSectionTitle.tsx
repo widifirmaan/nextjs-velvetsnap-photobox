@@ -9,7 +9,7 @@ interface Props {
 export default function AdminSectionTitle({ icon: Icon, title }: Props) {
   return (
     <h2 className={styles.sectionTitle}>
-      {Icon && <Icon size={18} style={{ flexShrink: 0 }} />}
+      {Icon && <Icon size={18} className="flex-shrink-0" />}
       {title}
     </h2>
   );

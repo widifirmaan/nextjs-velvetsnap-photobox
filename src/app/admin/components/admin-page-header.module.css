@@ -1,3 +1,13 @@
+.headerTitle {
+  text-align: left;
+  margin-bottom: 8px;
+}
+
+.headerSubtitle {
+  text-align: left;
+  margin-bottom: 0;
+}
+
 .header {
   display: flex;
   justify-content: space-between;

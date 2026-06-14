@@ -168,21 +168,31 @@
   background: var(--clay-bg);
 }
 
+.paginationWrap {
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.pageInfo {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
 @media (max-width: 640px) {
   .modalGrid {
     grid-template-columns: repeat(2, 1fr);
   }
-  :global(.admin-table) tbody td:nth-child(3),
-  :global(.admin-table) thead th:nth-child(3),
-  :global(.admin-table) tbody td:nth-child(6),
-  :global(.admin-table) thead th:nth-child(6) {
+  .tableContainer :global(.admin-table) tbody td:nth-child(3),
+  .tableContainer :global(.admin-table) thead th:nth-child(3),
+  .tableContainer :global(.admin-table) tbody td:nth-child(6),
+  .tableContainer :global(.admin-table) thead th:nth-child(6) {
     display: none;
   }
   .tableContainer {
     overflow: auto;
     margin-bottom: 16px;
   }
-  :global(.admin-table) {
+  .tableContainer :global(.admin-table) {
     min-width: 400px;
   }
   .pagination {
@@ -202,11 +212,11 @@
     font-size: 16px;
     padding: 8px 10px;
   }
-  :global(.admin-table) thead th {
+  .tableContainer :global(.admin-table) thead th {
     font-size: 10px;
     padding: 8px 6px;
   }
-  :global(.admin-table) tbody td {
+  .tableContainer :global(.admin-table) tbody td {
     padding: 8px 6px;
     font-size: 11px;
   }
@@ -238,14 +248,14 @@
   .tableContainer {
     margin-bottom: 12px;
   }
-  :global(.admin-table) {
+  .tableContainer :global(.admin-table) {
     min-width: 340px;
   }
-  :global(.admin-table) thead th {
+  .tableContainer :global(.admin-table) thead th {
     font-size: 8px;
     padding: 6px 4px;
   }
-  :global(.admin-table) tbody td {
+  .tableContainer :global(.admin-table) tbody td {
     padding: 6px 4px;
     font-size: 10px;
   }

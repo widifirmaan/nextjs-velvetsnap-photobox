@@ -1,0 +1,47 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  background: var(--clay-bg);
+  padding: 24px;
+}
+
+.form {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  box-shadow: var(--clay-shadow-elevated, 0 12px 40px rgba(0,0,0,0.08));
+}
+
+.brandText {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 2px;
+  letter-spacing: -0.03em;
+}
+
+.subText {
+  color: var(--text-secondary);
+  margin-bottom: 28px;
+  font-size: 14px;
+}
+
+.input {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  font-size: 16px;
+  background: var(--clay-bg);
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.submitBtn {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 600;
+}

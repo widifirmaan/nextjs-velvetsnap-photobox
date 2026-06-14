@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, XCircle, Play } from 'lucide-react';
 import { renderStripFrame, removeGreenScreen } from '@/lib/canvas-utils';
 import type { IStripElement } from '@/models/Template';
+import styles from './page.module.css';
 
 const HI_RES_MULTIPLIER = 3;
 
@@ -105,7 +106,7 @@ export default function ReprocessTemplatesPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+      <div className={styles.loadingScreen}>
         <Loader2 className="spin" size={32} />
       </div>
     );
@@ -113,9 +114,9 @@ export default function ReprocessTemplatesPage() {
 
   if (!templates.length) {
     return (
-      <div style={{ padding: 40, textAlign: 'center' }}>
+      <div className={styles.emptyState}>
         <h2>Reprocess Templates</h2>
-        <p style={{ color: 'var(--text-muted)', marginTop: 12 }}>
+        <p className={`text-muted-sm ${styles.emptyText}`}>
           No templates with editable elements found.
         </p>
       </div>
@@ -123,50 +124,29 @@ export default function ReprocessTemplatesPage() {
   }
 
   return (
-    <div style={{ padding: 32, maxWidth: 800, margin: '0 auto' }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>Reprocess Templates</h1>
-      <p style={{ color: 'var(--text-muted)', fontSize: 14, marginBottom: 20 }}>
+    <div className={styles.wrapper}>
+      <h1 className={`title ${styles.leftText}`}>Reprocess Templates</h1>
+      <p className={`subtitle ${styles.subtitle} ${styles.leftText}`}>
         Re-render all templates at {HI_RES_MULTIPLIER}x resolution ({templates.length} templates found, {countByStatus('done')} done, {countByStatus('error')} failed)
       </p>
 
-      <button
-        onClick={processAll}
-        disabled={running}
-        style={{
-          display: 'inline-flex', alignItems: 'center', gap: 8,
-          padding: '12px 24px', borderRadius: 10, border: 'none',
-          background: running ? '#ccc' : '#262626', color: '#fff',
-          fontWeight: 700, fontSize: 14, cursor: running ? 'not-allowed' : 'pointer',
-          marginBottom: 24,
-        }}
-      >
+      <button onClick={processAll} disabled={running} className={styles.processBtn}>
         {running ? <Loader2 className="spin" size={18} /> : <Play size={18} />}
         {running ? 'Processing...' : 'Process All'}
       </button>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className={styles.list}>
         {templates.map((t) => (
-          <div
-            key={t._id}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 12,
-              padding: '12px 16px', borderRadius: 10,
-              background: status[t._id] === 'error' ? '#fff5f5' : '#fff',
-              border: '1px solid',
-              borderColor: status[t._id] === 'error' ? '#fecaca' : 'var(--mn-border)',
-            }}
-          >
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{t.templateName}</div>
-              <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+          <div key={t._id} className={`${styles.card} ${status[t._id] === 'error' ? styles.cardError : ''}`}>
+            <div className={styles.cardBody}>
+              <div className={styles.cardTitle}>{t.templateName}</div>
+              <div className={styles.cardMeta}>
                 {t.templateData?.canvasWidth}×{t.templateData?.canvasHeight} → {t.templateData?.canvasWidth! * HI_RES_MULTIPLIER}×{t.templateData?.canvasHeight! * HI_RES_MULTIPLIER}
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              {status[t._id] === 'pending' && (
-                <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>Pending</span>
-              )}
+            <div className={styles.statusRow}>
+              {status[t._id] === 'pending' && <span className={styles.statusPending}>Pending</span>}
               {status[t._id] === 'processing' && <Loader2 className="spin" size={18} />}
               {status[t._id] === 'done' && <CheckCircle2 size={18} color="#16a34a" />}
               {status[t._id] === 'error' && (

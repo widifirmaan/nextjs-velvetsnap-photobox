@@ -10,8 +10,8 @@ export default function AdminPageHeader({ title, subtitle, action }: Props) {
   return (
     <div className={styles.header}>
       <div>
-        <h1 className="title" style={{ textAlign: 'left', marginBottom: '8px' }}>{title}</h1>
-        <p className="subtitle" style={{ textAlign: 'left', marginBottom: 0 }}>{subtitle}</p>
+        <h1 className={`title ${styles.headerTitle}`}>{title}</h1>
+        <p className={`subtitle ${styles.headerSubtitle}`}>{subtitle}</p>
       </div>
       {action}
     </div>

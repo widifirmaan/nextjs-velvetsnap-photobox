@@ -199,10 +199,10 @@ export default function SettingsPage() {
 
   if (authErr) {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flex:1, minHeight:200 }}>
-        <div style={{ textAlign:'center' }}>
-          <p style={{ color:'#ef4444', fontSize:15, fontWeight:600 }}>Session expired</p>
-          <p style={{ color:'#6b7280', fontSize:13, marginTop:4 }}>Redirecting to login...</p>
+      <div className={`flex-center ${styles.flexCenter}`}>
+        <div className={styles.centerBlock}>
+          <p className={styles.errorText}>Session expired</p>
+          <p className={styles.mutedText}>Redirecting to login...</p>
         </div>
       </div>
     );
@@ -210,38 +210,11 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'center', flex:1, minHeight:200 }}>
+      <div className={`flex-center ${styles.flexCenter}`}>
         <Loader2 className="spin" size={32} />
       </div>
     );
   }
-
-  const card: React.CSSProperties = {
-    background:'#fff', borderRadius:16, border:'1px solid #e5e7eb',
-    boxShadow:'0 1px 3px rgba(0,0,0,0.06)',
-  };
-
-  const cardHeader: React.CSSProperties = {
-    padding:'16px 20px', borderBottom:'1px solid #e5e7eb',
-    display:'flex', alignItems:'center', gap:10,
-    fontSize:15, fontWeight:700, color:'#111',
-  };
-
-  const cardBody: React.CSSProperties = {
-    padding:'20px',
-  };
-
-  const inputStyle: React.CSSProperties = {
-    width:'100%', padding:'10px 14px',
-    border:'1.5px solid #d1d5db', borderRadius:10,
-    fontSize:14, background:'#f9fafb', outline:'none',
-    boxSizing:'border-box', fontFamily:'inherit',
-    transition:'border-color 0.15s',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    fontSize:13, fontWeight:600, marginBottom:6, display:'block', color:'#374151',
-  };
 
   const navItems: NavItem[] = (() => { try { return JSON.parse(form.header.navItems); } catch { return []; } })();
 
@@ -258,15 +231,6 @@ export default function SettingsPage() {
   const removeNavItem = (i: number) => {
     const items = navItems.filter((_, idx) => idx !== i);
     updateSection('header', 'navItems', JSON.stringify(items));
-  };
-
-  const smallInput: React.CSSProperties = {
-    ...inputStyle, width: '100%', boxSizing: 'border-box' as const,
-  };
-
-  const focusProps = {
-    onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = '#111827'; },
-    onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => { e.target.style.borderColor = '#d1d5db'; },
   };
 
   const uploadImage = (file: File) => {
@@ -288,286 +252,197 @@ export default function SettingsPage() {
   };
 
   return (
-    <div style={{ flex:1, display:'flex', flexDirection:'column', gap:20, padding:'0 0 60px', overflowY:'auto', minHeight:0 }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'20px 4px 0' }}>
+    <div className={`flex-col ${styles.pageBody}`}>
+      <div className={`flex-row ${styles.headerRow}`}>
         <div>
-          <h1 style={{ fontSize:24, fontWeight:700, margin:0, color:'#111' }}>Settings</h1>
-          <p style={{ fontSize:14, color:'#6b7280', margin:'4px 0 0' }}>Customize homepage appearance</p>
+          <h1 className={styles.pageTitle}>Settings</h1>
+          <p className={styles.pageSubtext}>Customize homepage appearance</p>
         </div>
-        <button onClick={() => setConfirmSave(true)} disabled={saving || saved}
-          style={{
-            display:'inline-flex', alignItems:'center', gap:8,
-            padding:'10px 24px', borderRadius:10, border:'none',
-            fontSize:14, fontWeight:600, cursor:saving || saved ? 'default' : 'pointer',
-            background:saved ? '#10b981' : '#111827', color:'#fff',
-            opacity:saving ? 0.6 : 1, transition:'all 0.15s',
-          }}>
+        <button onClick={() => setConfirmSave(true)} disabled={saving || saved} className={`${styles.saveBtn} ${saved ? styles.saveBtnDone : ''}`}>
           {saving ? <Loader2 className="spin" size={16} /> : saved ? null : <Save size={16} />}
           {saving ? 'Menyimpan...' : saved ? 'Tersimpan' : 'Simpan'}
         </button>
       </div>
-      {saveErr && <p style={{ color:'#ef4444', fontSize:13, margin:0, textAlign:'right', paddingRight:4 }}>{saveErr}</p>}
+      {saveErr && <p className={styles.saveErr}>{saveErr}</p>}
 
       {/* Header */}
-      <div style={card}>
-        <div style={cardHeader}><MapPin size={18} /> Page Header</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div>
-              <label style={labelStyle}>Location Name</label>
-              <input style={inputStyle} value={form.header.location} onChange={(e) => updateSection('header', 'location', e.target.value)}
-                placeholder="Jakarta" {...focusProps} />
+      <section className="card card-md">
+        <div className={styles.sectionTitle}><MapPin size={18} /> Page Header</div>
+        <div className={styles.sectionBody}>
+          <div className="flex-col">
+            <div className="form-group">
+              <label className="form-label">Location Name</label>
+              <input className="form-input" value={form.header.location} onChange={(e) => updateSection('header', 'location', e.target.value)} placeholder="Jakarta" />
             </div>
-            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:16 }}>
-              <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}>
-                <label style={{ ...labelStyle, margin:0 }}>Navigation Items</label>
-                <button onClick={addNavItem} style={{
-                  display:'inline-flex', alignItems:'center', gap:4,
-                  padding:'5px 12px', borderRadius:8, border:'1px solid #d1d5db',
-                  fontSize:12, fontWeight:600, cursor:'pointer',
-                  background:'#f9fafb', color:'#374151',
-                }}><Plus size={14} /> Add Item</button>
+            <div className={styles.divider}>
+              <div className={`flex-row ${styles.navHeader}`}>
+                <label className={`form-label ${styles.navLabel}`}>Navigation Items</label>
+                <button onClick={addNavItem} className={`btn btn-ghost ${styles.addNavBtn}`}><Plus size={14} /> Add Item</button>
               </div>
-              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              <div className="flex-col">
                 {navItems.map((item, i) => (
                   <div key={i} className={styles.navItem}>
-                    <input style={smallInput} value={item.label} onChange={(e) => updateNavItem(i, 'label', e.target.value)}
-                      placeholder="Label" {...focusProps} />
-                    <input style={smallInput} value={item.url} onChange={(e) => updateNavItem(i, 'url', e.target.value)}
-                      placeholder="URL" {...focusProps} />
-                    <button onClick={() => removeNavItem(i)} style={{
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      width:36, height:36, border:'1px solid #e5e7eb', borderRadius:8,
-                      cursor:'pointer', background:'#fff', color:'#ef4444', flexShrink:0,
-                    }}><Trash2 size={14} /></button>
+                    <input className="form-input" value={item.label} onChange={(e) => updateNavItem(i, 'label', e.target.value)} placeholder="Label" />
+                    <input className="form-input" value={item.url} onChange={(e) => updateNavItem(i, 'url', e.target.value)} placeholder="URL" />
+                    <button onClick={() => removeNavItem(i)} className={styles.navDelBtn}><Trash2 size={14} /></button>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Page Content */}
-      <div style={card}>
-        <div style={cardHeader}><FileText size={18} /> Page Content</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-            <div>
-              <label style={labelStyle}>App Name</label>
-              <input style={inputStyle} value={form.appName} onChange={(e) => setRootField('appName', e.target.value)}
-                placeholder="VelvetSnap" {...focusProps} />
+      <section className="card card-md">
+        <div className={styles.sectionTitle}><FileText size={18} /> Page Content</div>
+        <div className={styles.sectionBody}>
+          <div className="flex-col">
+            <div className="form-group">
+              <label className="form-label">App Name</label>
+              <input className="form-input" value={form.appName} onChange={(e) => setRootField('appName', e.target.value)} placeholder="VelvetSnap" />
             </div>
-            <div>
-              <label style={labelStyle}>Tagline</label>
-              <input style={inputStyle} value={form.appTagline} onChange={(e) => setRootField('appTagline', e.target.value)}
-                placeholder="AI-Powered Photobooth Experience" {...focusProps} />
+            <div className="form-group">
+              <label className="form-label">Tagline</label>
+              <input className="form-input" value={form.appTagline} onChange={(e) => setRootField('appTagline', e.target.value)} placeholder="AI-Powered Photobooth Experience" />
             </div>
-            <div>
-              <label style={labelStyle}>Hero Subtitle</label>
-              <input style={inputStyle} value={form.heroSubtitle} onChange={(e) => setRootField('heroSubtitle', e.target.value)}
-                placeholder="Pilih frame, foto, edit..." {...focusProps} />
+            <div className="form-group">
+              <label className="form-label">Hero Subtitle</label>
+              <input className="form-input" value={form.heroSubtitle} onChange={(e) => setRootField('heroSubtitle', e.target.value)} placeholder="Pilih frame, foto, edit..." />
             </div>
-            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20 }}>
+            <div className={styles.divider}>
               <LogoUpload label="Logo" value={form.logo} onChange={(url) => setRootField('logo', url)} uploadImage={uploadImage} />
             </div>
-            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20 }}>
-              <label style={labelStyle}>Card Small HTML</label>
-              <textarea style={{ ...inputStyle, minHeight:80, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.cardSmallHtml}
-                onChange={(e) => setRootField('cardSmallHtml', e.target.value)}
-                placeholder="&lt;div&gt;... custom HTML untuk card kecil (akan ganti default)&lt;/div&gt;" {...focusProps} />
+            <div className={styles.divider}>
+              <div className="form-group">
+                <label className="form-label">Card Small HTML</label>
+                <textarea className={styles.textareaField} value={form.cardSmallHtml}
+                  onChange={(e) => setRootField('cardSmallHtml', e.target.value)}
+                  placeholder="&lt;div&gt;... custom HTML untuk card kecil (akan ganti default)&lt;/div&gt;" />
+              </div>
             </div>
-            <div>
-              <label style={labelStyle}>Card Promo HTML</label>
-              <textarea style={{ ...inputStyle, minHeight:80, resize:'vertical', fontFamily:'monospace', fontSize:13 }} value={form.cardPromoHtml}
+            <div className="form-group">
+              <label className="form-label">Card Promo HTML</label>
+              <textarea className={styles.textareaField} value={form.cardPromoHtml}
                 onChange={(e) => setRootField('cardPromoHtml', e.target.value)}
-                placeholder="&lt;div&gt;... custom HTML untuk card promo&lt;/div&gt;" {...focusProps} />
+                placeholder="&lt;div&gt;... custom HTML untuk card promo&lt;/div&gt;" />
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Slideshow */}
-      <div style={card}>
-        <div style={cardHeader}><Image size={18} /> Homepage Slideshow</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
-            <div>
-              <label style={labelStyle}>Add Slide Image</label>
-              <div style={{ display:'flex', gap:8, marginBottom:8 }}>
-                <input
-                  ref={slideUrlRef}
-                  style={{ ...inputStyle, flex:1 }}
-                  placeholder="Image URL"
-                  {...focusProps}
-                />
-                <button onClick={addSlideUrl}
-                  style={{
-                    display:'inline-flex', alignItems:'center', gap:4,
-                    padding:'8px 16px', borderRadius:8, border:'1px solid #d1d5db',
-                    fontSize:13, fontWeight:600, cursor:'pointer',
-                    background:'#f9fafb', color:'#374151', whiteSpace:'nowrap',
-                  }}><Plus size={14} /> URL</button>
-                <button onClick={() => slideUploadRef.current?.click()}
-                  style={{
-                    display:'inline-flex', alignItems:'center', gap:4,
-                    padding:'8px 16px', borderRadius:8, border:'1px solid #d1d5db',
-                    fontSize:13, fontWeight:600, cursor:'pointer',
-                    background:'#f9fafb', color:'#374151', whiteSpace:'nowrap',
-                  }}><Upload size={14} /> Upload</button>
-                <input ref={slideUploadRef} type="file" accept="image/*" style={{ display:'none' }}
-                  onChange={handleSlideUpload} />
+      <section className="card card-md">
+        <div className={styles.sectionTitle}><Image size={18} /> Homepage Slideshow</div>
+        <div className={styles.sectionBody}>
+          <div className="flex-col">
+            <div className="form-group">
+              <label className="form-label">Add Slide Image</label>
+              <div className={`flex-row ${styles.slideRow}`}>
+                <input ref={slideUrlRef} className="form-input grow" placeholder="Image URL" />
+                <button onClick={addSlideUrl} className={`btn btn-ghost ${styles.slideBtn}`}><Plus size={14} /> URL</button>
+                <button onClick={() => slideUploadRef.current?.click()} className={`btn btn-ghost ${styles.slideBtn}`}><Upload size={14} /> Upload</button>
+                <input ref={slideUploadRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleSlideUpload} />
               </div>
             </div>
-            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              <label style={labelStyle}>Slides ({form.slideshowImages.length})</label>
-              {form.slideshowImages.length === 0 && (
-                <p style={{ fontSize:13, color:'#9ca3af', margin:0 }}>No slides yet. Add one above.</p>
-              )}
+            <div className="flex-col">
+              <label className="form-label">Slides ({form.slideshowImages.length})</label>
+              {form.slideshowImages.length === 0 && <p className={styles.emptySlides}>No slides yet. Add one above.</p>}
               {form.slideshowImages.map((src, i) => (
-                <div key={i} style={{
-                  display:'flex', alignItems:'center', gap:10,
-                  padding:'8px 12px', borderRadius:10, border:'1px solid #e5e7eb',
-                  background:'#fafafa',
-                }}>
-                  <img src={src} alt="" style={{
-                    width:48, height:48, borderRadius:8, objectFit:'cover',
-                    border:'1px solid #e5e7eb', flexShrink:0,
-                  }} />
-                  <span style={{
-                    flex:1, fontSize:12, color:'#6b7280', overflow:'hidden',
-                    textOverflow:'ellipsis', whiteSpace:'nowrap', minWidth:0,
-                  }}>{src}</span>
-                  <div style={{ display:'flex', gap:4, flexShrink:0 }}>
-                    <button onClick={() => moveSlide(i, -1)} disabled={i === 0} title="Move up"
-                      style={{
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        width:30, height:30, border:'1px solid #e5e7eb', borderRadius:6,
-                        cursor:i === 0 ? 'default' : 'pointer', background:'#fff', color:'#6b7280',
-                        opacity:i === 0 ? 0.4 : 1, padding:0, fontSize:14,
-                      }}>↑</button>
-                    <button onClick={() => moveSlide(i, 1)} disabled={i === form.slideshowImages.length - 1} title="Move down"
-                      style={{
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        width:30, height:30, border:'1px solid #e5e7eb', borderRadius:6,
-                        cursor:i === form.slideshowImages.length - 1 ? 'default' : 'pointer', background:'#fff',
-                        color:'#6b7280', opacity:i === form.slideshowImages.length - 1 ? 0.4 : 1,
-                        padding:0, fontSize:14,
-                      }}>↓</button>
-                    <button onClick={() => removeSlide(i)} title="Remove"
-                      style={{
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        width:30, height:30, border:'1px solid #fee2e2', borderRadius:6,
-                        cursor:'pointer', background:'#fff', color:'#ef4444', padding:0,
-                      }}><Trash2 size={14} /></button>
+                <div key={i} className={styles.slideItem}>
+                  <img src={src} alt="" className={styles.slideThumb} />
+                  <span className={`grow text-ellipsis ${styles.slideName}`}>{src}</span>
+                  <div className={`flex-row ${styles.slideActions}`}>
+                    <button onClick={() => moveSlide(i, -1)} disabled={i === 0} className={styles.slideArrow}>↑</button>
+                    <button onClick={() => moveSlide(i, 1)} disabled={i === form.slideshowImages.length - 1} className={styles.slideArrow}>↓</button>
+                    <button onClick={() => removeSlide(i)} className={`${styles.slideArrow} ${styles.slideDel}`}><Trash2 size={14} /></button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Footer */}
-      <div style={card}>
-        <div style={cardHeader}><Image size={18} /> Footer</div>
-        <div style={cardBody}>
-          <div>
-            <label style={labelStyle}>Footer Text</label>
-            <input style={inputStyle} value={form.footer.text} onChange={(e) => updateSection('footer', 'text', e.target.value)}
-              placeholder="VelvetSnap Photobooth Platform"
-              {...focusProps} />
+      <section className="card card-md">
+        <div className={styles.sectionTitle}><Image size={18} /> Footer</div>
+        <div className={styles.sectionBody}>
+          <div className="form-group">
+            <label className="form-label">Footer Text</label>
+            <input className="form-input" value={form.footer.text} onChange={(e) => updateSection('footer', 'text', e.target.value)} placeholder="VelvetSnap Photobooth Platform" />
           </div>
         </div>
-      </div>
+      </section>
 
       {/* System */}
-      <div style={card}>
-        <div style={cardHeader}><Timer size={18} /> System</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+      <section className="card card-md">
+        <div className={styles.sectionTitle}><Timer size={18} /> System</div>
+        <div className={styles.sectionBody}>
+          <div className="flex-col">
             <div className={styles.row}>
-              <div>
-                <label style={{ ...labelStyle, display:'flex', alignItems:'center', gap:6 }}>
-                  <Timer size={14} /> Session Timer (menit)
+              <div className="form-group">
+                <label className={`form-label ${styles.rowLabel}`}><Timer size={14} /> Session Timer (menit)</label>
+                <input type="number" className="form-input" value={Math.round(form.system.sessionTimer / 60)} onChange={(e) => updateSection('system', 'sessionTimer', Math.max(1, Number(e.target.value)) * 60)} min={1} step={1} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Slideshow Interval (ms)</label>
+                <input type="number" className="form-input" value={form.system.slideshowInterval} onChange={(e) => updateSection('system', 'slideshowInterval', Number(e.target.value))} min={1000} step={500} />
+              </div>
+            </div>
+            <div className={styles.divider}>
+              <div className={styles.row}>
+                <div>
+                  <label className="form-label">Primary Color</label>
+                  <div className={`flex-row ${styles.colorRow}`}>
+                    <input type="color" value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)} className={styles.colorPicker} />
+                    <input className={`form-input ${styles.colorInput}`} value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)} />
+                  </div>
+                </div>
+                <div>
+                  <label className="form-label">Accent Color</label>
+                  <div className={`flex-row ${styles.colorRow}`}>
+                    <input type="color" value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} className={styles.colorPicker} />
+                    <input className={`form-input ${styles.colorInput}`} value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.divider}>
+              <div className="flex-col">
+                <label className={`flex-row ${styles.checkRow}`}>
+                  <input type="checkbox" checked={form.system.showPreloader} onChange={(e) => updateSection('system', 'showPreloader', e.target.checked)} className={styles.checkbox} />
+                  <span className={styles.checkLabel}>Show Preloader Animation</span>
                 </label>
-                <input type="number" value={Math.round(form.system.sessionTimer / 60)} onChange={(e) => updateSection('system', 'sessionTimer', Math.max(1, Number(e.target.value)) * 60)}
-                  style={inputStyle} min={1} step={1}
-                  {...focusProps} />
-              </div>
-              <div>
-                <label style={labelStyle}>Slideshow Interval (ms)</label>
-                <input type="number" value={form.system.slideshowInterval} onChange={(e) => updateSection('system', 'slideshowInterval', Number(e.target.value))}
-                  style={inputStyle} min={1000} step={500}
-                  {...focusProps} />
-              </div>
-            </div>
-            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20 }}>
-            <div className={styles.row}>
-                <div>
-                  <label style={labelStyle}>Primary Color</label>
-                  <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-                    <input type="color" value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)}
-                      style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
-                    <input style={{ ...inputStyle, width:'auto', flex:1, minWidth:0 }} value={form.system.primaryColor} onChange={(e) => updateSection('system', 'primaryColor', e.target.value)}
-                      {...focusProps} />
-                  </div>
-                </div>
-                <div>
-                  <label style={labelStyle}>Accent Color</label>
-                  <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-                    <input type="color" value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)}
-                      style={{ width:44, height:44, border:'1.5px solid #d1d5db', borderRadius:10, padding:3, cursor:'pointer', background:'none' }} />
-                    <input style={{ ...inputStyle, width:'auto', flex:1, minWidth:0 }} value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)}
-                      {...focusProps} />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div style={{ borderTop:'1px solid #e5e7eb', paddingTop:20, display:'flex', flexDirection:'column', gap:12 }}>
-              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <input type="checkbox" checked={form.system.showPreloader} onChange={(e) => updateSection('system', 'showPreloader', e.target.checked)}
-                  style={{ width:18, height:18, accentColor:'#111827' }} />
-                <span style={{ fontSize:14, color:'#374151' }}>Show Preloader Animation</span>
-              </div>
-              <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-                <input type="checkbox" checked={form.system.showStrips} onChange={(e) => updateSection('system', 'showStrips', e.target.checked)}
-                  style={{ width:18, height:18, accentColor:'#111827' }} />
-                <span style={{ fontSize:14, color:'#374151' }}>Show Recent Strips Carousel</span>
+                <label className={`flex-row ${styles.checkRow}`}>
+                  <input type="checkbox" checked={form.system.showStrips} onChange={(e) => updateSection('system', 'showStrips', e.target.checked)} className={styles.checkbox} />
+                  <span className={styles.checkLabel}>Show Recent Strips Carousel</span>
+                </label>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Security */}
-      <div style={card}>
-        <div style={cardHeader}><Lock size={18} /> Security</div>
-        <div style={cardBody}>
-          <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
-            <div>
-              <label style={labelStyle}>New Password</label>
-              <div style={{ display:'flex', gap:10 }}>
-                <input type="password" value={newPass} onChange={(e) => { setNewPass(e.target.value); setPassSaved(false); setPassErr(''); }}
-                  style={{ ...inputStyle, flex:1 }} placeholder="Minimal 4 karakter"
-                  {...focusProps} />
-                <button onClick={handleSavePass} disabled={passSaving || passSaved || !newPass}
-                  style={{
-                    display:'inline-flex', alignItems:'center', gap:6,
-                    padding:'10px 20px', borderRadius:10, border:'none',
-                    fontSize:14, fontWeight:600, cursor:passSaving || passSaved || !newPass ? 'default' : 'pointer',
-                    background:passSaved ? '#10b981' : '#111827', color:'#fff',
-                    opacity:passSaving ? 0.6 : 1, whiteSpace:'nowrap', transition:'all 0.15s',
-                  }}>
+      <section className="card card-md">
+        <div className={styles.sectionTitle}><Lock size={18} /> Security</div>
+        <div className={styles.sectionBody}>
+          <div className="flex-col">
+            <div className="form-group">
+              <label className="form-label">New Password</label>
+              <div className={`flex-row ${styles.passRow}`}>
+                <input type="password" className="form-input grow" value={newPass} onChange={(e) => { setNewPass(e.target.value); setPassSaved(false); setPassErr(''); }} placeholder="Minimal 4 karakter" />
+                <button onClick={handleSavePass} disabled={passSaving || passSaved || !newPass} className={`${styles.saveBtn} ${passSaved ? styles.saveBtnDone : ''}`}>
                   {passSaving ? <Loader2 className="spin" size={16} /> : passSaved ? <Check size={16} /> : <Save size={16} />}
                   {passSaving ? '...' : passSaved ? 'Tersimpan' : 'Simpan'}
                 </button>
               </div>
-              {passErr && <p style={{ color:'#ef4444', fontSize:12, marginTop:4 }}>{passErr}</p>}
+              {passErr && <p className={styles.passErr}>{passErr}</p>}
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <AdminConfirmModal
         open={confirmSave}
@@ -581,9 +456,9 @@ export default function SettingsPage() {
       />
 
       <AdminModal open={successOpen} onClose={() => setSuccessOpen(false)} title="Berhasil">
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:12, padding:'20px 0' }}>
+        <div className={`flex-col flex-center ${styles.successBlock}`}>
           <CheckCircle size={48} color="#10b981" />
-          <p style={{ color:'var(--text-secondary)', fontSize:14, margin:0 }}>Pengaturan berhasil disimpan.</p>
+          <p className={styles.successText}>Pengaturan berhasil disimpan.</p>
         </div>
       </AdminModal>
 
@@ -598,26 +473,17 @@ function LogoUpload({ label, value, onChange, uploadImage }: {
   const inputRef = useRef<HTMLInputElement>(null);
   return (
     <div>
-      <label style={{ fontSize:13, fontWeight:600, marginBottom:8, display:'block', color:'#374151' }}>{label}</label>
+      <label className={`form-label ${styles.logoLabel}`}>{label}</label>
       {value && (
-        <div style={{ position:'relative', marginBottom:8, borderRadius:10, overflow:'hidden', border:'1px solid #e5e7eb', maxWidth:200 }}>
-          <img src={value} alt="" style={{ width:'100%', height:100, objectFit:'cover', display:'block' }} />
-          <button onClick={() => onChange('')} style={{
-            position:'absolute', top:4, right:4, width:24, height:24, borderRadius:'50%', border:'none',
-            background:'rgba(0,0,0,0.5)', color:'#fff', fontSize:14, lineHeight:'24px', textAlign:'center',
-            cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', padding:0,
-          }}>&times;</button>
+        <div className={styles.logoPreview}>
+          <img src={value} alt="" className={styles.logoImg} />
+          <button onClick={() => onChange('')} className={styles.logoDel}>&times;</button>
         </div>
       )}
-      <button onClick={() => inputRef.current?.click()} style={{
-        display:'inline-flex', alignItems:'center', gap:6,
-        padding:'8px 16px', borderRadius:8, border:'1px solid #d1d5db',
-        fontSize:13, fontWeight:600, cursor:'pointer',
-        background:'#f9fafb', color:'#374151',
-      }}>
+      <button onClick={() => inputRef.current?.click()} className={`btn btn-ghost ${styles.logoBtn}`}>
         <Upload size={14} /> {value ? 'Ganti' : 'Upload'}
       </button>
-      <input ref={inputRef} type="file" accept="image/*" style={{ display:'none' }}
+      <input ref={inputRef} type="file" accept="image/*" style={{ display: 'none' }}
         onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadImage(f); }} />
     </div>
   );

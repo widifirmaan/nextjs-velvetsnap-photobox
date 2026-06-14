@@ -94,6 +94,19 @@
   color: var(--text-secondary);
 }
 
+.sectionBody {
+  margin-top: 20px;
+}
+
+.sectionBodyMb {
+  margin-bottom: 12px;
+}
+
+.macBtnSm {
+  padding: 10px 20px;
+  font-size: 13px;
+}
+
 .dslrStatus {
   margin-top: 12px;
   font-size: 13px;

@@ -1,6 +1,7 @@
 'use client';
 
 import type { IStripElement } from '@/models/Template';
+import styles from './PropertiesPanel.module.css';
 
 const FONT_LIST = [
   { value: 'Inter', label: 'Inter' },
@@ -102,7 +103,7 @@ export default function PropertiesPanel({
             />
           </FieldRow>
         </Section>
-        <p style={{ color: 'var(--text-muted)', fontSize: 14, textAlign: 'center', marginTop: 24 }}>
+        <p className={styles.emptyState}>
           Select an element to edit
         </p>
       </aside>
@@ -116,8 +117,8 @@ export default function PropertiesPanel({
 
   return (
     <aside className="properties-panel">
-      <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 12 }}>
-        Properties — <span style={{ color: 'var(--text-primary)' }}>{selected.type}</span>
+      <h3 className="section-heading">
+        Properties — <span className={styles.selectedType}>{selected.type}</span>
       </h3>
 
       <Section label="Transform">
@@ -176,17 +177,17 @@ export default function PropertiesPanel({
               value={p.content || ''}
               onChange={(e) => set('content', e.target.value)}
               rows={3}
-              style={{ width: '100%', padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', fontFamily: 'inherit', fontSize: 13, resize: 'vertical' }}
+              className={styles.textareaField}
               placeholder="Type here..."
             />
           </FieldRow>
           <FieldRow>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Font</label>
+            <div className="grow">
+              <label className={styles.fieldLabel}>Font</label>
               <select
                 value={p.fontFamily || 'Inter'}
                 onChange={(e) => set('fontFamily', e.target.value)}
-                style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff' }}
+                className={`${styles.fullWidth} form-input-compact`}
               >
                 {FONT_LIST.map((f) => (
                   <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.label}</option>
@@ -202,23 +203,25 @@ export default function PropertiesPanel({
             <NumberField label="Letter Spacing" value={p.letterSpacing ?? 0} onChange={(v) => set('letterSpacing', v)} min={-5} max={20} />
           </FieldRow>
           <FieldRow>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Weight</label>
+            <div className="grow">
+              <label className={styles.fieldLabel}>Weight</label>
               <select
                 value={p.fontWeight || '400'}
                 onChange={(e) => set('fontWeight', e.target.value)}
-                style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff', fontFamily: p.fontFamily || 'Inter', fontWeight: p.fontWeight || '400' }}
+                className={`${styles.fullWidth} form-input-compact`}
+                style={{ fontFamily: p.fontFamily || 'Inter', fontWeight: p.fontWeight || '400' }}
               >
                 <option value="400" style={{ fontWeight: 400 }}>Regular</option>
                 <option value="700" style={{ fontWeight: 700 }}>Bold</option>
               </select>
             </div>
-            <div style={{ flex: 1 }}>
-              <label style={labelStyle}>Style</label>
+            <div className="grow">
+              <label className={styles.fieldLabel}>Style</label>
               <select
                 value={p.fontStyle || 'normal'}
                 onChange={(e) => set('fontStyle', e.target.value)}
-                style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff', fontFamily: p.fontFamily || 'Inter', fontStyle: p.fontStyle || 'normal' }}
+                className={`${styles.fullWidth} form-input-compact`}
+                style={{ fontFamily: p.fontFamily || 'Inter', fontStyle: p.fontStyle || 'normal' }}
               >
                 {[
                   { value: 'normal', label: 'Normal' },
@@ -251,19 +254,20 @@ export default function PropertiesPanel({
       {selected.type === 'sticker' && (
         <Section label="Sticker">
           <FieldRow>
-            <div style={{ width: '100%' }}>
-              <label style={{...labelStyle}}>Image URL</label>
+            <div className={styles.fullWidth}>
+              <label className={styles.fieldLabel}>Image URL</label>
               <input
                 type="text"
                 value={p.stickerUrl || ''}
                 onChange={(e) => set('stickerUrl', e.target.value)}
                 placeholder="https://..."
-                style={{ width: '100%', padding: '6px 8px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.08)', fontSize: 13, marginBottom: 6 }}
+                className={styles.stickerInput}
               />
               <button
                 onClick={onBrowseStickers}
                 disabled={disabled}
-                style={{ width: '100%', padding: '8px', borderRadius: 8, border: '1px solid var(--accent-color)', background: disabled ? '#eee' : 'var(--accent-bg)', color: disabled ? '#999' : 'var(--accent-color)', fontWeight: 600, fontSize: 13, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}
+                className={styles.browseGalleryBtn}
+                style={{ background: disabled ? '#eee' : 'var(--accent-bg)', color: disabled ? '#999' : 'var(--accent-color)', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}
               >
                 🎨 Browse Gallery
               </button>
@@ -294,14 +298,14 @@ export default function PropertiesPanel({
 
 
 
-      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <button onClick={onBringForward} disabled={disabled} style={{ ...btnStyle, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
+      <div className={styles.actionButtons}>
+        <button onClick={onBringForward} disabled={disabled} className={styles.actionBtn} style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
           ↑ Bring Forward
         </button>
-        <button onClick={onSendBackward} disabled={disabled} style={{ ...btnStyle, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
+        <button onClick={onSendBackward} disabled={disabled} className={styles.actionBtn} style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
           ↓ Send Backward
         </button>
-        <button onClick={onDelete} disabled={disabled} style={{ ...btnStyle, borderColor: disabled ? '#ddd' : '#e74c3c', color: disabled ? '#ccc' : '#e74c3c', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
+        <button onClick={onDelete} disabled={disabled} className={styles.actionBtn} style={{ borderColor: disabled ? '#ddd' : '#e74c3c', color: disabled ? '#ccc' : '#e74c3c', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
           ✕ Delete Element
         </button>
       </div>
@@ -311,29 +315,21 @@ export default function PropertiesPanel({
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 16 }}>
-      <p style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 8 }}>{label}</p>
+    <div className={styles.sectionWrapper}>
+      <p className={styles.sectionLabel}>{label}</p>
       {children}
     </div>
   );
 }
 
 function FieldRow({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'flex', gap: 8, marginBottom: 6 }}>{children}</div>;
+  return <div className={styles.fieldRow}>{children}</div>;
 }
-
-const labelStyle: React.CSSProperties = {
-  display: 'block',
-  fontSize: 11,
-  fontWeight: 600,
-  color: 'var(--text-muted)',
-  marginBottom: 2,
-};
 
 function NumberField({ label, value, onChange, min, max, step }: { label: string; value: number; onChange: (v: number) => void; min?: number; max?: number; step?: number }) {
   return (
-    <div style={{ flex: 1 }}>
-      <label style={labelStyle}>{label}</label>
+    <div className="grow">
+      <label className={styles.fieldLabel}>{label}</label>
       <input
         type="number"
         value={Math.round(value * 100) / 100}
@@ -341,7 +337,7 @@ function NumberField({ label, value, onChange, min, max, step }: { label: string
         min={min}
         max={max}
         step={step ?? 1}
-        style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12 }}
+        className={`${styles.fullWidth} form-input-compact`}
       />
     </div>
   );
@@ -349,20 +345,21 @@ function NumberField({ label, value, onChange, min, max, step }: { label: string
 
 function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
-    <div style={{ flex: 1 }}>
-      <label style={labelStyle}>{label}</label>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+    <div className="grow">
+      <label className={styles.fieldLabel}>{label}</label>
+      <div className={styles.flexRowSm}>
         <input
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          style={{ width: 28, height: 28, padding: 0, border: 'none', borderRadius: 6, cursor: 'pointer' }}
+          className={styles.colorPicker}
         />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          style={{ flex: 1, padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, fontFamily: 'monospace' }}
+          className="grow form-input-compact"
+          style={{ fontFamily: 'monospace' }}
         />
       </div>
     </div>
@@ -371,12 +368,12 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
 
 function SelectField({ label, value, options, onChange }: { label: string; value: string; options: { value: string; label: string }[]; onChange: (v: string) => void }) {
   return (
-    <div style={{ flex: 1 }}>
-      <label style={labelStyle}>{label}</label>
+    <div className="grow">
+      <label className={styles.fieldLabel}>{label}</label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        style={{ width: '100%', padding: '4px 6px', borderRadius: 6, border: '1px solid rgba(0,0,0,0.08)', fontSize: 12, background: '#fff' }}
+        className={`${styles.fullWidth} form-input-compact`}
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
@@ -385,15 +382,3 @@ function SelectField({ label, value, options, onChange }: { label: string; value
     </div>
   );
 }
-
-const btnStyle: React.CSSProperties = {
-  padding: '8px 12px',
-  borderRadius: 10,
-  border: '1px solid var(--mn-border)',
-  background: '#fff',
-  cursor: 'pointer',
-  fontSize: 13,
-  fontWeight: 600,
-  textAlign: 'left',
-  color: 'var(--text-primary)',
-};

@@ -14,5 +14,5 @@ const statusMap: Record<string, string> = {
 export default function AdminBadge({ status }: { status: string }) {
   const key = status.toLowerCase().replace(/\s+/g, '_');
   const variant = statusMap[key] || 'info';
-  return <span className={`${styles.badge} ${styles[variant]}`}>{status}</span>;
+  return <span className={`badge ${styles[variant]}`}>{status}</span>;
 }

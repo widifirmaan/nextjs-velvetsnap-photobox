@@ -101,14 +101,10 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 18px;
   text-decoration: none;
   color: var(--text-primary);
   transition: all var(--transition-fast);
   cursor: pointer;
-  background: var(--clay-bg);
-  border-radius: var(--clay-radius);
-  box-shadow: var(--clay-shadow);
 }
 
 .quickLink:hover {

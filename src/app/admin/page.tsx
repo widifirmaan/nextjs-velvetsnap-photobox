@@ -117,7 +117,7 @@ export default async function AdminDashboard() {
       {/* Quick Access */}
       <h2 className={styles.sectionTitle}>Quick Access</h2>
       <div className={styles.quickLinksGrid}>
-        <Link href="/admin/templates" className={styles.quickLink}>
+        <Link href="/admin/templates" className={`card card-sm ${styles.quickLink}`}>
           <div className={`${styles.quickLinkIcon} ${styles.blue}`}>
             <Layers size={20} />
           </div>
@@ -127,7 +127,7 @@ export default async function AdminDashboard() {
           </div>
           <ChevronRight size={18} className={styles.quickLinkArrow} />
         </Link>
-        <Link href="/admin/history" className={styles.quickLink}>
+        <Link href="/admin/history" className={`card card-sm ${styles.quickLink}`}>
           <div className={`${styles.quickLinkIcon} ${styles.orange}`}>
             <Clock size={20} />
           </div>
@@ -137,7 +137,7 @@ export default async function AdminDashboard() {
           </div>
           <ChevronRight size={18} className={styles.quickLinkArrow} />
         </Link>
-        <Link href="/admin/finance" className={styles.quickLink}>
+        <Link href="/admin/finance" className={`card card-sm ${styles.quickLink}`}>
           <div className={`${styles.quickLinkIcon} ${styles.green}`}>
             <DollarSign size={20} />
           </div>

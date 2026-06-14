@@ -48,6 +48,17 @@
   color: var(--text-primary);
 }
 
+.confirmMessage {
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+}
+
+.confirmActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

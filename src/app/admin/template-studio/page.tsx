@@ -162,7 +162,7 @@ export default function StripsStudioPageWrapper() {
     <Suspense fallback={
       <div className={styles.page}>
         <AdminPageHeader title="Strips Studio" subtitle="Loading..." />
-        <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:200 }}>
+        <div className={`flex-center ${styles.fallbackLoader}`}>
           <Loader2 className="spin" size={32} />
         </div>
       </div>
@@ -573,51 +573,30 @@ function StripsStudioPage() {
   };
 
   const renderBackgroundSection = () => (
-      <aside style={{
-        background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
-        border: '1px solid var(--mn-border)',
-      }}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 10 }}>
-          Background
-        </h3>
-        <div style={{
-          width: '100%', aspectRatio: '3/1', borderRadius: 8, overflow: 'hidden',
-          marginBottom: 10, background: '#f0f0f0',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          border: '1px solid var(--mn-border)',
-        }}>
+      <aside className={styles.asideCard}>
+        <h3 className="section-heading">Background</h3>
+        <div className={styles.bgPreview}>
           {(elements.find((el) => el.id === 'bg-image')?.props as any)?.stickerUrl ? (
             <img
               src={(elements.find((el) => el.id === 'bg-image')!.props as any).stickerUrl}
               alt="Background"
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           ) : (
-            <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>No background</span>
+            <span className="text-muted-sm">No background</span>
           )}
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
+        <div className="flex-row flex-row-sm">
           <button
             onClick={openBgSearch}
             disabled={pageLoading}
-            style={{
-              flex: 1, padding: '8px', borderRadius: 8,
-              border: '1px solid var(--mn-border)', background: pageLoading ? '#eee' : '#fff',
-              cursor: pageLoading ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600,
-              opacity: pageLoading ? 0.5 : 1,
-            }}
+            className={styles.bgBtn}
           >
             🔍 Search
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={importProcessing || pageLoading}
-            style={{
-              flex: 1, padding: '8px', borderRadius: 8,
-              border: '1px solid var(--mn-border)', background: pageLoading ? '#eee' : '#fff',
-              cursor: importProcessing || pageLoading ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 600,
-              opacity: importProcessing || pageLoading ? 0.6 : 1,
-            }}
+            className={styles.bgBtn}
           >
             {importProcessing ? '⏳...' : '📁 Import'}
           </button>
@@ -723,7 +702,7 @@ function StripsStudioPage() {
             disabled={pageLoading}
           />
         ) : (
-          <p style={{ padding: 24, textAlign: 'center', fontSize: 13, color: 'var(--text-muted)' }}>
+          <p className={styles.emptyState}>
             Select an element to edit
           </p>
         );
@@ -754,33 +733,18 @@ function StripsStudioPage() {
 
       <div className={styles.editorLayout}>
         <div className={styles.leftSidebar}>
-          <aside style={{
-            background: 'var(--clay-bg)', borderRadius: 12, padding: 14,
-            border: '1px solid var(--mn-border)',
-          }}>
+          <aside className={styles.asideCard}>
             <button
               onClick={() => setShowNewConfirm(true)}
               disabled={pageLoading}
-              style={{
-                width: '100%', padding: '10px', borderRadius: 8,
-                border: '1px solid var(--mn-border)', background: pageLoading ? '#eee' : '#fff',
-                cursor: pageLoading ? 'not-allowed' : 'pointer', fontWeight: 700, fontSize: 13,
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 8,
-                opacity: pageLoading ? 0.5 : 1,
-              }}
+              className={styles.toolBtnGhost}
             >
               ✚ New Template
             </button>
             <button
               onClick={() => setShowSaveModal(true)}
               disabled={pageLoading}
-              style={{
-                width: '100%', padding: '10px', borderRadius: 8,
-                border: 'none', background: pageLoading ? '#ccc' : 'var(--accent-color, #C5D89D)',
-                color: '#fff', fontWeight: 700, fontSize: 13, cursor: pageLoading ? 'not-allowed' : 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                opacity: pageLoading ? 0.5 : 1,
-              }}
+              className={styles.toolBtnPrimary}
             >
               💾 Save Template
             </button>
@@ -802,9 +766,9 @@ function StripsStudioPage() {
           />
         </div>
 
-        <div className={styles.canvasArea} style={{ position: 'relative' }}>
+        <div className={styles.canvasArea}>
           {pageLoading && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.7)', zIndex: 10, borderRadius: 12 }}>
+            <div className={styles.loadingOverlay}>
               <Loader2 className="spin" size={36} />
             </div>
           )}
@@ -892,126 +856,46 @@ function StripsStudioPage() {
       )}
 
       {showNewConfirm && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 1000, display: 'flex',
-          alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(2px)',
-        }} onClick={() => setShowNewConfirm(false)}>
-          <div style={{
-            background: '#fff', borderRadius: 16, padding: 28, width: 360,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-          }} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700 }}>New Template</h3>
-            <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-muted)' }}>
-              All current work will be cleared. Continue?
-            </p>
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setShowNewConfirm(false)}
-                style={{
-                  padding: '10px 20px', borderRadius: 10, border: '1px solid var(--mn-border)',
-                  background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleNewTemplate}
-                style={{
-                  padding: '10px 24px', borderRadius: 10, border: 'none',
-                  background: '#e74c3c', color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                }}
-              >
-                Clear & Start New
-              </button>
+        <div className={styles.modalOverlay} onClick={() => setShowNewConfirm(false)}>
+          <div className={styles.modalDialog} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>New Template</h3>
+            <p className={styles.modalText}>All current work will be cleared. Continue?</p>
+            <div className={styles.modalActions}>
+              <button onClick={() => setShowNewConfirm(false)} className={styles.modalBtn}>Cancel</button>
+              <button onClick={handleNewTemplate} className={styles.modalBtnDanger}>Clear & Start New</button>
             </div>
           </div>
         </div>
       )}
 
       {showSaveModal && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 1000, display: 'flex',
-          alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(0,0,0,0.4)', backdropFilter: 'blur(2px)',
-        }} onClick={() => !saving && setShowSaveModal(false)}>
-          <div style={{
-            background: '#fff', borderRadius: 16, padding: 28, width: 400,
-            boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-          }} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 700 }}>
-              {editingTemplateId ? 'Update Template' : 'Save Template'}
-            </h3>
-            <p style={{ margin: '0 0 20px', fontSize: 13, color: 'var(--text-muted)' }}>
-              {editingTemplateId ? 'Update your strip template' : 'Enter details for your strip template'}
-            </p>
+        <div className={styles.modalOverlay} onClick={() => !saving && setShowSaveModal(false)}>
+          <div className={`${styles.modalDialog} ${styles.modalWide}`} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.modalTitle}>{editingTemplateId ? 'Update Template' : 'Save Template'}</h3>
+            <p className={styles.modalText}>{editingTemplateId ? 'Update your strip template' : 'Enter details for your strip template'}</p>
             <input
-              type="text"
-              placeholder="Template name"
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-              autoFocus
-              style={{
-                width: '100%', padding: '12px 14px', borderRadius: 10,
-                border: '1px solid var(--mn-border)', fontSize: 15,
-                marginBottom: 12, fontFamily: 'inherit', boxSizing: 'border-box',
-              }}
+              type="text" placeholder="Template name"
+              value={templateName} onChange={(e) => setTemplateName(e.target.value)} autoFocus
+              className={`${styles.modalInput} ${styles.modalInputBig}`}
             />
             <input
-              type="text"
-              placeholder="Template ID (auto)"
-              value={templateIdField}
-              readOnly
-              style={{
-                width: '100%', padding: '12px 14px', borderRadius: 10,
-                border: '1px solid var(--mn-border)', fontSize: 14,
-                marginBottom: 12, fontFamily: 'inherit', boxSizing: 'border-box',
-                background: '#f5f5f5', color: '#555',
-              }}
+              type="text" placeholder="Template ID (auto)"
+              value={templateIdField} readOnly
+              className={styles.modalInput}
             />
             <input
-              type="text"
-              placeholder="Description"
-              value={templateDesc}
-              onChange={(e) => setTemplateDesc(e.target.value)}
-              style={{
-                width: '100%', padding: '12px 14px', borderRadius: 10,
-                border: '1px solid var(--mn-border)', fontSize: 14,
-                marginBottom: 12, fontFamily: 'inherit', boxSizing: 'border-box',
-              }}
+              type="text" placeholder="Description"
+              value={templateDesc} onChange={(e) => setTemplateDesc(e.target.value)}
+              className={styles.modalInput}
             />
             <input
-              type="number"
-              placeholder="Price"
-              value={templatePrice}
-              onChange={(e) => setTemplatePrice(Number(e.target.value))}
-              style={{
-                width: '100%', padding: '12px 14px', borderRadius: 10,
-                border: '1px solid var(--mn-border)', fontSize: 14,
-                marginBottom: 20, fontFamily: 'inherit', boxSizing: 'border-box',
-              }}
+              type="number" placeholder="Price"
+              value={templatePrice} onChange={(e) => setTemplatePrice(Number(e.target.value))}
+              className={`${styles.modalInput} ${styles.modalInputMb20}`}
             />
-            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-              <button
-                onClick={() => setShowSaveModal(false)}
-                disabled={saving}
-                style={{
-                  padding: '10px 20px', borderRadius: 10, border: '1px solid var(--mn-border)',
-                  background: '#fff', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                  opacity: saving ? 0.5 : 1,
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                disabled={saving || !templateName.trim()}
-                style={{
-                  padding: '10px 24px', borderRadius: 10, border: 'none',
-                  background: saving || !templateName.trim() ? '#ccc' : 'var(--accent-color, #C5D89D)',
-                  color: '#fff', fontWeight: 700, fontSize: 13, cursor: 'pointer',
-                }}
-              >
+            <div className={styles.modalActions}>
+              <button onClick={() => setShowSaveModal(false)} disabled={saving} className={styles.modalBtn}>Cancel</button>
+              <button onClick={handleSave} disabled={saving || !templateName.trim()} className={styles.modalBtnSave}>
                 {saving ? 'Saving...' : editingTemplateId ? 'Update' : 'Save'}
               </button>
             </div>

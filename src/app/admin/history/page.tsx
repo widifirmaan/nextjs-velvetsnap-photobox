@@ -254,11 +254,11 @@ export default function HistoryPage() {
           </div>
 
           {pagination.totalPages > 1 && (
-            <div className="flex-row" style={{ justifyContent: 'center', marginTop: 12 }}>
+            <div className={`flex-row ${styles.paginationWrap}`}>
               <button className="mac-button secondary" disabled={pagination.page <= 1} onClick={() => fetchData(pagination.page - 1)}>
                 ← Previous
               </button>
-              <span style={{ fontSize: 14, color: 'var(--text-secondary)' }}>
+              <span className={styles.pageInfo}>
                 Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
               </span>
               <button className="mac-button secondary" disabled={pagination.page >= pagination.totalPages} onClick={() => fetchData(pagination.page + 1)}>

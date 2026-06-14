@@ -1,6 +1,7 @@
 'use client';
 
 import type { IStripElement } from '@/models/Template';
+import styles from './ElementToolbar.module.css';
 
 interface ElementToolbarProps {
   onAdd: (type: IStripElement['type']) => void;
@@ -15,43 +16,16 @@ const TOOLS: { type: IStripElement['type']; label: string; icon: string }[] = [
 export default function ElementToolbar({ onAdd, disabled }: ElementToolbarProps) {
   return (
     <aside className="toolbar">
-      <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', marginBottom: 12 }}>Elements</h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <h3 className="section-heading">Elements</h3>
+      <div className={styles.toolWrap}>
         {TOOLS.map((t) => (
           <button
             key={t.type}
             onClick={() => onAdd(t.type)}
             disabled={disabled}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              padding: '10px 14px',
-              borderRadius: 12,
-              border: '1px solid var(--mn-border)',
-              background: disabled ? '#eee' : 'var(--clay-bg)',
-              cursor: disabled ? 'not-allowed' : 'pointer',
-              fontSize: 14,
-              fontWeight: 600,
-              color: 'var(--text-primary)',
-              opacity: disabled ? 0.5 : 1,
-              transition: 'all 0.15s',
-            }}
-            onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.borderColor = 'var(--accent-color)'; e.currentTarget.style.background = 'var(--accent-bg)'; } }}
-            onMouseLeave={(e) => { if (!disabled) { e.currentTarget.style.borderColor = 'var(--mn-border)'; e.currentTarget.style.background = 'var(--clay-bg)'; } }}
+            className={`${styles.toolBtn} ${disabled ? styles.toolBtnDisabled : styles.toolBtnEnabled}`}
           >
-            <span style={{
-              width: 28,
-              height: 28,
-              borderRadius: 8,
-              background: 'var(--accent-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: t.type === 'text' ? 12 : 16,
-              fontWeight: 700,
-              color: 'var(--accent-color)',
-            }}>
+            <span className={`${styles.toolBtnIcon} ${t.type === 'text' ? styles.iconText : styles.iconImage}`}>
               {t.icon}
             </span>
             {t.label}

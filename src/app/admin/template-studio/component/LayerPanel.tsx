@@ -1,6 +1,7 @@
 'use client';
 
 import type { IStripElement } from '@/models/Template';
+import styles from './LayerPanel.module.css';
 
 interface LayerPanelProps {
   elements: IStripElement[];
@@ -36,28 +37,16 @@ export default function LayerPanel({
     .sort((a, b) => a.zIndex - b.zIndex);
 
   return (
-    <div style={{
-      background: '#fff',
-      borderRadius: 16,
-      border: '1px solid var(--mn-border)',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
-      flex: 1,
-      minHeight: 0,
-    }}>
-      <div style={{
-        padding: '12px 14px 8px',
-        borderBottom: '1px solid var(--mn-border)',
-      }}>
-        <h3 style={{ fontSize: 13, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-muted)', margin: 0 }}>
+    <div className={styles.panel}>
+      <div className={styles.panelHeader}>
+        <h3 className="section-heading">
           Layers
         </h3>
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
+      <div className="grow scroll-y">
         {sorted.length === 0 ? (
-          <p style={{ padding: '24px 14px', textAlign: 'center', fontSize: 13, color: 'var(--text-muted)', margin: 0 }}>
+          <p className={`text-muted-sm text-center ${styles.emptyState}`}>
             No elements yet
           </p>
         ) : (
@@ -69,17 +58,11 @@ export default function LayerPanel({
               <div
                 key={el.id}
                 onClick={() => { if (!disabled) onSelect(el.id); }}
+                className={styles.layerRow}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 14px',
                   cursor: disabled ? 'default' : 'pointer',
                   background: isSelected ? 'var(--accent-bg)' : 'transparent',
                   borderLeft: isSelected ? '3px solid var(--accent-color)' : '3px solid transparent',
-                  transition: 'all 0.1s',
-                  userSelect: 'none',
-                  fontSize: 13,
                   opacity: disabled ? 0.5 : 1,
                 }}
                 onMouseEnter={(e) => { if (!isSelected && !disabled) e.currentTarget.style.background = 'rgba(0,0,0,0.02)'; }}
@@ -88,50 +71,54 @@ export default function LayerPanel({
                 <button
                   onClick={(e) => { e.stopPropagation(); if (!disabled) onToggleVisibility(el.id); }}
                   disabled={disabled}
+                  className={styles.visToggle}
                   style={{
-                    width: 22, height: 22, borderRadius: 6, border: 'none',
-                    background: 'transparent', cursor: disabled ? 'default' : 'pointer', fontSize: 14,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    opacity: disabled ? 0.2 : el.visible ? 0.6 : 0.25, padding: 0,
+                    cursor: disabled ? 'default' : 'pointer',
+                    opacity: disabled ? 0.2 : el.visible ? 0.6 : 0.25,
                   }}
                   title={el.visible ? 'Hide' : 'Show'}
                 >
                   {el.visible ? '👁' : '👁‍🗨'}
                 </button>
 
-                <span style={{
-                  width: 24, height: 24, borderRadius: 6,
-                  background: isSelected ? 'var(--accent-color)' : 'rgba(0,0,0,0.04)',
-                  color: isSelected ? '#fff' : 'var(--text-primary)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, flexShrink: 0,
-                }}>
+                <span className={styles.indexBadge}
+                  style={{
+                    background: isSelected ? 'var(--accent-color)' : 'rgba(0,0,0,0.04)',
+                    color: isSelected ? '#fff' : 'var(--text-primary)',
+                  }}
+                >
                   {i + 1}
                 </span>
 
-                <span style={{
-                  width: 20, fontSize: 14, textAlign: 'center', flexShrink: 0,
-                  opacity: el.visible ? 1 : 0.4,
-                }}>
+                <span className={styles.typeIcon}
+                  style={{ opacity: el.visible ? 1 : 0.4 }}
+                >
                   {TYPE_ICONS[el.type] || '?'}
                 </span>
 
-                <span style={{
-                  flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  fontWeight: isSelected ? 600 : 400,
-                  opacity: el.visible ? 1 : 0.4,
-                }}>
+                <span className="grow text-ellipsis"
+                  style={{
+                    fontWeight: isSelected ? 600 : 400,
+                    opacity: el.visible ? 1 : 0.4,
+                  }}
+                >
                   {el.type === 'photo-slot' ? 'Photo' :
                    el.type === 'text' ? 'Text' :
                    el.type === 'sticker' ? 'Sticker' :
                    el.type === 'shape' ? 'Shape' : 'Background'}
                 </span>
 
-                <div style={{ display: 'flex', gap: 2, flexShrink: 0 }}>
+                <div className={styles.layerActions}>
                   <button
                     onClick={(e) => { e.stopPropagation(); onBringForward(el.id); }}
                     disabled={isLast || disabled}
-                    style={arrowBtnStyle(isLast || !!disabled)}
+                    className={styles.layerBtn}
+                    style={{
+                      fontSize: 9,
+                      cursor: isLast || disabled ? 'default' : 'pointer',
+                      color: isLast || disabled ? '#ddd' : 'var(--text-muted)',
+                      opacity: isLast || disabled ? 0.3 : 0.7,
+                    }}
                     title="Bring forward"
                   >
                     ▲
@@ -139,7 +126,13 @@ export default function LayerPanel({
                   <button
                     onClick={(e) => { e.stopPropagation(); onSendBackward(el.id); }}
                     disabled={isFirst || disabled}
-                    style={arrowBtnStyle(isFirst || !!disabled)}
+                    className={styles.layerBtn}
+                    style={{
+                      fontSize: 9,
+                      cursor: isFirst || disabled ? 'default' : 'pointer',
+                      color: isFirst || disabled ? '#ddd' : 'var(--text-muted)',
+                      opacity: isFirst || disabled ? 0.3 : 0.7,
+                    }}
                     title="Send backward"
                   >
                     ▼
@@ -149,11 +142,12 @@ export default function LayerPanel({
                 <button
                   onClick={(e) => { e.stopPropagation(); if (!disabled) onDelete(el.id); }}
                   disabled={disabled}
+                  className={styles.layerBtn}
                   style={{
-                    width: 20, height: 20, borderRadius: 4, border: 'none',
-                    background: 'transparent', cursor: disabled ? 'default' : 'pointer', fontSize: 12,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0,
-                    color: disabled ? '#ddd' : '#999', opacity: disabled ? 0.2 : 0.5,
+                    fontSize: 12,
+                    cursor: disabled ? 'default' : 'pointer',
+                    color: disabled ? '#ddd' : '#999',
+                    opacity: disabled ? 0.2 : 0.5,
                   }}
                   onMouseEnter={(e) => { if (!disabled) { e.currentTarget.style.color = '#e74c3c'; e.currentTarget.style.opacity = '1'; } }}
                   onMouseLeave={(e) => { if (!disabled) { e.currentTarget.style.color = '#999'; e.currentTarget.style.opacity = '0.5'; } }}
@@ -170,20 +164,3 @@ export default function LayerPanel({
   );
 }
 
-function arrowBtnStyle(disabled: boolean): React.CSSProperties {
-  return {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    border: 'none',
-    background: 'transparent',
-    cursor: disabled ? 'default' : 'pointer',
-    fontSize: 9,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 0,
-    color: disabled ? '#ddd' : 'var(--text-muted)',
-    opacity: disabled ? 0.3 : 0.7,
-  };
-}

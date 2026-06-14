@@ -90,7 +90,7 @@ export default function TemplatesAdmin() {
         {loading ? (
           <div className={styles.loader}><Loader2 className="spin" size={32} /></div>
         ) : (
-          <table className="admin-table">
+          <div className={styles.responsiveTable}><table className="admin-table">
             <thead>
               <tr>
                 <th>Preview</th>
@@ -115,7 +115,7 @@ export default function TemplatesAdmin() {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={t.templateFull} alt={t.templateName} />
                       ) : (
-                        <span style={{ fontSize: 10, color: 'var(--text-muted)' }}>—</span>
+                        <span className="text-muted-sm">—</span>
                       )}
                     </div>
                   </td>
@@ -148,13 +148,13 @@ export default function TemplatesAdmin() {
               ))}
               {templates.length === 0 && (
                 <tr>
-                  <td colSpan={8} style={{ textAlign: 'center', padding: '40px' }}>
+                  <td colSpan={8} className={styles.emptyCell}>
                     No templates found. Create one in the Strips Studio.
                   </td>
                 </tr>
               )}
             </tbody>
-          </table>
+          </table></div>
         )}
       </AdminTableCard>
 

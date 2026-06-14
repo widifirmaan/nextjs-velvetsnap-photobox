@@ -101,7 +101,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   if (!authed) return (
-    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', minHeight:'100dvh', background:'var(--clay-bg)' }}>
+    <div className={styles.loadingScreen}>
       <Loader2 className="spin" size={32} />
     </div>
   );
@@ -119,7 +119,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      <div className={`glass-panel ${styles.sidebar}`}>
+      <div className={`card ${styles.sidebar}`}>
         <div className={styles.brand}>VelvetSnap</div>
         <nav className={styles.nav}>
           {navLinks.map(renderNavLink)}
@@ -127,19 +127,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {bottomLinks.map(renderNavLink)}
         </nav>
 
-        <div className={styles.sidebarFooter} style={{ display:'flex', flexDirection:'column', gap:2 }}>
-          <Link
-            href="/"
-            className={styles.navLink}
-            style={{ color: 'var(--text-secondary)' }}
-          >
-            &larr; Return to App
-          </Link>
-          <button
-            onClick={() => { sessionStorage.removeItem('admin_session_token'); fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login')); }}
-            className={styles.navLink}
-            style={{ color:'var(--text-secondary)', border:'none', background:'none', cursor:'pointer', textAlign:'left', fontSize:14, padding:'10px 12px', width:'100%', display:'flex', alignItems:'center', gap:10 }}
-          >
+        <div className={styles.sidebarFooter}>
+          <Link href="/" className={`${styles.navLink} ${styles.sidebarLink}`}>&larr; Return to App</Link>
+          <button onClick={() => { sessionStorage.removeItem('admin_session_token'); fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login')); }} className={styles.logoutBtn}>
             <LogOut size={20} /> Logout
           </button>
         </div>
@@ -148,7 +138,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className={styles.content}>
         {children}
         <footer className={styles.contentFooter}>
-          <span>Velvetsnap Photobooth Platform by <a href="https://widifirmaan.web.id" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>W</a></span>
+          <span>Velvetsnap Photobooth Platform by <a href="https://widifirmaan.web.id" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>W</a></span>
         </footer>
       </div>
 
