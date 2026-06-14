@@ -1,3 +1,76 @@
+.sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  align-content: start;
+}
+
+.section {
+  animation: fadeInUp 0.4s ease backwards;
+}
+
+.section:nth-child(1) { animation-delay: 0s; }
+.section:nth-child(2) { animation-delay: 0.05s; }
+.section:nth-child(3) { animation-delay: 0.1s; }
+.section:nth-child(4) { animation-delay: 0.15s; }
+.section:nth-child(5) { animation-delay: 0.2s; }
+.section:nth-child(6) { animation-delay: 0.25s; }
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--mn-border);
+}
+
+.sectionHeader h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.sectionBody {
+  padding: 0;
+}
+
+.saveBar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  margin-bottom: 60px;
+}
+
+.savedMsg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-color);
+}
+
+.saveBtnDone {
+  background: #10b981 !important;
+}
+
+.saveErr {
+  color: #ef4444;
+  font-size: 13px;
+  margin: 0;
+}
+
+.divider {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 16px;
+}
+
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -8,82 +81,6 @@
   display: flex;
   gap: 8px;
   align-items: center;
-}
-
-.pageBody {
-  flex: 1;
-  padding: 0 0 60px;
-  overflow-y: auto;
-  min-height: 0;
-}
-
-.headerRow {
-  justify-content: space-between;
-  padding: 20px 4px 0;
-}
-
-.pageTitle {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0;
-  color: #111;
-}
-
-.pageSubtext {
-  font-size: 14px;
-  color: #6b7280;
-  margin: 4px 0 0;
-}
-
-.saveBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
-  border-radius: 10px;
-  border: none;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  background: #111827;
-  color: #fff;
-  transition: all 0.15s;
-}
-.saveBtn:disabled {
-  cursor: default;
-}
-.saveBtn:hover:not(:disabled) {
-  opacity: 0.9;
-}
-.saveBtnDone {
-  background: #10b981 !important;
-}
-
-.saveErr {
-  color: #ef4444;
-  font-size: 13px;
-  margin: 0;
-  text-align: right;
-  padding-right: 4px;
-}
-
-.sectionTitle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 15px;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 16px;
-}
-
-.sectionBody {
-  padding: 0;
-}
-
-.divider {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 16px;
 }
 
 .navHeader {
@@ -109,6 +106,15 @@
   background: #fef2f2;
 }
 
+.navLabel {
+  margin: 0;
+}
+
+.addNavBtn {
+  font-size: 12px;
+  padding: 5px 12px;
+}
+
 .textareaField {
   width: 100%;
   padding: 10px 14px;
@@ -130,6 +136,10 @@
 .slideRow {
   gap: 8px;
   margin-bottom: 8px;
+}
+
+.slideBtn {
+  white-space: nowrap;
 }
 
 .emptySlides {
@@ -219,6 +229,12 @@
   background: none;
 }
 
+.colorInput {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+}
+
 .checkRow {
   gap: 12px;
   align-items: center;
@@ -294,30 +310,6 @@
   line-height: 24px;
 }
 
-.flexCenter {
-  flex: 1;
-  min-height: 200px;
-}
-
-.navLabel {
-  margin: 0;
-}
-
-.addNavBtn {
-  font-size: 12px;
-  padding: 5px 12px;
-}
-
-.slideBtn {
-  white-space: nowrap;
-}
-
-.colorInput {
-  width: auto;
-  flex: 1;
-  min-width: 0;
-}
-
 .logoLabel {
   margin-bottom: 8px;
   display: block;
@@ -325,6 +317,11 @@
 
 .logoBtn {
   font-size: 13px;
+}
+
+.flexCenter {
+  flex: 1;
+  min-height: 200px;
 }
 
 .centerBlock {
@@ -343,12 +340,61 @@
   margin-top: 4px;
 }
 
+@media (max-width: 768px) {
+  .sections {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .sectionHeader {
+    margin-bottom: 12px;
+  }
+  .sectionHeader h2 {
+    font-size: 15px;
+  }
+  .saveBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+  .row {
+    gap: 16px;
+  }
+}
+
 @media (max-width: 640px) {
+  .sections {
+    gap: 12px;
+  }
+  .sectionHeader {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+  }
   .row {
     grid-template-columns: 1fr;
-    gap: 16px;
   }
   .navItem {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .sections {
+    gap: 10px;
+  }
+  .sectionHeader h2 {
+    font-size: 13px;
+  }
+  .sectionHeader {
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+  }
+  .saveBar {
+    width: 100%;
+    margin-top: 16px;
+    margin-bottom: 20px;
+  }
+  .saveBar button {
+    width: 100%;
   }
 }
