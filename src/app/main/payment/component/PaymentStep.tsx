@@ -72,9 +72,11 @@ export default function PaymentStep({
     <div className={`${styles.stepPage} ${styles.stepPagePayment}`}>
       <StepperBar current={3} total={5} />
       <div className={styles.paymentCard}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
-        </div>
+        {!paid && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            <button className={styles.boothBtnSecondary} onClick={onBack}><ArrowLeft size={16} /> Back</button>
+          </div>
+        )}
         <h2 className={styles.stepHeading}>Payment</h2>
         <p style={{ color: '#888', marginBottom: '24px' }}>Scan the QRIS code to pay</p>
         {paid ? (

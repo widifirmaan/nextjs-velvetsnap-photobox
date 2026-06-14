@@ -1,161 +1,144 @@
 /**
- * Migration script: re-save all templates via template-studio UI
- * to upload any remaining base64 stickerUrl to Cloudinary.
+ * Migration script: upload all base64 element stickerUrls to Cloudinary
+ * by re-saving each template via the API.
+ *
+ * This replicates the core logic of template-studio's save flow:
+ *   1. Fetch template data
+ *   2. Upload any base64 element stickerUrl to Cloudinary via /api/upload
+ *   3. Update element with Cloudinary URL
+ *   4. PUT updated template back
  *
  * Usage:
+ *   ADMIN_PASSWORD=root node scripts/migrate-remote-assets.mjs
+ *
+ * Or for remote:
  *   BASE_URL=https://velvetsnap.vercel.app ADMIN_PASSWORD=xxx node scripts/migrate-remote-assets.mjs
- *
- * Defaults:
- *   BASE_URL=http://localhost:3000
- *   ADMIN_PASSWORD=root
- *   CHROMIUM_PATH=/usr/bin/chromium-browser  (or set env)
- *
- * It mimics the exact manual flow:
- *   1. Login → navigate to /admin/templates
- *   2. Collect all template edit links
- *   3. Open each in template-studio
- *   4. Wait for canvas to fully load
- *   5. Click "Save Template" → confirm → wait for redirect
- *   6. Repeat
  */
-
-import puppeteer from 'puppeteer-core';
 
 const BASE = process.env.BASE_URL || 'http://localhost:3000';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'root';
-const CHROMIUM_PATH = process.env.CHROMIUM_PATH || '/usr/bin/chromium-browser';
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
+async function api(path, options = {}) {
+  const url = `${BASE}${path}`;
+  const res = await fetch(url, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+  const data = await res.json();
+  if (!data.success) throw new Error(`${options.method || 'GET'} ${path}: ${data.error}`);
+  return data;
 }
 
-async function gotoPage(page, url) {
-  try {
-    await page.goto(url, { waitUntil: 'load', timeout: 30000 });
-  } catch (e) {
-    if (!e.message.includes('frame was detached') && !e.message.includes('LifecycleWatcher')) throw e;
-  }
-  await sleep(1500);
-  return page.url();
+function isBase64(str) {
+  return typeof str === 'string' && str.startsWith('data:');
 }
 
 async function main() {
-  console.log(`Starting remote asset migration at ${BASE}`);
-  console.log(`Chromium: ${CHROMIUM_PATH}`);
+  console.log(`Starting remote asset migration at ${BASE}\n`);
 
-  const browser = await puppeteer.launch({
-    executablePath: CHROMIUM_PATH,
-    headless: true,
-    args: ['--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--disable-setuid-sandbox'],
+  // ── Login to get session token ──
+  console.log('Logging in...');
+  const login = await api('/api/admin/login', {
+    method: 'POST',
+    body: JSON.stringify({ password: ADMIN_PASSWORD }),
   });
+  const token = login.token;
+  const authHeaders = { Authorization: `Bearer ${token}` };
+  console.log('Logged in\n');
 
-  const page = await browser.newPage();
-  page.setDefaultTimeout(30000);
+  // ── Fetch all templates ──
+  console.log('Fetching templates...');
+  const list = await api('/api/templates/list', { headers: authHeaders });
+  const templates = list.data;
+  console.log(`Found ${templates.length} templates\n`);
 
-  try {
-    // ── Login ──
-    console.log('\nLogging in...');
-    await gotoPage(page, `${BASE}/admin/login`);
-    const loginRes = await page.evaluate(async (pw) => {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pw }),
-      });
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (data.token) sessionStorage.setItem('admin_session_token', data.token);
-      return data.token;
-    }, ADMIN_PASSWORD);
+  let migrated = 0;
+  let skipped = 0;
+  let failed = 0;
 
-    if (!loginRes) {
-      console.error('Login failed — wrong password?');
-      await browser.close();
-      return;
-    }
-    console.log('Logged in');
+  for (let i = 0; i < templates.length; i++) {
+    const t = templates[i];
+    const id = t._id || t.templateId;
+    process.stdout.write(`[${i + 1}/${templates.length}] ${t.templateName || id} ... `);
 
-    // ── Collect template IDs ──
-    console.log('\nFetching template list...');
-    await gotoPage(page, `${BASE}/admin/templates`);
+    try {
+      // ── Load full template data (including elements) ──
+      const detail = await api(`/api/templates/thumbnails?id=${id}`, { headers: authHeaders });
+      const template = detail.data?.[0];
+      if (!template) { console.log('SKIP (no data)'); skipped++; continue; }
 
-    const ids = await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('a[href*="/admin/template-studio?edit="]'));
-      return links.map((a) => new URL(a.href).searchParams.get('edit')).filter(Boolean);
-    });
+      const elements = template.templateData?.elements || template.elements || [];
+      if (elements.length === 0) { console.log('SKIP (no elements)'); skipped++; continue; }
 
-    console.log(`Found ${ids.length} templates`);
-    if (ids.length === 0) {
-      console.log('Nothing to migrate.');
-      await browser.close();
-      return;
-    }
+      // ── Check for base64 stickerUrls ──
+      const base64Els = elements.filter((el) => isBase64(el.props?.stickerUrl));
+      if (base64Els.length === 0) { console.log('OK (no base64)'); skipped++; continue; }
 
-    // ── Process each template ──
-    let success = 0;
-    let fail = 0;
+      process.stdout.write(`${base64Els.length} base64 sticker(s) ... `);
 
-    for (let i = 0; i < ids.length; i++) {
-      const id = ids[i];
-      console.log(`\n[${i + 1}/${ids.length}] ${id}`);
+      // ── Upload each base64 to Cloudinary via /api/upload ──
+      const folderId = template.templateId || id;
+      const baseFolder = `velvetsnap/templates/${folderId}`;
 
-      try {
-        await gotoPage(page, `${BASE}/admin/template-studio?edit=${id}`);
-        console.log('  Loading canvas...');
-        await sleep(5000);
-
-        // Click "Save Template" button
-        const saveClicked = await page.evaluate(() => {
-          const btn = Array.from(document.querySelectorAll('button')).find(
-            (b) => b.textContent.trim().includes('Save Template')
-          );
-          if (btn) { btn.click(); return true; }
-          return false;
+      const uploads = await Promise.all(base64Els.map(async (el) => {
+        const key = 'el_' + el.id;
+        const up = await api('/api/upload', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ dataUri: el.props.stickerUrl, folder: baseFolder, publicId: key }),
         });
+        return { id: el.id, url: up.url };
+      }));
 
-        if (!saveClicked) {
-          console.error('  Save Template button not found');
-          fail++;
-          continue;
-        }
-        console.log('  Save modal opened');
-        await sleep(1000);
-
-        // Click confirm (Update / Save)
-        const confirmClicked = await page.evaluate(() => {
-          const btn = Array.from(document.querySelectorAll('button')).find(
-            (b) => (b.textContent.trim() === 'Update' || b.textContent.trim() === 'Save') && !b.disabled
-          );
-          if (btn) { btn.click(); return true; }
-          return false;
-        });
-
-        if (!confirmClicked) {
-          console.error('  Confirm button not found');
-          fail++;
-          continue;
-        }
-        console.log('  Save submitted, waiting for redirect...');
-
-        await page.waitForFunction(
-          () => window.location.pathname.includes('/admin/templates'),
-          { timeout: 30000 }
-        );
-        console.log('  Done ✓');
-        success++;
-      } catch (err) {
-        console.error(`  Error: ${err.message}`);
-        fail++;
+      // ── Apply uploaded URLs ──
+      for (const u of uploads) {
+        const el = elements.find((e) => e.id === u.id);
+        if (el) el.props.stickerUrl = u.url;
       }
-    }
 
-    console.log(`\n=== Summary ===`);
-    console.log(`Total: ${ids.length}, Success: ${success}, Failed: ${fail}`);
-  } catch (err) {
-    console.error('Fatal error:', err);
-  } finally {
-    await browser.close();
+      // ── PUT updated template ──
+      await api(`/api/templates/${id}`, {
+        method: 'PUT',
+        headers: authHeaders,
+        body: JSON.stringify({
+          templateName: template.templateName,
+          templateDesc: template.templateDesc,
+          templatePrice: template.templatePrice,
+          templateFull: template.templateFull || '',
+          templateThumb: template.templateThumb || '',
+          templateData: {
+            elements,
+            slotsLayout: template.templateData?.slotsLayout || [],
+            canvasWidth: template.templateData?.canvasWidth || 1000,
+            canvasHeight: template.templateData?.canvasHeight || 3000,
+            color: template.templateData?.color || '#ffffff',
+            type: template.templateData?.type || 'strip',
+            slots: template.templateData?.slots || elements.filter((e) => e.type === 'photo-slot').length,
+          },
+          isActive: template.isActive,
+        }),
+      });
+
+      console.log(`MIGRATED (${uploadUrls(uploads)})`);
+      migrated++;
+    } catch (err) {
+      console.log(`FAILED: ${err.message}`);
+      failed++;
+    }
   }
+
+  console.log(`\n=== Summary ===`);
+  console.log(`Total: ${templates.length}, Migrated: ${migrated}, Skipped: ${skipped}, Failed: ${failed}`);
 }
 
-main();
+function uploadUrls(uploads) {
+  return uploads.map((u) => u.id).join(', ');
+}
+
+main().catch((err) => {
+  console.error('Fatal:', err);
+  process.exit(1);
+});
