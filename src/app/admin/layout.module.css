@@ -128,7 +128,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 70px;
+  height: calc(70px + env(safe-area-inset-bottom));
   background: #fff;
   border-top: 1px solid var(--mn-border);
   display: flex;
@@ -137,6 +137,7 @@
   z-index: 100;
   box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
   padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: border-box;
 }
 
 .bottomNavItem {
@@ -152,7 +153,6 @@
   font-size: 11px;
   font-weight: 500;
   transition: all var(--transition-fast);
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .bottomNavItem:hover {
@@ -207,9 +207,7 @@
     left: 0;
     right: 0;
     z-index: 50;
-    height: auto;
-    min-height: 40px;
-    padding-top: env(safe-area-inset-top);
+    height: 40px;
     background: #fff;
     border-bottom: 1px solid var(--mn-border);
     font-size: 12px;
@@ -219,7 +217,7 @@
   
   .content {
     padding: 16px;
-    padding-top: calc(56px + env(safe-area-inset-top));
+    padding-top: 56px;
     padding-bottom: calc(70px + env(safe-area-inset-bottom) + 16px);
   }
 }
@@ -227,17 +225,17 @@
 @media (max-width: 480px) {
   .content {
     padding: 12px;
-    padding-top: calc(52px + env(safe-area-inset-top));
+    padding-top: 52px;
     padding-bottom: calc(65px + env(safe-area-inset-bottom) + 12px);
   }
   
   .mobileTopBar {
-    min-height: 36px;
+    height: 36px;
     font-size: 11px;
   }
   
   .bottomNav {
-    height: 65px;
+    height: calc(65px + env(safe-area-inset-bottom));
   }
   
   .bottomNavItem {
