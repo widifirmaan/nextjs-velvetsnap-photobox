@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Save, Loader2, Image, Timer, Lock, Check, MapPin, Plus, Trash2, CheckCircle, FileText, Upload } from 'lucide-react';
+import { Save, Loader2, Image, Timer, Lock, Check, MapPin, Plus, Trash2, CheckCircle, FileText, Upload, Layout } from 'lucide-react';
 import { adminFetch } from '@/lib/admin-fetch';
 import { AdminConfirmModal, AdminModal, AdminPageHeader } from '@/app/admin/components';
 import styles from './page.module.css';
@@ -354,7 +354,7 @@ export default function SettingsPage() {
 
         <div className={`card card-md ${styles.section}`}>
           <div className={styles.sectionHeader}>
-            <span className="section-icon"><Image size={20} /></span>
+            <span className="section-icon"><Layout size={20} /></span>
             <h2>Footer</h2>
           </div>
           <div className="form-group">

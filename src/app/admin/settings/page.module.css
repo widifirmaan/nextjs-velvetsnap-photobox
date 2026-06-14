@@ -63,7 +63,7 @@
 }
 
 .divider {
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--mn-border);
   padding-top: 16px;
 }
 
@@ -140,7 +140,7 @@
 
 .emptySlides {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -378,6 +378,12 @@
   .navItem {
     flex-wrap: wrap;
   }
+  .slideRow {
+    flex-wrap: wrap;
+  }
+  .passRow {
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 480px) {
@@ -393,6 +399,12 @@
   .sectionHeader {
     margin-bottom: 8px;
     padding-bottom: 6px;
+  }
+  .slideRow {
+    flex-wrap: wrap;
+  }
+  .passRow {
+    flex-wrap: wrap;
   }
   .saveBar {
     width: 100%;
