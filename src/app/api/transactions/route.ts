@@ -123,7 +123,7 @@ export async function POST(req: Request) {
       finalImage: finalImageUrl,
     });
 
-    return NextResponse.json({ success: true, transaction: tx });
+    return NextResponse.json({ success: true, data: tx });
   } catch (error: any) {
     console.error('Transaction POST error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
