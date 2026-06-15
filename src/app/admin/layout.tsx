@@ -16,11 +16,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
     const token = sessionStorage.getItem('admin_session_token');
-    if (token) setAuthed(true);
-    if (!token) { router.replace('/admin/login'); return; }
-    fetch('/api/admin/session', { headers: { Authorization: 'Bearer ' + token } })
-      .then((r) => { if (!r.ok) { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); } })
-      .catch(() => { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); });
+    if (token) {
+      setAuthed(true);
+      fetch('/api/admin/session', { headers: { Authorization: 'Bearer ' + token } })
+        .then((r) => { if (!r.ok) { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); } })
+        .catch(() => { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); });
+    } else {
+      fetch('/api/admin/session')
+        .then((r) => { if (r.ok) setAuthed(true); else router.replace('/admin/login'); })
+        .catch(() => router.replace('/admin/login'));
+    }
   }, [pathname, router]);
 
   useEffect(() => {
