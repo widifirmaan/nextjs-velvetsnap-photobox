@@ -61,6 +61,7 @@ export interface ITemplate extends Document {
   templateThumb?: string;
   templateData: ITemplateData;
   isActive: boolean;
+  accountId?: string | null;
 }
 
 const StripElementSchema = new Schema<IStripElement>({
@@ -100,6 +101,7 @@ const TemplateSchema = new Schema<any>({
   templateThumb: { type: String },
   templateData: { type: TemplateDataSchema, default: () => ({}) },
   isActive: { type: Boolean, default: true },
+  accountId: { type: String, default: null, index: true },
 
   // Legacy flat fields — kept for backward compat with existing DB docs
   name: { type: String },

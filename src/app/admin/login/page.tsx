@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function AdminLoginPage() {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
@@ -15,9 +16,7 @@ export default function AdminLoginPage() {
   useEffect(() => {
     const t = sessionStorage.getItem('admin_session_token');
     fetch('/api/admin/session', { headers: t ? { 'Authorization': 'Bearer ' + t } : {} })
-      .then((r) => {
-        if (r.status === 200) router.replace('/admin');
-      })
+      .then((r) => { if (r.status === 200) router.replace('/admin'); })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [router]);
@@ -30,16 +29,27 @@ export default function AdminLoginPage() {
       const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ username: username.trim() || 'root', password }),
       });
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || 'Invalid password');
+        setError(data.error || 'Login failed');
         setSubmitting(false);
         return;
       }
       const data = await res.json();
-      if (data.token) sessionStorage.setItem('admin_session_token', data.token);
+      if (data.token) {
+        sessionStorage.setItem('admin_session_token', data.token);
+        sessionStorage.setItem('admin_is_root', data.isRoot ? '1' : '0');
+        if (data.accountId) sessionStorage.setItem('admin_account_id', data.accountId);
+        if (data.username) sessionStorage.setItem('admin_username', data.username);
+        // Sync to localStorage for kiosk pages
+        if (data.accountId && !data.isRoot) {
+          localStorage.setItem('velvetsnap_account_id', data.accountId);
+        } else {
+          localStorage.removeItem('velvetsnap_account_id');
+        }
+      }
       router.replace('/admin');
     } catch {
       setError('Network error');
@@ -62,7 +72,13 @@ export default function AdminLoginPage() {
         <div className={styles.subText}>Admin Panel</div>
 
         <input
-          type="password" placeholder="Password" autoFocus
+          type="text" placeholder="Username (kosongkan untuk root)" autoFocus
+          value={username} onChange={(e) => setUsername(e.target.value)}
+          className={`form-input ${styles.input}`}
+        />
+
+        <input
+          type="password" placeholder="Password"
           value={password} onChange={(e) => setPassword(e.target.value)}
           className={`form-input ${styles.input}`}
         />

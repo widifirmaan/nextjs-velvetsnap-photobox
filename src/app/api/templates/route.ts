@@ -3,11 +3,34 @@ import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import { uploadBase64, isBase64 } from '@/lib/cloudinary';
 import { normalizeTemplate } from '@/lib/normalize-template';
+import { getSession } from '@/lib/require-admin';
+
 export async function GET(req: Request) {
   try {
     await connectDB();
-    const docs = await Template.find({})
-      .select('templateId templateName name templateDesc description templatePrice price templateData templateFull fullresUrl frameImage templateThumb thumbUrl thumbnail canvasWidth canvasHeight color type slots elements slotsLayout isActive createdAt')
+    const { searchParams } = new URL(req.url);
+    const session = await getSession(req);
+
+    let filter: any = {};
+    if (session.isRoot) {
+      // Root sees all
+    } else if (session.accountId) {
+      // Account sees only own templates
+      filter = { accountId: session.accountId };
+    } else {
+      // Public/unauth sees root templates
+      filter = { accountId: { $in: [null, undefined] } };
+    }
+
+    // Query param override
+    const qAccountId = searchParams.get('accountId');
+    if (qAccountId) {
+      if (qAccountId === 'root') filter = { accountId: { $in: [null, undefined] } };
+      else filter = { accountId: qAccountId };
+    }
+
+    const docs = await Template.find(filter)
+      .select('templateId templateName name templateDesc description templatePrice price templateData templateFull fullresUrl frameImage templateThumb thumbUrl thumbnail canvasWidth canvasHeight color type slots elements slotsLayout isActive accountId createdAt')
       .lean();
     return NextResponse.json({ success: true, data: docs.map(normalizeTemplate) });
   } catch (error: any) {
@@ -19,9 +42,9 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const body = await req.json();
+    const session = await getSession(req);
     const tData = body.templateData || {};
 
-    // Backward compat: accept both new (templateFull) and old (fullresUrl) field names
     const templateFull = body.templateFull || body.fullresUrl || '';
     const templateThumb = body.templateThumb || body.thumbUrl || '';
     const elements = tData.elements || body.elements || [];
@@ -70,6 +93,7 @@ export async function POST(req: Request) {
         slots: tData.slots ?? body.slots ?? 1,
       },
       isActive: body.isActive ?? true,
+      accountId: session.accountId || null,
     });
 
     return NextResponse.json({ success: true, data: normalizeTemplate(doc.toObject()) });

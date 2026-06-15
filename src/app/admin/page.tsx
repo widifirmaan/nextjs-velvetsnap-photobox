@@ -1,6 +1,9 @@
 import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import Transaction from '@/models/Transaction';
+import Account from '@/models/Account';
+import { cookies } from 'next/headers';
+import Settings from '@/models/Settings';
 import Link from 'next/link';
 import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'lucide-react';
 import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
@@ -9,20 +12,54 @@ import styles from './page.module.css';
 
 export const revalidate = 0;
 
+async function getSession() {
+  const cookieStore = await cookies();
+  const adminSession = cookieStore.get('admin_session');
+  if (!adminSession?.value) return { isRoot: false, accountId: null, username: null };
+
+  await connectDB();
+  const settings = await Settings.findOne({}).lean();
+  const rootToken = settings?.security?.session || settings?.adminSession;
+  if (rootToken === adminSession.value) {
+    return { isRoot: true, accountId: null, username: 'root' };
+  }
+
+  const account = await Account.findOne({ session: adminSession.value }).lean();
+  if (account) {
+    return { isRoot: false, accountId: account._id.toString(), username: account.username };
+  }
+
+  return { isRoot: false, accountId: null, username: null };
+}
+
 export default async function AdminDashboard() {
   await connectDB();
+  const session = await getSession();
 
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   const weekStart = new Date(todayStart);
   weekStart.setDate(weekStart.getDate() - 6);
 
+  const txFilter: any = {};
+  const tmplFilter: any = {};
+
+  if (session.isRoot) {
+    // Root sees all
+  } else if (session.accountId) {
+    txFilter.accountId = session.accountId;
+    tmplFilter.accountId = session.accountId;
+  } else {
+    txFilter.accountId = { $in: [null, undefined] };
+    tmplFilter.accountId = { $in: [null, undefined] };
+  }
+
   const [templateCount, activeCount, totalSessions, aggResult] = await Promise.all([
-    Template.countDocuments(),
-    Template.countDocuments({ isActive: { $ne: false } }),
-    Transaction.countDocuments(),
+    Template.countDocuments(tmplFilter),
+    Template.countDocuments({ ...tmplFilter, isActive: { $ne: false } }),
+    Transaction.countDocuments(txFilter),
     Transaction.aggregate([
-      { $match: { status: 'PAID' } },
+      { $match: { ...txFilter, status: 'PAID' } },
       {
         $facet: {
           allTime: [{ $group: { _id: null, total: { $sum: '$price' } } }],
@@ -70,26 +107,20 @@ export default async function AdminDashboard() {
     <div className="page-stack">
       <AdminPageHeader
         title="Dashboard"
-        subtitle="VelvetSnap Co. — Admin Dashboard"
+        subtitle={session.isRoot ? 'VelvetSnap Co. — Root Dashboard (all accounts)' : `VelvetSnap Co. — ${session.username || 'Account'} Dashboard`}
       />
-
       <MobileActions />
-
       <AdminStatGrid>
         <AdminStatCard icon={<Camera size={22} />} label="Total Sessions" value={totalSessions.toLocaleString('id-ID')} color="blue" delay={0.05} />
         <AdminStatCard icon={<DollarSign size={22} />} label="Total Revenue" value={`Rp ${revenue.toLocaleString('id-ID')}`} color="green" delay={0.1} />
-        <AdminStatCard icon={<TrendingUp size={22} />} label="Today&apos;s Revenue" value={`Rp ${todayRevenue.toLocaleString('id-ID')}`} color="orange" delay={0.15} />
+        <AdminStatCard icon={<TrendingUp size={22} />} label="Today's Revenue" value={`Rp ${todayRevenue.toLocaleString('id-ID')}`} color="orange" delay={0.15} />
         <AdminStatCard icon={<Layers size={22} />} label="Active Templates" value={`${activeCount}`} color="purple" delay={0.2} subtext={`${templateCount} total`} />
       </AdminStatGrid>
-
-      {/* Revenue Chart */}
       <div className={`card card-md ${styles.chartSection}`}>
         <div className={styles.chartHeader}>
           <div>
             <h2 className={styles.chartTitle}>Revenue — Last 7 Days</h2>
-            <p className={styles.chartSubtitle}>
-              Daily paid transaction totals
-            </p>
+            <p className={styles.chartSubtitle}>Daily paid transaction totals</p>
           </div>
         </div>
         <div className={styles.barChart}>
@@ -97,30 +128,18 @@ export default async function AdminDashboard() {
             const heightPct = maxRevenue > 0 ? (day.total / maxRevenue) * 100 : 0;
             return (
               <div key={day.date} className={styles.barGroup}>
-                {day.total > 0 && (
-                  <span className={styles.barAmount}>
-                    {(day.total / 1000).toFixed(0)}k
-                  </span>
-                )}
-                <div
-                  className={styles.bar}
-                  style={{ height: `${Math.max(heightPct, 2)}%` }}
-                  title={`Rp ${day.total.toLocaleString('id-ID')} (${day.count} sessions)`}
-                />
+                {day.total > 0 && <span className={styles.barAmount}>{(day.total / 1000).toFixed(0)}k</span>}
+                <div className={styles.bar} style={{ height: `${Math.max(heightPct, 2)}%` }} title={`Rp ${day.total.toLocaleString('id-ID')} (${day.count} sessions)`} />
                 <span className={styles.barLabel}>{day.dayLabel}</span>
               </div>
             );
           })}
         </div>
       </div>
-
-      {/* Quick Access */}
       <h2 className={styles.sectionTitle}>Quick Access</h2>
       <div className={styles.quickLinksGrid}>
         <Link href="/admin/templates" className={`card card-sm ${styles.quickLink}`}>
-          <div className={`${styles.quickLinkIcon} ${styles.blue}`}>
-            <Layers size={20} />
-          </div>
+          <div className={`${styles.quickLinkIcon} ${styles.blue}`}><Layers size={20} /></div>
           <div>
             <div className={styles.quickLinkText}>Templates</div>
             <div className={styles.quickLinkDesc}>Manage frames &amp; layouts</div>
@@ -128,9 +147,7 @@ export default async function AdminDashboard() {
           <ChevronRight size={18} className={styles.quickLinkArrow} />
         </Link>
         <Link href="/admin/history" className={`card card-sm ${styles.quickLink}`}>
-          <div className={`${styles.quickLinkIcon} ${styles.orange}`}>
-            <Clock size={20} />
-          </div>
+          <div className={`${styles.quickLinkIcon} ${styles.orange}`}><Clock size={20} /></div>
           <div>
             <div className={styles.quickLinkText}>Photo History</div>
             <div className={styles.quickLinkDesc}>Browse past sessions</div>
@@ -138,8 +155,6 @@ export default async function AdminDashboard() {
           <ChevronRight size={18} className={styles.quickLinkArrow} />
         </Link>
       </div>
-
-
     </div>
   );
 }

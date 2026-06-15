@@ -17,6 +17,10 @@ export default function MobileActions() {
       <button
         onClick={() => {
           sessionStorage.removeItem('admin_session_token');
+          sessionStorage.removeItem('admin_is_root');
+          sessionStorage.removeItem('admin_account_id');
+          sessionStorage.removeItem('admin_username');
+          localStorage.removeItem('velvetsnap_account_id');
           fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
         }}
         className={`card card-sm ${styles.mobileActionBtn}`}

@@ -15,21 +15,14 @@ export async function GET(req: Request) {
         ? { $or: [{ _id: id }, { templateId: id }] }
         : { templateId: id };
       const template = await Template.findOne(query)
-        .select('templateId templateName templateDesc templatePrice templateFull templateThumb templateData isActive')
+        .select('templateId templateName templateDesc templatePrice templateFull templateThumb templateData isActive accountId')
         .lean();
-      if (!template) {
-        return NextResponse.json({ success: false, error: 'Template not found' }, { status: 404 });
-      }
-      return NextResponse.json({
-        success: true,
-        data: [normalizeTemplate(template)],
-      }, {
-        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
-      });
+      if (!template) { return NextResponse.json({ success: false, error: 'Template not found' }, { status: 404 }); }
+      return NextResponse.json({ success: true, data: [normalizeTemplate(template)] }, { headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' } });
     }
 
     const templates = await Template.find({})
-      .select('templateId templateName templateDesc templatePrice templateThumb templateData templateFull isActive')
+      .select('templateId templateName templateDesc templatePrice templateThumb templateData templateFull isActive accountId')
       .lean();
     const data = templates.map(normalizeTemplate);
     return NextResponse.json({ success: true, data });

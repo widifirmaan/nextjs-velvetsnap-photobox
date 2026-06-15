@@ -65,7 +65,9 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   useEffect(() => {
     if (cachedTemplates) { setTemplatesLoading(false); return; }
-    fetch('/api/templates/list')
+    const accountId = typeof window !== 'undefined' ? localStorage.getItem('velvetsnap_account_id') : null;
+    const url = accountId ? `/api/templates/list?accountId=${encodeURIComponent(accountId)}` : '/api/templates/list';
+    fetch(url)
       .then((r) => r.json())
       .then((res) => {
         if (!res.success || !res.data?.length) { setTemplatesLoading(false); return; }

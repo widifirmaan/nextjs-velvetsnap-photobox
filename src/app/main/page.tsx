@@ -44,8 +44,14 @@ export default function Home() {
 
   const handleRefresh = useCallback(() => setRefreshKey((k) => k + 1), []);
 
+  const getAccountParam = () => {
+    if (typeof window === 'undefined') return '';
+    const id = localStorage.getItem('velvetsnap_account_id');
+    return id ? `?accountId=${encodeURIComponent(id)}` : '';
+  };
+
   const fetchSettings = useCallback(() => {
-    fetch('/api/settings')
+    fetch(`/api/settings${getAccountParam()}`)
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -94,18 +100,19 @@ export default function Home() {
   }, [handleRefresh]);
 
   useEffect(() => {
+    const ap = getAccountParam();
     fetchSettings();
-    fetch('/api/transactions/strips')
+    fetch(`/api/transactions/strips${ap}`)
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data?.length) setStrips(res.data);
       })
       .catch(() => {});
-    fetch('/api/transactions/count')
+    fetch(`/api/transactions/count${ap}`)
       .then((r) => r.json())
       .then((res) => { if (res.success) setTxCount(res.total); })
       .catch(() => {});
-    fetch('/api/templates/list')
+    fetch(`/api/templates/list${ap}`)
       .then((r) => r.json())
       .then((res) => { if (res.success) setTmplCount(res.data.length); })
       .catch(() => {});

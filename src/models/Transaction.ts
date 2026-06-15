@@ -8,6 +8,7 @@ export interface ITransaction extends Document {
   captures: string[];
   finalImage: string;
   showInCarousel: boolean;
+  accountId?: string | null;
   createdAt: Date;
 }
 
@@ -19,6 +20,7 @@ const TransactionSchema = new Schema<ITransaction>({
   captures: { type: [String], default: [] },
   finalImage: { type: String, default: '' },
   showInCarousel: { type: Boolean, default: false },
+  accountId: { type: String, default: null, index: true },
 }, { timestamps: true });
 
 TransactionSchema.index({ sessionId: 1 }, { unique: true });

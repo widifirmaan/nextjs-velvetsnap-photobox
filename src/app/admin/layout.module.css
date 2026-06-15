@@ -68,6 +68,16 @@
   letter-spacing: -0.03em;
 }
 
+.accountInfo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: -24px;
+}
+
 .nav {
   display: flex;
   flex-direction: column;

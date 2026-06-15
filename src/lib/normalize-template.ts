@@ -19,6 +19,7 @@ export function normalizeTemplate(doc: any) {
       slots: td.slots ?? doc.slots ?? 1,
     },
     isActive: doc.isActive ?? true,
+    accountId: doc.accountId || null,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
   };

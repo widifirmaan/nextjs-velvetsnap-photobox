@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Layers, Server, Clock, Image, Loader2, LogOut, Settings2 } from 'lucide-react';
+import { LayoutDashboard, Layers, Server, Clock, Image, Loader2, LogOut, Settings2, User, Users } from 'lucide-react';
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -11,6 +11,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const [isRoot, setIsRoot] = useState(true);
+  const [username, setUsername] = useState('');
   const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
@@ -18,12 +20,45 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const token = sessionStorage.getItem('admin_session_token');
     if (token) {
       setAuthed(true);
+      const savedRoot = sessionStorage.getItem('admin_is_root');
+      const savedUser = sessionStorage.getItem('admin_username');
+      if (savedRoot !== null) setIsRoot(savedRoot === '1');
+      if (savedUser) setUsername(savedUser);
       fetch('/api/admin/session', { headers: { Authorization: 'Bearer ' + token } })
-        .then((r) => { if (!r.ok) { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); } })
-        .catch(() => { sessionStorage.removeItem('admin_session_token'); router.replace('/admin/login'); });
+        .then((r) => {
+          if (r.ok) return r.json();
+          sessionStorage.removeItem('admin_session_token');
+          sessionStorage.removeItem('admin_is_root');
+          sessionStorage.removeItem('admin_account_id');
+          sessionStorage.removeItem('admin_username');
+          router.replace('/admin/login');
+          return null;
+        })
+        .then((data) => {
+          if (data) {
+            setIsRoot(data.isRoot);
+            setUsername(data.username || '');
+            sessionStorage.setItem('admin_is_root', data.isRoot ? '1' : '0');
+            if (data.accountId) sessionStorage.setItem('admin_account_id', data.accountId);
+            if (data.username) sessionStorage.setItem('admin_username', data.username);
+            // Sync to localStorage for kiosk pages
+            if (data.accountId && !data.isRoot) {
+              localStorage.setItem('velvetsnap_account_id', data.accountId);
+            } else {
+              localStorage.removeItem('velvetsnap_account_id');
+            }
+          }
+        })
+        .catch(() => {
+          sessionStorage.removeItem('admin_session_token');
+          sessionStorage.removeItem('admin_is_root');
+          sessionStorage.removeItem('admin_account_id');
+          sessionStorage.removeItem('admin_username');
+          router.replace('/admin/login');
+        });
     } else {
       fetch('/api/admin/session')
-        .then((r) => { if (r.ok) setAuthed(true); else router.replace('/admin/login'); })
+        .then((r) => { if (r.ok) { setAuthed(true); } else router.replace('/admin/login'); })
         .catch(() => router.replace('/admin/login'));
     }
   }, [pathname, router]);
@@ -39,28 +74,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .catch(() => {});
   }, []);
 
-
-
   const clearNav = useCallback(() => {
     setNavigating(false);
     if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
   }, []);
 
-  useEffect(() => {
-    clearNav();
-  }, [pathname, clearNav]);
+  useEffect(() => { clearNav(); }, [pathname, clearNav]);
 
-  const navLinks = [
+  const rootNavLinks = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/templates', label: 'Templates', icon: Layers },
+    { href: '/admin/accounts', label: 'Accounts', icon: Users },
     { href: '/admin/devices', label: 'Devices', icon: Server },
     { href: '/admin/template-studio', label: 'Strips Studio', icon: Image },
     { href: '/admin/settings', label: 'Settings', icon: Settings2 },
   ];
 
+  const accountNavLinks = [
+    { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+    { href: '/admin/templates', label: 'Templates', icon: Layers },
+    { href: '/admin/settings', label: 'My Settings', icon: Settings2 },
+  ];
+
   const bottomLinks = [
     { href: '/admin/history', label: 'History', icon: Clock },
   ];
+
+  const navLinks = isRoot ? rootNavLinks : accountNavLinks;
 
   const isActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin';
@@ -73,6 +113,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
     navTimeoutRef.current = setTimeout(() => setNavigating(false), 5000);
   }, [isActive]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('admin_session_token');
+    sessionStorage.removeItem('admin_is_root');
+    sessionStorage.removeItem('admin_account_id');
+    sessionStorage.removeItem('admin_username');
+    localStorage.removeItem('velvetsnap_account_id');
+    fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
+  };
 
   const renderNavLink = (link: { href: string; label: string; icon: any }) => {
     const Icon = link.icon;
@@ -125,6 +174,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div className={`card ${styles.sidebar}`}>
         <div className={styles.brand}>VelvetSnap</div>
+        <div className={styles.accountInfo}>
+          <User size={14} />
+          <span>{username} {isRoot ? '(Root)' : ''}</span>
+        </div>
         <nav className={styles.nav}>
           {navLinks.map(renderNavLink)}
           <div className={styles.navDivider} />
@@ -133,7 +186,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className={styles.sidebarFooter}>
           <Link href="/" className={`${styles.navLink} ${styles.sidebarLink}`}>&larr; Return to App</Link>
-          <button onClick={() => { sessionStorage.removeItem('admin_session_token'); fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login')); }} className={styles.logoutBtn}>
+          <button onClick={handleLogout} className={styles.logoutBtn}>
             <LogOut size={20} /> Logout
           </button>
         </div>

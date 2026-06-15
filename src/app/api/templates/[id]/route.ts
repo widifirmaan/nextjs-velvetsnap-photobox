@@ -3,12 +3,24 @@ import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import { uploadBase64, isBase64, deleteImages } from '@/lib/cloudinary';
 import { normalizeTemplate } from '@/lib/normalize-template';
+import { getSession } from '@/lib/require-admin';
+
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     await connectDB();
     const body = await req.json();
+    const session = await getSession(req);
     const tData = body.templateData || {};
+
+    // Scope check: account can only edit own templates
+    const existing = await Template.findById(id).lean();
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'Template not found' }, { status: 404 });
+    }
+    if (session.accountId && existing.accountId && existing.accountId !== session.accountId) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
 
     const templateFull = body.templateFull || body.fullresUrl || '';
     const templateThumb = body.templateThumb || body.thumbUrl || '';
@@ -18,7 +30,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const toUpload: { key: string; b64: string }[] = [];
     if (templateFull && isBase64(templateFull)) toUpload.push({ key: 'templateFull', b64: templateFull });
     if (templateThumb && isBase64(templateThumb)) toUpload.push({ key: 'templateThumb', b64: templateThumb });
-
     if (body.elementImages && elements.length) {
       for (const [eid, b64] of Object.entries(body.elementImages as Record<string, string>)) {
         if (isBase64(b64)) toUpload.push({ key: `el_${eid}`, b64 });
@@ -48,8 +59,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       templateFull: templateFullUrl,
       templateThumb: templateThumbUrl,
       templateData: {
-        elements,
-        slotsLayout,
+        elements, slotsLayout,
         canvasWidth: tData.canvasWidth || body.canvasWidth || 1000,
         canvasHeight: tData.canvasHeight || body.canvasHeight || 3000,
         color: tData.color || body.color || '#ffffff',
@@ -70,9 +80,14 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
   try {
     const { id } = await params;
     await connectDB();
+    const session = await getSession(req);
+
     const doc = await Template.findById(id).lean();
-    if (!doc) {
-      return NextResponse.json({ success: false, error: 'Template not found' }, { status: 404 });
+    if (!doc) { return NextResponse.json({ success: false, error: 'Template not found' }, { status: 404 }); }
+
+    // Scope check
+    if (session.accountId && doc.accountId && doc.accountId !== session.accountId) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
     const imageUrls: string[] = [];
@@ -81,9 +96,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     if (fullUrl) imageUrls.push(fullUrl);
     if (thumbUrl) imageUrls.push(thumbUrl);
     const els = doc.templateData?.elements || doc.elements || [];
-    for (const el of els) {
-      if (el.props?.stickerUrl) imageUrls.push(el.props.stickerUrl);
-    }
+    for (const el of els) { if (el.props?.stickerUrl) imageUrls.push(el.props.stickerUrl); }
 
     await deleteImages(imageUrls);
     await Template.findByIdAndDelete(id);

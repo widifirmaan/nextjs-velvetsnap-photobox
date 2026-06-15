@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Settings from '@/models/Settings';
+import Account from '@/models/Account';
+import { getSession } from '@/lib/require-admin';
 
 const SENSITIVE_PATHS = ['security.password', 'security.passwordSalt', 'security.session', 'security.sessionExpires'];
 const SENSITIVE_FLAT = ['adminPassword', 'adminPasswordSalt', 'adminSession', 'adminSessionExpires'];
@@ -40,7 +42,35 @@ function cleanDoc(doc: Record<string, any>) {
   return cleaned;
 }
 
-async function getOrCreate() {
+function mapAccountSettings(account: any) {
+  const s = account.settings || {};
+  return {
+    appName: s.appName || 'VelvetSnap',
+    appTagline: s.appTagline || 'AI-Powered Photobooth Experience',
+    heroSubtitle: s.heroSubtitle || 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
+    logo: s.logo || '',
+    cardSmallHtml: s.cardSmallHtml || '',
+    cardPromoHtml: s.cardPromoHtml || '',
+    slideshowImages: Array.isArray(s.slideshowImages) ? s.slideshowImages : [],
+    header: {
+      location: s.header?.location || 'Jakarta',
+      navItems: s.header?.navItems || '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]',
+    },
+    footer: {
+      text: s.footer?.text || 'VelvetSnap Photobooth Platform',
+    },
+    system: {
+      primaryColor: s.system?.primaryColor || '#262626',
+      accentColor: s.system?.accentColor || '#C5D89D',
+      showPreloader: s.system?.showPreloader ?? true,
+      showStrips: s.system?.showStrips ?? true,
+      slideshowInterval: s.system?.slideshowInterval || 3000,
+      sessionTimer: s.system?.sessionTimer ?? 600,
+    },
+  };
+}
+
+async function getOrCreateRoot() {
   await connectDB();
   let doc = await Settings.findOne({}).lean();
   if (!doc) {
@@ -52,7 +82,24 @@ async function getOrCreate() {
 
 export async function GET(req: Request) {
   try {
-    const doc = await getOrCreate();
+    const { searchParams } = new URL(req.url);
+    const session = await getSession(req);
+
+    // Explicit accountId query param overrides session
+    const qAccountId = searchParams.get('accountId');
+    if (qAccountId || (session.accountId && !session.isRoot)) {
+      const accountId = qAccountId || session.accountId;
+      await connectDB();
+      const account = await Account.findById(accountId).lean();
+      if (account) {
+        return NextResponse.json({ success: true, data: mapAccountSettings(account) }, {
+          headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
+        });
+      }
+    }
+
+    // Root or public → return root settings
+    const doc = await getOrCreateRoot();
     return NextResponse.json({ success: true, data: cleanDoc(doc) }, {
       headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
     });
@@ -63,13 +110,34 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
   try {
+    const session = await getSession(req);
+
+    // Account user → save to account settings
+    if (session.accountId && !session.isRoot) {
+      await connectDB();
+      const body = await req.json();
+      const $set: Record<string, any> = {};
+      for (const [key, val] of Object.entries(body)) {
+        if (val !== null && typeof val === 'object' && !Array.isArray(val)) {
+          for (const [subKey, subVal] of Object.entries(val as Record<string, any>)) {
+            $set[`settings.${key}.${subKey}`] = subVal;
+          }
+        } else {
+          $set[`settings.${key}`] = val;
+        }
+      }
+      await Account.findByIdAndUpdate(session.accountId, { $set });
+      const account = await Account.findById(session.accountId).lean();
+      return NextResponse.json({ success: true, data: mapAccountSettings(account) });
+    }
+
+    // Root → save to root settings (existing behavior)
     await connectDB();
     const body = await req.json();
     for (const path of SENSITIVE_PATHS) {
       const parts = path.split('.');
       if (parts.length === 2 && body[parts[0]]) delete body[parts[0]][parts[1]];
     }
-
     const $set: Record<string, any> = {};
     for (const [key, val] of Object.entries(body)) {
       if (val !== null && typeof val === 'object' && !Array.isArray(val)) {
@@ -80,7 +148,6 @@ export async function PUT(req: Request) {
         $set[key] = val;
       }
     }
-
     await Settings.collection.updateOne({}, { $set }, { upsert: true });
     const doc = await Settings.collection.findOne({});
     return NextResponse.json({ success: true, data: cleanDoc(doc as any) });

@@ -47,6 +47,7 @@ export default function SettingsPage() {
   const [confirmSave, setConfirmSave] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [authErr, setAuthErr] = useState(false);
+  const [isRoot, setIsRoot] = useState(true);
   const [newPass, setNewPass] = useState('');
   const [passSaving, setPassSaving] = useState(false);
   const [passSaved, setPassSaved] = useState(false);
@@ -108,6 +109,9 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
+    const root = sessionStorage.getItem('admin_is_root');
+    setIsRoot(root === '1');
+    setLoading(true);
     adminFetch('/api/settings')
       .then((r) => {
         if (r.status === 401) { handleAuthFail(); return null; }
@@ -253,10 +257,10 @@ export default function SettingsPage() {
 
   return (
     <div className="page-stack">
-      <AdminPageHeader
-        title="Settings"
-        subtitle="Customize homepage appearance"
-      />
+        <AdminPageHeader
+          title={isRoot ? 'Settings' : 'My Settings'}
+          subtitle={isRoot ? 'Customize homepage appearance' : 'Customize your account homepage appearance'}
+        />
 
       <div className={styles.sections}>
         <div className={`card card-md ${styles.section}`}>
@@ -410,23 +414,25 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className={`card card-md ${styles.section}`}>
-          <div className={styles.sectionHeader}>
-            <span className="section-icon"><Lock size={20} /></span>
-            <h2>Security</h2>
-          </div>
-          <div className="form-group">
-            <label className="form-label">New Password</label>
-            <div className={`flex-row ${styles.passRow}`}>
-              <input type="password" className="form-input grow" value={newPass} onChange={(e) => { setNewPass(e.target.value); setPassSaved(false); setPassErr(''); }} placeholder="Minimal 4 karakter" />
-              <button onClick={handleSavePass} disabled={passSaving || passSaved || !newPass} className={`mac-button ${passSaved ? styles.saveBtnDone : ''}`}>
-                {passSaving ? <Loader2 className="spin" size={16} /> : passSaved ? <Check size={16} /> : <Save size={16} />}
-                {passSaving ? '...' : passSaved ? 'Tersimpan' : 'Simpan'}
-              </button>
+        {isRoot && (
+          <div className={`card card-md ${styles.section}`}>
+            <div className={styles.sectionHeader}>
+              <span className="section-icon"><Lock size={20} /></span>
+              <h2>Security</h2>
             </div>
-            {passErr && <p className={styles.passErr}>{passErr}</p>}
+            <div className="form-group">
+              <label className="form-label">New Root Password</label>
+              <div className={`flex-row ${styles.passRow}`}>
+                <input type="password" className="form-input grow" value={newPass} onChange={(e) => { setNewPass(e.target.value); setPassSaved(false); setPassErr(''); }} placeholder="Minimal 4 karakter" />
+                <button onClick={handleSavePass} disabled={passSaving || passSaved || !newPass} className={`mac-button ${passSaved ? styles.saveBtnDone : ''}`}>
+                  {passSaving ? <Loader2 className="spin" size={16} /> : passSaved ? <Check size={16} /> : <Save size={16} />}
+                  {passSaving ? '...' : passSaved ? 'Tersimpan' : 'Simpan'}
+                </button>
+              </div>
+              {passErr && <p className={styles.passErr}>{passErr}</p>}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className={styles.saveBar}>

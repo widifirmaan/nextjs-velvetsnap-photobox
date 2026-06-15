@@ -40,7 +40,9 @@ export default function TemplatesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/templates/list')
+    const accountId = typeof window !== 'undefined' ? localStorage.getItem('velvetsnap_account_id') : null;
+    const url = accountId ? `/api/templates/list?accountId=${encodeURIComponent(accountId)}` : '/api/templates/list';
+    fetch(url)
       .then((res) => res.json())
       .then((res) => {
         if (res.success) {

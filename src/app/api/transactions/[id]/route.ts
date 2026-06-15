@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
+import { getSession } from '@/lib/require-admin';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -10,6 +11,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     if (!tx) {
       return NextResponse.json({ success: false, error: 'Transaction not found' }, { status: 404 });
     }
+
+    const session = await getSession(_req);
+    if (session.accountId && tx.accountId && tx.accountId !== session.accountId) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+
     return NextResponse.json({ success: true, data: tx });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -22,6 +29,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const body = await req.json();
     await connectDB();
 
+    const session = await getSession(req);
+    const existing = await Transaction.findById(id).lean();
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'Transaction not found' }, { status: 404 });
+    }
+    if (session.accountId && existing.accountId && existing.accountId !== session.accountId) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+
     if (body.showInCarousel === true) {
       const activeCount = await Transaction.countDocuments({ showInCarousel: true, _id: { $ne: id } });
       if (activeCount >= 7) {
@@ -30,9 +46,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 
     const tx = await Transaction.findByIdAndUpdate(id, { showInCarousel: body.showInCarousel }, { new: true }).lean();
-    if (!tx) {
-      return NextResponse.json({ success: false, error: 'Transaction not found' }, { status: 404 });
-    }
     return NextResponse.json({ success: true, data: tx });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
