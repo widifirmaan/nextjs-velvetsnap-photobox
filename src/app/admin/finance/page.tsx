@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DollarSign, TrendingUp, Calendar, Clock, Download, Loader2 } from 'lucide-react';
+import { DollarSign, TrendingUp, Calendar, Clock, Download, Loader2, BarChart3, LayoutGrid } from 'lucide-react';
 import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
 import styles from './page.module.css';
 
@@ -99,13 +99,12 @@ export default function FinancePage() {
       </AdminStatGrid>
 
       {/* Daily Revenue Chart */}
-      <div className={`card card-lg ${styles.chartSection}`}>
-        <div className={styles.chartHeader}>
-          <div>
-            <h2 className={styles.chartTitle}>Daily Revenue — Last 7 Days</h2>
-            <p className={styles.chartSubtitle}>Revenue from paid transactions</p>
-          </div>
+      <div className={`card card-md ${styles.chartSection}`}>
+        <div className={styles.sectionHeader}>
+          <span className="section-icon"><BarChart3 size={20} /></span>
+          <h2>Daily Revenue — Last 7 Days</h2>
         </div>
+        <p className={styles.chartSubtitle}>Revenue from paid transactions</p>
         <div className={styles.barChart}>
           {data.dailyRevenue.map((day, idx) => {
             const heightPct = (day.total / maxDaily) * 100;
@@ -133,8 +132,11 @@ export default function FinancePage() {
 
       {/* Two Column: Template Breakdown + Monthly */}
       <div className={styles.twoCol}>
-        <div className={`card card-lg ${styles.breakdownSection}`}>
-          <h3 className={styles.breakdownTitle}>Revenue by Template</h3>
+        <div className={`card card-md ${styles.breakdownSection}`}>
+          <div className={styles.sectionHeader}>
+            <span className="section-icon"><LayoutGrid size={20} /></span>
+            <h2>Revenue by Template</h2>
+          </div>
           {data.templateRevenue.length === 0 ? (
             <p className={styles.emptyBreakdown}>No template data yet.</p>
           ) : (
@@ -158,8 +160,11 @@ export default function FinancePage() {
           )}
         </div>
 
-        <div className={`card card-lg ${styles.breakdownSection}`}>
-          <h3 className={styles.breakdownTitle}>Monthly Revenue</h3>
+        <div className={`card card-md ${styles.breakdownSection}`}>
+          <div className={styles.sectionHeader}>
+            <span className="section-icon"><Calendar size={20} /></span>
+            <h2>Monthly Revenue</h2>
+          </div>
           {data.monthlyRevenue.length === 0 ? (
             <p className={styles.emptyBreakdown}>No monthly data yet.</p>
           ) : (
