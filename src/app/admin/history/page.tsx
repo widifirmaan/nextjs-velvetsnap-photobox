@@ -152,7 +152,7 @@ export default function HistoryPage() {
       />
 
       <div className={`card card-md ${styles.filters}`}>
-        <div className="flex-row">
+        <div className={styles.filterGrid}>
           <div className="form-group">
             <label className="form-label">Status</label>
             <select className="form-input" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
@@ -170,7 +170,7 @@ export default function HistoryPage() {
             <label className="form-label">To Date</label>
             <input className="form-input" type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} />
           </div>
-          <div className="flex-row flex-row-sm">
+          <div className={styles.filterActions}>
             <button className="mac-button" onClick={handleSearch}>
               <Search size={16} /> Search
             </button>
@@ -235,7 +235,7 @@ export default function HistoryPage() {
                       })}
                     </td>
                     <td>
-                      <div className="flex-row flex-row-sm">
+                      <div className={styles.actionRow}>
                         <button className="icon-btn" title="Cetak Nota" onClick={(e) => handlePrintNota(tx, e)}>
                           <Printer size={15} />
                         </button>

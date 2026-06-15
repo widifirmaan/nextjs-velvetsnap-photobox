@@ -5,6 +5,27 @@
   animation-delay: 0.1s;
 }
 
+.filterGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.filterActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
 /* Table */
 .tableContainer {
   padding: 0;
@@ -178,7 +199,27 @@
   color: var(--text-secondary);
 }
 
+@media (max-width: 768px) {
+  .filterGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .filterActions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+}
+
 @media (max-width: 640px) {
+  .filterGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .filterActions {
+    justify-content: stretch;
+  }
+  .filterActions button {
+    flex: 1;
+  }
   .modalGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -195,22 +236,12 @@
   .tableContainer :global(.admin-table) {
     min-width: 400px;
   }
-  .pagination {
-    flex-wrap: wrap;
-    margin-top: 8px;
-    gap: 8px;
-  }
   .pageInfo {
     font-size: 12px;
   }
   .filters {
     padding: 14px;
     margin-bottom: 14px;
-  }
-  .filterGroup input,
-  .filterGroup select {
-    font-size: 16px;
-    padding: 8px 10px;
   }
   .tableContainer :global(.admin-table) thead th {
     font-size: 10px;
@@ -227,24 +258,6 @@
     padding: 10px;
     margin-bottom: 10px;
   }
-  .filterGroup label {
-    font-size: 10px;
-  }
-  .filterGroup input,
-  .filterGroup select {
-    padding: 8px 10px;
-    font-size: 13px;
-  }
-  .filterRow {
-    gap: 8px;
-  }
-  .filterActions {
-    gap: 4px;
-  }
-  .filterActions button {
-    font-size: 11px;
-    padding: 6px 10px;
-  }
   .tableContainer {
     margin-bottom: 12px;
   }
@@ -258,18 +271,6 @@
   .tableContainer :global(.admin-table) tbody td {
     padding: 6px 4px;
     font-size: 10px;
-  }
-  .actionBtn {
-    width: 24px;
-    height: 24px;
-  }
-  .pagination {
-    margin-top: 6px;
-    gap: 6px;
-  }
-  .pagination button {
-    font-size: 11px !important;
-    padding: 6px 10px !important;
   }
   .pageInfo {
     font-size: 10px;
