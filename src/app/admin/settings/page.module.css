@@ -5,11 +5,13 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   align-content: start;
 }
 
 .section {
   animation: fadeInUp 0.4s ease backwards;
+  min-width: 0;
 }
 
 .section:nth-child(1) { animation-delay: 0s; }
