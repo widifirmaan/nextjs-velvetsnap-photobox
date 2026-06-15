@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Layers, Server, Clock, DollarSign, Image, Loader2, LogOut, Settings2 } from 'lucide-react';
+import { LayoutDashboard, Layers, Server, Clock, Image, Loader2, LogOut, Settings2 } from 'lucide-react';
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -55,7 +55,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const bottomLinks = [
     { href: '/admin/history', label: 'History', icon: Clock },
-    { href: '/admin/finance', label: 'Finance', icon: DollarSign },
   ];
 
   const isActive = (href: string) => {

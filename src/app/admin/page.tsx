@@ -137,16 +137,6 @@ export default async function AdminDashboard() {
           </div>
           <ChevronRight size={18} className={styles.quickLinkArrow} />
         </Link>
-        <Link href="/admin/finance" className={`card card-sm ${styles.quickLink}`}>
-          <div className={`${styles.quickLinkIcon} ${styles.green}`}>
-            <DollarSign size={20} />
-          </div>
-          <div>
-            <div className={styles.quickLinkText}>Finance</div>
-            <div className={styles.quickLinkDesc}>Revenue &amp; analytics</div>
-          </div>
-          <ChevronRight size={18} className={styles.quickLinkArrow} />
-        </Link>
       </div>
 
 
