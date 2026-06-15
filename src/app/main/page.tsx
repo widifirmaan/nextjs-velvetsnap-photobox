@@ -50,8 +50,9 @@ export default function Home() {
     return id ? `?accountId=${encodeURIComponent(id)}` : '';
   };
 
-  const fetchSettings = useCallback(() => {
-    fetch(`/api/settings${getAccountParam()}`)
+  const fetchSettings = useCallback((accountId?: string | null) => {
+    const qp = accountId ? `?accountId=${encodeURIComponent(accountId)}` : getAccountParam();
+    fetch(`/api/settings${qp}`)
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data) {
@@ -100,22 +101,42 @@ export default function Home() {
   }, [handleRefresh]);
 
   useEffect(() => {
-    const ap = getAccountParam();
-    fetchSettings();
-    fetch(`/api/transactions/strips${ap}`)
-      .then((r) => r.json())
-      .then((res) => {
-        if (res.success && res.data?.length) setStrips(res.data);
-      })
-      .catch(() => {});
-    fetch(`/api/transactions/count${ap}`)
-      .then((r) => r.json())
-      .then((res) => { if (res.success) setTxCount(res.total); })
-      .catch(() => {});
-    fetch(`/api/templates/list${ap}`)
-      .then((r) => r.json())
-      .then((res) => { if (res.success) setTmplCount(res.data.length); })
-      .catch(() => {});
+    const resolveAccountId = async (): Promise<string | null> => {
+      const localId = localStorage.getItem('velvetsnap_account_id');
+      if (localId) return localId;
+      const ssId = sessionStorage.getItem('admin_account_id');
+      if (ssId) return ssId;
+      try {
+        const r = await fetch('/api/admin/session');
+        if (r.ok) {
+          const data = await r.json();
+          if (!data.isRoot && data.accountId) {
+            localStorage.setItem('velvetsnap_account_id', data.accountId);
+            return data.accountId;
+          }
+        }
+      } catch {}
+      return null;
+    };
+
+    resolveAccountId().then((accountId) => {
+      const qp = accountId ? `?accountId=${encodeURIComponent(accountId)}` : '';
+      fetchSettings(accountId);
+      fetch(`/api/transactions/strips${qp}`)
+        .then((r) => r.json())
+        .then((res) => {
+          if (res.success && res.data?.length) setStrips(res.data);
+        })
+        .catch(() => {});
+      fetch(`/api/transactions/count${qp}`)
+        .then((r) => r.json())
+        .then((res) => { if (res.success) setTxCount(res.total); })
+        .catch(() => {});
+      fetch(`/api/templates/list${qp}`)
+        .then((r) => r.json())
+        .then((res) => { if (res.success) setTmplCount(res.data.length); })
+        .catch(() => {});
+    });
   }, [refreshKey]);
 
   useEffect(() => {

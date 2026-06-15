@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
+import { getSession } from '@/lib/require-admin';
 
 export async function GET(req: Request) {
   try {
@@ -9,13 +10,19 @@ export async function GET(req: Request) {
     const accountId = searchParams.get('accountId');
 
     const filter: any = { finalImage: { $ne: '' }, showInCarousel: true };
-    if (accountId === 'root') {
-      filter.accountId = { $in: [null, undefined] };
-    } else if (accountId) {
-      filter.accountId = accountId;
+
+    if (accountId) {
+      if (accountId === 'root') filter.accountId = { $in: [null, undefined] };
+      else filter.accountId = accountId;
     } else {
-      // Public/kiosk — root strips only
-      filter.accountId = { $in: [null, undefined] };
+      const session = await getSession(req);
+      if (session.accountId && !session.isRoot) {
+        filter.accountId = session.accountId;
+      } else if (!session.token) {
+        // No session → root only
+        filter.accountId = { $in: [null, undefined] };
+      }
+      // Root session → no filter (all)
     }
 
     const transactions = await Transaction.find(filter)
