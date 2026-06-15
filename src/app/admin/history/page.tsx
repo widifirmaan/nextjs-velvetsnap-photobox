@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Clock, Camera, Loader2, Search, X, Trash2, Printer, ImageIcon } from 'lucide-react';
+import { Clock, Camera, Loader2, Search, X, Trash2, Printer, ImageIcon, Eye, EyeOff } from 'lucide-react';
 import { AdminPageHeader, AdminBadge, AdminEmptyState, AdminModal, AdminConfirmModal } from '@/app/admin/components';
 import styles from './page.module.css';
 
@@ -13,6 +13,7 @@ interface Transaction {
   status: string;
   captures: string[];
   finalImage: string;
+  showInCarousel?: boolean;
   createdAt: string;
 }
 
@@ -35,6 +36,7 @@ export default function HistoryPage() {
   const [modalLoading, setModalLoading] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const fetchData = useCallback(async (page = 1) => {
     setLoading(true);
@@ -144,6 +146,30 @@ export default function HistoryPage() {
     win.document.close();
   };
 
+  const handleToggleCarousel = async (tx: Transaction, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (togglingId) return;
+    const next = !tx.showInCarousel;
+    setTogglingId(tx._id);
+    setTransactions((prev) => prev.map((t) => t._id === tx._id ? { ...t, showInCarousel: next } : t));
+    try {
+      const res = await fetch(`/api/transactions/${tx._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ showInCarousel: next }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        setTransactions((prev) => prev.map((t) => t._id === tx._id ? { ...t, showInCarousel: !next } : t));
+        alert(data.error || 'Gagal mengubah status');
+      }
+    } catch {
+      setTransactions((prev) => prev.map((t) => t._id === tx._id ? { ...t, showInCarousel: !next } : t));
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
   return (
     <div className="page-stack">
       <AdminPageHeader
@@ -200,6 +226,7 @@ export default function HistoryPage() {
                   <th>Price</th>
                   <th>Photos</th>
                   <th>Status</th>
+                  <th>Carousel</th>
                   <th>Date</th>
                   <th>Actions</th>
                 </tr>
@@ -228,6 +255,16 @@ export default function HistoryPage() {
                     <td className={styles.tablePrice}>Rp {(tx.price || 0).toLocaleString('id-ID')}</td>
                     <td><Camera size={14} /> {tx.captures?.length || 0}</td>
                     <td><AdminBadge status={tx.status || 'PENDING'} /></td>
+                    <td>
+                      <button
+                        className={`${styles.toggleBtn} ${tx.showInCarousel ? styles.toggleOn : ''}`}
+                        title={tx.showInCarousel ? 'Sembunyikan dari carousel' : 'Tampilkan di carousel'}
+                        onClick={(e) => handleToggleCarousel(tx, e)}
+                        disabled={togglingId === tx._id}
+                      >
+                        {togglingId === tx._id ? <Loader2 size={14} className="spin" /> : tx.showInCarousel ? <Eye size={15} /> : <EyeOff size={15} />}
+                      </button>
+                    </td>
                     <td className={styles.tableDate}>
                       {new Date(tx.createdAt || new Date()).toLocaleDateString('en-US', {
                         year: 'numeric', month: 'short', day: 'numeric',

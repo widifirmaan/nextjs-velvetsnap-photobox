@@ -26,6 +26,35 @@
   flex-wrap: nowrap;
 }
 
+/* Toggle */
+.toggleBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--mn-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+.toggleBtn:hover {
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+.toggleBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.toggleOn {
+  background: color-mix(in srgb, var(--accent-color) 12%, transparent);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
 /* Table */
 .tableContainer {
   padding: 0;
@@ -226,7 +255,9 @@
   .tableContainer :global(.admin-table) tbody td:nth-child(3),
   .tableContainer :global(.admin-table) thead th:nth-child(3),
   .tableContainer :global(.admin-table) tbody td:nth-child(6),
-  .tableContainer :global(.admin-table) thead th:nth-child(6) {
+  .tableContainer :global(.admin-table) thead th:nth-child(6),
+  .tableContainer :global(.admin-table) tbody td:nth-child(8),
+  .tableContainer :global(.admin-table) thead th:nth-child(8) {
     display: none;
   }
   .tableContainer {
@@ -261,8 +292,14 @@
   .tableContainer {
     margin-bottom: 12px;
   }
+  .tableContainer :global(.admin-table) tbody td:nth-child(4),
+  .tableContainer :global(.admin-table) thead th:nth-child(4),
+  .tableContainer :global(.admin-table) tbody td:nth-child(5),
+  .tableContainer :global(.admin-table) thead th:nth-child(5) {
+    display: none;
+  }
   .tableContainer :global(.admin-table) {
-    min-width: 340px;
+    min-width: 280px;
   }
   .tableContainer :global(.admin-table) thead th {
     font-size: 8px;

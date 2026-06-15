@@ -5,9 +5,9 @@ import Transaction from '@/models/Transaction';
 export async function GET() {
   try {
     await connectDB();
-    const transactions = await Transaction.find({ finalImage: { $ne: '' } })
+    const transactions = await Transaction.find({ finalImage: { $ne: '' }, showInCarousel: true })
       .sort({ createdAt: -1 })
-      .limit(9)
+      .limit(7)
       .lean();
 
     return NextResponse.json({ success: true, data: transactions });

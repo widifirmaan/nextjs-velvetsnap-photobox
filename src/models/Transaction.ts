@@ -7,6 +7,7 @@ export interface ITransaction extends Document {
   status: 'PENDING' | 'PAID' | 'COMPLETED';
   captures: string[];
   finalImage: string;
+  showInCarousel: boolean;
   createdAt: Date;
 }
 
@@ -17,6 +18,7 @@ const TransactionSchema = new Schema<ITransaction>({
   status: { type: String, enum: ['PENDING', 'PAID', 'COMPLETED'], default: 'PENDING' },
   captures: { type: [String], default: [] },
   finalImage: { type: String, default: '' },
+  showInCarousel: { type: Boolean, default: false },
 }, { timestamps: true });
 
 TransactionSchema.index({ sessionId: 1 }, { unique: true });

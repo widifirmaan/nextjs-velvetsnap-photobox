@@ -25,7 +25,7 @@ export async function GET(req: Request) {
 
     const total = await Transaction.countDocuments(filter);
     const transactions = await Transaction.find(filter)
-      .select('sessionId templateId price status createdAt finalImage')
+      .select('sessionId templateId price status createdAt finalImage showInCarousel')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit)
