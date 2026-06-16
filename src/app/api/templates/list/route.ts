@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     }
 
     const templates = await Template.find(filter).sort({ createdAt: -1 }).lean();
-    const { default: normalizeTemplate } = await import('@/lib/normalize-template');
+    const { normalizeTemplate } = await import('@/lib/normalize-template');
 
     const data = templates.map((t: any) => normalizeTemplate(t));
 
