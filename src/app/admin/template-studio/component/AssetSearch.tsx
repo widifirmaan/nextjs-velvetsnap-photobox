@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { Search, FolderUp, Palette, X } from 'lucide-react';
 import { useModel } from '@/lib/ModelContext';
 import styles from './AssetSearch.module.css';
 
@@ -166,7 +167,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <h3 className={styles.modalTitle}>Image Search</h3>
-          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+          <button className={styles.closeBtn} onClick={onClose}><X size={18} /></button>
         </div>
 
         {model.status === 'downloading' && (
@@ -201,7 +202,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
               onClick={() => setActiveTab(tab)}
               className={`${styles.tabBtn} ${activeTab === tab ? styles.tabBtnActive : ''}`}
             >
-              {tab === 'search' ? '🔍 Search' : tab === 'upload' ? '📁 Upload' : '🎨 Color'}
+              {tab === 'search' ? <><Search size={16} /> Search</> : tab === 'upload' ? <><FolderUp size={16} /> Upload</> : <><Palette size={16} /> Color</>}
             </button>
           ))}
         </div>
@@ -294,7 +295,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
           <div className={`text-center ${styles.uploadTab}`}>
             {!uploadedUrl ? (
               <label className={styles.uploadArea}>
-                <span className={styles.uploadIcon}>📁</span>
+                <span className={styles.uploadIcon}><FolderUp size={40} /></span>
                 <span className={styles.uploadHint}>Click to upload an image</span>
                 <span className={styles.uploadFormats}>PNG, JPG, WebP</span>
                 <input

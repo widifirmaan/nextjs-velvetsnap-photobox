@@ -47,6 +47,8 @@ export default function PaymentPage() {
         setPaid(false);
         return;
       }
+      const txId = data.data?._id || data._id;
+      if (txId) sessionStorage.setItem('photobooth_txId', txId);
       setTimeout(() => {
         router.push('/result');
       }, 1500);

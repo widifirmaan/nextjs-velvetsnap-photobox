@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Download, Printer, Home, Loader2 } from 'lucide-react';
+import { Download, Printer, Home, Smartphone, Loader2 } from 'lucide-react';
+import QRCode from 'qrcode';
 import { composeStripImage, renderStripFrame } from '@/lib/canvas-utils';
 import { getHighResUrl } from '@/lib/cloudinary-url';
 import styles from './page.module.css';
@@ -196,6 +197,7 @@ export default function ResultPage() {
   const [imagesReady, setImagesReady] = useState(false);
   const [compositedImage, setCompositedImage] = useState<string | null>(null);
   const [rendering, setRendering] = useState(false);
+  const [txId, setTxId] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -204,6 +206,8 @@ export default function ResultPage() {
       const storedFilter = sessionStorage.getItem('photobooth_filter');
       const storedAdjust = sessionStorage.getItem('photobooth_adjust');
       const storedComposited = sessionStorage.getItem('photobooth_composited');
+      const storedTxId = sessionStorage.getItem('photobooth_txId');
+      if (storedTxId) setTxId(storedTxId);
 
       if (storedComposited) {
         setCompositedImage(storedComposited);
@@ -323,6 +327,18 @@ export default function ResultPage() {
     .finally(() => setRendering(false));
   }, [imagesReady, compositedImage, dbTemplate, keyedFrameImage, captures, photoAdjust]);
 
+  const downloadUrl = txId ? (typeof window !== 'undefined' ? `${window.location.origin}/download/${txId}` : null) : null;
+
+  useEffect(() => {
+    if (qrRef.current && downloadUrl) {
+      QRCode.toCanvas(qrRef.current, downloadUrl, {
+        width: 140,
+        margin: 2,
+        color: { dark: '#1d1d1f', light: '#ffffff' },
+      });
+    }
+  }, [downloadUrl]);
+
   const handleDownload = () => {
     const dataUrl = compositedImage;
     if (!dataUrl) return;
@@ -418,6 +434,16 @@ export default function ResultPage() {
               <Home size={20} /> Home
             </button>
           </div>
+          {downloadUrl && (
+            <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: '100%', height: 1, background: 'var(--mn-border, #e5e5e5)', margin: '4px 0' }} />
+              <p style={{ fontSize: 12, color: '#888', margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Smartphone size={14} /> Scan to download on your phone
+              </p>
+              <canvas ref={qrRef} style={{ borderRadius: 8, border: '1px solid var(--mn-border, #e5e5e5)' }} />
+              <p style={{ fontSize: 10, color: '#aaa', margin: 0, wordBreak: 'break-all', textAlign: 'center', maxWidth: '100%' }}>{downloadUrl}</p>
+            </div>
+          )}
         </div>
       </div>
         </>

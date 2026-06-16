@@ -4,7 +4,11 @@ import StepperBar from '../../StepperBar';
 import ResultActions from './ResultActions';
 import styles from '@/app/main/page.module.css';
 
-export default function ResultStep({ compositedImage, onHome }: { compositedImage: string | null; onHome: () => void }) {
+export default function ResultStep({
+  compositedImage, onHome, txId,
+}: {
+  compositedImage: string | null; onHome: () => void; txId?: string | null;
+}) {
   return (
     <div className={`${styles.stepPage} ${styles.stepPageResult}`}>
       <StepperBar current={4} total={5} />
@@ -14,7 +18,7 @@ export default function ResultStep({ compositedImage, onHome }: { compositedImag
         <div className={styles.resultImage}>
           {compositedImage ? <img src={compositedImage} alt="Final strip" /> : <Loader2 className="spin" size={40} />}
         </div>
-        <ResultActions compositedImage={compositedImage} onHome={onHome} />
+        <ResultActions compositedImage={compositedImage} onHome={onHome} txId={txId} />
       </div>
     </div>
   );

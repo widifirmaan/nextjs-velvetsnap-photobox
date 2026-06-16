@@ -1,5 +1,6 @@
 'use client';
 
+import { Type, Image } from 'lucide-react';
 import type { IStripElement } from '@/models/Template';
 import styles from './ElementToolbar.module.css';
 
@@ -8,9 +9,9 @@ interface ElementToolbarProps {
   disabled?: boolean;
 }
 
-const TOOLS: { type: IStripElement['type']; label: string; icon: string }[] = [
-  { type: 'text', label: 'Text', icon: 'Aa' },
-  { type: 'sticker', label: 'Image', icon: '🖼' },
+const TOOLS: { type: IStripElement['type']; label: string; icon: React.ReactNode }[] = [
+  { type: 'text', label: 'Text', icon: <Type size={20} /> },
+  { type: 'sticker', label: 'Image', icon: <Image size={20} /> },
 ];
 
 export default function ElementToolbar({ onAdd, disabled }: ElementToolbarProps) {
@@ -25,7 +26,7 @@ export default function ElementToolbar({ onAdd, disabled }: ElementToolbarProps)
             disabled={disabled}
             className={`${styles.toolBtn} ${disabled ? styles.toolBtnDisabled : styles.toolBtnEnabled}`}
           >
-            <span className={`${styles.toolBtnIcon} ${t.type === 'text' ? styles.iconText : styles.iconImage}`}>
+            <span className={styles.toolBtnIcon}>
               {t.icon}
             </span>
             {t.label}

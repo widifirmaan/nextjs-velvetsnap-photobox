@@ -1,12 +1,27 @@
 'use client';
-import { Download, Printer, Home as HomeIcon } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { Download, Printer, Home as HomeIcon, Smartphone } from 'lucide-react';
+import QRCode from 'qrcode';
 import styles from '@/app/main/page.module.css';
 
 export default function ResultActions({
-  compositedImage, onHome,
+  compositedImage, onHome, txId,
 }: {
-  compositedImage: string | null; onHome: () => void;
+  compositedImage: string | null; onHome: () => void; txId?: string | null;
 }) {
+  const qrRef = useRef<HTMLCanvasElement>(null);
+  const downloadUrl = txId ? `${window.location.origin}/download/${txId}` : null;
+
+  useEffect(() => {
+    if (qrRef.current && downloadUrl) {
+      QRCode.toCanvas(qrRef.current, downloadUrl, {
+        width: 140,
+        margin: 2,
+        color: { dark: '#1d1d1f', light: '#ffffff' },
+      });
+    }
+  }, [downloadUrl]);
+
   const handleDownload = () => {
     if (!compositedImage) return;
     const link = document.createElement('a');
@@ -47,6 +62,17 @@ export default function ResultActions({
       <button className={`${styles.boothBtnSecondary} ${styles.resultHomeBtn}`} onClick={onHome}>
         <HomeIcon size={18} /> Home
       </button>
+
+      {downloadUrl && (
+        <div className={styles.qrSection}>
+          <div className={styles.qrDivider} />
+          <p className={styles.qrLabel}>
+            <Smartphone size={14} /> Scan to download on your phone
+          </p>
+          <canvas ref={qrRef} className={styles.qrCanvas} />
+          <p className={styles.qrUrl}>{downloadUrl}</p>
+        </div>
+      )}
     </div>
   );
 }

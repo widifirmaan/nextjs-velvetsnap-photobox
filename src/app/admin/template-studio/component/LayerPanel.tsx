@@ -1,5 +1,6 @@
 'use client';
 
+import { Camera, Type, Sparkles, Diamond, Palette, Eye, EyeOff, ChevronUp, ChevronDown, X } from 'lucide-react';
 import type { IStripElement } from '@/models/Template';
 import styles from './LayerPanel.module.css';
 
@@ -14,12 +15,12 @@ interface LayerPanelProps {
   disabled?: boolean;
 }
 
-const TYPE_ICONS: Record<string, string> = {
-  'photo-slot': '📷',
-  text: 'Aa',
-  sticker: '✨',
-  shape: '◇',
-  background: '🎨',
+const TYPE_ICONS: Record<string, React.ReactNode> = {
+  'photo-slot': <Camera size={14} />,
+  text: <Type size={14} />,
+  sticker: <Sparkles size={14} />,
+  shape: <Diamond size={14} />,
+  background: <Palette size={14} />,
 };
 
 export default function LayerPanel({
@@ -78,7 +79,7 @@ export default function LayerPanel({
                   }}
                   title={el.visible ? 'Hide' : 'Show'}
                 >
-                  {el.visible ? '👁' : '👁‍🗨'}
+                  {el.visible ? <Eye size={14} /> : <EyeOff size={14} />}
                 </button>
 
                 <span className={styles.indexBadge}
@@ -114,28 +115,26 @@ export default function LayerPanel({
                     disabled={isLast || disabled}
                     className={styles.layerBtn}
                     style={{
-                      fontSize: 9,
                       cursor: isLast || disabled ? 'default' : 'pointer',
                       color: isLast || disabled ? '#ddd' : 'var(--text-muted)',
                       opacity: isLast || disabled ? 0.3 : 0.7,
                     }}
                     title="Bring forward"
                   >
-                    ▲
+                    <ChevronUp size={14} />
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); onSendBackward(el.id); }}
                     disabled={isFirst || disabled}
                     className={styles.layerBtn}
                     style={{
-                      fontSize: 9,
                       cursor: isFirst || disabled ? 'default' : 'pointer',
                       color: isFirst || disabled ? '#ddd' : 'var(--text-muted)',
                       opacity: isFirst || disabled ? 0.3 : 0.7,
                     }}
                     title="Send backward"
                   >
-                    ▼
+                    <ChevronDown size={14} />
                   </button>
                 </div>
 
@@ -144,7 +143,6 @@ export default function LayerPanel({
                   disabled={disabled}
                   className={styles.layerBtn}
                   style={{
-                    fontSize: 12,
                     cursor: disabled ? 'default' : 'pointer',
                     color: disabled ? '#ddd' : '#999',
                     opacity: disabled ? 0.2 : 0.5,
@@ -153,7 +151,7 @@ export default function LayerPanel({
                   onMouseLeave={(e) => { if (!disabled) { e.currentTarget.style.color = '#999'; e.currentTarget.style.opacity = '0.5'; } }}
                   title="Delete"
                 >
-                  ✕
+                  <X size={14} />
                 </button>
               </div>
             );
@@ -163,4 +161,3 @@ export default function LayerPanel({
     </div>
   );
 }
-

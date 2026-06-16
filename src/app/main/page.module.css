@@ -1788,6 +1788,44 @@
   margin-top: auto;
 }
 
+.qrSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.qrDivider {
+  width: 100%;
+  height: 1px;
+  background: var(--mn-border, #e5e5e5);
+  margin: 8px 0;
+}
+
+.qrLabel {
+  font-size: 12px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+}
+
+.qrCanvas {
+  border-radius: 8px;
+  border: 1px solid var(--mn-border, #e5e5e5);
+}
+
+.qrUrl {
+  font-size: 10px;
+  color: #aaa;
+  word-break: break-all;
+  text-align: center;
+  margin: 0;
+  max-width: 100%;
+}
+
 /* ── Step Responsive ── */
 
 @media (max-width: 768px) {

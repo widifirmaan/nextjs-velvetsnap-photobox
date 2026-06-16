@@ -1,5 +1,6 @@
 'use client';
 
+import { Palette, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import type { IStripElement } from '@/models/Template';
 import styles from './PropertiesPanel.module.css';
 
@@ -269,7 +270,7 @@ export default function PropertiesPanel({
                 className={styles.browseGalleryBtn}
                 style={{ background: disabled ? '#eee' : 'var(--accent-bg)', color: disabled ? '#999' : 'var(--accent-color)', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 }}
               >
-                🎨 Browse Gallery
+                <Palette size={16} /> Browse Gallery
               </button>
             </div>
           </FieldRow>
@@ -300,13 +301,13 @@ export default function PropertiesPanel({
 
       <div className={styles.actionButtons}>
         <button onClick={onBringForward} disabled={disabled} className={styles.actionBtn} style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
-          ↑ Bring Forward
+          <ChevronUp size={16} /> Bring Forward
         </button>
         <button onClick={onSendBackward} disabled={disabled} className={styles.actionBtn} style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
-          ↓ Send Backward
+          <ChevronDown size={16} /> Send Backward
         </button>
         <button onClick={onDelete} disabled={disabled} className={styles.actionBtn} style={{ borderColor: disabled ? '#ddd' : '#e74c3c', color: disabled ? '#ccc' : '#e74c3c', cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1, background: disabled ? '#f5f5f5' : '#fff' }}>
-          ✕ Delete Element
+          <Trash2 size={16} /> Delete Element
         </button>
       </div>
     </aside>

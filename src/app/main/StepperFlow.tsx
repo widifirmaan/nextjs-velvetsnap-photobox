@@ -295,6 +295,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     <ResultStep
       compositedImage={compositedImage}
       onHome={startOver}
+      txId={txId}
     />
   );
 

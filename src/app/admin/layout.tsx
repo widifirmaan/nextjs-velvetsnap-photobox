@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Layers, Server, Clock, Image, Loader2, LogOut, Settings2, User, Users } from 'lucide-react';
+import { LayoutDashboard, Layers, Server, Clock, Film, Loader2, LogOut, Settings2, User, Users } from 'lucide-react';
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -83,21 +83,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const rootNavLinks = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+    { href: '/admin/history', label: 'History', icon: Clock },
     { href: '/admin/templates', label: 'Templates', icon: Layers },
+    { href: '/admin/template-studio', label: 'Strips Studio', icon: Film },
     { href: '/admin/accounts', label: 'Accounts', icon: Users },
     { href: '/admin/devices', label: 'Devices', icon: Server },
-    { href: '/admin/template-studio', label: 'Strips Studio', icon: Image },
     { href: '/admin/settings', label: 'Settings', icon: Settings2 },
   ];
 
   const accountNavLinks = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
+    { href: '/admin/history', label: 'History', icon: Clock },
     { href: '/admin/templates', label: 'Templates', icon: Layers },
     { href: '/admin/settings', label: 'My Settings', icon: Settings2 },
-  ];
-
-  const bottomLinks = [
-    { href: '/admin/history', label: 'History', icon: Clock },
   ];
 
   const navLinks = isRoot ? rootNavLinks : accountNavLinks;
@@ -180,8 +178,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
         <nav className={styles.nav}>
           {navLinks.map(renderNavLink)}
-          <div className={styles.navDivider} />
-          {bottomLinks.map(renderNavLink)}
         </nav>
 
         <div className={styles.sidebarFooter}>
@@ -205,7 +201,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <nav className={styles.bottomNav}>
         {navLinks.map(renderBottomNavItem)}
-        {bottomLinks.map(renderBottomNavItem)}
       </nav>
     </div>
   );

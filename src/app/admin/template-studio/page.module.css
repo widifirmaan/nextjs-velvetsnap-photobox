@@ -184,10 +184,6 @@
   transition: all 0.15s;
 }
 
-.mobileToolbar button span {
-  font-size: 16px;
-}
-
 .mobileToolbar button[data-active="true"] {
   color: var(--accent-color, #C5D89D);
   background: color-mix(in srgb, var(--accent-color) 10%, transparent);

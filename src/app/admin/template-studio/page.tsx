@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
-import { Loader2 } from 'lucide-react';
+import { Search, FolderUp, Plus, Save, Image, Layers, Settings2, X, Loader2 } from 'lucide-react';
 import { AdminPageHeader } from '@/app/admin/components';
 
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -591,14 +591,14 @@ function StripsStudioPage() {
             disabled={pageLoading}
             className={styles.bgBtn}
           >
-            🔍 Search
+            <Search size={16} /> Search
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={importProcessing || pageLoading}
             className={styles.bgBtn}
           >
-            {importProcessing ? '⏳...' : '📁 Import'}
+            {importProcessing ? <Loader2 className="spin" size={16} /> : <FolderUp size={16} />} Import
           </button>
         </div>
       <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }}
@@ -714,7 +714,7 @@ function StripsStudioPage() {
         <div className={styles.mobilePanel} onClick={(e) => e.stopPropagation()}>
           <div className={styles.mobilePanelHeader}>
             <h3>{titles[activeMobilePanel]}</h3>
-            <button onClick={() => setActiveMobilePanel(null)}>✕</button>
+            <button onClick={() => setActiveMobilePanel(null)}><X size={18} /></button>
           </div>
           <div className={styles.mobilePanelBody}>
             {content}
@@ -739,14 +739,14 @@ function StripsStudioPage() {
               disabled={pageLoading}
               className={styles.toolBtnGhost}
             >
-              ✚ New Template
+              <Plus size={18} /> New Template
             </button>
             <button
               onClick={() => setShowSaveModal(true)}
               disabled={pageLoading}
               className={styles.toolBtnPrimary}
             >
-              💾 Save Template
+              <Save size={18} /> Save Template
             </button>
           </aside>
 
@@ -812,21 +812,21 @@ function StripsStudioPage() {
           disabled={pageLoading}
           style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
-          <span>🖼</span> Bg
+          <Image size={18} /> Bg
         </button>
         <button
           onClick={() => setActiveMobilePanel(activeMobilePanel === 'layers' ? null : 'layers')}
           disabled={pageLoading}
           style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
-          <span>🧩</span> Layers
+          <Layers size={18} /> Layers
         </button>
         <button
           onClick={() => setActiveMobilePanel(activeMobilePanel === 'properties' ? null : 'properties')}
           disabled={pageLoading}
           style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
-          <span>⚙</span> Props
+          <Settings2 size={18} /> Props
         </button>
         <div className={styles.mobileToolbarDivider} />
         <button
@@ -834,14 +834,14 @@ function StripsStudioPage() {
           disabled={pageLoading}
           style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
-          <span>✚</span> New
+          <Plus size={18} /> New
         </button>
         <button
           onClick={() => setShowSaveModal(true)}
           disabled={pageLoading}
           style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
-          <span>💾</span> Save
+          <Save size={18} /> Save
         </button>
       </div>
 
