@@ -4,7 +4,7 @@ import { Timer } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
 import { getHighResUrl, getFullQualityUrl } from '@/lib/cloudinary-url';
-import { TEMPLATE_CONFIGS, type TemplateData, type PhotoAdjust } from './types';
+import { TEMPLATE_CONFIGS, type IStripElement, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';
 import EditorStep from './editor/EditorStep';
@@ -77,6 +77,18 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       .catch(() => setTemplatesLoading(false));
   }, []);
 
+  const renderFrameFromElements = useCallback(async (elements: IStripElement[], cw: number, ch: number, bgColor: string) => {
+    try {
+      const frameDataUrl = await renderStripFrame(elements, cw, ch, bgColor, 720);
+      const bgFrameDataUrl = await removeGreenScreen(frameDataUrl, 720);
+      const img = new window.Image();
+      img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
+      img.src = bgFrameDataUrl;
+      setKeyedFrameImage(bgFrameDataUrl);
+    } catch {}
+    setStripLoading(false);
+  }, []);
+
   const handleSelectTemplate = useCallback((id: string, data?: TemplateData, keyedUrl?: string) => {
     setTemplateId(id);
     setStripLoading(true);
@@ -92,15 +104,18 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     if (data) {
       setTemplateData(data);
       setPrice(data.templatePrice ?? 35000);
-      const fullUrl = data.templateFull || '';
-      if (fullUrl) {
-        setKeyedFrameImage(fullUrl);
+      if (data.templateData?.elements?.length) {
+        renderFrameFromElements(data.templateData.elements, cw, ch, data.templateData.color || '#ffffff');
+        return;
+      }
+      if (data.templateFull) {
+        setKeyedFrameImage(data.templateFull);
         setStripLoading(false);
         return;
       }
     }
     setStripLoading(false);
-  }, [setStep]);
+  }, [setStep, renderFrameFromElements]);
 
   useEffect(() => {
     if (!templateId || templateData) return;
@@ -153,19 +168,11 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
           );
         }
 
-        // Keyed frame: templateFull is already chroma-keyed from studio save
-        if (matched.templateFull) {
+        // Keyed frame: render from elements to get proper transparent slot holes
+        if (matched.templateData.elements?.length) {
+          renderFrameFromElements(matched.templateData.elements, cw, ch, matched.templateData.color || '#ffffff');
+        } else if (matched.templateFull) {
           setKeyedFrameImage(getFullQualityUrl(matched.templateFull));
-          setStripLoading(false);
-        } else if (matched.templateData.elements?.length) {
-          try {
-            const frameDataUrl = await renderStripFrame(matched.templateData.elements, cw, ch, matched.templateData.color || '#ffffff', 720);
-            const bgFrameDataUrl = await removeGreenScreen(frameDataUrl, 720);
-            const img = new window.Image();
-            img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
-            img.src = bgFrameDataUrl;
-            setKeyedFrameImage(bgFrameDataUrl);
-          } catch {}
           setStripLoading(false);
         } else {
           setStripLoading(false);
