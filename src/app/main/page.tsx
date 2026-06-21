@@ -134,7 +134,12 @@ export default function Home() {
         .catch(() => {});
       fetch(`/api/templates/list${qp}`)
         .then((r) => r.json())
-        .then((res) => { if (res.success) setTmplCount(res.data.length); })
+        .then((res) => {
+          if (res.success) {
+            setTmplCount(res.data.length);
+            sessionStorage.setItem('velvetsnap_templates', JSON.stringify(res.data.filter((t: any) => t.isActive !== false)));
+          }
+        })
         .catch(() => {});
     });
   }, [refreshKey]);
