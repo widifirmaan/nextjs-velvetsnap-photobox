@@ -28,7 +28,7 @@ export async function GET(req: Request) {
 
     const data = templates.map((t: any) => normalizeTemplate(t));
 
-    return NextResponse.json({ success: true, data });
+      return NextResponse.json({ success: true, data }, { headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60' } });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

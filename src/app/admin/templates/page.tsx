@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Edit2, Trash2, Loader2, ExternalLink } from 'lucide-react';
+import { Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { AdminPageHeader, AdminTableCard, AdminConfirmModal } from '@/app/admin/components';
 import styles from './page.module.css';
 

@@ -1,10 +1,8 @@
 export { default as AdminPageHeader } from './AdminPageHeader';
 export { default as AdminStatCard } from './AdminStatCard';
 export { AdminStatGrid } from './AdminStatGrid';
-export { default as AdminSectionTitle } from './AdminSectionTitle';
 export { default as AdminBadge } from './AdminBadge';
 export { default as AdminEmptyState } from './AdminEmptyState';
 export { default as AdminModal } from './AdminModal';
 export { default as AdminConfirmModal } from './AdminConfirmModal';
 export { default as AdminTableCard } from './AdminTableCard';
-export { default as AdminBarChart } from './AdminBarChart';

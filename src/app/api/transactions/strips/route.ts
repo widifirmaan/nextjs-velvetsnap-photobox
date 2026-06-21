@@ -30,7 +30,7 @@ export async function GET(req: Request) {
       .limit(7)
       .lean();
 
-    return NextResponse.json({ success: true, data: transactions });
+    return NextResponse.json({ success: true, data: transactions }, { headers: { 'Cache-Control': 'public, max-age=60, s-maxage=120, stale-while-revalidate=30' } });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

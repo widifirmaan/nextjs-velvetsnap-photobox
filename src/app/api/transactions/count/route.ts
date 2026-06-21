@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     }
 
     const total = await Transaction.countDocuments(filter);
-    return NextResponse.json({ success: true, total });
+    return NextResponse.json({ success: true, total }, { headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60' } });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
