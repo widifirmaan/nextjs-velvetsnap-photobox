@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type SlotShape = 'circle' | 'heart' | 'star' | 'diamond' | 'hexagon' | 'polaroid' | 'rounded';
+export type SlotShape = 'rectangle' | 'circle' | 'heart' | 'star' | 'diamond' | 'hexagon' | 'polaroid' | 'rounded';
 
 export interface ShapeDrawOptions {
   shape: SlotShape;

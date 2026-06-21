@@ -6,7 +6,7 @@ import { Camera } from 'lucide-react';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
 import { STORAGE_KEYS, PRELOADER_FADE_MS, PRELOADER_DURATION_MS, PRELOADER_CAROUSEL_READY_DELAY, MORPH_BUTTON_DELAY_MS, MORPH_CLEANUP_MS } from '@/lib/constants';
 import styles from './page.module.css';
-import type { StripResult } from './types';
+import type { StripResult, TemplateData } from './types';
 import HomePage from './homepage/HomePage';
 import StepperFlow from './StepperFlow';
 
@@ -140,10 +140,10 @@ export default function Home() {
         .then((res) => {
           if (res.success) {
             setTmplCount(res.data.length);
-            const list = res.data.filter((t: any) => t.isActive !== false);
+            const list = (res.data as TemplateData[]).filter((t) => t.isActive !== false);
             sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
             // Preload thumbnail images in background
-            list.forEach((t: any) => {
+            list.forEach((t) => {
               const src = t.templateFull ? getOptimizedUrl(t.templateFull, 200, 600) : t.templateThumb;
               if (src) { const img = new window.Image(); img.src = src; }
             });

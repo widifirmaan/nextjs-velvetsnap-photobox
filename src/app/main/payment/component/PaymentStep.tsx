@@ -9,9 +9,9 @@ declare global {
   interface Window {
     snap?: {
       pay: (token: string, options?: {
-        onSuccess?: (result: any) => void;
-        onPending?: (result: any) => void;
-        onError?: (result: any) => void;
+        onSuccess?: (result: unknown) => void;
+        onPending?: (result: unknown) => void;
+        onError?: (result: unknown) => void;
         onClose?: () => void;
       }) => void;
     };
@@ -165,8 +165,8 @@ export default function PaymentStep({
             setLoading(false);
           },
         });
-      } catch (err: any) {
-        setErrMsg(err.message || String(err));
+      } catch (err: unknown) {
+        setErrMsg(err instanceof Error ? err.message : String(err));
         setLoading(false);
         autoTriggered.current = false;
       }

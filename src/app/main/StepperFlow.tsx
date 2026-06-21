@@ -150,14 +150,14 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
         // Convert legacy (frameImage + slotsLayout) to elements
         if (!matched.templateData.elements?.length && matched.templateFull && matched.templateData.slotsLayout?.length) {
-          const els: any[] = [];
+          const els: IStripElement[] = [];
           els.push({
             id: 'bg', type: 'background',
             x: 0, y: 0, width: cw, height: ch,
             rotation: 0, zIndex: 0, visible: true,
             props: { stickerUrl: getHighResUrl(matched.templateFull, cw, ch), opacity: 1 },
           });
-          (matched.templateData.slotsLayout || []).forEach((slot: any, i: number) => {
+          (matched.templateData.slotsLayout || []).forEach((slot: { x: number; y: number; w: number; h: number }, i: number) => {
             els.push({
               id: `slot-${i}`, type: 'photo-slot',
               x: (slot.x / 100) * cw, y: (slot.y / 100) * ch,

@@ -47,7 +47,7 @@ export default function BoothStep({
         const data = await res.json();
         if (data.success) onAddCapture(data.dataUrl);
         else alert('Gagal mengambil foto: ' + (data.error || 'Unknown error'));
-      } catch (err: any) { alert('Gagal terhubung ke kamera: ' + err.message); }
+      } catch (err: unknown) { alert('Gagal terhubung ke kamera: ' + (err instanceof Error ? err.message : 'Unknown error')); }
       finally { setDslrCapturing(false); }
     } else {
       const imageSrc = webcamRef.current?.getScreenshot();

@@ -5,22 +5,12 @@ import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { SlotDots } from '../StepperBar';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
+import type { TemplateData } from '../types';
 import styles from '@/app/main/page.module.css';
 
 interface TemplateCardProps {
-  template: {
-    _id?: string;
-    templateId: string;
-    templateName: string;
-    templatePrice: number;
-    templateFull?: string;
-    templateThumb?: string;
-    templateData?: {
-      color: string;
-      slots: number;
-    };
-  };
-  onSelect: (template: any) => void;
+  template: TemplateData;
+  onSelect: (template: TemplateData) => void;
   keyedFrameUrl?: string;
 }
 

@@ -5,6 +5,28 @@ export interface ISlot {
   h: number;
 }
 
+export interface ElementProps {
+  shape?: 'rectangle' | 'rounded' | 'circle' | 'heart' | 'star' | 'diamond' | 'polaroid' | 'hexagon';
+  shapeType?: 'rect' | 'circle' | 'ellipse' | 'star' | 'line';
+  borderWidth?: number;
+  borderColor?: string;
+  borderRadius?: number;
+  content?: string;
+  fontSize?: number;
+  fontFamily?: string;
+  color?: string;
+  fontWeight?: string;
+  textAlign?: 'left' | 'center' | 'right';
+  fontStyle?: 'normal' | 'italic';
+  stickerUrl?: string;
+  fillColor?: string;
+  strokeColor?: string;
+  strokeWidth?: number;
+  opacity?: number;
+  searchBg?: boolean;
+  letterSpacing?: number;
+}
+
 export interface IStripElement {
   id: string;
   type: 'photo-slot' | 'text' | 'sticker' | 'shape' | 'background';
@@ -15,7 +37,7 @@ export interface IStripElement {
   rotation: number;
   zIndex: number;
   visible: boolean;
-  props: Record<string, any>;
+  props: ElementProps;
 }
 
 export interface ITemplateData {
