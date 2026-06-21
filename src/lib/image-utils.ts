@@ -16,35 +16,6 @@ export function loadImages(urls: string[], crossOrigin = 'anonymous'): Promise<(
   );
 }
 
-export function resizeImage(
-  dataUrl: string,
-  maxDim: number,
-  quality = 0.75,
-  format = 'image/jpeg',
-): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const img = new window.Image();
-    img.onload = () => {
-      let { width, height } = img;
-      if (width > maxDim || height > maxDim) {
-        const ratio = Math.min(maxDim / width, maxDim / height);
-        width = Math.round(width * ratio);
-        height = Math.round(height * ratio);
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) { resolve(dataUrl); return; }
-      ctx.imageSmoothingQuality = 'high';
-      ctx.drawImage(img, 0, 0, width, height);
-      resolve(canvas.toDataURL(format, quality));
-    };
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
-}
-
 export function flipImageHorizontal(dataUrl: string): Promise<string> {
   return new Promise((resolve) => {
     const img = new window.Image();
@@ -63,14 +34,7 @@ export function flipImageHorizontal(dataUrl: string): Promise<string> {
   });
 }
 
-export interface FitResult {
-  dw: number;
-  dh: number;
-  dx: number;
-  dy: number;
-}
-
-export function calcCoverFit(imgW: number, imgH: number, boxW: number, boxH: number): FitResult {
+export function calcCoverFit(imgW: number, imgH: number, boxW: number, boxH: number): {dw:number;dh:number;dx:number;dy:number} {
   const ia = imgW / imgH;
   const sa = boxW / boxH;
   let dw: number, dh: number, dx: number, dy: number;
@@ -85,15 +49,6 @@ export function calcCoverFit(imgW: number, imgH: number, boxW: number, boxH: num
     dx = 0;
     dy = boxH / 2 - dh / 2;
   }
-  return { dw, dh, dx, dy };
-}
-
-export function calcContainFit(imgW: number, imgH: number, boxW: number, boxH: number): FitResult {
-  const scale = Math.min(boxW / imgW, boxH / imgH);
-  const dw = imgW * scale;
-  const dh = imgH * scale;
-  const dx = (boxW - dw) / 2;
-  const dy = (boxH - dh) / 2;
   return { dw, dh, dx, dy };
 }
 

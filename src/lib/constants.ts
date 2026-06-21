@@ -61,9 +61,3 @@ export const STORAGE_KEYS = {
   IMGLY_MODEL_RETRY: 'imgly_model_retry',
 } as const;
 
-// Legacy individual exports (use STORAGE_KEYS instead)
-export const ACCOUNT_STORAGE_KEY = STORAGE_KEYS.ACCOUNT;
-export const TEMPLATE_CACHE_KEY = STORAGE_KEYS.TEMPLATES;
-export const CAMERA_DEVICE_KEY = STORAGE_KEYS.CAMERA;
-export const SKIP_PRELOADER_KEY = STORAGE_KEYS.SKIP_PRELOADER;
-export const ADMIN_SESSION_KEY = STORAGE_KEYS.ADMIN_SESSION;
