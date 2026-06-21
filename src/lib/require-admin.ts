@@ -51,3 +51,28 @@ export async function requireAdmin(req: Request): Promise<NextResponse | null> {
   }
   return null;
 }
+
+export async function buildAccountFilter(req: Request): Promise<Record<string, unknown>> {
+  const { searchParams } = new URL(req.url);
+  const filter: Record<string, unknown> = {};
+  const session = await getSession(req);
+
+  const qAccountId = searchParams.get('accountId');
+  if (qAccountId) {
+    if (!session.isRoot && qAccountId !== session.accountId) {
+      filter.accountId = session.accountId || { $in: [null, undefined] };
+    } else if (qAccountId === 'root') {
+      filter.accountId = { $in: [null, undefined] };
+    } else {
+      filter.accountId = qAccountId;
+    }
+  } else {
+    if (session.accountId && !session.isRoot) {
+      filter.accountId = session.accountId;
+    } else if (!session.token) {
+      filter.accountId = { $in: [null, undefined] };
+    }
+  }
+
+  return filter;
+}

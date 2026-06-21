@@ -19,10 +19,11 @@ import ElementToolbar from './component/ElementToolbar';
 import LayerPanel from './component/LayerPanel';
 import PropertiesPanel from './component/PropertiesPanel';
 import AssetSearch from './component/AssetSearch';
+import { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT } from '@/lib/constants';
 import styles from './page.module.css';
 
-const DEFAULT_CANVAS_W = 1000;
-const DEFAULT_CANVAS_H = 3000;
+const DEFAULT_CANVAS_W = DEFAULT_CANVAS_WIDTH;
+const DEFAULT_CANVAS_H = DEFAULT_CANVAS_HEIGHT;
 
 function makeId(): string {
   const now = new Date();

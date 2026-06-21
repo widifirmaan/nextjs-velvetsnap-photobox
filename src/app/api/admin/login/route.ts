@@ -4,6 +4,7 @@ import Settings from '@/models/Settings';
 import Account from '@/models/Account';
 import { hashPassword, verifyPassword, generateSessionToken } from '@/lib/auth';
 import { getAdminToken } from '@/lib/require-admin';
+import { apiError } from '@/lib/api-utils';
 
 export async function POST(req: Request) {
   try {
@@ -63,7 +64,7 @@ export async function POST(req: Request) {
     res.cookies.set('admin_session', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
     return res;
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
 
@@ -91,6 +92,6 @@ export async function DELETE(req: Request) {
     res.cookies.set('admin_session', '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 0 });
     return res;
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

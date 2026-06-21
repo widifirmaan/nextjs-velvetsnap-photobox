@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
+import { MODEL_RETRY_DELAY, MODEL_CLEAR_CACHE_DELAY } from './constants';
 
 type ModelStatus = 'checking' | 'ready' | 'downloading' | 'error';
 
@@ -141,7 +142,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
 
       if (isCorrupt && attempt < 3) {
         localStorage.setItem(RETRY_KEY, String(attempt));
-        await new Promise((r) => setTimeout(r, 1500));
+        await new Promise((r) => setTimeout(r, MODEL_RETRY_DELAY));
         return preload(attempt + 1);
       }
 
@@ -153,7 +154,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
     loaded.current = false;
     setErrorMessage('');
     await clearModelCache();
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, MODEL_CLEAR_CACHE_DELAY));
     return preload();
   }, [preload]);
 

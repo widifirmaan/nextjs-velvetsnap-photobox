@@ -3,6 +3,7 @@
 import { X, Check, Upload, Loader2 } from 'lucide-react';
 import { TemplateData, type ISlot } from '../../types';
 import styles from '@/app/main/page.module.css';
+import { UPLOAD_MAX_DIM, UPLOAD_JPEG_QUALITY } from '@/lib/constants';
 import { useRef } from 'react';
 
 export default function BoothPreview({
@@ -26,16 +27,15 @@ export default function BoothPreview({
     fileRefs.current[idx]?.click();
   };
 
-  const MAX_DIM = 1200;
-  const JPEG_QUALITY = 0.75;
+
 
   const compressImage = (dataUrl: string): Promise<string> => {
     return new Promise((resolve) => {
       const img = new window.Image();
       img.onload = () => {
         let { width, height } = img;
-        if (width > MAX_DIM || height > MAX_DIM) {
-          const scale = Math.min(MAX_DIM / width, MAX_DIM / height);
+        if (width > UPLOAD_MAX_DIM || height > UPLOAD_MAX_DIM) {
+          const scale = Math.min(UPLOAD_MAX_DIM / width, UPLOAD_MAX_DIM / height);
           width = Math.round(width * scale);
           height = Math.round(height * scale);
         }
@@ -45,7 +45,7 @@ export default function BoothPreview({
         const ctx = c.getContext('2d');
         if (!ctx) { resolve(dataUrl); return; }
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(c.toDataURL('image/jpeg', JPEG_QUALITY));
+        resolve(c.toDataURL('image/jpeg', UPLOAD_JPEG_QUALITY));
       };
       img.onerror = () => resolve(dataUrl);
       img.src = dataUrl;

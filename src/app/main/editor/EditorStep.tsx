@@ -3,7 +3,7 @@ import { ArrowLeft, RefreshCcw, Check } from 'lucide-react';
 import StepperBar from '../StepperBar';
 import EditorFrame from './EditorFrame';
 import AdjustSlider from './AdjustSlider';
-import { TemplateData, PhotoAdjust } from '../types';
+import { TemplateData, PhotoAdjust, DEFAULT_ADJUST } from '../types';
 import styles from '@/app/main/page.module.css';
 
 export default function EditorStep({
@@ -24,12 +24,12 @@ export default function EditorStep({
 
   const hasTemplate = templateData && templateData.templateFull && templateData.templateData.slotsLayout && templateData.templateData.slotsLayout.length > 0;
 
-  const sel = photoAdjust[selectedSlotIdx] || { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
+  const sel = photoAdjust[selectedSlotIdx] || DEFAULT_ADJUST;
 
   const updateSlot = (idx: number, patch: Partial<typeof sel>) => {
     setPhotoAdjust((prev) => {
       const next = prev.map((a) => ({ ...a }));
-      if (!next[idx]) next[idx] = { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
+      if (!next[idx]) next[idx] = { ...DEFAULT_ADJUST };
       Object.assign(next[idx], patch);
       return next;
     });

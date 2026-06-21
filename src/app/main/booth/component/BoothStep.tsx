@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { flipImage } from '@/lib/canvas-utils';
 import { useCameraDevices, useCountdown } from '@/lib/hooks';
 import Webcam from 'react-webcam';

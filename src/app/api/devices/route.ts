@@ -1,13 +1,14 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Device from '@/models/Device';
+import { apiError } from '@/lib/api-utils';
 export async function GET(req: Request) {
   try {
     await connectDB();
     const devices = await Device.find({});
     return NextResponse.json({ success: true, data: devices });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
 
@@ -18,6 +19,6 @@ export async function POST(req: Request) {
     const device = await Device.create(body);
     return NextResponse.json({ success: true, data: device });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

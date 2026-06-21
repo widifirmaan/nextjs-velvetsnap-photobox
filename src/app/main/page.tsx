@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
-import { STORAGE_KEYS, PRELOADER_FADE_MS, PRELOADER_DURATION_MS, PRELOADER_CAROUSEL_READY_DELAY, MORPH_BUTTON_DELAY_MS, MORPH_CLEANUP_MS } from '@/lib/constants';
+import { STORAGE_KEYS, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H, PRELOADER_FADE_MS, PRELOADER_DURATION_MS, PRELOADER_CAROUSEL_READY_DELAY, MORPH_BUTTON_DELAY_MS, MORPH_CLEANUP_MS } from '@/lib/constants';
 import styles from './page.module.css';
 import type { StripResult, TemplateData } from './types';
 import HomePage from './homepage/HomePage';
@@ -144,7 +144,7 @@ export default function Home() {
             sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
             // Preload thumbnail images in background
             list.forEach((t) => {
-              const src = t.templateFull ? getOptimizedUrl(t.templateFull, 200, 600) : t.templateThumb;
+              const src = t.templateFull ? getOptimizedUrl(t.templateFull, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H) : t.templateThumb;
               if (src) { const img = new window.Image(); img.src = src; }
             });
           }

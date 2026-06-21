@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
-import { getSession } from '@/lib/require-admin';
+import { getSession, buildAccountFilter } from '@/lib/require-admin';
 import { v4 as uuidv4 } from 'uuid';
+import { apiError } from '@/lib/api-utils';
 
 export async function POST(req: Request) {
   try {
@@ -13,12 +14,15 @@ export async function POST(req: Request) {
     if (!sessionId) {
       return NextResponse.json({ success: false, error: 'sessionId is required' }, { status: 400 });
     }
+    if (typeof sessionId !== 'string') {
+      return NextResponse.json({ success: false, error: 'Invalid sessionId' }, { status: 400 });
+    }
 
-    const txData: any = {
+    const txData: Record<string, unknown> = {
       sessionId: sessionId || uuidv4(),
       templateId: templateId || 't1',
       price: price || 35000,
-      status: status || 'PAID',
+      status: status || 'PENDING',
       captures: captures || [],
       finalImage: finalImage || '',
       orderId: orderId || null,
@@ -35,7 +39,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, data: tx }, { status: existing ? 200 : 201 });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
 
@@ -44,20 +48,7 @@ export async function GET(req: Request) {
     await connectDB();
     const { searchParams } = new URL(req.url);
 
-    const filter: any = {};
-
-    const qAccountId = searchParams.get('accountId');
-    if (qAccountId) {
-      if (qAccountId === 'root') filter.accountId = { $in: [null, undefined] };
-      else filter.accountId = qAccountId;
-    } else {
-      const session = await getSession(req);
-      if (session.accountId && !session.isRoot) {
-        filter.accountId = session.accountId;
-      } else if (!session.token) {
-        filter.accountId = { $in: [null, undefined] };
-      }
-    }
+    const filter = await buildAccountFilter(req);
 
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '12');
@@ -74,12 +65,9 @@ export async function GET(req: Request) {
     return NextResponse.json({
       success: true,
       data: transactions,
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
+import { apiError } from '@/lib/api-utils';
 
 export async function GET(req: Request) {
   try {
@@ -37,6 +38,6 @@ export async function GET(req: Request) {
       },
     });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

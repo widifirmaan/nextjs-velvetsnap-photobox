@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useLayoutEffect, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { Stage, Layer, Transformer, Rect, Circle, Text, Group, Image as KonvaImage, Ellipse, Star, Line, Path } from 'react-konva';
+import { Stage, Layer, Transformer, Rect, Circle, Text, Group, Image as KonvaImage, Ellipse, Star, Line } from 'react-konva';
 import Konva from 'konva';
 import type { IStripElement } from '@/models/Template';
 import { useImage } from './useImage';

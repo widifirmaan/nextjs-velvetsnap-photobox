@@ -4,6 +4,7 @@ import Settings from '@/models/Settings';
 import Account from '@/models/Account';
 import { hashPassword } from '@/lib/auth';
 import { getSession } from '@/lib/require-admin';
+import { apiError } from '@/lib/api-utils';
 
 export async function PUT(req: Request) {
   try {
@@ -32,6 +33,6 @@ export async function PUT(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

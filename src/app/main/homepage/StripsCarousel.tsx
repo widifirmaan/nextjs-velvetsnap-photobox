@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { Camera as CameraIcon } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 import type { StripResult } from '../types';
+import { STRIPS_CAROUSEL_RESUME_DELAY, STRIPS_CAROUSEL_AUTO_START_DELAY, STRIPS_CAROUSEL_ONREADY_TIMEOUT } from '@/lib/constants';
 
 export default function StripsCarousel({ strips, smallVpRef, onReady }: {
   strips: StripResult[]; smallVpRef: React.MutableRefObject<boolean>; onReady?: () => void;
@@ -98,7 +99,7 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
 
   const resumeAuto = useCallback(() => {
     clearTimeout(resumeTimer.current);
-    resumeTimer.current = setTimeout(startAutoScroll, 3000);
+    resumeTimer.current = setTimeout(startAutoScroll, STRIPS_CAROUSEL_RESUME_DELAY);
   }, [startAutoScroll]);
 
   useEffect(() => {
@@ -110,7 +111,7 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
     c.style.willChange = 'transform';
     applyTransform();
     updateTransforms();
-    const t = setTimeout(startAutoScroll, 100);
+    const t = setTimeout(startAutoScroll, STRIPS_CAROUSEL_AUTO_START_DELAY);
     return () => { clearTimeout(t); stopAuto(); };
   }, [strips.length, applyTransform, updateTransforms, startAutoScroll, stopAuto]);
 
@@ -128,7 +129,7 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
         readyRef.current = true;
         onReady();
       }
-    }, 3000);
+    }, STRIPS_CAROUSEL_ONREADY_TIMEOUT);
     return () => clearTimeout(fallback);
   }, [onReady, strips]);
 

@@ -1,35 +1,21 @@
 import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/require-admin';
+import { buildAccountFilter } from '@/lib/require-admin';
+import { normalizeTemplate } from '@/lib/normalize-template';
+import { apiError } from '@/lib/api-utils';
 
 export async function GET(req: Request) {
   try {
     await connectDB();
-    const { searchParams } = new URL(req.url);
-
-    let filter: Record<string, unknown> = {};
-
-    const qAccountId = searchParams.get('accountId');
-    if (qAccountId) {
-      if (qAccountId === 'root') filter = { accountId: { $in: [null, undefined] } };
-      else filter = { accountId: qAccountId };
-    } else {
-      const session = await getSession(req);
-      if (session.accountId && !session.isRoot) {
-        filter = { accountId: session.accountId };
-      } else if (!session.token) {
-        filter = { accountId: { $in: [null, undefined] } };
-      }
-    }
+    const filter = await buildAccountFilter(req);
 
     const templates = await Template.find(filter).sort({ createdAt: -1 }).lean();
-    const { normalizeTemplate } = await import('@/lib/normalize-template');
 
     const data = templates.map((t) => normalizeTemplate(t as unknown as Record<string, unknown>));
 
       return NextResponse.json({ success: true, data }, { headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60' } });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

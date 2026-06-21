@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import { Clock, Camera, Loader2, Search, X, Trash2, Printer, ImageIcon, Eye, EyeOff } from 'lucide-react';
+import { Camera, Loader2, Search, X, Trash2, Printer, ImageIcon, Eye, EyeOff } from 'lucide-react';
 import { AdminPageHeader, AdminBadge, AdminEmptyState, AdminModal, AdminConfirmModal } from '@/app/admin/components';
 import styles from './page.module.css';
 

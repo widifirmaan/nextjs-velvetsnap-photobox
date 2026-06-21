@@ -4,6 +4,7 @@ import Template from '@/models/Template';
 import { uploadBase64, isBase64, deleteImages } from '@/lib/cloudinary';
 import { normalizeTemplate } from '@/lib/normalize-template';
 import { getSession } from '@/lib/require-admin';
+import { apiError } from '@/lib/api-utils';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -13,6 +14,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const session = await getSession(req);
     const tData = body.templateData || {};
 
+    if (!session.token) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
     // Scope check: account can only edit own templates
     const existing = await Template.findById(id).lean();
     if (!existing) {
@@ -22,11 +26,15 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
     }
 
+    // Validate incoming types
+    if (body.templateData && typeof body.templateData !== 'object') {
+      return NextResponse.json({ success: false, error: 'Invalid templateData' }, { status: 400 });
+    }
+
     const templateFull = body.templateFull || body.fullresUrl || '';
     const templateThumb = body.templateThumb || body.thumbUrl || '';
     const elements = tData.elements || body.elements || [];
     const slotsLayout = tData.slotsLayout || body.slotsLayout || [];
-
     const toUpload: { key: string; b64: string }[] = [];
     if (templateFull && isBase64(templateFull)) toUpload.push({ key: 'templateFull', b64: templateFull });
     if (templateThumb && isBase64(templateThumb)) toUpload.push({ key: 'templateThumb', b64: templateThumb });
@@ -72,7 +80,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     const doc = await Template.findByIdAndUpdate(id, update, { returnDocument: 'after' }).lean();
     return NextResponse.json({ success: true, data: normalizeTemplate(doc) });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
 
@@ -81,6 +89,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     const { id } = await params;
     await connectDB();
     const session = await getSession(req);
+
+    if (!session.token) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
 
     const doc = await Template.findById(id).lean();
     if (!doc) { return NextResponse.json({ success: false, error: 'Template not found' }, { status: 404 }); }
@@ -102,6 +114,6 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     await Template.findByIdAndDelete(id);
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

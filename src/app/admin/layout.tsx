@@ -6,6 +6,7 @@ import { LayoutDashboard, Layers, Server, Clock, Film, Loader2, LogOut, Settings
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { STORAGE_KEYS } from '@/lib/constants';
+import { clearAdminSession } from '@/lib/admin-fetch';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -129,11 +130,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [isActive, curtainPhase]);
 
   const handleLogout = () => {
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_IS_ROOT);
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_USERNAME);
-    localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
+    clearAdminSession();
     fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
   };
 
@@ -145,6 +142,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         href={link.href}
         onClick={(e) => handleNavClick(e, link.href)}
         className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
+        aria-label={link.label}
       >
         <Icon size={20} /> {link.label}
       </Link>
@@ -160,6 +158,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         onClick={(e) => handleNavClick(e, link.href)}
         className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
         title={link.label}
+        aria-label={link.label}
       >
         <Icon size={24} />
         <span className={styles.bottomNavLabel}>{link.label}</span>
@@ -196,7 +195,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className={styles.sidebarFooter}>
           <Link href="/" className={`${styles.navLink} ${styles.sidebarLink}`}>&larr; Return to App</Link>
-          <button onClick={handleLogout} className={styles.logoutBtn}>
+          <button onClick={handleLogout} className={styles.logoutBtn} aria-label="Logout">
             <LogOut size={20} /> Logout
           </button>
         </div>

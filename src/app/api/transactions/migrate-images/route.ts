@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/cloudinary';
+import { apiError } from '@/lib/api-utils';
 async function runMigration() {
   await connectDB();
 
@@ -56,7 +57,7 @@ export async function GET(req: Request) {
     const result = await runMigration();
     return NextResponse.json({ success: true, ...result });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
 
@@ -65,6 +66,6 @@ export async function POST(req: Request) {
     const result = await runMigration();
     return NextResponse.json({ success: true, ...result });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

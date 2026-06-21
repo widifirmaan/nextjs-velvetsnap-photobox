@@ -78,6 +78,8 @@ export interface PhotoAdjust {
   temperature: number;
 }
 
+export const DEFAULT_ADJUST: PhotoAdjust = { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
+
 export const SAMPLE_IMAGES = [
   'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&q=80',
   'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&q=80',

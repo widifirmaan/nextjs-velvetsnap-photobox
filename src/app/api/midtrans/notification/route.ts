@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
+import crypto from 'crypto';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
+import { apiError } from '@/lib/api-utils';
 
 export async function POST(req: Request) {
   try {
@@ -11,11 +13,29 @@ export async function POST(req: Request) {
     const transactionId = body.transaction_id;
     const paymentType = body.payment_type;
     const fraudStatus = body.fraud_status;
+    const grossAmount = body.gross_amount;
+    const statusCode = body.status_code;
+    const signatureKey = body.signature_key;
 
     console.log('Midtrans notification:', { orderId, transactionStatus, transactionId, paymentType });
 
     if (!orderId) {
       return NextResponse.json({ success: false, error: 'Missing order_id' }, { status: 400 });
+    }
+
+    if (typeof orderId !== 'string') {
+      return NextResponse.json({ success: false, error: 'Invalid order_id' }, { status: 400 });
+    }
+
+    // Signature verification
+    const serverKey = process.env.MIDTRANS_SERVER_KEY || '';
+    const computed = crypto
+      .createHash('sha512')
+      .update(orderId + statusCode + grossAmount + serverKey)
+      .digest('hex');
+    if (computed !== signatureKey) {
+      console.error('Midtrans signature mismatch:', { computed, received: signatureKey });
+      return NextResponse.json({ success: false, error: 'Invalid signature' }, { status: 403 });
     }
 
     await connectDB();
@@ -44,7 +64,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true });
   } catch (error: unknown) {
     console.error('Midtrans notification error:', error);
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
 

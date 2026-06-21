@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LogOut, ExternalLink } from 'lucide-react';
-import { STORAGE_KEYS } from '@/lib/constants';
+import { clearAdminSession } from '@/lib/admin-fetch';
 import styles from './page.module.css';
 
 export default function MobileActions() {
@@ -17,11 +17,7 @@ export default function MobileActions() {
       </Link>
       <button
         onClick={() => {
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_IS_ROOT);
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
-          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_USERNAME);
-          localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
+          clearAdminSession();
           fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
         }}
         className={`card card-sm ${styles.mobileActionBtn}`}

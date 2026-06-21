@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { Snap } from 'midtrans-client';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
+import { MIDTRANS_PAYMENT_EXPIRY_DURATION, MIDTRANS_PAYMENT_EXPIRY_UNIT } from '@/lib/constants';
+import { apiError } from '@/lib/api-utils';
 
 export async function POST(req: Request) {
   try {
@@ -10,6 +12,9 @@ export async function POST(req: Request) {
 
     if (!sessionId || !templateId || !price) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
+    }
+    if (typeof sessionId !== 'string' || typeof templateId !== 'string' || typeof price !== 'number') {
+      return NextResponse.json({ success: false, error: 'Invalid field types' }, { status: 400 });
     }
 
     const orderId = `VS-${sessionId}-${Date.now()}`;
@@ -27,7 +32,7 @@ export async function POST(req: Request) {
       },
       credit_card: { secure: false },
       enabled_payments: ['qris'],
-      expiry: { duration: 30, unit: 'minutes' },
+      expiry: { duration: MIDTRANS_PAYMENT_EXPIRY_DURATION, unit: MIDTRANS_PAYMENT_EXPIRY_UNIT },
       customer_details: {
         first_name: 'Photobooth',
         last_name: 'Customer',
@@ -75,6 +80,6 @@ export async function POST(req: Request) {
       },
     });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

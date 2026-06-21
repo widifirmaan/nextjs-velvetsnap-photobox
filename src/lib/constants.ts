@@ -7,7 +7,6 @@ export const STRIP_JPEG_QUALITY = 0.85;
 export const DEFAULT_CANVAS_WIDTH = 1000;
 export const DEFAULT_CANVAS_HEIGHT = 3000;
 export const FRAME_RENDER_MAX_W = 720;
-export const FRAME_RENDER_MAX_W_BOOTH = 720;
 
 export const MIDTRANS_SNAP_URL = 'https://app.sandbox.midtrans.com/snap/snap.js';
 export const MIDTRANS_PAYMENT_EXPIRY_DURATION = 30;
@@ -21,11 +20,6 @@ export const UPLOAD_COMPRESS_THRESHOLD = 3.8 * 1024 * 1024;
 export const UPLOAD_MAX_DIM = 1200;
 export const UPLOAD_JPEG_QUALITY = 0.75;
 
-export const CLOUDINARY_HIRES_W = 1000;
-export const CLOUDINARY_HIRES_H = 3000;
-export const CLOUDINARY_THUMB_W = 200;
-export const CLOUDINARY_THUMB_H = 600;
-
 export const TEMPLATE_PRELOAD_W = 200;
 export const TEMPLATE_PRELOAD_H = 600;
 
@@ -36,16 +30,12 @@ export const PRELOADER_CAROUSEL_READY_DELAY = 300;
 export const MORPH_BUTTON_DELAY_MS = 900;
 export const MORPH_CLEANUP_MS = 2000;
 
-export const SESSION_TIMER_DEFAULT = 600;
-
 export const STRIPS_CAROUSEL_RESUME_DELAY = 3000;
 export const STRIPS_CAROUSEL_AUTO_START_DELAY = 100;
 export const STRIPS_CAROUSEL_ONREADY_TIMEOUT = 3000;
 
 export const MODEL_RETRY_DELAY = 1500;
 export const MODEL_CLEAR_CACHE_DELAY = 300;
-
-export const PAYMENT_POLL_INTERVAL = 3000;
 
 export const STORAGE_KEYS = {
   ACCOUNT: 'velvetsnap_account_id',

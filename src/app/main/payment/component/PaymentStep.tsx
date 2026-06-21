@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import StepperBar from '../../StepperBar';
 import PaymentPending from './PaymentPending';
+import { MIDTRANS_SNAP_URL, UPLOAD_COMPRESS_THRESHOLD } from '@/lib/constants';
 import styles from '@/app/main/page.module.css';
 
 declare global {
@@ -29,24 +30,45 @@ export default function PaymentStep({
 }) {
   const [loading, setLoading] = useState(true);
   const [snapLoaded, setSnapLoaded] = useState(false);
+  const [snapError, setSnapError] = useState(false);
   const autoTriggered = useRef(false);
   const snapInitRef = useRef(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (snapInitRef.current) return;
     snapInitRef.current = true;
     const script = document.createElement('script');
-    script.src = `https://app.sandbox.midtrans.com/snap/snap.js`;
+    script.src = MIDTRANS_SNAP_URL;
     script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '');
     script.async = true;
-    script.onload = () => setSnapLoaded(true);
+    let timeoutId: ReturnType<typeof setTimeout> | null = setTimeout(() => {
+      setSnapError(true);
+    }, 15000);
+
+    script.onload = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = null;
+      setSnapLoaded(true);
+    };
+    script.onerror = () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = null;
+      setSnapError(true);
+    };
     document.body.appendChild(script);
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (pollRef.current) clearInterval(pollRef.current);
+      snapInitRef.current = false;
+    };
   }, []);
 
   const uploadImages = useCallback(async (): Promise<{ captures: string[]; finalImage: string }> => {
     const uploadOne = async (dataUri: string, folder: string): Promise<string> => {
       let payload = dataUri;
-      if (payload.length > 3.8 * 1024 * 1024) {
+      if (payload.length > UPLOAD_COMPRESS_THRESHOLD) {
         const img = await new Promise<HTMLImageElement>((res, rej) => {
           const i = new window.Image();
           i.onload = () => res(i);
@@ -133,12 +155,13 @@ export default function PaymentStep({
           },
           onPending: () => {
             setPaid(true);
-            const poll = setInterval(async () => {
+            pollRef.current = setInterval(async () => {
               try {
                 const res = await fetch('/api/midtrans/status?sessionId=' + encodeURIComponent(sessionId));
                 const data = await res.json();
                 if (data.success && data.data.status === 'PAID') {
-                  clearInterval(poll);
+                  if (pollRef.current) clearInterval(pollRef.current);
+                  pollRef.current = null;
                   if (data.data._id) sessionStorage.setItem('photobooth_txId', data.data._id);
                   try {
                     const { captures: uploadedCaptures, finalImage: uploadedFinal } = await uploadImages();
@@ -204,7 +227,19 @@ export default function PaymentStep({
                 </button>
               </div>
             )}
-            {!errMsg && loading && (
+            {!errMsg && snapError && (
+              <div style={{ textAlign: 'center', marginTop: 16 }}>
+                <p style={{ color: 'var(--danger-color)', fontSize: '13px' }}>Payment gateway failed to load. Check your connection.</p>
+                <button
+                  className={styles.boothBtnPrimary}
+                  onClick={() => { snapInitRef.current = false; window.location.reload(); }}
+                  style={{ marginTop: 12 }}
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+            {!errMsg && !snapError && loading && (
               <p style={{ color: '#888', fontSize: '13px', marginTop: '12px', textAlign: 'center' }}>
                 {!snapLoaded ? 'Loading payment gateway...' : 'Preparing QRIS...'}
               </p>

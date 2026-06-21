@@ -3,6 +3,7 @@ import connectDB from '@/lib/db';
 import Settings from '@/models/Settings';
 import Account from '@/models/Account';
 import { getSession } from '@/lib/require-admin';
+import { apiError } from '@/lib/api-utils';
 
 const SENSITIVE_PATHS = ['security.password', 'security.passwordSalt', 'security.session', 'security.sessionExpires'];
 const SENSITIVE_FLAT = ['adminPassword', 'adminPasswordSalt', 'adminSession', 'adminSessionExpires'];
@@ -104,7 +105,7 @@ export async function GET(req: Request) {
       headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
     });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
 
@@ -152,6 +153,6 @@ export async function PUT(req: Request) {
     const doc = await Settings.collection.findOne({});
     return NextResponse.json({ success: true, data: cleanDoc(doc as any) });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

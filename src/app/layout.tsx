@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import './globals.css';
 import { ModelProvider } from '@/lib/ModelContext';
+
+const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
   title: 'VelvetSnap Co.',
@@ -26,7 +29,7 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
         <link rel="apple-touch-icon" href="/favicon.ico" />
       </head>
-      <body>
+      <body className={inter.className}>
         <ModelProvider>
           {children}
         </ModelProvider>

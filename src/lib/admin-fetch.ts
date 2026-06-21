@@ -6,3 +6,12 @@ export function adminFetch(url: string, opts: RequestInit = {}): Promise<Respons
   if (token) headers.set('Authorization', 'Bearer ' + token);
   return fetch(url, { ...opts, headers });
 }
+
+export function clearAdminSession() {
+  if (typeof window === 'undefined') return;
+  sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
+  sessionStorage.removeItem(STORAGE_KEYS.ADMIN_IS_ROOT);
+  sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+  sessionStorage.removeItem(STORAGE_KEYS.ADMIN_USERNAME);
+  localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
+}

@@ -51,10 +51,8 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [branding.system.slideshowInterval, slideshowImages.length]);
 
-  const style = {} as React.CSSProperties;
-
   return (
-    <div className={styles.page} style={style}>
+    <div className={styles.page}>
       <HomeHeader tooltipVisible={tooltipVisible} setTooltipVisible={setTooltipVisible} branding={branding} />
 
       <main className={styles.main}>

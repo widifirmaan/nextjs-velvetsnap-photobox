@@ -5,7 +5,7 @@ import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
 import { getHighResUrl, getFullQualityUrl } from '@/lib/cloudinary-url';
 import { STORAGE_KEYS, FRAME_RENDER_MAX_W } from '@/lib/constants';
-import { TEMPLATE_CONFIGS, type IStripElement, type TemplateData, type PhotoAdjust } from './types';
+import { TEMPLATE_CONFIGS, DEFAULT_ADJUST, type IStripElement, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';
 import EditorStep from './editor/EditorStep';
@@ -33,6 +33,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   const [templatesLoading, setTemplatesLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(sessionTimer);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const compositingId = useRef(0);
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -86,7 +87,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
         setTemplatesLoading(false);
       })
-      .catch(() => setTemplatesLoading(false));
+      .catch((e) => { console.error('Failed to fetch templates', e); setTemplatesLoading(false); });
   }, []);
 
   const renderFrameFromElements = useCallback(async (elements: IStripElement[], cw: number, ch: number, bgColor: string) => {
@@ -97,7 +98,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
       img.src = bgFrameDataUrl;
       setKeyedFrameImage(bgFrameDataUrl);
-    } catch {}
+    } catch (e) { console.error('renderFrameFromElements failed', e); }
   }, []);
 
   const handleSelectTemplate = useCallback((id: string, data?: TemplateData, keyedUrl?: string) => {
@@ -109,8 +110,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     setFrameRatio(cw / ch);
     if (keyedUrl) {
       setKeyedFrameImage(keyedUrl);
-      setStripLoading(false);
-      return;
     }
     if (data) {
       setTemplateData(data);
@@ -118,9 +117,15 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       if (data.templateFull) {
         setKeyedFrameImage(data.templateFull);
       }
+    } else if (keyedUrl && cachedTemplates) {
+      const found = cachedTemplates.find(t => t.templateId === id);
+      if (found) {
+        setTemplateData(found);
+        setPrice(found.templatePrice ?? 35000);
+      }
     }
     setStripLoading(false);
-  }, [setStep]);
+  }, [setStep, cachedTemplates]);
 
   // Background chroma-key render when template changes
   useEffect(() => {
@@ -216,7 +221,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   };
 
   useEffect(() => {
-    setPhotoAdjust(captures.map(() => ({ scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 })));
+    setPhotoAdjust(prev => captures.map((_, i) => prev[i] || { ...DEFAULT_ADJUST }));
   }, [captures]);
 
   useEffect(() => {
@@ -224,16 +229,17 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     const outW = templateData.templateData?.canvasWidth || 1000;
     const frameSrc = keyedFrameImage || templateData.templateFull || '';
     const hasPreComposed = !!frameSrc;
+    const id = ++compositingId.current;
     if (!hasPreComposed && templateData.templateData?.type === 'strip' && templateData.templateData?.elements?.length) {
       composeStripImage(
         templateData.templateData?.elements, templateData.templateData?.color || '#ffffff',
         captures, photoAdjust,
         outW, templateData.templateData?.canvasHeight || 3000, outW,
-      ).then(setCompositedImage).catch(() => {});
+      ).then(result => { if (compositingId.current === id) setCompositedImage(result); }).catch(e => console.error('composeStripImage failed', e));
     } else if (frameSrc) {
       composeFrameImage(frameSrc, templateData.templateData?.slotsLayout, captures, photoAdjust, templateData.templateData?.color || '#ffffff', outW)
-        .then(setCompositedImage)
-        .catch(() => {});
+        .then(result => { if (compositingId.current === id) setCompositedImage(result); })
+        .catch(e => console.error('composeFrameImage failed', e));
     }
   }, [captures, photoAdjust, templateData, keyedFrameImage]);
 
@@ -241,7 +247,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   const filledCount = useMemo(() => captures.filter((c) => c !== '').length, [captures]);
 
   const timerBadge = (step >= 1 && step <= 5 && sessionTimer > 0 && timeLeft > 0) ? (
-    <div style={{
+    <div role="timer" aria-label={`Session time remaining: ${formatTime(timeLeft)}`} style={{
       position:'fixed', top:8, left:'50%', transform:'translateX(-50%)', zIndex:100,
       display:'flex', alignItems:'center', gap:6,
       padding:'6px 14px', borderRadius:8,
@@ -319,9 +325,9 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   if (!content) return null;
 
   return (
-    <>
+    <div aria-label="Photobooth stepper">
       {timerBadge}
       <div className={styles.stepTransition} style={timerBadge ? { paddingTop: 48 } : undefined}>{content}</div>
-    </>
+    </div>
   );
 }

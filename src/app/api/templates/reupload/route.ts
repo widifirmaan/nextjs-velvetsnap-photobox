@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import { uploadBase64 } from '@/lib/cloudinary';
+import { apiError } from '@/lib/api-utils';
 
 async function urlToBase64(url: string): Promise<string | null> {
   try {
@@ -96,6 +97,6 @@ export async function GET() {
       results,
     });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }

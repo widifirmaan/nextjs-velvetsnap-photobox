@@ -29,7 +29,7 @@ export default function TemplateStep({ templates, loading, onSelect, onBack }: T
       {loading && templates.length === 0 ? (
         <div className={styles.stepEmpty}><Loader2 className="spin" size={40} /></div>
       ) : templates.length === 0 ? (
-        <div className={styles.stepEmpty}><Loader2 className="spin" size={40} /></div>
+        <div className={styles.stepEmpty}><p style={{ color: '#888', fontSize: 14 }}>No templates available</p></div>
       ) : (
         <div className={styles.templateGrid}>
           {templates.map((t) => (

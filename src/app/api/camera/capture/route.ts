@@ -4,6 +4,7 @@ import { promisify } from 'util';
 import { readFile, unlink, mkdtemp } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { apiError } from '@/lib/api-utils';
 
 const execAsync = promisify(exec);
 
@@ -60,6 +61,6 @@ export async function POST() {
 
     return NextResponse.json({ success: true, dataUrl });
   } catch (error: unknown) {
-    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+    return apiError(error);
   }
 }
