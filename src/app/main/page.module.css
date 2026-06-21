@@ -12,11 +12,7 @@
   transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-.preloaderHide {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
+
 
 .preloaderHidden {
   opacity: 0;
@@ -45,20 +41,7 @@
   will-change: transform;
 }
 
-.btnMorph_pill {
-  border-radius: 28px;
-  transform: scale(1);
-}
 
-.btnMorph_circle {
-  border-radius: 50%;
-  transform: scale(1);
-}
-
-.btnMorph_expand {
-  border-radius: 50%;
-  opacity: 0;
-}
 
 .btnGhost {
   position: fixed;
@@ -301,9 +284,7 @@
   display: block;
 }
 
-.cardSmallMobile {
-  display: none;
-}
+
 
 .cardSmallRow {
   display: none;
@@ -423,11 +404,7 @@
   flex-shrink: 0;
 }
 
-.heroCard {
-  background: var(--mn-card);
-  border-radius: var(--mn-radius);
-  padding: 24px 20px;
-}
+
 
 .heroCard :global(img) {
   max-width: 100%;
@@ -853,12 +830,7 @@
   background: #f0f0f0;
 }
 
-.stepLoading {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
 
 .stepEmpty {
   flex: 1;
@@ -1501,100 +1473,25 @@
   min-height: 400px;
 }
 
-.editorFilters {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 
-.editorSlotGrid {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
 
-.editorSlotThumb {
-  width: 72px;
-  height: 72px;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 2.5px solid transparent;
-  background: #f0f0f0;
-  cursor: pointer;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: #999;
-  transition: border-color 0.2s, transform 0.15s;
-  position: relative;
-}
+
+
+
 
 .editorSlotThumb:hover {
   transform: scale(1.05);
 }
 
-.editorSlotThumbActive {
-  border-color: #262626;
-  box-shadow: 0 0 0 2px #262626;
-  transform: scale(1.05);
-}
 
-.editorSlotBadge {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  font-size: 11px;
-  font-weight: 700;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
 
-.editorSlotCheck {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background: #262626;
-  color: #fff;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
 
-.editorSliderBar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 8px 12px;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(4px);
-  z-index: 10;
-  flex-wrap: wrap;
-}
 
-.editorSliderGroup {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
+
+
+
+
+
 
 .editorSlider {
   flex: 1;

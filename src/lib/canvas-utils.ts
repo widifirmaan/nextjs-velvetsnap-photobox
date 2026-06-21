@@ -1,51 +1,10 @@
+import type { ISlot, IStripElement } from '@/app/main/types';
 import { loadImage, loadImages, flipImageHorizontal, calcCoverFit, applyPhotoAdjustment } from './image-utils';
 import { drawSlotShape, clipSlotShape } from './shapes';
 import {
   CHROMA_KEY_GREEN, CHROMA_KEY_TARGET, CHROMA_KEY_THRESHOLD,
   COMPOSE_JPEG_QUALITY, STRIP_JPEG_QUALITY,
 } from './constants';
-
-export interface ISlot {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-interface ElementProps {
-  shape?: 'rectangle' | 'rounded' | 'circle' | 'heart' | 'star' | 'diamond' | 'polaroid' | 'hexagon';
-  shapeType?: 'rect' | 'circle' | 'ellipse' | 'star' | 'line';
-  borderWidth?: number;
-  borderColor?: string;
-  borderRadius?: number;
-  content?: string;
-  fontSize?: number;
-  fontFamily?: string;
-  color?: string;
-  fontWeight?: string;
-  textAlign?: 'left' | 'center' | 'right';
-  fontStyle?: 'normal' | 'italic';
-  stickerUrl?: string;
-  fillColor?: string;
-  strokeColor?: string;
-  strokeWidth?: number;
-  opacity?: number;
-  searchBg?: boolean;
-  letterSpacing?: number;
-}
-
-export interface IStripElement {
-  id: string;
-  type: 'photo-slot' | 'text' | 'sticker' | 'shape' | 'background';
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-  zIndex: number;
-  visible: boolean;
-  props: ElementProps;
-}
 
 export const flipImage = flipImageHorizontal;
 
