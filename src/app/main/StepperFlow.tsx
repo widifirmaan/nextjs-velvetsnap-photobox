@@ -86,7 +86,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       img.src = bgFrameDataUrl;
       setKeyedFrameImage(bgFrameDataUrl);
     } catch {}
-    setStripLoading(false);
   }, []);
 
   const handleSelectTemplate = useCallback((id: string, data?: TemplateData, keyedUrl?: string) => {
@@ -104,18 +103,21 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     if (data) {
       setTemplateData(data);
       setPrice(data.templatePrice ?? 35000);
-      if (data.templateData?.elements?.length) {
-        renderFrameFromElements(data.templateData.elements, cw, ch, data.templateData.color || '#ffffff');
-        return;
-      }
       if (data.templateFull) {
         setKeyedFrameImage(data.templateFull);
-        setStripLoading(false);
-        return;
       }
     }
     setStripLoading(false);
-  }, [setStep, renderFrameFromElements]);
+  }, [setStep]);
+
+  // Background chroma-key render when template changes
+  useEffect(() => {
+    if (!templateData?.templateData?.elements?.length) return;
+    const els = templateData.templateData.elements;
+    const cw = templateData.templateData.canvasWidth || 1000;
+    const ch = templateData.templateData.canvasHeight || 3000;
+    renderFrameFromElements(els, cw, ch, templateData.templateData.color || '#ffffff');
+  }, [templateData]);
 
   useEffect(() => {
     if (!templateId || templateData) return;
@@ -168,20 +170,16 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
           );
         }
 
-        // Keyed frame: render from elements to get proper transparent slot holes
-        if (matched.templateData.elements?.length) {
-          renderFrameFromElements(matched.templateData.elements, cw, ch, matched.templateData.color || '#ffffff');
-        } else if (matched.templateFull) {
+        if (matched.templateFull) {
           setKeyedFrameImage(getFullQualityUrl(matched.templateFull));
-          setStripLoading(false);
-        } else {
-          setStripLoading(false);
         }
+        setStripLoading(false);
       } else {
         const fallback = TEMPLATE_CONFIGS[templateId];
         if (fallback) {
           setTemplateData({ templateId, templateName: fallback.name, templateData: { slots: fallback.slots, color: '#ffffff', canvasWidth: 1000, canvasHeight: 3000, type: 'frame', elements: [], slotsLayout: [] }, templatePrice: 35000, templateDesc: '' } as TemplateData);
         }
+        setStripLoading(false);
       }
     };
     loadTemplate();
