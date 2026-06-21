@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
+import { getOptimizedUrl } from '@/lib/cloudinary-url';
 import styles from './page.module.css';
 import type { StripResult } from './types';
 import HomePage from './homepage/HomePage';
@@ -137,7 +138,13 @@ export default function Home() {
         .then((res) => {
           if (res.success) {
             setTmplCount(res.data.length);
-            sessionStorage.setItem('velvetsnap_templates', JSON.stringify(res.data.filter((t: any) => t.isActive !== false)));
+            const list = res.data.filter((t: any) => t.isActive !== false);
+            sessionStorage.setItem('velvetsnap_templates', JSON.stringify(list));
+            // Preload thumbnail images in background
+            list.forEach((t: any) => {
+              const src = t.templateFull ? getOptimizedUrl(t.templateFull, 200, 600) : t.templateThumb;
+              if (src) { const img = new window.Image(); img.src = src; }
+            });
           }
         })
         .catch(() => {});
