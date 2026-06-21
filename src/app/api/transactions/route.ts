@@ -25,17 +25,17 @@ export async function POST(req: Request) {
       qrCodeUrl: qrCodeUrl || null,
     };
 
-    const existing = await (Transaction as any).findOne({ sessionId });
+    const existing = await Transaction.findOne({ sessionId });
     let tx;
     if (existing) {
-      tx = await (Transaction as any).findOneAndUpdate({ sessionId }, txData, { new: true }).lean();
+      tx = await Transaction.findOneAndUpdate({ sessionId }, txData, { new: true }).lean();
     } else {
-      tx = await (Transaction as any).create(txData);
+      tx = await Transaction.create(txData);
     }
 
     return NextResponse.json({ success: true, data: tx }, { status: existing ? 200 : 201 });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -79,7 +79,7 @@ export async function GET(req: Request) {
       total,
       totalPages: Math.ceil(total / limit),
     });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

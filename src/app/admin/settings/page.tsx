@@ -178,8 +178,8 @@ export default function SettingsPage() {
       const json = await res.json();
       if (json.success) { setSaved(true); setSuccessOpen(true); try { new BroadcastChannel('velvetsnap').postMessage('settings-updated'); } catch {} }
       else setSaveErr(json.error || 'Gagal menyimpan');
-    } catch (e: any) {
-      setSaveErr(e?.message || 'Network error');
+    } catch (e: unknown) {
+      setSaveErr(e instanceof Error ? e.message : String(e));
     }
     setSaving(false);
   };

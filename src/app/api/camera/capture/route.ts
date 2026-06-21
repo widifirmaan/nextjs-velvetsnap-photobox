@@ -38,16 +38,15 @@ export async function POST() {
     // Try gphoto2 first
     try {
       dataUrl = await captureViaGphoto2();
-    } catch (e: any) {
-      errors.push(`gphoto2: ${e.message}`);
+    } catch (e: unknown) {
+      errors.push(`gphoto2: ${e instanceof Error ? e.message : String(e)}`);
     }
 
-    // Try DigiCamControl next
     if (!dataUrl) {
       try {
         dataUrl = await captureViaDigiCamControl();
-      } catch (e: any) {
-        errors.push(`DigiCamControl: ${e.message}`);
+      } catch (e: unknown) {
+        errors.push(`DigiCamControl: ${e instanceof Error ? e.message : String(e)}`);
       }
     }
 
@@ -60,7 +59,7 @@ export async function POST() {
     }
 
     return NextResponse.json({ success: true, dataUrl });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

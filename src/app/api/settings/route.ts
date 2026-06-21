@@ -103,8 +103,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: true, data: cleanDoc(doc) }, {
       headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
     });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -151,7 +151,7 @@ export async function PUT(req: Request) {
     await Settings.collection.updateOne({}, { $set }, { upsert: true });
     const doc = await Settings.collection.findOne({});
     return NextResponse.json({ success: true, data: cleanDoc(doc as any) });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

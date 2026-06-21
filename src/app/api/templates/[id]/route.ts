@@ -41,13 +41,13 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     let templateThumbUrl = templateThumb;
     for (const u of toUpload) {
       const url = await uploadBase64(u.b64, folder, u.key).catch(
-        (e: any) => { throw new Error(`${u.key} upload failed: ${e.message}`); }
+        (e: unknown) => { throw new Error(`${u.key} upload failed: ${e instanceof Error ? e.message : String(e)}`); }
       );
       if (u.key === 'templateFull') templateFullUrl = url;
       else if (u.key === 'templateThumb') templateThumbUrl = url;
       else {
         const eid = u.key.replace('el_', '');
-        const el = elements.find((e: any) => e.id === eid);
+        const el = elements.find((e: { id: string }) => e.id === eid);
         if (el) el.props.stickerUrl = url;
       }
     }
@@ -71,8 +71,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const doc = await Template.findByIdAndUpdate(id, update, { returnDocument: 'after' }).lean();
     return NextResponse.json({ success: true, data: normalizeTemplate(doc) });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -101,7 +101,7 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     await deleteImages(imageUrls);
     await Template.findByIdAndDelete(id);
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

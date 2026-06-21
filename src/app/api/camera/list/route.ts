@@ -15,8 +15,8 @@ export async function GET() {
       const parts = line.trim().split(/\s{2,}/);
       if (parts.length >= 2) cameras.push({ name: parts[0].trim(), port: parts[1].trim() });
     }
-  } catch (e: any) {
-    errors.push(`gphoto2: ${e.message}`);
+  } catch (e: unknown) {
+    errors.push(`gphoto2: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   try {
@@ -25,8 +25,8 @@ export async function GET() {
       const data = await res.json();
       cameras.push({ name: data?.camera || 'DigiCamControl Camera', port: 'digicamcontrol' });
     }
-  } catch (e: any) {
-    errors.push(`DigiCamControl: ${e.message}`);
+  } catch (e: unknown) {
+    errors.push(`DigiCamControl: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   return NextResponse.json({ success: true, cameras, errors });

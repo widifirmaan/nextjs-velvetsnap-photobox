@@ -36,11 +36,11 @@ export async function POST(req: Request) {
 
     const midtransResponse = await snap.createTransaction(parameter);
 
-    const existing = await (Transaction as any).findOne({ sessionId });
+    const existing = await Transaction.findOne({ sessionId });
 
     let tx;
     if (existing) {
-      await (Transaction as any).updateOne(
+      await Transaction.updateOne(
         { _id: existing._id },
         {
           orderId,
@@ -50,9 +50,9 @@ export async function POST(req: Request) {
           qrCodeUrl: midtransResponse.redirect_url,
         }
       );
-      tx = await (Transaction as any).findById(existing._id);
+      tx = await Transaction.findById(existing._id);
     } else {
-      tx = await (Transaction as any).create({
+      tx = await Transaction.create({
         sessionId,
         templateId,
         orderId,
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         transactionId: tx._id,
       },
     });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

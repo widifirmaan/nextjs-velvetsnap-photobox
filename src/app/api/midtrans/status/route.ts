@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     if (orderId) filter.orderId = orderId;
     else filter.sessionId = sessionId;
 
-    const tx = await (Transaction as any).findOne(filter).lean();
+    const tx = await Transaction.findOne(filter).lean();
 
     if (!tx) {
       return NextResponse.json({ success: false, error: 'Transaction not found' }, { status: 404 });
@@ -36,7 +36,7 @@ export async function GET(req: Request) {
         paymentMethod: tx.paymentMethod,
       },
     });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

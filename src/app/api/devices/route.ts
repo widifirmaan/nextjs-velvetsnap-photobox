@@ -6,8 +6,8 @@ export async function GET(req: Request) {
     await connectDB();
     const devices = await Device.find({});
     return NextResponse.json({ success: true, data: devices });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const device = await Device.create(body);
     return NextResponse.json({ success: true, data: device });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

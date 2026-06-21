@@ -82,9 +82,9 @@ export async function GET() {
         await Template.findByIdAndUpdate(id, { $set: updateFields });
 
         if (errors.length) status = 'partial';
-      } catch (e: any) {
+      } catch (e: unknown) {
         status = 'error';
-        errors.push(e.message);
+        errors.push(e instanceof Error ? e.message : String(e));
       }
 
       results.push({ id, name, status, errors: errors.length ? errors : undefined });
@@ -95,7 +95,7 @@ export async function GET() {
       processed: results.length,
       results,
     });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

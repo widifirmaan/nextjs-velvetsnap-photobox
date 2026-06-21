@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     await connectDB();
     const { searchParams } = new URL(req.url);
 
-    const filter: any = {};
+    const filter: Record<string, unknown> = {};
     const accountId = searchParams.get('accountId');
 
     if (accountId) {
@@ -25,7 +25,7 @@ export async function GET(req: Request) {
 
     const total = await Transaction.countDocuments(filter);
     return NextResponse.json({ success: true, total }, { headers: { 'Cache-Control': 'public, max-age=300, s-maxage=300, stale-while-revalidate=60' } });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

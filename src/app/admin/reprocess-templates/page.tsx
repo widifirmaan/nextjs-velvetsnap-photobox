@@ -86,9 +86,9 @@ export default function ReprocessTemplatesPage() {
       if (!updateData.success) throw new Error(updateData.error || 'Update failed');
 
       setStatus((s) => ({ ...s, [t._id]: 'done' }));
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus((s) => ({ ...s, [t._id]: 'error' }));
-      setErrors((e) => ({ ...e, [t._id]: err.message }));
+      setErrors((e) => ({ ...e, [t._id]: err instanceof Error ? err.message : String(err) }));
     }
   };
 

@@ -61,9 +61,9 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
       const url = URL.createObjectURL(blob);
       onSelect(url);
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (id !== requestId.current) { log('warn', 'removeBackground cancelled after error'); return; }
-      const msg = err?.message || 'Remove background failed';
+      const msg = err instanceof Error ? err.message : String(err);
       log('error', 'removeBackground failed', { message: msg, elapsed: Date.now() - startedAt });
       setImageError(msg);
       setActiveUrl(null);

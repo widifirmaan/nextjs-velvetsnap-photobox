@@ -10,10 +10,12 @@ export async function POST(req: Request) {
     }
     const url = await uploadBase64(dataUri, folder || 'velvetsnap/templates', publicId);
     return NextResponse.json({ success: true, url });
-  } catch (error: any) {
-    console.error('/api/upload error:', error.message, error.http_code, error.code);
+  } catch (error: unknown) {
+    const cloudErr = error as { message?: string; http_code?: number; code?: string };
+    const msg = cloudErr.message || String(error);
+    console.error('/api/upload error:', msg, cloudErr.http_code, cloudErr.code);
     return NextResponse.json(
-      { success: false, error: error.message, info: { http_code: error.http_code, code: error.code } },
+      { success: false, error: msg, info: { http_code: cloudErr.http_code, code: cloudErr.code } },
       { status: 500 }
     );
   }

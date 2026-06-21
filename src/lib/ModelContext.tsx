@@ -128,9 +128,9 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
       localStorage.removeItem(RETRY_KEY);
       setStatus('ready');
       log('info', 'preload completed');
-    } catch (err: any) {
+    } catch (err: unknown) {
       loaded.current = false;
-      const msg = err?.message || 'Unknown error';
+      const msg = err instanceof Error ? err.message : String(err);
       setErrorMessage(msg);
       log('error', 'preload failed', { message: msg, attempt });
 

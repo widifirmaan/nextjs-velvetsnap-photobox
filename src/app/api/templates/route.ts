@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     await connectDB();
     const { searchParams } = new URL(req.url);
 
-    let filter: any = {};
+    let filter: Record<string, unknown> = {};
 
     const qAccountId = searchParams.get('accountId');
     if (qAccountId) {
@@ -26,10 +26,10 @@ export async function GET(req: Request) {
     const templates = await Template.find(filter).sort({ createdAt: -1 }).lean();
     const { normalizeTemplate } = await import('@/lib/normalize-template');
 
-    const data = templates.map((t: any) => normalizeTemplate(t));
+    const data = templates.map((t) => normalizeTemplate(t as unknown as Record<string, unknown>));
 
     return NextResponse.json({ success: true, data });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

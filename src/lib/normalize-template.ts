@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeTemplate(doc: any) {
   if (!doc) return doc;
   const td = doc.templateData || {};

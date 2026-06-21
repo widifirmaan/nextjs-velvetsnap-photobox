@@ -18,8 +18,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     }
 
     return NextResponse.json({ success: true, data: tx });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -47,7 +47,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     const tx = await Transaction.findByIdAndUpdate(id, { showInCarousel: body.showInCarousel }, { new: true }).lean();
     return NextResponse.json({ success: true, data: tx });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

@@ -55,8 +55,8 @@ export async function GET(req: Request) {
   try {
     const result = await runMigration();
     return NextResponse.json({ success: true, ...result });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
 
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   try {
     const result = await runMigration();
     return NextResponse.json({ success: true, ...result });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

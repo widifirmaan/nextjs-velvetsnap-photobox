@@ -9,7 +9,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const accountId = searchParams.get('accountId');
 
-    const filter: any = { finalImage: { $ne: '' }, showInCarousel: true };
+    const filter: Record<string, unknown> = { finalImage: { $ne: '' }, showInCarousel: true };
 
     if (accountId) {
       if (accountId === 'root') filter.accountId = { $in: [null, undefined] };
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
       .lean();
 
     return NextResponse.json({ success: true, data: transactions }, { headers: { 'Cache-Control': 'public, max-age=60, s-maxage=120, stale-while-revalidate=30' } });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ success: false, error: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }
