@@ -47,8 +47,18 @@ export const MODEL_CLEAR_CACHE_DELAY = 300;
 
 export const PAYMENT_POLL_INTERVAL = 3000;
 
-export const ACCOUNT_STORAGE_KEY = 'velvetsnap_account_id';
-export const TEMPLATE_CACHE_KEY = 'velvetsnap_templates';
-export const CAMERA_DEVICE_KEY = 'velvetsnap_camera_device';
-export const SKIP_PRELOADER_KEY = 'skipPreloader';
-export const ADMIN_SESSION_KEY = 'admin_account_id';
+export const STORAGE_KEYS = {
+  ACCOUNT: 'velvetsnap_account_id',
+  TEMPLATES: 'velvetsnap_templates',
+  CAMERA: 'velvetsnap_camera_device',
+  DEVICE_SETTINGS: 'velvetsnap_device_settings',
+  SKIP_PRELOADER: 'skipPreloader',
+  ADMIN_SESSION: 'admin_account_id',
+} as const;
+
+// Legacy individual exports (use STORAGE_KEYS instead)
+export const ACCOUNT_STORAGE_KEY = STORAGE_KEYS.ACCOUNT;
+export const TEMPLATE_CACHE_KEY = STORAGE_KEYS.TEMPLATES;
+export const CAMERA_DEVICE_KEY = STORAGE_KEYS.CAMERA;
+export const SKIP_PRELOADER_KEY = STORAGE_KEYS.SKIP_PRELOADER;
+export const ADMIN_SESSION_KEY = STORAGE_KEYS.ADMIN_SESSION;
