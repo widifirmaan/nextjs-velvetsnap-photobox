@@ -34,6 +34,7 @@ export default function PaymentStep({
   const autoTriggered = useRef(false);
   const snapInitRef = useRef(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const payTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (snapInitRef.current) return;
@@ -61,6 +62,7 @@ export default function PaymentStep({
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
       if (pollRef.current) clearInterval(pollRef.current);
+      if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
       snapInitRef.current = false;
     };
   }, []);
@@ -135,8 +137,18 @@ export default function PaymentStep({
           throw new Error('Payment gateway not loaded');
         }
 
+        // Payment processing timeout: if no callback within 30s, show retry
+        payTimeoutRef.current = setTimeout(() => {
+          setErrMsg('Payment popup may be blocked or timed out. Please try again.');
+          setLoading(false);
+          autoTriggered.current = false;
+          payTimeoutRef.current = null;
+        }, 30000);
+
         window.snap.pay(token, {
           onSuccess: async () => {
+            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
+            payTimeoutRef.current = null;
             setPaid(true);
             if (transactionId) sessionStorage.setItem('photobooth_txId', transactionId);
             try {
@@ -154,6 +166,8 @@ export default function PaymentStep({
             setTimeout(() => onSuccess(transactionId || 'ok'), 800);
           },
           onPending: () => {
+            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
+            payTimeoutRef.current = null;
             setPaid(true);
             pollRef.current = setInterval(async () => {
               try {
@@ -181,10 +195,14 @@ export default function PaymentStep({
             }, 3000);
           },
           onError: () => {
+            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
+            payTimeoutRef.current = null;
             setErrMsg('Payment failed. Please try again.');
             setLoading(false);
           },
           onClose: () => {
+            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
+            payTimeoutRef.current = null;
             setLoading(false);
           },
         });
@@ -194,6 +212,10 @@ export default function PaymentStep({
         autoTriggered.current = false;
       }
     })();
+    return () => {
+      if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
+      payTimeoutRef.current = null;
+    };
   }, [snapLoaded, templateId, price, paid, uploadImages, onSuccess, setErrMsg, setPaid]);
 
   return (
