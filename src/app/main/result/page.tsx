@@ -198,6 +198,7 @@ export default function ResultPage() {
   const [compositedImage, setCompositedImage] = useState<string | null>(null);
   const [rendering, setRendering] = useState(false);
   const [txId, setTxId] = useState<string | null>(null);
+  const qrRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
