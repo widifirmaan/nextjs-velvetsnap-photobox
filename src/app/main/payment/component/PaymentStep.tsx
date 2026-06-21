@@ -39,20 +39,24 @@ export default function PaymentStep({
   useEffect(() => {
     if (snapInitRef.current) return;
     snapInitRef.current = true;
+    console.log('[Payment] snapInitRef.current', snapInitRef.current);
     const script = document.createElement('script');
     script.src = MIDTRANS_SNAP_URL;
     script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '');
     script.async = true;
     let timeoutId: ReturnType<typeof setTimeout> | null = setTimeout(() => {
+      console.warn('[Payment] snap.js load timeout 15s exceeded');
       setSnapError(true);
     }, 15000);
 
     script.onload = () => {
+      console.log('[Payment] snap.js loaded');
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = null;
       setSnapLoaded(true);
     };
-    script.onerror = () => {
+    script.onerror = (e) => {
+      console.error('[Payment] snap.js load error', e);
       if (timeoutId) clearTimeout(timeoutId);
       timeoutId = null;
       setSnapError(true);
@@ -109,6 +113,7 @@ export default function PaymentStep({
   useEffect(() => {
     if (autoTriggered.current || paid) return;
     if (!snapLoaded || !templateId || !price) return;
+    console.log('[Payment] autoTriggered', { snapLoaded, templateId, price, paid });
 
     autoTriggered.current = true;
     setLoading(true);
@@ -121,12 +126,14 @@ export default function PaymentStep({
 
     (async () => {
       try {
+        console.log('[Payment] calling /api/midtrans/charge', { sessionId, templateId, price });
         const chargeRes = await fetch('/api/midtrans/charge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId, templateId: templateId || 't1', price }),
         });
         const chargeData = await chargeRes.json();
+        console.log('[Payment] charge response', { ok: chargeRes.ok, chargeData });
         if (!chargeRes.ok || !chargeData.success) {
           throw new Error(chargeData.error || 'Failed to create payment');
         }
@@ -136,9 +143,11 @@ export default function PaymentStep({
         if (!window.snap) {
           throw new Error('Payment gateway not loaded');
         }
+        console.log('[Payment] calling window.snap.pay', { token, transactionId, orderId });
 
         // Payment processing timeout: if no callback within 30s, show retry
         payTimeoutRef.current = setTimeout(() => {
+          console.warn('[Payment] snap.pay timeout — no callback in 30s');
           setErrMsg('Payment popup may be blocked or timed out. Please try again.');
           setLoading(false);
           autoTriggered.current = false;
@@ -147,6 +156,7 @@ export default function PaymentStep({
 
         window.snap.pay(token, {
           onSuccess: async () => {
+            console.log('[Payment] snap.pay onSuccess');
             if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
             payTimeoutRef.current = null;
             setPaid(true);
@@ -166,14 +176,17 @@ export default function PaymentStep({
             setTimeout(() => onSuccess(transactionId || 'ok'), 800);
           },
           onPending: () => {
+            console.log('[Payment] snap.pay onPending');
             if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
             payTimeoutRef.current = null;
             setPaid(true);
             pollRef.current = setInterval(async () => {
+              console.log('[Payment] polling status...');
               try {
                 const res = await fetch('/api/midtrans/status?sessionId=' + encodeURIComponent(sessionId));
                 const data = await res.json();
                 if (data.success && data.data.status === 'PAID') {
+                  console.log('[Payment] poll detected PAID');
                   if (pollRef.current) clearInterval(pollRef.current);
                   pollRef.current = null;
                   if (data.data._id) sessionStorage.setItem('photobooth_txId', data.data._id);
@@ -191,16 +204,18 @@ export default function PaymentStep({
                   } catch {}
                   onSuccess(data.data._id || 'ok');
                 }
-              } catch {}
+              } catch (e) { console.error('[Payment] poll error', e); }
             }, 3000);
           },
-          onError: () => {
+          onError: (result) => {
+            console.error('[Payment] snap.pay onError', result);
             if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
             payTimeoutRef.current = null;
             setErrMsg('Payment failed. Please try again.');
             setLoading(false);
           },
           onClose: () => {
+            console.log('[Payment] snap.pay onClose');
             if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
             payTimeoutRef.current = null;
             setLoading(false);
