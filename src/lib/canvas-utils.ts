@@ -1,3 +1,10 @@
+import { loadImage, loadImages, flipImageHorizontal, calcCoverFit, applyPhotoAdjustment } from './image-utils';
+import { drawSlotShape, clipSlotShape } from './shapes';
+import {
+  CHROMA_KEY_GREEN, CHROMA_KEY_TARGET, CHROMA_KEY_THRESHOLD,
+  COMPOSE_JPEG_QUALITY, STRIP_JPEG_QUALITY,
+} from './constants';
+
 export interface ISlot {
   x: number;
   y: number;
@@ -18,23 +25,7 @@ export interface IStripElement {
   props: Record<string, any>;
 }
 
-export function flipImage(dataUrl: string): Promise<string> {
-  return new Promise((resolve) => {
-    const img = new window.Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.naturalWidth || img.width;
-      canvas.height = img.naturalHeight || img.height;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) { resolve(dataUrl); return; }
-      ctx.scale(-1, 1);
-      ctx.drawImage(img, -canvas.width, 0);
-      resolve(canvas.toDataURL('image/jpeg'));
-    };
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
-}
+export const flipImage = flipImageHorizontal;
 
 export async function composeFrameImage(
   frameImageBase64: string,
@@ -61,60 +52,32 @@ export async function composeFrameImage(
         ctx.fillStyle = color || '#ffffff';
         ctx.fillRect(0, 0, cw, ch);
 
+        const photoLoads: Promise<void>[] = [];
         for (let idx = 0; idx < slots.length; idx++) {
           const slot = slots[idx];
           const src = captures[idx];
           if (!src) continue;
 
-          const sx = (slot.x / 100) * cw;
-          const sy = (slot.y / 100) * ch;
-          const sw = (slot.w / 100) * cw;
-          const sh = (slot.h / 100) * ch;
+          photoLoads.push((async () => {
+            const sx = (slot.x / 100) * cw;
+            const sy = (slot.y / 100) * ch;
+            const sw = (slot.w / 100) * cw;
+            const sh = (slot.h / 100) * ch;
 
-          const photo = await new Promise<HTMLImageElement>((res, rej) => {
-            const img = new window.Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => res(img);
-            img.onerror = () => rej(new Error('Photo load failed'));
-            img.src = src;
-          });
+            const photo = await loadImage(src);
+            ctx.save();
+            ctx.beginPath();
+            ctx.rect(sx, sy, sw, sh);
+            ctx.clip();
 
-          ctx.save();
-          ctx.beginPath();
-          ctx.rect(sx, sy, sw, sh);
-          ctx.clip();
-
-          const adj = adjust[idx] || { scale: 1, x: 0, y: 0 };
-          const ia = photo.naturalWidth / photo.naturalHeight;
-          const sa = sw / sh;
-          let dw = sw, dh = sh, dx = sx, dy = sy;
-          if (ia > sa) {
-            dh = sh;
-            dw = sh * ia;
-            dx = sx - (dw - sw) / 2;
-            dy = sy;
-          } else {
-            dw = sw;
-            dh = sw / ia;
-            dx = sx;
-            dy = sy - (dh - sh) / 2;
-          }
-
-          const sc = adj.scale || 1;
-          const cx2 = dx + dw / 2;
-          const cy2 = dy + dh / 2;
-          dw *= sc; dh *= sc;
-          dx = cx2 - dw / 2;
-          dy = cy2 - dh / 2;
-          dx += (adj.x || 0) / 100 * sw;
-          dy += (adj.y || 0) / 100 * sh;
-
-          ctx.drawImage(photo, dx, dy, dw, dh);
-          ctx.restore();
+            applyPhotoAdjustment(ctx, photo, sx, sy, sw, sh, adjust[idx] || { scale: 1, x: 0, y: 0 });
+            ctx.restore();
+          })());
         }
+        await Promise.all(photoLoads);
 
         ctx.drawImage(frameImg, 0, 0, cw, ch);
-        resolve(canvas.toDataURL('image/jpeg', 0.95));
+        resolve(canvas.toDataURL('image/jpeg', COMPOSE_JPEG_QUALITY));
       } catch (err) {
         reject(err);
       }
@@ -131,9 +94,9 @@ export function removeGreenScreen(base64: string, maxW: number = 1000): Promise<
     img.crossOrigin = 'anonymous';
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const scale = maxW / (img.naturalWidth || img.width);
+      const s = maxW / (img.naturalWidth || img.width);
       canvas.width = maxW;
-      canvas.height = Math.round((img.naturalHeight || img.height) * scale);
+      canvas.height = Math.round((img.naturalHeight || img.height) * s);
       const ctx = canvas.getContext('2d');
       if (!ctx) { resolve(base64); return; }
       ctx.imageSmoothingQuality = 'high';
@@ -142,8 +105,8 @@ export function removeGreenScreen(base64: string, maxW: number = 1000): Promise<
       try { imgData = ctx.getImageData(0, 0, canvas.width, canvas.height); }
       catch { resolve(base64); return; }
       const d = imgData.data;
-      const targetR = 0, targetG = 191, targetB = 99;
-      const threshold2 = 5000;
+      const [targetR, targetG, targetB] = CHROMA_KEY_TARGET;
+      const threshold2 = CHROMA_KEY_THRESHOLD;
       const len = d.length;
       for (let i = 0; i < len; i += 4) {
         const dr = d[i] - targetR;
@@ -190,22 +153,12 @@ export function renderStripFrame(
     if (!ctx) { reject(new Error('No context')); return; }
     ctx.imageSmoothingQuality = 'high';
 
-    // Fill background color first
     ctx.fillStyle = bgColor || '#ffffff';
     ctx.fillRect(0, 0, cw, ch);
 
     const sorted = [...elements]
       .filter((el) => el.visible)
       .sort((a, b) => a.zIndex - b.zIndex);
-
-    const loadImage = (url: string): Promise<HTMLImageElement> =>
-      new Promise((res, rej) => {
-        const img = new window.Image();
-        img.crossOrigin = 'anonymous';
-        img.onload = () => res(img);
-        img.onerror = () => rej(new Error(`Failed to load: ${url}`));
-        img.src = url;
-      });
 
     const scaleEl = (el: IStripElement) => ({
       ...el,
@@ -216,102 +169,27 @@ export function renderStripFrame(
       props: { ...el.props },
     });
 
-    const drawPhotoSlot = (el: IStripElement) => {
-      const bw = (el.props.borderWidth ?? 2) * scale;
-      const bc = el.props.borderColor || '#ffffff';
-      const br = (el.props.borderRadius ?? 8) * scale;
-      const shape = el.props.shape || 'rounded';
-
+    const drawSlot = (el: IStripElement) => {
       ctx.save();
       ctx.globalAlpha = el.props.opacity ?? 1;
-
-      ctx.fillStyle = '#00bf63';
-      ctx.strokeStyle = bc;
-      ctx.lineWidth = bw;
-
-      if (shape === 'circle') {
-        const r = Math.min(el.width, el.height) / 2;
-        const cx = el.x + el.width / 2;
-        const cy = el.y + el.height / 2;
-        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
-        ctx.stroke();
-      } else if (shape === 'heart') {
-        const s = Math.min(el.width, el.height) * 0.45;
-        const hx = el.x + el.width / 2;
-        const hy = el.y + el.height * 0.4;
-        ctx.beginPath();
-        ctx.moveTo(hx, hy + s * 0.3);
-        ctx.bezierCurveTo(hx - s * 0.7, hy - s * 0.2, hx - s, hy - s * 0.5, hx, hy - s * 0.7);
-        ctx.bezierCurveTo(hx + s, hy - s * 0.5, hx + s * 0.7, hy - s * 0.2, hx, hy + s * 0.3);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      } else if (shape === 'star') {
-        const cx = el.x + el.width / 2;
-        const cy = el.y + el.height / 2;
-        const r = Math.min(el.width, el.height) / 2;
-        ctx.beginPath();
-        for (let i = 0; i < 5; i++) {
-          const outerAngle = (Math.PI * 2 * i) / 5 - Math.PI / 2;
-          const innerAngle = outerAngle + Math.PI / 5;
-          const px = cx + r * Math.cos(outerAngle);
-          const py = cy + r * Math.sin(outerAngle);
-          const ix = cx + r * 0.4 * Math.cos(innerAngle);
-          const iy = cy + r * 0.4 * Math.sin(innerAngle);
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-          ctx.lineTo(ix, iy);
-        }
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      } else if (shape === 'diamond') {
-        const cx = el.x + el.width / 2;
-        const cy = el.y + el.height / 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, el.y);
-        ctx.lineTo(el.x + el.width, cy);
-        ctx.lineTo(cx, el.y + el.height);
-        ctx.lineTo(el.x, cy);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      } else if (shape === 'hexagon') {
-        const cx = el.x + el.width / 2;
-        const cy = el.y + el.height / 2;
-        const hr = Math.min(el.width, el.height) / 2;
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const a = (Math.PI / 3) * i - Math.PI / 2;
-          const px = cx + hr * Math.cos(a);
-          const py = cy + hr * Math.sin(a);
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      } else if (shape === 'polaroid') {
-        ctx.fillRect(el.x, el.y, el.width, el.height);
-        ctx.strokeRect(el.x, el.y, el.width, el.height);
-        ctx.fillStyle = bc;
-        ctx.fillRect(el.x + el.width * 0.2, el.y + el.height - 14 * scale, el.width * 0.6, 8 * scale);
-      } else {
-        const r = Math.min(br, el.width / 2, el.height / 2);
-        ctx.beginPath();
-        ctx.moveTo(el.x + r, el.y);
-        ctx.lineTo(el.x + el.width - r, el.y);
-        ctx.quadraticCurveTo(el.x + el.width, el.y, el.x + el.width, el.y + r);
-        ctx.lineTo(el.x + el.width, el.y + el.height - r);
-        ctx.quadraticCurveTo(el.x + el.width, el.y + el.height, el.x + el.width - r, el.y + el.height);
-        ctx.lineTo(el.x + r, el.y + el.height);
-        ctx.quadraticCurveTo(el.x, el.y + el.height, el.x, el.y + el.height - r);
-        ctx.lineTo(el.x, el.y + r);
-        ctx.quadraticCurveTo(el.x, el.y, el.x + r, el.y);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
-      }
+      drawSlotShape(ctx, {
+        shape: el.props.shape || 'rounded',
+        x: el.x, y: el.y, w: el.width, h: el.height,
+        fill: CHROMA_KEY_GREEN,
+        stroke: el.props.borderColor || '#ffffff',
+        strokeWidth: (el.props.borderWidth ?? 2) * scale,
+        borderRadius: (el.props.borderRadius ?? 8) * scale,
+      });
       ctx.restore();
     };
 
-    const drawNonPhotoElement = (el: IStripElement, imageCache: Map<string, HTMLImageElement>) => {
+    const drawNonPhoto = (el: IStripElement, cache: Map<string, HTMLImageElement>) => {
       ctx.save();
       ctx.globalAlpha = el.props.opacity ?? 1;
 
       if (el.type === 'background') {
         if (el.props.stickerUrl) {
-          const img = imageCache.get(el.props.stickerUrl);
+          const img = cache.get(el.props.stickerUrl);
           if (img) {
             const sc = Math.max(el.width / img.naturalWidth, el.height / img.naturalHeight);
             const dw = img.naturalWidth * sc;
@@ -330,7 +208,7 @@ export function renderStripFrame(
         ctx.fillText(el.props.content || 'Text', tx, el.y + el.height / 2, el.width);
       } else if (el.type === 'sticker') {
         if (el.props.stickerUrl) {
-          const img = imageCache.get(el.props.stickerUrl);
+          const img = cache.get(el.props.stickerUrl);
           if (img) {
             const sc = Math.min(el.width / img.naturalWidth, el.height / img.naturalHeight);
             const dw = img.naturalWidth * sc;
@@ -363,28 +241,24 @@ export function renderStripFrame(
       try {
         const scaledElements = sorted.map(scaleEl);
 
-        // Collect and preload all images in parallel
         const imageUrls = new Set<string>();
         for (const el of scaledElements) {
           if ((el.type === 'background' || el.type === 'sticker') && el.props.stickerUrl) {
             imageUrls.add(el.props.stickerUrl);
           }
         }
-        const imageEntries = await Promise.all(
-          Array.from(imageUrls).map(async (url) => {
-            try { return [url, await loadImage(url)] as const; } catch { return null; }
-          })
-        );
-        const imageCache = new Map<string, HTMLImageElement>();
-        for (const entry of imageEntries) {
-          if (entry) imageCache.set(entry[0], entry[1]);
+        const images = await loadImages(Array.from(imageUrls));
+        const cache = new Map<string, HTMLImageElement>();
+        const urls = Array.from(imageUrls);
+        for (let i = 0; i < urls.length; i++) {
+          if (images[i]) cache.set(urls[i], images[i]!);
         }
 
         for (const el of scaledElements) {
           if (el.type === 'photo-slot') {
-            drawPhotoSlot(el);
+            drawSlot(el);
           } else {
-            drawNonPhotoElement(el, imageCache);
+            drawNonPhoto(el, cache);
           }
         }
         resolve(canvas.toDataURL('image/png'));
@@ -422,14 +296,7 @@ export async function composeStripImage(
     .filter((el) => el.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
 
-  const loadImg = (url: string): Promise<HTMLImageElement> =>
-    new Promise((res, rej) => {
-      const img = new window.Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => res(img);
-      img.onerror = () => rej(new Error(`Failed: ${url}`));
-      img.src = url;
-    });
+  const loadImg = (url: string) => loadImage(url);
 
   let photoIdx = 0;
 
@@ -448,85 +315,21 @@ export async function composeStripImage(
       if (!src) { ctx.restore(); continue; }
       const bw = (el.props.borderWidth ?? 2) * scale;
       const bc = el.props.borderColor || '#ffffff';
-      const br = (el.props.borderRadius ?? 8) * scale;
-      const shape = el.props.shape || 'rounded';
 
-      // Clip to shape
-      ctx.beginPath();
-      if (shape === 'circle') {
-        const r = Math.min(ew, eh) / 2;
-        ctx.arc(ex + ew / 2, ey + eh / 2, r, 0, Math.PI * 2);
-      } else if (shape === 'heart') {
-        const s = Math.min(ew, eh) * 0.45;
-        const hx = ex + ew / 2;
-        const hy = ey + eh * 0.4;
-        ctx.moveTo(hx, hy + s * 0.3);
-        ctx.bezierCurveTo(hx - s * 0.7, hy - s * 0.2, hx - s, hy - s * 0.5, hx, hy - s * 0.7);
-        ctx.bezierCurveTo(hx + s, hy - s * 0.5, hx + s * 0.7, hy - s * 0.2, hx, hy + s * 0.3);
-      } else if (shape === 'star') {
-        const cx2 = ex + ew / 2, cy2 = ey + eh / 2, r = Math.min(ew, eh) / 2;
-        for (let i = 0; i < 5; i++) {
-          const oa = (Math.PI * 2 * i) / 5 - Math.PI / 2;
-          const ia = oa + Math.PI / 5;
-          const px = cx2 + r * Math.cos(oa), py = cy2 + r * Math.sin(oa);
-          const ix = cx2 + r * 0.4 * Math.cos(ia), iy = cy2 + r * 0.4 * Math.sin(ia);
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-          ctx.lineTo(ix, iy);
-        }
-      } else if (shape === 'diamond') {
-        const cx2 = ex + ew / 2, cy2 = ey + eh / 2;
-        ctx.moveTo(cx2, ey); ctx.lineTo(ex + ew, cy2);
-        ctx.lineTo(cx2, ey + eh); ctx.lineTo(ex, cy2);
-      } else if (shape === 'hexagon') {
-        const cx2 = ex + ew / 2, cy2 = ey + eh / 2, hr = Math.min(ew, eh) / 2;
-        for (let i = 0; i < 6; i++) {
-          const a = (Math.PI / 3) * i - Math.PI / 2;
-          const px = cx2 + hr * Math.cos(a), py = cy2 + hr * Math.sin(a);
-          if (i === 0) ctx.moveTo(px, py);
-          else ctx.lineTo(px, py);
-        }
-      } else {
-        const r = Math.min(br, ew / 2, eh / 2);
-        ctx.moveTo(ex + r, ey);
-        ctx.lineTo(ex + ew - r, ey);
-        ctx.quadraticCurveTo(ex + ew, ey, ex + ew, ey + r);
-        ctx.lineTo(ex + ew, ey + eh - r);
-        ctx.quadraticCurveTo(ex + ew, ey + eh, ex + ew - r, ey + eh);
-        ctx.lineTo(ex + r, ey + eh);
-        ctx.quadraticCurveTo(ex, ey + eh, ex, ey + eh - r);
-        ctx.lineTo(ex, ey + r);
-        ctx.quadraticCurveTo(ex, ey, ex + r, ey);
-      }
-      ctx.closePath();
-      ctx.clip();
+      clipSlotShape(ctx, {
+        shape: el.props.shape || 'rounded',
+        x: ex, y: ey, w: ew, h: eh,
+        borderRadius: (el.props.borderRadius ?? 8) * scale,
+      });
 
-      // Draw photo
       try {
         const photo = await loadImg(src);
-        const adj = adjusts[photoIdx - 1] || { scale: 1, x: 0, y: 0 };
-        const ia = photo.naturalWidth / photo.naturalHeight;
-        const sa = ew / eh;
-        let dw = ew, dh = eh, dx = ex, dy = ey;
-        if (ia > sa) { dh = eh; dw = eh * ia; dx = ex - (dw - ew) / 2; }
-        else { dw = ew; dh = ew / ia; dx = ex; dy = ey - (dh - eh) / 2; }
-        const sc = adj.scale || 1;
-        const cx2 = dx + dw / 2, cy2 = dy + dh / 2;
-        dw *= sc; dh *= sc;
-        dx = cx2 - dw / 2; dy = cy2 - dh / 2;
-        dx += (adj.x || 0) / 100 * ew;
-        dy += (adj.y || 0) / 100 * eh;
-        ctx.drawImage(photo, dx, dy, dw, dh);
+        applyPhotoAdjustment(ctx, photo, ex, ey, ew, eh, adjusts[photoIdx - 1] || { scale: 1, x: 0, y: 0 });
       } catch {}
 
-      // Draw border
       ctx.strokeStyle = bc;
       ctx.lineWidth = bw;
-      ctx.beginPath();
-      // need to re-create the path for stroke
-      // same shape logic — simplified: use rect with stroke
-      ctx.stroke();
-
+      ctx.strokeRect(ex, ey, ew, eh);
       ctx.restore();
 
     } else if (el.type === 'background') {
@@ -556,7 +359,8 @@ export async function composeStripImage(
         try {
           const img = await loadImg(el.props.stickerUrl);
           const sc2 = Math.min(ew / img.naturalWidth, eh / img.naturalHeight);
-          const dw = img.naturalWidth * sc2, dh = img.naturalHeight * sc2;
+          const dw = img.naturalWidth * sc2;
+          const dh = img.naturalHeight * sc2;
           ctx.drawImage(img, ex + (ew - dw) / 2, ey + (dh - eh) / 2 + eh - dh, dw, dh);
           ctx.restore();
         } catch { ctx.restore(); }
@@ -584,5 +388,5 @@ export async function composeStripImage(
     }
   }
 
-  return canvas.toDataURL('image/jpeg', 0.85);
+  return canvas.toDataURL('image/jpeg', STRIP_JPEG_QUALITY);
 }

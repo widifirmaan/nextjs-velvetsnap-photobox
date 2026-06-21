@@ -3,7 +3,7 @@
 import { Suspense, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import Webcam from 'react-webcam';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, Monitor, RotateCcw, X } from 'lucide-react';
+import { Camera as CameraIcon, RefreshCcw, Check, Loader2, ArrowLeft, RotateCcw, X } from 'lucide-react';
 import styles from './page.module.css';
 
 interface ISlot {

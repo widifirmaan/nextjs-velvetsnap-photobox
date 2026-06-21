@@ -5,6 +5,7 @@ import { Stage, Layer, Transformer, Rect, Circle, Text, Group, Image as KonvaIma
 import Konva from 'konva';
 import type { IStripElement } from '@/models/Template';
 import { useImage } from './useImage';
+import { createSlotShapeNodes, type SlotShape } from '@/lib/shapes';
 
 const SNAP_THRESHOLD = 6;
 const GUIDE_WIDTH = 1;
@@ -465,115 +466,16 @@ function CanvasElement({
 
 function PhotoSlotShape({ el, common }: { el: IStripElement; common: any }) {
   const p = el.props || {};
-  const shape = p.shape || 'rounded';
+  const shape = (p.shape || 'rounded') as SlotShape;
   const bw = p.borderWidth ?? 2;
   const bc = p.borderColor || '#ffffff';
   const br = p.borderRadius ?? 8;
   const fill = 'rgba(0, 191, 99, 0.12)';
   const slotIndex = (parseInt(el.id.replace('slot-', ''), 10) || 0) + 1;
 
-  const slotNumber = (
-    <Text
-      text={String(slotIndex)}
-      fontSize={Math.min(el.width, el.height) * 0.35}
-      fill="rgba(0, 191, 99, 0.25)"
-      align="center"
-      verticalAlign="middle"
-      width={el.width}
-      height={el.height}
-      x={0}
-      y={0}
-      listening={false}
-    />
-  );
+  const nodes = createSlotShapeNodes(shape, el.width, el.height, fill, bc, bw, br, slotIndex);
 
-  switch (shape) {
-    case 'circle': {
-      const r = Math.min(el.width, el.height) / 2;
-      return (
-        <Group {...common}>
-          <Circle x={el.width / 2} y={el.height / 2} radius={r} fill={fill} stroke={bc} strokeWidth={bw} />
-          {slotNumber}
-        </Group>
-      );
-    }
-    case 'heart': {
-      const cx = el.width / 2;
-      const cy = el.height / 2;
-      const s = Math.min(el.width, el.height) * 0.4;
-      const d = [
-        `M${cx},${cy + s * 0.7}`,
-        `C${cx - s * 0.7},${cy + s * 0.1} ${cx - s},${cy - s * 0.3} ${cx},${cy - s * 0.5}`,
-        `C${cx + s},${cy - s * 0.3} ${cx + s * 0.7},${cy + s * 0.1} ${cx},${cy + s * 0.7}`,
-        'Z',
-      ].join(' ');
-      return (
-        <Group {...common}>
-          <Path data={d} fill={fill} stroke={bc} strokeWidth={bw} />
-          {slotNumber}
-        </Group>
-      );
-    }
-    case 'star': {
-      const cx = el.width / 2;
-      const cy = el.height / 2;
-      const r = Math.min(el.width, el.height) / 2;
-      return (
-        <Group {...common}>
-          <Star x={cx} y={cy} numPoints={5} innerRadius={r * 0.4} outerRadius={r} fill={fill} stroke={bc} strokeWidth={bw} />
-          {slotNumber}
-        </Group>
-      );
-    }
-    case 'diamond':
-      return (
-        <Group {...common}>
-          <Line
-            x={0}
-            y={0}
-            points={[el.width / 2, 0, el.width, el.height / 2, el.width / 2, el.height, 0, el.height / 2]}
-            closed
-            fill={fill}
-            stroke={bc}
-            strokeWidth={bw}
-          />
-          {slotNumber}
-        </Group>
-      );
-    case 'polaroid':
-      return (
-        <Group {...common}>
-          <Rect x={0} y={0} width={el.width} height={el.height} fill={fill} stroke={bc} strokeWidth={bw} cornerRadius={2} />
-          <Rect x={el.width * 0.2} y={el.height - 14} width={el.width * 0.6} height={8} fill={bc} cornerRadius={1} />
-          {slotNumber}
-        </Group>
-      );
-    case 'hexagon': {
-      const hxw = el.width;
-      const hxh = el.height;
-      const hxr = Math.min(hxw, hxh) / 2;
-      const hxcx = hxw / 2;
-      const hxcy = hxh / 2;
-      const hxPoints: number[] = [];
-      for (let i = 0; i < 6; i++) {
-        const angle = (Math.PI / 3) * i - Math.PI / 2;
-        hxPoints.push(hxcx + hxr * Math.cos(angle), hxcy + hxr * Math.sin(angle));
-      }
-      return (
-        <Group {...common}>
-          <Line x={0} y={0} points={hxPoints} closed fill={fill} stroke={bc} strokeWidth={bw} />
-          {slotNumber}
-        </Group>
-      );
-    }
-    default:
-      return (
-        <Group {...common}>
-          <Rect x={0} y={0} width={el.width} height={el.height} fill={fill} stroke={bc} strokeWidth={bw} cornerRadius={br} />
-          {slotNumber}
-        </Group>
-      );
-  }
+  return <Group {...common}>{nodes}</Group>;
 }
 
 function BgElement({ el, common }: { el: IStripElement; common: any }) {

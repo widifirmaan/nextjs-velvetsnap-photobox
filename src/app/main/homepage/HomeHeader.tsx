@@ -2,8 +2,6 @@
 import { MapPin } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 
-const ICON_MAP: Record<string, React.ReactNode> = {};
-
 export default function HomeHeader({ tooltipVisible, setTooltipVisible, branding }: {
   tooltipVisible: boolean; setTooltipVisible: (v: boolean) => void;
   branding: { header: { location: string; navItems: string } };

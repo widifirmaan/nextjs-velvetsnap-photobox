@@ -1,0 +1,118 @@
+export function loadImage(url: string, crossOrigin: string | null = 'anonymous'): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    if (crossOrigin) img.crossOrigin = crossOrigin;
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Failed to load image: ${url.slice(0, 80)}`));
+    img.src = url;
+  });
+}
+
+export function loadImages(urls: string[], crossOrigin = 'anonymous'): Promise<(HTMLImageElement | null)[]> {
+  return Promise.all(
+    urls.map(async (url) => {
+      try { return await loadImage(url, crossOrigin); } catch { return null; }
+    })
+  );
+}
+
+export function resizeImage(
+  dataUrl: string,
+  maxDim: number,
+  quality = 0.75,
+  format = 'image/jpeg',
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    img.onload = () => {
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        const ratio = Math.min(maxDim / width, maxDim / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { resolve(dataUrl); return; }
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL(format, quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+export function flipImageHorizontal(dataUrl: string): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth || img.width;
+      canvas.height = img.naturalHeight || img.height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { resolve(dataUrl); return; }
+      ctx.scale(-1, 1);
+      ctx.drawImage(img, -canvas.width, 0);
+      resolve(canvas.toDataURL('image/jpeg'));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+export interface FitResult {
+  dw: number;
+  dh: number;
+  dx: number;
+  dy: number;
+}
+
+export function calcCoverFit(imgW: number, imgH: number, boxW: number, boxH: number): FitResult {
+  const ia = imgW / imgH;
+  const sa = boxW / boxH;
+  let dw: number, dh: number, dx: number, dy: number;
+  if (ia > sa) {
+    dh = boxH;
+    dw = boxH * ia;
+    dx = boxW / 2 - dw / 2;
+    dy = 0;
+  } else {
+    dw = boxW;
+    dh = boxW / ia;
+    dx = 0;
+    dy = boxH / 2 - dh / 2;
+  }
+  return { dw, dh, dx, dy };
+}
+
+export function calcContainFit(imgW: number, imgH: number, boxW: number, boxH: number): FitResult {
+  const scale = Math.min(boxW / imgW, boxH / imgH);
+  const dw = imgW * scale;
+  const dh = imgH * scale;
+  const dx = (boxW - dw) / 2;
+  const dy = (boxH - dh) / 2;
+  return { dw, dh, dx, dy };
+}
+
+export function applyPhotoAdjustment(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  adj: { scale?: number; x?: number; y?: number },
+): void {
+  const fit = calcCoverFit(img.naturalWidth, img.naturalHeight, w, h);
+  const sc = adj.scale ?? 1;
+  const cx2 = x + fit.dx + fit.dw / 2;
+  const cy2 = y + fit.dy + fit.dh / 2;
+  const dw = fit.dw * sc;
+  const dh = fit.dh * sc;
+  const dx = cx2 - dw / 2 + ((adj.x ?? 0) / 100) * w;
+  const dy = cy2 - dh / 2 + ((adj.y ?? 0) / 100) * h;
+  ctx.drawImage(img, dx, dy, dw, dh);
+}
