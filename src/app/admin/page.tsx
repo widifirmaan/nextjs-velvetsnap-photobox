@@ -10,7 +10,7 @@ import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/compo
 import MobileActions from './MobileActions';
 import styles from './page.module.css';
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 async function getSession() {
   const cookieStore = await cookies();
