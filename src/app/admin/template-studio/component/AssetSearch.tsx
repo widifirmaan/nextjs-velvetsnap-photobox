@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { Search, FolderUp, Palette, X } from 'lucide-react';
 import { useModel } from '@/lib/ModelContext';
 import styles from './AssetSearch.module.css';
@@ -254,7 +255,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
                     onClick={() => handleImageClick(img.url)}
                     title={img.title}
                   >
-                    <img src={img.thumbnail} alt={img.title} loading="lazy" />
+                    <Image src={img.thumbnail} alt={img.title} fill sizes="100px" />
                     {activeUrl?.url === img.url && activeUrl.mode === 'choice' && !isBackground && (
                       <div className={styles.choiceOverlay}>
                         <button className={styles.choiceBtn} onClick={(e) => { e.stopPropagation(); handleFull(img.url); }}>

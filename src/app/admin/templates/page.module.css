@@ -5,15 +5,7 @@
   overflow: hidden;
   background: #fff;
   border: 1px solid var(--mn-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.templateThumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  position: relative;
 }
 
 .statusToggle {

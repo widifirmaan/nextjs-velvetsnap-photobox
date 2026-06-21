@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { Clock, Camera, Loader2, Search, X, Trash2, Printer, ImageIcon, Eye, EyeOff } from 'lucide-react';
 import { AdminPageHeader, AdminBadge, AdminEmptyState, AdminModal, AdminConfirmModal } from '@/app/admin/components';
 import styles from './page.module.css';
@@ -245,7 +246,9 @@ export default function HistoryPage() {
                   }}>
                     <td>
                       {tx.finalImage ? (
-                        <img src={tx.finalImage} alt="" className={styles.tableThumb} />
+                        <div className={styles.tableThumb}>
+                          <Image src={tx.finalImage} alt="" fill sizes="44px" />
+                        </div>
                       ) : (
                         <span className={styles.tableThumbPlaceholder} />
                       )}
@@ -336,7 +339,9 @@ export default function HistoryPage() {
                 <div className={styles.modalGrid}>
                   {selectedTx.finalImage && (
                     <div className={styles.modalGridItem}>
-                      <img src={selectedTx.finalImage} alt="Final" />
+                      <div className={styles.modalImgWrap}>
+                        <Image src={selectedTx.finalImage} alt="Final" fill sizes="(max-width:768px) 100vw, 300px" />
+                      </div>
                       <div className={styles.modalActionRow}>
                         <button className={styles.modalDownloadBtn} onClick={() => {
                           const link = document.createElement('a');

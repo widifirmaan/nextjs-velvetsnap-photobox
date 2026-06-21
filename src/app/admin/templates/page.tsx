@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { AdminPageHeader, AdminTableCard, AdminConfirmModal } from '@/app/admin/components';
 import styles from './page.module.css';
@@ -109,11 +110,9 @@ export default function TemplatesAdmin() {
                   <td>
                     <div className={styles.templateThumb}>
                       {t.templateThumb ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.templateThumb} alt={t.templateName} />
+                        <Image src={t.templateThumb} alt={t.templateName} fill sizes="48px" />
                       ) : t.templateFull ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={t.templateFull} alt={t.templateName} />
+                        <Image src={t.templateFull} alt={t.templateName} fill sizes="48px" />
                       ) : (
                         <span className="text-muted-sm">—</span>
                       )}

@@ -3,11 +3,12 @@
 import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
 import { v4 as uuid } from 'uuid';
 import type { IStripElement } from '@/models/Template';
-import { Search, FolderUp, Plus, Save, Image, Layers, Settings2, X, Loader2 } from 'lucide-react';
+import { Search, FolderUp, Plus, Save, Image as ImageIcon, Layers, Settings2, X, Loader2 } from 'lucide-react';
 import { AdminPageHeader } from '@/app/admin/components';
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import type { EditorCanvasHandle } from './component/EditorCanvas';
 
 const EditorCanvas = dynamic(() => import('./component/EditorCanvas'), {
@@ -581,14 +582,15 @@ function StripsStudioPage() {
       <aside className={styles.asideCard}>
         <h3 className="section-heading">Background</h3>
         <div className={styles.bgPreview}>
-          {(elements.find((el) => el.id === 'bg-image')?.props as any)?.stickerUrl ? (
-            <img
-              src={(elements.find((el) => el.id === 'bg-image')!.props as any).stickerUrl}
-              alt="Background"
-            />
-          ) : (
-            <span className="text-muted-sm">No background</span>
-          )}
+          {(() => {
+            const bg = elements.find((el) => el.id === 'bg-image');
+            const url = bg?.props?.stickerUrl;
+            return url ? (
+              <Image src={url} alt="Background" fill sizes="300px" />
+            ) : (
+              <span className="text-muted-sm">No background</span>
+            );
+          })()}
         </div>
         <div className="flex-row flex-row-sm">
           <button
@@ -817,7 +819,7 @@ function StripsStudioPage() {
           disabled={pageLoading}
           style={{ opacity: pageLoading ? 0.4 : 1 }}
         >
-          <Image size={18} /> Bg
+          <ImageIcon size={18} /> Bg
         </button>
         <button
           onClick={() => setActiveMobilePanel(activeMobilePanel === 'layers' ? null : 'layers')}
