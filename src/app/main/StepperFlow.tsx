@@ -65,13 +65,24 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   useEffect(() => {
     if (cachedTemplates) { setTemplatesLoading(false); return; }
+    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('velvetsnap_templates') : null;
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored) as TemplateData[];
+        setCachedTemplates(parsed);
+        setTemplatesLoading(false);
+        return;
+      } catch {}
+    }
     const accountId = typeof window !== 'undefined' ? localStorage.getItem('velvetsnap_account_id') : null;
     const url = accountId ? `/api/templates/list?accountId=${encodeURIComponent(accountId)}` : '/api/templates/list';
     fetch(url)
       .then((r) => r.json())
       .then((res) => {
         if (!res.success || !res.data?.length) { setTemplatesLoading(false); return; }
-        setCachedTemplates(res.data.filter((t: TemplateData) => t.isActive !== false));
+        const list = res.data.filter((t: TemplateData) => t.isActive !== false);
+        setCachedTemplates(list);
+        sessionStorage.setItem('velvetsnap_templates', JSON.stringify(list));
         setTemplatesLoading(false);
       })
       .catch(() => setTemplatesLoading(false));
