@@ -1,6 +1,7 @@
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
-import { Download, Image } from 'lucide-react';
+import NextImage from 'next/image';
+import { Download, Image as LucideImage } from 'lucide-react';
 import styles from './page.module.css';
 import type { Metadata } from 'next';
 
@@ -47,7 +48,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>Photo Strip</h2>
             <div className={styles.imageWrap}>
-              <img src={tx.finalImage} alt="Photo strip" className={styles.image} />
+              <NextImage src={tx.finalImage} alt="Photo strip" className={styles.image} fill sizes="400px" />
             </div>
             <DownloadBtn url={tx.finalImage} label="Download Strip" />
           </div>
@@ -56,12 +57,12 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
         {tx.captures?.length > 0 && (
           <div className={styles.section}>
             <h2 className={styles.sectionTitle}>
-              <Image size={18} /> Individual Photos ({tx.captures.length})
+              <LucideImage size={18} /> Individual Photos ({tx.captures.length})
             </h2>
             <div className={styles.grid}>
               {tx.captures.map((url: string, i: number) => (
                 <div key={i} className={styles.thumbCard}>
-                  <img src={url} alt={`Photo ${i + 1}`} className={styles.thumb} />
+                  <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="150px" />
                   <DownloadBtn url={url} label={`Photo ${i + 1}`} />
                 </div>
               ))}

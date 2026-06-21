@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 
@@ -21,7 +22,7 @@ export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
       <div className={styles.introContent}>
         <div className={styles.logoWrap}>
           {branding.logo ? (
-            <img src={branding.logo} alt="" className={styles.logo} style={{ width:56, height:56, objectFit:'contain' }} />
+            <Image src={branding.logo} alt="" className={styles.logo} width={56} height={56} style={{ objectFit:'contain' }} />
           ) : (
             <svg width="56" height="56" viewBox="0 0 56 56" fill="none" className={styles.logo}>
               <rect x="4" y="12" width="48" height="34" rx="8" fill="var(--mn-text)" />

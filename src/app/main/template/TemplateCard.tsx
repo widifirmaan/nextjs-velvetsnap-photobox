@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import Image from 'next/image';
 import { SlotDots } from '../StepperBar';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
 import styles from '@/app/main/page.module.css';
@@ -36,7 +37,7 @@ export default function TemplateCard({ template, onSelect, keyedFrameUrl }: Temp
                 <Loader2 className="spin" size={32} />
               </div>
             )}
-            <img src={thumbSrc} alt={template.templateName} loading="lazy" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} />
+            <Image src={thumbSrc} alt={template.templateName} fill sizes="200px" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} />
           </div>
         ) : (
           <Loader2 className="spin" size={32} />

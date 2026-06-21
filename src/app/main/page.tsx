@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import { Camera } from 'lucide-react';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
 import { STORAGE_KEYS, PRELOADER_FADE_MS, PRELOADER_DURATION_MS, PRELOADER_CAROUSEL_READY_DELAY, MORPH_BUTTON_DELAY_MS, MORPH_CLEANUP_MS } from '@/lib/constants';
@@ -223,7 +224,7 @@ export default function Home() {
         <div className={`${styles.preloader} ${preloaderFade ? styles.preloaderHidden : ''}`}>
           <div className={styles.preloaderInner}>
             {branding.logo ? (
-              <img src={branding.logo} alt="" className={styles.preloaderLogo} style={{ width:64, height:64, objectFit:'contain' }} />
+              <Image src={branding.logo} alt="" className={styles.preloaderLogo} width={64} height={64} style={{ objectFit:'contain' }} />
             ) : (
               <svg width="64" height="64" viewBox="0 0 56 56" fill="none" className={styles.preloaderLogo}>
                 <rect x="4" y="12" width="48" height="34" rx="8" fill={branding.system.primaryColor} />
