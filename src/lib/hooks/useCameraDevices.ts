@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type Dispatch, type SetStateAction } from 'react';
 import { STORAGE_KEYS } from '../constants';
 
 export interface UseCameraDevicesReturn {
@@ -9,7 +9,7 @@ export interface UseCameraDevicesReturn {
   setCameraType: (t: 'webcam' | 'dslr') => void;
   availableCams: MediaDeviceInfo[];
   showCamMenu: boolean;
-  setShowCamMenu: (v: boolean) => void;
+  setShowCamMenu: Dispatch<SetStateAction<boolean>>;
   camMenuRef: React.RefObject<HTMLDivElement | null>;
   isFrontCamera: boolean;
   handleSwitchCamera: (camId: string) => void;

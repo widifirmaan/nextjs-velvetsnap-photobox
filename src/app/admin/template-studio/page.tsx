@@ -7,8 +7,13 @@ import { Search, FolderUp, Plus, Save, Image, Layers, Settings2, X, Loader2 } fr
 import { AdminPageHeader } from '@/app/admin/components';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import EditorCanvas from './component/EditorCanvas';
+import dynamic from 'next/dynamic';
 import type { EditorCanvasHandle } from './component/EditorCanvas';
+
+const EditorCanvas = dynamic(() => import('./component/EditorCanvas'), {
+  ssr: false,
+  loading: () => <div className={styles.canvasLoading}><Loader2 className="spin" size={40} /></div>,
+});
 import ElementToolbar from './component/ElementToolbar';
 import LayerPanel from './component/LayerPanel';
 import PropertiesPanel from './component/PropertiesPanel';

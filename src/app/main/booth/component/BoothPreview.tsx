@@ -1,8 +1,7 @@
 'use client';
 
-import { ISlot } from '@/lib/canvas-utils';
 import { X, Check, Upload, Loader2 } from 'lucide-react';
-import { TemplateData } from '../../types';
+import { TemplateData, type ISlot } from '../../types';
 import styles from '@/app/main/page.module.css';
 import { useRef } from 'react';
 

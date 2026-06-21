@@ -65,9 +65,14 @@ export const SAMPLE_IMAGES = [
 ];
 
 export const TEMPLATE_CONFIGS: Record<string, { name: string; slots: number }> = {
+  // StepperFlow keys
   'newspaper': { name: 'Newspaper', slots: 4 },
   'classic': { name: 'Classic', slots: 3 },
   'polaroid': { name: 'Polaroid', slots: 2 },
+  // Standalone fallback keys
+  't1': { name: 'Classic Strips', slots: 3 },
+  't2': { name: 'Retro Film', slots: 4 },
+  't3': { name: 'Newspaper', slots: 1 },
 };
 
 export const STEP_LABELS = ['Template', 'Photo', 'Edit', 'Pay', 'Cetak'];

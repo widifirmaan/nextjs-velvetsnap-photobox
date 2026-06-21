@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { Download, Printer, Home as HomeIcon, Smartphone } from 'lucide-react';
-import QRCode from 'qrcode';
 import styles from '@/app/main/page.module.css';
 
 export default function ResultActions({
@@ -13,13 +12,14 @@ export default function ResultActions({
   const downloadUrl = txId ? `${window.location.origin}/download/${txId}` : null;
 
   useEffect(() => {
-    if (qrRef.current && downloadUrl) {
-      QRCode.toCanvas(qrRef.current, downloadUrl, {
+    if (!qrRef.current || !downloadUrl) return;
+    import('qrcode').then((QRCode) => {
+      QRCode.toCanvas(qrRef.current!, downloadUrl, {
         width: 140,
         margin: 2,
         color: { dark: '#1d1d1f', light: '#ffffff' },
       });
-    }
+    });
   }, [downloadUrl]);
 
   const handleDownload = () => {
