@@ -78,14 +78,13 @@ export default function BoothPreview({
                 <Loader2 className="spin" size={36} />
               </div>
             )}
-            {keyedFrameImage && <img src={keyedFrameImage} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} />}
             {templateData.templateData.slotsLayout.map((slot: ISlot, idx: number) => {
               const src = captures[idx];
               return (
                 <div key={idx} style={{
                   position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`,
                   width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden',
-                  background: src ? 'none' : 'rgba(0,0,0,0.06)', borderRadius: '2px', zIndex: 1,
+                  background: src ? 'none' : 'rgba(0,0,0,0.06)', borderRadius: '2px',
                 }}>
                   {src ? (
                     <>
@@ -107,6 +106,7 @@ export default function BoothPreview({
                 </div>
               );
             })}
+            {keyedFrameImage && <img src={keyedFrameImage} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />}
           </div>
           {filledCount === slotsCount && (
             <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Edit</button>
