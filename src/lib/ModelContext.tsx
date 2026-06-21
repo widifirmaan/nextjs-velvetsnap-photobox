@@ -20,8 +20,9 @@ const ModelContext = createContext<ModelContextValue>({
   errorMessage: '',
 });
 
-const STORAGE_KEY = 'imgly_model_ready';
-const RETRY_KEY = 'imgly_model_retry';
+import { STORAGE_KEYS } from './constants';
+const STORAGE_KEY = STORAGE_KEYS.IMGLY_MODEL_READY;
+const RETRY_KEY = STORAGE_KEYS.IMGLY_MODEL_RETRY;
 
 async function clearModelCache() {
   try {

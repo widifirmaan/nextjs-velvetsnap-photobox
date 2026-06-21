@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import styles from './page.module.css';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
@@ -14,7 +15,7 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const t = sessionStorage.getItem('admin_session_token');
+    const t = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
     fetch('/api/admin/session', { headers: t ? { 'Authorization': 'Bearer ' + t } : {} })
       .then((r) => { if (r.status === 200) router.replace('/admin'); })
       .catch(() => {})
@@ -39,15 +40,15 @@ export default function AdminLoginPage() {
       }
       const data = await res.json();
       if (data.token) {
-        sessionStorage.setItem('admin_session_token', data.token);
-        sessionStorage.setItem('admin_is_root', data.isRoot ? '1' : '0');
-        if (data.accountId) sessionStorage.setItem('admin_account_id', data.accountId);
-        if (data.username) sessionStorage.setItem('admin_username', data.username);
+        sessionStorage.setItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN, data.token);
+        sessionStorage.setItem(STORAGE_KEYS.ADMIN_IS_ROOT, data.isRoot ? '1' : '0');
+        if (data.accountId) sessionStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, data.accountId);
+        if (data.username) sessionStorage.setItem(STORAGE_KEYS.ADMIN_USERNAME, data.username);
         // Sync to localStorage for kiosk pages
         if (data.accountId && !data.isRoot) {
-          localStorage.setItem('velvetsnap_account_id', data.accountId);
+          localStorage.setItem(STORAGE_KEYS.ACCOUNT, data.accountId);
         } else {
-          localStorage.removeItem('velvetsnap_account_id');
+          localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
         }
       }
       router.replace('/admin');

@@ -1,6 +1,7 @@
 'use client';
 
 import { useModel } from '@/lib/ModelContext';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 const btn = {
   padding: '8px 20px',
@@ -30,8 +31,8 @@ export default function DebugModelPage() {
         <h3>localStorage</h3>
         <pre style={{ background: '#f5f5f5', padding: 12, borderRadius: 6 }}>
 {JSON.stringify({
-  imgly_model_ready: typeof window !== 'undefined' ? localStorage.getItem('imgly_model_ready') : null,
-  imgly_model_retry: typeof window !== 'undefined' ? localStorage.getItem('imgly_model_retry') : null,
+  imgly_model_ready: typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.IMGLY_MODEL_READY) : null,
+  imgly_model_retry: typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.IMGLY_MODEL_RETRY) : null,
 }, null, 2)}
         </pre>
       </section>
@@ -64,8 +65,8 @@ export default function DebugModelPage() {
                 }
               }
             }
-            localStorage.removeItem('imgly_model_ready');
-            localStorage.removeItem('imgly_model_retry');
+            localStorage.removeItem(STORAGE_KEYS.IMGLY_MODEL_READY);
+            localStorage.removeItem(STORAGE_KEYS.IMGLY_MODEL_RETRY);
             window.location.reload();
           }}
         >
@@ -74,7 +75,7 @@ export default function DebugModelPage() {
         <button
           style={btn}
           onClick={() => {
-            localStorage.setItem('imgly_model_ready', 'true');
+            localStorage.setItem(STORAGE_KEYS.IMGLY_MODEL_READY, 'true');
             window.location.reload();
           }}
         >

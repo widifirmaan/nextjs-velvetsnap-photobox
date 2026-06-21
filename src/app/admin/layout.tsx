@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Layers, Server, Clock, Film, Loader2, LogOut, Settings2, User, Users } from 'lucide-react';
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -18,20 +19,19 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
-    const token = sessionStorage.getItem('admin_session_token');
+    const token = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
     if (token) {
       setAuthed(true);
-      const savedRoot = sessionStorage.getItem('admin_is_root');
-      const savedUser = sessionStorage.getItem('admin_username');
+      const savedRoot = sessionStorage.getItem(STORAGE_KEYS.ADMIN_IS_ROOT);
+      const savedUser = sessionStorage.getItem(STORAGE_KEYS.ADMIN_USERNAME);
       if (savedRoot !== null) setIsRoot(savedRoot === '1');
       if (savedUser) setUsername(savedUser);
       fetch('/api/admin/session', { headers: { Authorization: 'Bearer ' + token } })
         .then((r) => {
           if (r.ok) return r.json();
-          sessionStorage.removeItem('admin_session_token');
-          sessionStorage.removeItem('admin_is_root');
-          sessionStorage.removeItem('admin_account_id');
-          sessionStorage.removeItem('admin_username');
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_IS_ROOT);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_USERNAME);
           router.replace('/admin/login');
           return null;
         })
@@ -39,22 +39,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           if (data) {
             setIsRoot(data.isRoot);
             setUsername(data.username || '');
-            sessionStorage.setItem('admin_is_root', data.isRoot ? '1' : '0');
-            if (data.accountId) sessionStorage.setItem('admin_account_id', data.accountId);
-            if (data.username) sessionStorage.setItem('admin_username', data.username);
+            sessionStorage.setItem(STORAGE_KEYS.ADMIN_IS_ROOT, data.isRoot ? '1' : '0');
+            if (data.accountId) sessionStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, data.accountId);
+            if (data.username) sessionStorage.setItem(STORAGE_KEYS.ADMIN_USERNAME, data.username);
             // Sync to localStorage for kiosk pages
             if (data.accountId && !data.isRoot) {
-              localStorage.setItem('velvetsnap_account_id', data.accountId);
+              localStorage.setItem(STORAGE_KEYS.ACCOUNT, data.accountId);
             } else {
-              localStorage.removeItem('velvetsnap_account_id');
+              localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
             }
           }
         })
         .catch(() => {
-          sessionStorage.removeItem('admin_session_token');
-          sessionStorage.removeItem('admin_is_root');
-          sessionStorage.removeItem('admin_account_id');
-          sessionStorage.removeItem('admin_username');
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_IS_ROOT);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_USERNAME);
           router.replace('/admin/login');
         });
     } else {
@@ -130,11 +129,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [isActive, curtainPhase]);
 
   const handleLogout = () => {
-    sessionStorage.removeItem('admin_session_token');
-    sessionStorage.removeItem('admin_is_root');
-    sessionStorage.removeItem('admin_account_id');
-    sessionStorage.removeItem('admin_username');
-    localStorage.removeItem('velvetsnap_account_id');
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_IS_ROOT);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_USERNAME);
+    localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
     fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
   };
 

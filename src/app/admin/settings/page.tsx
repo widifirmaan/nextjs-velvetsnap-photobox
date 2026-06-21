@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, Loader2, Image, Timer, Lock, Check, MapPin, Plus, Trash2, CheckCircle, FileText, Upload, Layout } from 'lucide-react';
 import { adminFetch } from '@/lib/admin-fetch';
+import { STORAGE_KEYS } from '@/lib/constants';
 import { AdminConfirmModal, AdminModal, AdminPageHeader } from '@/app/admin/components';
 import styles from './page.module.css';
 
@@ -109,7 +110,7 @@ export default function SettingsPage() {
   };
 
   useEffect(() => {
-    const root = sessionStorage.getItem('admin_is_root');
+    const root = sessionStorage.getItem(STORAGE_KEYS.ADMIN_IS_ROOT);
     setIsRoot(root === '1');
     setLoading(true);
     adminFetch('/api/settings')

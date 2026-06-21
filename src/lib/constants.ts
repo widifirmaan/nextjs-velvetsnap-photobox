@@ -54,6 +54,11 @@ export const STORAGE_KEYS = {
   DEVICE_SETTINGS: 'velvetsnap_device_settings',
   SKIP_PRELOADER: 'skipPreloader',
   ADMIN_SESSION: 'admin_account_id',
+  ADMIN_SESSION_TOKEN: 'admin_session_token',
+  ADMIN_IS_ROOT: 'admin_is_root',
+  ADMIN_USERNAME: 'admin_username',
+  IMGLY_MODEL_READY: 'imgly_model_ready',
+  IMGLY_MODEL_RETRY: 'imgly_model_retry',
 } as const;
 
 // Legacy individual exports (use STORAGE_KEYS instead)

@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LogOut, ExternalLink } from 'lucide-react';
+import { STORAGE_KEYS } from '@/lib/constants';
 import styles from './page.module.css';
 
 export default function MobileActions() {
@@ -16,11 +17,11 @@ export default function MobileActions() {
       </Link>
       <button
         onClick={() => {
-          sessionStorage.removeItem('admin_session_token');
-          sessionStorage.removeItem('admin_is_root');
-          sessionStorage.removeItem('admin_account_id');
-          sessionStorage.removeItem('admin_username');
-          localStorage.removeItem('velvetsnap_account_id');
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_IS_ROOT);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+          sessionStorage.removeItem(STORAGE_KEYS.ADMIN_USERNAME);
+          localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
           fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
         }}
         className={`card card-sm ${styles.mobileActionBtn}`}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Camera, Save, Monitor, Printer, RefreshCw, CheckCircle, Usb } from 'lucide-react';
 import AdminPageHeader from '@/app/admin/components/AdminPageHeader';
 import styles from './page.module.css';
+import { STORAGE_KEYS } from '@/lib/constants';
 
 interface DeviceSettings {
   cameraType: 'webcam' | 'dslr';
@@ -14,8 +15,6 @@ interface DeviceSettings {
   printOrientation: 'portrait' | 'landscape';
   printDpi: number;
 }
-
-const LS_KEY = 'velvetsnap_device_settings';
 
 const DEFAULT_SETTINGS: DeviceSettings = {
   cameraType: 'webcam',
@@ -29,14 +28,14 @@ const DEFAULT_SETTINGS: DeviceSettings = {
 
 function loadSettings(): DeviceSettings {
   try {
-    const raw = localStorage.getItem(LS_KEY);
+    const raw = localStorage.getItem(STORAGE_KEYS.DEVICE_SETTINGS);
     if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
   } catch {}
   return { ...DEFAULT_SETTINGS };
 }
 
 function saveSettings(s: DeviceSettings) {
-  localStorage.setItem(LS_KEY, JSON.stringify(s));
+  localStorage.setItem(STORAGE_KEYS.DEVICE_SETTINGS, JSON.stringify(s));
 }
 
 export default function DevicesPage() {

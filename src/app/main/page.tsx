@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
+import { STORAGE_KEYS, PRELOADER_FADE_MS, PRELOADER_DURATION_MS, PRELOADER_CAROUSEL_READY_DELAY, MORPH_BUTTON_DELAY_MS, MORPH_CLEANUP_MS } from '@/lib/constants';
 import styles from './page.module.css';
 import type { StripResult } from './types';
 import HomePage from './homepage/HomePage';
@@ -47,7 +48,7 @@ export default function Home() {
 
   const getAccountParam = () => {
     if (typeof window === 'undefined') return '';
-    const id = localStorage.getItem('velvetsnap_account_id');
+    const id = localStorage.getItem(STORAGE_KEYS.ACCOUNT);
     return id ? `?accountId=${encodeURIComponent(id)}` : '';
   };
 
@@ -103,16 +104,16 @@ export default function Home() {
 
   useEffect(() => {
     const resolveAccountId = async (): Promise<string | null> => {
-      const localId = localStorage.getItem('velvetsnap_account_id');
+      const localId = localStorage.getItem(STORAGE_KEYS.ACCOUNT);
       if (localId) return localId;
-      const ssId = sessionStorage.getItem('admin_account_id');
+      const ssId = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION);
       if (ssId) return ssId;
       try {
         const r = await fetch('/api/admin/session');
         if (r.ok) {
           const data = await r.json();
           if (!data.isRoot && data.accountId) {
-            localStorage.setItem('velvetsnap_account_id', data.accountId);
+            localStorage.setItem(STORAGE_KEYS.ACCOUNT, data.accountId);
             return data.accountId;
           }
         }
@@ -139,7 +140,7 @@ export default function Home() {
           if (res.success) {
             setTmplCount(res.data.length);
             const list = res.data.filter((t: any) => t.isActive !== false);
-            sessionStorage.setItem('velvetsnap_templates', JSON.stringify(list));
+            sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
             // Preload thumbnail images in background
             list.forEach((t: any) => {
               const src = t.templateFull ? getOptimizedUrl(t.templateFull, 200, 600) : t.templateThumb;
@@ -165,15 +166,15 @@ export default function Home() {
 
   useEffect(() => {
     if (!branding.system.showPreloader) { setShowPreloader(false); return; }
-    const skipPreloader = sessionStorage.getItem('skipPreloader');
+    const skipPreloader = sessionStorage.getItem(STORAGE_KEYS.SKIP_PRELOADER);
     if (skipPreloader) {
       setShowPreloader(false);
-      sessionStorage.removeItem('skipPreloader');
+      sessionStorage.removeItem(STORAGE_KEYS.SKIP_PRELOADER);
     } else {
       const timer = setTimeout(() => {
         setPreloaderFade(true);
-        setTimeout(() => setShowPreloader(false), 500);
-      }, 4000);
+        setTimeout(() => setShowPreloader(false), PRELOADER_FADE_MS);
+      }, PRELOADER_DURATION_MS);
       return () => clearTimeout(timer);
     }
   }, [branding.system.showPreloader]);
@@ -182,8 +183,8 @@ export default function Home() {
     if (!carouselReady) return;
     const t = setTimeout(() => {
       setPreloaderFade(true);
-      setTimeout(() => setShowPreloader(false), 500);
-    }, 300);
+      setTimeout(() => setShowPreloader(false), PRELOADER_FADE_MS);
+    }, PRELOADER_CAROUSEL_READY_DELAY);
     return () => clearTimeout(t);
   }, [carouselReady]);
 
@@ -207,8 +208,8 @@ export default function Home() {
           setClipStage('expand');
         });
       });
-    }, 900);
-    setTimeout(() => { setBtnMorph(null); setClipStage(null); }, 2000);
+    }, MORPH_BUTTON_DELAY_MS);
+    setTimeout(() => { setBtnMorph(null); setClipStage(null); }, MORPH_CLEANUP_MS);
   }, []);
 
   const clipStyle = morphOrigin && clipStage ? {

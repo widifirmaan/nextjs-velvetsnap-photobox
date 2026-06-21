@@ -4,6 +4,7 @@ import { Timer } from 'lucide-react';
 import styles from '@/app/main/page.module.css';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '@/lib/canvas-utils';
 import { getHighResUrl, getFullQualityUrl } from '@/lib/cloudinary-url';
+import { STORAGE_KEYS, FRAME_RENDER_MAX_W } from '@/lib/constants';
 import { TEMPLATE_CONFIGS, type IStripElement, type TemplateData, type PhotoAdjust } from './types';
 import TemplateStep from './template/TemplateStep';
 import BoothStep from './booth/component/BoothStep';
@@ -65,7 +66,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   useEffect(() => {
     if (cachedTemplates) { setTemplatesLoading(false); return; }
-    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('velvetsnap_templates') : null;
+    const stored = typeof window !== 'undefined' ? sessionStorage.getItem(STORAGE_KEYS.TEMPLATES) : null;
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as TemplateData[];
@@ -74,7 +75,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         return;
       } catch {}
     }
-    const accountId = typeof window !== 'undefined' ? localStorage.getItem('velvetsnap_account_id') : null;
+    const accountId = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.ACCOUNT) : null;
     const url = accountId ? `/api/templates/list?accountId=${encodeURIComponent(accountId)}` : '/api/templates/list';
     fetch(url)
       .then((r) => r.json())
@@ -82,7 +83,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         if (!res.success || !res.data?.length) { setTemplatesLoading(false); return; }
         const list = res.data.filter((t: TemplateData) => t.isActive !== false);
         setCachedTemplates(list);
-        sessionStorage.setItem('velvetsnap_templates', JSON.stringify(list));
+        sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
         setTemplatesLoading(false);
       })
       .catch(() => setTemplatesLoading(false));
@@ -91,7 +92,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   const renderFrameFromElements = useCallback(async (elements: IStripElement[], cw: number, ch: number, bgColor: string) => {
     try {
       const frameDataUrl = await renderStripFrame(elements, cw, ch, bgColor, 720);
-      const bgFrameDataUrl = await removeGreenScreen(frameDataUrl, 720);
+      const bgFrameDataUrl = await removeGreenScreen(frameDataUrl, FRAME_RENDER_MAX_W);
       const img = new window.Image();
       img.onload = () => setFrameRatio(img.naturalWidth / img.naturalHeight);
       img.src = bgFrameDataUrl;
