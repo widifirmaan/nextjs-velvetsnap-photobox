@@ -20,6 +20,7 @@ import LayerPanel from './component/LayerPanel';
 import PropertiesPanel from './component/PropertiesPanel';
 import AssetSearch from './component/AssetSearch';
 import { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT } from '@/lib/constants';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from './page.module.css';
 
 const DEFAULT_CANVAS_W = DEFAULT_CANVAS_WIDTH;
@@ -346,7 +347,7 @@ function StripsStudioPage() {
   const uploadBase64Client = async (dataUri: string, folder: string, publicId?: string): Promise<string> => {
     const body: Record<string, any> = { dataUri, folder };
     if (publicId) body.publicId = publicId;
-    const res = await fetch('/api/upload', {
+    const res = await adminFetch('/api/upload', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -444,14 +445,14 @@ function StripsStudioPage() {
       };
       let res;
       if (editingTemplateId) {
-        res = await fetch(`/api/templates/${editingTemplateId}`, {
+        res = await adminFetch(`/api/templates/${editingTemplateId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
       } else {
         body.templateId = folderId;
-        res = await fetch('/api/templates', {
+        res = await adminFetch('/api/templates', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
