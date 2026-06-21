@@ -15,25 +15,69 @@
   background: var(--clay-bg);
 }
 
-.navLoader {
+.curtainOverlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  pointer-events: none;
 }
 
-.navLoaderInner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  color: var(--text-secondary);
-  font-size: 14px;
-  font-weight: 500;
+.curtainPanel {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 50%;
+  background: #fff;
+  will-change: transform;
+}
+
+.curtainLeft {
+  left: 0;
+  transform: translateX(-100%);
+  box-shadow: 3px 0 10px rgba(0,0,0,0.04);
+}
+
+.curtainRight {
+  right: 0;
+  transform: translateX(100%);
+  box-shadow: -3px 0 10px rgba(0,0,0,0.04);
+}
+
+.curtainLeft.closing {
+  animation: curtainCloseLeft 0.4s ease forwards;
+}
+
+.curtainRight.closing {
+  animation: curtainCloseRight 0.4s ease forwards;
+}
+
+.curtainLeft.opening {
+  animation: curtainOpenLeft 0.4s ease forwards;
+}
+
+.curtainRight.opening {
+  animation: curtainOpenRight 0.4s ease forwards;
+}
+
+@keyframes curtainCloseLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes curtainCloseRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes curtainOpenLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes curtainOpenRight {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
 }
 
 .hamburger {

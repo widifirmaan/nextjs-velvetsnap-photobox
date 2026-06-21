@@ -2,6 +2,42 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import { getSession } from '@/lib/require-admin';
+import { v4 as uuidv4 } from 'uuid';
+
+export async function POST(req: Request) {
+  try {
+    await connectDB();
+    const body = await req.json();
+    const { sessionId, templateId, price, status, captures, finalImage, orderId, qrCodeUrl } = body;
+
+    if (!sessionId) {
+      return NextResponse.json({ success: false, error: 'sessionId is required' }, { status: 400 });
+    }
+
+    const txData: any = {
+      sessionId: sessionId || uuidv4(),
+      templateId: templateId || 't1',
+      price: price || 35000,
+      status: status || 'PAID',
+      captures: captures || [],
+      finalImage: finalImage || '',
+      orderId: orderId || null,
+      qrCodeUrl: qrCodeUrl || null,
+    };
+
+    const existing = await (Transaction as any).findOne({ sessionId });
+    let tx;
+    if (existing) {
+      tx = await (Transaction as any).findOneAndUpdate({ sessionId }, txData, { new: true }).lean();
+    } else {
+      tx = await (Transaction as any).create(txData);
+    }
+
+    return NextResponse.json({ success: true, data: tx }, { status: existing ? 200 : 201 });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+  }
+}
 
 export async function GET(req: Request) {
   try {

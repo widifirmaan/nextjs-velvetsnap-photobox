@@ -10,10 +10,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
+  const [curtainPhase, setCurtainPhase] = useState<'idle' | 'closing' | 'opening'>('idle');
   const [authed, setAuthed] = useState(false);
   const [isRoot, setIsRoot] = useState(true);
   const [username, setUsername] = useState('');
-  const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const targetRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (pathname === '/admin/login') { setAuthed(true); return; }
@@ -74,12 +75,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       .catch(() => {});
   }, []);
 
-  const clearNav = useCallback(() => {
-    setNavigating(false);
-    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
-  }, []);
-
-  useEffect(() => { clearNav(); }, [pathname, clearNav]);
+  useEffect(() => {
+    if (curtainPhase === 'closing') {
+      const t = setTimeout(() => {
+        const href = targetRef.current;
+        if (href) {
+          targetRef.current = null;
+          router.push(href);
+          setCurtainPhase('opening');
+        }
+      }, 400);
+      return () => clearTimeout(t);
+    }
+    if (curtainPhase === 'opening') {
+      const t = setTimeout(() => {
+        setCurtainPhase('idle');
+        setNavigating(false);
+      }, 400);
+      return () => clearTimeout(t);
+    }
+  }, [curtainPhase, router]);
 
   const rootNavLinks = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
@@ -105,12 +120,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return pathname === href || pathname.startsWith(href + '/');
   };
 
-  const handleNavClick = useCallback((href: string) => {
+  const handleNavClick = useCallback((e: React.MouseEvent, href: string) => {
+    e.preventDefault();
+    if (curtainPhase !== 'idle') return;
     if (isActive(href)) return;
+    targetRef.current = href;
+    setCurtainPhase('closing');
     setNavigating(true);
-    if (navTimeoutRef.current) clearTimeout(navTimeoutRef.current);
-    navTimeoutRef.current = setTimeout(() => setNavigating(false), 5000);
-  }, [isActive]);
+  }, [isActive, curtainPhase]);
 
   const handleLogout = () => {
     sessionStorage.removeItem('admin_session_token');
@@ -127,7 +144,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <Link
         key={link.href}
         href={link.href}
-        onClick={() => handleNavClick(link.href)}
+        onClick={(e) => handleNavClick(e, link.href)}
         className={`${styles.navLink} ${isActive(link.href) ? styles.navLinkActive : ''}`}
       >
         <Icon size={20} /> {link.label}
@@ -141,7 +158,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <Link
         key={link.href}
         href={link.href}
-        onClick={() => handleNavClick(link.href)}
+        onClick={(e) => handleNavClick(e, link.href)}
         className={`${styles.bottomNavItem} ${isActive(link.href) ? styles.bottomNavItemActive : ''}`}
         title={link.label}
       >
@@ -162,11 +179,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className={styles.adminLayout}>
       {navigating && (
-        <div className={styles.navLoader}>
-          <div className={styles.navLoaderInner}>
-            <Loader2 className="spin" size={32} />
-            <span>Loading...</span>
-          </div>
+        <div className={styles.curtainOverlay}>
+          <div className={`${styles.curtainPanel} ${styles.curtainLeft} ${curtainPhase === 'closing' ? styles.closing : curtainPhase === 'opening' ? styles.opening : ''}`} />
+          <div className={`${styles.curtainPanel} ${styles.curtainRight} ${curtainPhase === 'closing' ? styles.closing : curtainPhase === 'opening' ? styles.opening : ''}`} />
         </div>
       )}
 
