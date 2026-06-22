@@ -492,6 +492,11 @@ function StripsStudioPage() {
       imgEl.onload = () => {
         const iw = imgEl.naturalWidth;
         const ih = imgEl.naturalHeight;
+        const scale = Math.max(canvasSize.w / iw, canvasSize.h / ih);
+        const dw = Math.round(iw * scale);
+        const dh = Math.round(ih * scale);
+        const cx = Math.round((canvasSize.w - dw) / 2);
+        const cy = Math.round((canvasSize.h - dh) / 2);
         const existing = elements.find((el) => el.id === id);
         if (existing) {
           setElements((prev) =>
@@ -499,8 +504,8 @@ function StripsStudioPage() {
               el.id === id ? {
                 ...el,
                 zIndex: -1,
-                width: iw, height: ih,
-                x: -Math.round(iw / 2), y: -Math.round(ih / 2),
+                width: dw, height: dh,
+                x: cx, y: cy,
                 props: { ...el.props, stickerUrl: url, searchBg: true },
               } : el
             )
@@ -508,8 +513,8 @@ function StripsStudioPage() {
         } else {
           setElements((prev) => [...prev, {
             id, type: 'background',
-            x: -Math.round(iw / 2), y: -Math.round(ih / 2),
-            width: iw, height: ih,
+            x: cx, y: cy,
+            width: dw, height: dh,
             rotation: 0,
             zIndex: -1,
             visible: true,
