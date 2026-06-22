@@ -83,7 +83,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         if (res.success && res.data?.length) {
           const list = res.data.filter((t: TemplateData) => t.isActive !== false);
           setCachedTemplates(list);
-          try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch {}
+          try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch (e) { console.error('Failed to cache templates in sessionStorage', e); }
         }
         setTemplatesLoading(false);
       }).catch(() => setTemplatesLoading(false));
@@ -97,7 +97,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         if (!res.success || !res.data?.length) { setTemplatesLoading(false); return; }
         const list = res.data.filter((t: TemplateData) => t.isActive !== false);
         setCachedTemplates(list);
-        try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch {}
+        try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch (e) { console.error('Failed to cache templates in sessionStorage', e); }
         setTemplatesLoading(false);
       })
       .catch((e) => { console.error('Failed to fetch templates', e); setTemplatesLoading(false); });

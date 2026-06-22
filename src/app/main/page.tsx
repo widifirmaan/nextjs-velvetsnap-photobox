@@ -147,7 +147,7 @@ export default function Home() {
       if (res.success) {
         setTmplCount(res.data.length);
         const list = (res.data as TemplateData[]).filter((t) => t.isActive !== false);
-        try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch {}
+        try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch (e) { console.error('Failed to cache templates in sessionStorage', e); }
         list.forEach((t) => {
           const src = t.templateFull ? getOptimizedUrl(t.templateFull, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H) : t.templateThumb;
           if (src) { const img = new window.Image(); img.src = src; }
