@@ -193,14 +193,6 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     }
   }, [selectedId, elements]);
 
-  const clampBg = useCallback((el: IStripElement, newX: number, newY: number) => {
-    if (el.type !== 'background') return { x: newX, y: newY };
-    return {
-      x: Math.min(0, Math.max(newX, canvasSize.w - el.width)),
-      y: Math.min(0, Math.max(newY, canvasSize.h - el.height)),
-    };
-  }, [canvasSize]);
-
   const sorted = elements
     .filter((el) => el.visible)
     .sort((a, b) => a.zIndex - b.zIndex);
@@ -209,30 +201,15 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
 
   const handleDragEnd = useCallback((id: string, e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target;
-    const el = elements.find(el => el.id === id);
-    if (el?.type === 'background') {
-      const { x, y } = clampBg(el, node.x(), node.y());
-      node.x(x); node.y(y);
-      onUpdate(id, { x, y });
-    } else {
-      onUpdate(id, { x: node.x(), y: node.y() });
-    }
+    onUpdate(id, { x: node.x(), y: node.y() });
     setGuides([]);
     guideLayerRef.current?.batchDraw();
-  }, [onUpdate, elements, clampBg]);
+  }, [onUpdate]);
 
   const handleDragMove = useCallback((id: string, e: Konva.KonvaEventObject<DragEvent>) => {
     const node = e.target;
     const el = elements.find(el => el.id === id);
     if (!el) return;
-
-    if (el.type === 'background') {
-      const { x, y } = clampBg(el, node.x(), node.y());
-      node.x(x); node.y(y);
-      setGuides([]);
-      guideLayerRef.current?.batchDraw();
-      return;
-    }
 
     const b: Bounds = {
       left: node.x(),
@@ -248,7 +225,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     if (snapY !== null) node.y(snapY);
     setGuides(g);
     guideLayerRef.current?.batchDraw();
-  }, [elements, others, canvasSize, clampBg]);
+  }, [elements, others, canvasSize]);
 
   const handleTransformMove = useCallback((_e: Konva.KonvaEventObject<Event>) => {
     if (!selectedId) return;
@@ -286,13 +263,11 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     if (el?.type === 'background') {
       w = Math.max(w, canvasSize.w);
       h = Math.max(h, canvasSize.h);
-      const clamped = clampBg({ ...el, width: w, height: h }, x, y);
-      x = clamped.x; y = clamped.y;
     }
     onUpdate(id, { x, y, width: w, height: h, rotation: node.rotation() });
     setGuides([]);
     guideLayerRef.current?.batchDraw();
-  }, [onUpdate, canvasSize, elements, clampBg]);
+  }, [onUpdate, canvasSize, elements]);
 
   return (
     <div ref={containerRef}>
