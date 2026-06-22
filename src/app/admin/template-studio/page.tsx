@@ -488,10 +488,10 @@ function StripsStudioPage() {
     if (bgTargetRef.current) {
       bgTargetRef.current = false;
       const id = 'bg-image';
-      const img = new Image();
-      img.onload = () => {
-        const iw = img.naturalWidth;
-        const ih = img.naturalHeight;
+      const imgEl = document.createElement('img');
+      imgEl.onload = () => {
+        const iw = imgEl.naturalWidth;
+        const ih = imgEl.naturalHeight;
         const existing = elements.find((el) => el.id === id);
         if (existing) {
           setElements((prev) =>
@@ -519,7 +519,7 @@ function StripsStudioPage() {
         stickerTargetRef.current = null;
         setStickerTargetId(null);
       };
-      img.src = url;
+      imgEl.src = url;
       return;
     }
     const target = stickerTargetRef.current;
