@@ -1,5 +1,6 @@
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
+import { isValidObjectId } from 'mongoose';
 import NextImage from 'next/image';
 import { Download, Image as LucideImage } from 'lucide-react';
 import styles from './page.module.css';
@@ -11,7 +12,16 @@ export const metadata: Metadata = {
 
 async function getTransaction(id: string) {
   await connectDB();
-  const tx = await Transaction.findById(id).lean();
+  let tx;
+  if (isValidObjectId(id)) {
+    tx = await Transaction.findById(id).lean();
+  }
+  if (!tx) {
+    tx = await Transaction.findOne({ orderId: id }).lean();
+  }
+  if (!tx) {
+    tx = await Transaction.findOne({ sessionId: id }).lean();
+  }
   return tx ? JSON.parse(JSON.stringify(tx)) : null;
 }
 
