@@ -76,6 +76,19 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         return;
       } catch {}
     }
+    // Await homepage preload promise if available (avoid duplicate fetch)
+    const globalPromise = typeof window !== 'undefined' ? (window as any).__templatePromise : null;
+    if (globalPromise) {
+      globalPromise.then((res: any) => {
+        if (res.success && res.data?.length) {
+          const list = res.data.filter((t: TemplateData) => t.isActive !== false);
+          setCachedTemplates(list);
+          sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
+        }
+        setTemplatesLoading(false);
+      }).catch(() => setTemplatesLoading(false));
+      return;
+    }
     const accountId = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.ACCOUNT) : null;
     const url = accountId ? `/api/templates/list?accountId=${encodeURIComponent(accountId)}` : '/api/templates/list';
     fetch(url)

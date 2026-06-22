@@ -10,7 +10,9 @@ export async function GET(req: Request) {
     await connectDB();
     const filter = await buildAccountFilter(req);
 
-    const templates = await Template.find(filter).sort({ createdAt: -1 }).lean();
+    const templates = await Template.find(filter)
+      .select('-name -description -price -fullresUrl -thumbUrl -__v')
+      .sort({ createdAt: -1 }).lean();
 
     const data = templates.map((t) => normalizeTemplate(t as unknown as Record<string, unknown>));
 

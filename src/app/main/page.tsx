@@ -126,35 +126,46 @@ export default function Home() {
       return null;
     };
 
+    const localId = localStorage.getItem(STORAGE_KEYS.ACCOUNT);
+    const ssId = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION);
+    const immediateId = localId || ssId;
+    const qp = immediateId ? `?accountId=${encodeURIComponent(immediateId)}` : '';
+
+    if (immediateId) fetchSettings(immediateId); else fetchSettings();
+
+    // Start all fetches in parallel immediately
+    const stripsPromise = fetch(`/api/transactions/strips${qp}`).then((r) => r.json());
+    const countPromise = fetch(`/api/transactions/count${qp}`).then((r) => r.json());
+    const tmplPromise = fetch(`/api/templates/list${qp}`).then((r) => r.json());
+
+    // @ts-expect-error global shared promise for StepperFlow
+    if (typeof window !== 'undefined') window.__templatePromise = tmplPromise;
+
+    stripsPromise.then((res) => { if (res.success && res.data?.length) setStrips(res.data); }).catch(() => {});
+    countPromise.then((res) => { if (res.success) setTxCount(res.total); }).catch(() => {});
+    tmplPromise.then((res) => {
+      if (res.success) {
+        setTmplCount(res.data.length);
+        const list = (res.data as TemplateData[]).filter((t) => t.isActive !== false);
+        sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
+        list.forEach((t) => {
+          const src = t.templateFull ? getOptimizedUrl(t.templateFull, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H) : t.templateThumb;
+          if (src) { const img = new window.Image(); img.src = src; }
+        });
+      }
+    }).catch(() => {});
+
+    // Background account resolution for more accurate data
     resolveAccountId().then((accountId) => {
-      const qp = accountId ? `?accountId=${encodeURIComponent(accountId)}` : '';
-      fetchSettings(accountId);
-      fetch(`/api/transactions/strips${qp}`)
-        .then((r) => r.json())
-        .then((res) => {
-          if (res.success && res.data?.length) setStrips(res.data);
-        })
-        .catch(() => {});
-      fetch(`/api/transactions/count${qp}`)
-        .then((r) => r.json())
-        .then((res) => { if (res.success) setTxCount(res.total); })
-        .catch(() => {});
-      fetch(`/api/templates/list${qp}`)
-        .then((r) => r.json())
-        .then((res) => {
-          if (res.success) {
-            setTmplCount(res.data.length);
-            const list = (res.data as TemplateData[]).filter((t) => t.isActive !== false);
-            sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list));
-            // Preload thumbnail images in background
-            list.forEach((t) => {
-              const src = t.templateFull ? getOptimizedUrl(t.templateFull, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H) : t.templateThumb;
-              if (src) { const img = new window.Image(); img.src = src; }
-            });
-          }
-        })
-        .catch(() => {});
-    });
+      if (accountId && accountId !== immediateId) {
+        const qp2 = `?accountId=${encodeURIComponent(accountId)}`;
+        fetchSettings(accountId);
+        fetch(`/api/transactions/strips${qp2}`)
+          .then((r) => r.json()).then((res) => { if (res.success && res.data?.length) setStrips(res.data); }).catch(() => {});
+        fetch(`/api/transactions/count${qp2}`)
+          .then((r) => r.json()).then((res) => { if (res.success) setTxCount(res.total); }).catch(() => {});
+      }
+    }).catch(() => {});
   }, [refreshKey]);
 
   useEffect(() => {
