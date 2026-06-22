@@ -43,8 +43,8 @@ export default async function AdminDashboard() {
   const weekStart = new Date(todayStart);
   weekStart.setDate(weekStart.getDate() - 6);
 
-  const txFilter: Record<string, string> = {};
-  const tmplFilter: Record<string, string> = {};
+  const txFilter: Record<string, unknown> = {};
+  const tmplFilter: Record<string, unknown> = {};
 
   if (session.isRoot) {
     // Root sees all
