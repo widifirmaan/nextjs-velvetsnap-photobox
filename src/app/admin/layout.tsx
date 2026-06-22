@@ -187,13 +187,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   };
 
+  if (pathname === '/admin/login') return <>{children}</>;
+
   if (!authed) return (
     <div className={styles.loadingScreen}>
       <Loader2 className="spin" size={32} />
     </div>
   );
-
-  if (pathname === '/admin/login') return <>{children}</>;
 
   return (
     <div className={styles.adminLayout}>
