@@ -219,6 +219,34 @@ export default function PaymentStep({
     };
   }, [snapLoaded, templateId, price, paid, onSuccess, setErrMsg, setPaid]);
 
+  const handleBypass = useCallback(async () => {
+    if (paid) return;
+    setErrMsg(null);
+    const sessionId = sessionStorage.getItem(STORAGE_KEYS.PHOTOBOOTH_SESSION) ||
+      (typeof crypto !== 'undefined' && crypto.randomUUID?.()) ||
+      Math.random().toString(36).substring(2);
+    sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, sessionId);
+    const orderId = 'BYPASS_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    try {
+      const { captures: uploadedCaptures, finalImage: uploadedFinal } = await uploadImagesFn.current();
+      const res = await fetch('/api/transactions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId, templateId: templateId || 't1', price,
+          captures: uploadedCaptures, finalImage: uploadedFinal,
+          status: 'PAID', orderId,
+        }),
+      });
+      const data = await res.json();
+      if (data.success && data.data?._id) {
+        sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, data.data._id);
+      }
+    } catch (e) { console.error('Bypass upload failed', e); }
+    setPaid(true);
+    setTimeout(() => onSuccess('bypass_' + Date.now()), PAYMENT_SUCCESS_DELAY);
+  }, [paid, templateId, price, onSuccess, setPaid, setErrMsg]);
+
   return (
     <div className={`${styles.stepPage} ${styles.stepPagePayment}`}>
       <StepperBar current={3} total={5} />
@@ -267,6 +295,18 @@ export default function PaymentStep({
                 {!snapLoaded ? 'Loading payment gateway...' : 'Preparing QRIS...'}
               </p>
             )}
+            <div style={{ textAlign: 'center', marginTop: 24, opacity: 0.5 }}>
+              <button
+                onClick={handleBypass}
+                disabled={paid}
+                style={{
+                  background: 'none', border: '1px dashed #666', borderRadius: 6,
+                  padding: '4px 12px', fontSize: 11, color: '#888', cursor: 'pointer',
+                }}
+              >
+                Bypass Payment (testing)
+              </button>
+            </div>
           </>
         )}
       </div>
