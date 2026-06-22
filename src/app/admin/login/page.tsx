@@ -16,6 +16,10 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (!sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN)) {
+      setLoading(false);
+      return;
+    }
     adminFetch('/api/admin/session')
       .then((r) => { if (r.status === 200) router.replace('/admin'); })
       .catch(() => {})
