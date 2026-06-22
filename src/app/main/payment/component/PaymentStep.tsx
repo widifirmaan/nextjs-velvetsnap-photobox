@@ -229,13 +229,12 @@ export default function PaymentStep({
     sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, sessionId);
     const orderId = 'BYPASS_' + now + '_' + Math.random().toString(36).slice(2, 6);
     try {
-      const { captures: uploadedCaptures, finalImage: uploadedFinal } = await uploadImagesFn.current();
       const res = await fetch('/api/transactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           sessionId, templateId: templateId || 't1', price,
-          captures: uploadedCaptures, finalImage: uploadedFinal,
+          captures: [], finalImage: '',
           status: 'PAID', orderId,
         }),
       });
@@ -246,7 +245,7 @@ export default function PaymentStep({
       setPaid(true);
       setTimeout(() => onSuccess('bypass_' + now), PAYMENT_SUCCESS_DELAY);
     } catch (e) {
-      console.error('Bypass upload failed', e);
+      console.error('Bypass failed', e);
       setErrMsg('Bypass failed: ' + (e instanceof Error ? e.message : String(e)));
     }
   }, [paid, templateId, price, onSuccess, setPaid, setErrMsg]);
