@@ -12,16 +12,14 @@ export const metadata: Metadata = {
 
 async function getTransaction(id: string) {
   await connectDB();
-  let tx;
-  if (isValidObjectId(id)) {
-    tx = await Transaction.findById(id).lean();
+  const filter: Record<string, unknown>[] = [];
+  if (isValidObjectId(id)) filter.push({ _id: id });
+  filter.push({ orderId: id }, { sessionId: id });
+  if (/^bypass_/i.test(id)) {
+    const prefix = id.toUpperCase();
+    filter.push({ orderId: { $regex: `^${prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}` } });
   }
-  if (!tx) {
-    tx = await Transaction.findOne({ orderId: id }).lean();
-  }
-  if (!tx) {
-    tx = await Transaction.findOne({ sessionId: id }).lean();
-  }
+  const tx = await Transaction.findOne({ $or: filter }).lean();
   return tx ? JSON.parse(JSON.stringify(tx)) : null;
 }
 
