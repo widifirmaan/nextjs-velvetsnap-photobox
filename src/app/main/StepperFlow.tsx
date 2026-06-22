@@ -74,7 +74,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         setCachedTemplates(parsed);
         setTemplatesLoading(false);
         return;
-      } catch {}
+      } catch (e) { console.error('StepperFlow: failed to parse cached templates', e); }
     }
     // Await homepage preload promise if available (avoid duplicate fetch)
     const globalPromise = typeof window !== 'undefined' ? (window as any).__templatePromise : null;
@@ -153,7 +153,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         const res = await fetch(`/api/templates/thumbnails?id=${templateId}`);
         const data = await res.json();
         if (data.success && data.data?.length) matched = data.data[0];
-      } catch {}
+      } catch (e) { console.error('StepperFlow: failed to load thumbnails', e); }
       if (matched) {
         setTemplateData(matched);
         setPrice(matched.templatePrice ?? 35000);

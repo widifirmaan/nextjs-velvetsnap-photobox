@@ -36,7 +36,7 @@ export default function AccountsPage() {
       const res = await adminFetch('/api/admin/accounts');
       const data = await res.json();
       if (data.success) setAccounts(data.data || []);
-    } catch {} finally { setLoading(false); }
+    } catch (e) { console.error('fetchAccounts failed', e); } finally { setLoading(false); }
   };
 
   useEffect(() => { fetchAccounts(); }, []);
@@ -71,7 +71,7 @@ export default function AccountsPage() {
       await adminFetch(`/api/admin/accounts/${deleteTarget}`, { method: 'DELETE' });
       setDeleteTarget(null);
       fetchAccounts();
-    } catch {} finally { setDeleteLoading(false); }
+    } catch (e) { console.error('delete account failed', e); } finally { setDeleteLoading(false); }
   };
 
   const handleResetPw = async () => {

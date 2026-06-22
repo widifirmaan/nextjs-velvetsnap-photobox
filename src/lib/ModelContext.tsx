@@ -45,7 +45,7 @@ async function clearModelCache() {
         }
       }
     }
-  } catch {}
+    } catch (e) { console.error('log route call failed', e); }
 }
 
 export function ModelProvider({ children }: { children: React.ReactNode }) {
@@ -61,7 +61,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ level, message, data }),
       });
-    } catch {}
+  } catch (e) { console.error('clearModelCache failed', e); }
   }, []);
 
   const preload = useCallback(async (attempt = 1) => {

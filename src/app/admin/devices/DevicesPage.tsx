@@ -31,7 +31,7 @@ function loadSettings(): DeviceSettings {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.DEVICE_SETTINGS);
     if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch {}
+  } catch (e) { console.error('DevicesPage: loadSettings parse failed', e); }
   return { ...DEFAULT_SETTINGS };
 }
 
@@ -77,7 +77,7 @@ export default function DevicesPage() {
             return prev;
           });
         }
-      } catch {}
+      } catch (e) { console.error('DevicesPage: enumerateDevices failed', e); }
     })();
   }, [initialized]);
 

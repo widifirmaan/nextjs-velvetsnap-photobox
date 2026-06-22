@@ -81,7 +81,7 @@ export default function SettingsPage() {
             setSaved(false);
           }
         })
-        .catch(() => {})
+        .catch((e) => { console.error('settings page fetch failed', e); })
         .finally(() => { if (slideUploadRef.current) slideUploadRef.current.value = ''; });
     };
     reader.readAsDataURL(file);
@@ -176,7 +176,7 @@ export default function SettingsPage() {
       });
       if (res.status === 401) { handleAuthFail(); setSaving(false); return; }
       const json = await res.json();
-      if (json.success) { setSaved(true); setSuccessOpen(true); try { new BroadcastChannel('velvetsnap').postMessage('settings-updated'); } catch {} }
+      if (json.success) { setSaved(true); setSuccessOpen(true); try { new BroadcastChannel('velvetsnap').postMessage('settings-updated'); } catch (e) { console.error('BroadcastChannel postMessage failed', e); } }
       else setSaveErr(json.error || 'Gagal menyimpan');
     } catch (e: unknown) {
       setSaveErr(e instanceof Error ? e.message : String(e));
@@ -251,7 +251,7 @@ export default function SettingsPage() {
         .then((res) => {
           if (res.success) { setRootField('logo', res.url); }
         })
-        .catch(() => {});
+        .catch((e) => { console.error('settings page fetch failed', e); });
     };
     reader.readAsDataURL(file);
   };

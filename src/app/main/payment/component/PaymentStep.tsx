@@ -192,7 +192,7 @@ export default function PaymentStep({
                   } catch (e) { console.error('Payment upload failed', e); }
                   onSuccess(data.data._id || 'ok');
                 }
-              } catch {} // poll error — will retry
+              } catch (e) { console.error('PaymentStep poll error', e); }
             }, PAYMENT_POLL_INTERVAL);
           },
           onError: () => {

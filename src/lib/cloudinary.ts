@@ -42,7 +42,7 @@ async function deleteImage(url: string): Promise<void> {
     const publicIdWithVersion = parts.slice(uploadIndex + 2).join('/');
     const publicId = publicIdWithVersion.replace(/^v\d+\//, '').replace(/\.[^.]+$/, '');
     await cloudinary.uploader.destroy(publicId);
-  } catch {}
+  } catch (e) { console.error('deleteImage failed:', url, e); }
 }
 
 export async function deleteImages(urls: (string | undefined | null)[]): Promise<void> {

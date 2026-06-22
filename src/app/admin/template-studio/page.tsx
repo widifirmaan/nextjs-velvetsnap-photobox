@@ -677,7 +677,7 @@ function StripsStudioPage() {
               img.src = processed;
             };
             reader.readAsDataURL(file);
-          } catch { setImportProcessing(false); }
+          } catch (e) { console.error('import processing failed', e); setImportProcessing(false); }
         }}
       />
     </aside>

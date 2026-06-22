@@ -90,7 +90,7 @@ export default function Home() {
           });
         }
       })
-      .catch(() => {});
+      .catch((e) => { console.error('fetchSettings failed', e); });
   }, []);
 
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function Home() {
             return data.accountId;
           }
         }
-      } catch {}
+      } catch (e) { console.error('resolveAccountId session check failed', e); }
       return null;
     };
 
@@ -141,8 +141,8 @@ export default function Home() {
     // @ts-expect-error global shared promise for StepperFlow
     if (typeof window !== 'undefined') window.__templatePromise = tmplPromise;
 
-    stripsPromise.then((res) => { if (res.success && res.data?.length) setStrips(res.data); }).catch(() => {});
-    countPromise.then((res) => { if (res.success) setTxCount(res.total); }).catch(() => {});
+    stripsPromise.then((res) => { if (res.success && res.data?.length) setStrips(res.data); }).catch((e) => { console.error('fetch strips failed', e); });
+    countPromise.then((res) => { if (res.success) setTxCount(res.total); }).catch((e) => { console.error('fetch count failed', e); });
     tmplPromise.then((res) => {
       if (res.success) {
         setTmplCount(res.data.length);
@@ -153,7 +153,7 @@ export default function Home() {
           if (src) { const img = new window.Image(); img.src = src; }
         });
       }
-    }).catch(() => {});
+    }).catch((e) => { console.error('tmplPromise failed', e); });
 
     // Background account resolution for more accurate data
     resolveAccountId().then((accountId) => {
@@ -161,11 +161,11 @@ export default function Home() {
         const qp2 = `?accountId=${encodeURIComponent(accountId)}`;
         fetchSettings(accountId);
         fetch(`/api/transactions/strips${qp2}`)
-          .then((r) => r.json()).then((res) => { if (res.success && res.data?.length) setStrips(res.data); }).catch(() => {});
+          .then((r) => r.json()).then((res) => { if (res.success && res.data?.length) setStrips(res.data); }).catch((e) => { console.error('retry strips failed', e); });
         fetch(`/api/transactions/count${qp2}`)
-          .then((r) => r.json()).then((res) => { if (res.success) setTxCount(res.total); }).catch(() => {});
+          .then((r) => r.json()).then((res) => { if (res.success) setTxCount(res.total); }).catch((e) => { console.error('retry count failed', e); });
       }
-    }).catch(() => {});
+    }).catch((e) => { console.error('resolveAccountId failed', e); });
   }, [refreshKey]);
 
   useEffect(() => {
@@ -173,7 +173,7 @@ export default function Home() {
       const bc = new BroadcastChannel('velvetsnap');
       bc.onmessage = (e) => { if (e.data === 'settings-updated') fetchSettings(); };
       return () => bc.close();
-    } catch {}
+    } catch (e) { console.error('BroadcastChannel init failed', e); }
   }, [fetchSettings]);
 
   useEffect(() => {

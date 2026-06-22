@@ -305,7 +305,7 @@ export async function composeStripImage(
       try {
         const photo = await loadImg(src);
         applyPhotoAdjustment(ctx, photo, ex, ey, ew, eh, adjusts[photoIdx - 1] || { scale: 1, x: 0, y: 0 });
-      } catch {}
+      } catch (e) { console.error('composeStripImage: photo load failed', e); }
 
       ctx.strokeStyle = bc;
       ctx.lineWidth = bw;
@@ -320,7 +320,7 @@ export async function composeStripImage(
           const dw = img.naturalWidth * sc2;
           const dh = img.naturalHeight * sc2;
           ctx.drawImage(img, ex + (ew - dw) / 2, ey + (eh - dh) / 2, dw, dh);
-        } catch {}
+        } catch (e) { console.error('composeStripImage: bg load failed', e); }
       }
       ctx.restore();
 
@@ -343,7 +343,7 @@ export async function composeStripImage(
           const dh = img.naturalHeight * sc2;
           ctx.drawImage(img, ex + (ew - dw) / 2, ey + (dh - eh) / 2 + eh - dh, dw, dh);
           ctx.restore();
-        } catch { ctx.restore(); }
+        } catch (e) { console.error('composeStripImage: sticker load failed', e); ctx.restore(); }
       } else { ctx.restore(); }
     } else if (el.type === 'shape') {
       const sx = el.props.shapeType || 'rect';

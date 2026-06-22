@@ -7,7 +7,7 @@ export default function HomeHeader({ tooltipVisible, setTooltipVisible, branding
   branding: { header: { location: string; navItems: string } };
 }) {
   let navItems: { label: string; url: string }[] = [];
-  try { navItems = JSON.parse(branding.header.navItems); } catch {}
+  try { navItems = JSON.parse(branding.header.navItems); } catch (e) { console.warn('HomeHeader: invalid navItems JSON', e); }
 
   return (
     <header className={styles.header}>

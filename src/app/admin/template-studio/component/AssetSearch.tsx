@@ -37,7 +37,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ level, message, data }),
       });
-    } catch {}
+    } catch (e) { console.error('AssetSearch: log route failed', e); }
   }, []);
 
   const handleRemoveBg = async (imageUrl: string) => {
@@ -127,8 +127,9 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
       } else {
         setImageError(data.error || 'Search failed');
       }
-    } catch {
+    } catch (e) {
       setImageError('Search failed. Check your network.');
+      console.error('AssetSearch: image search failed', e);
     } finally {
       setImageLoading(false);
       setLoadingMore(false);

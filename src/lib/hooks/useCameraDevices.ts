@@ -54,14 +54,14 @@ export function useCameraDevices(): UseCameraDevicesReturn {
         if (sorted.length) {
           const savedRaw = localStorage.getItem(STORAGE_KEYS.DEVICE_SETTINGS);
           let savedId: string | undefined;
-          try { if (savedRaw) { const s = JSON.parse(savedRaw); savedId = s.camera; } } catch {}
+          try { if (savedRaw) { const s = JSON.parse(savedRaw); savedId = s.camera; } } catch (e) { console.error('useCameraDevices: saved settings parse failed', e); }
           if (!savedId || !sorted.some((c) => c.deviceId === savedId)) {
             setDeviceId(sorted[0].deviceId);
             saveDeviceId(sorted[0].deviceId);
           }
         }
         setAvailableCams(sorted);
-      } catch {}
+      } catch (e) { console.error('useCameraDevices: enumerateDevices failed', e); }
     })();
     return () => { cancelled = true; };
   }, [cameraType]);
@@ -72,7 +72,7 @@ export function useCameraDevices(): UseCameraDevicesReturn {
       const s = raw ? JSON.parse(raw) : {};
       s.camera = id;
       localStorage.setItem(STORAGE_KEYS.DEVICE_SETTINGS, JSON.stringify(s));
-    } catch {}
+    } catch (e) { console.error('useCameraDevices: saveDeviceId failed', e); }
   }, []);
 
   useEffect(() => {

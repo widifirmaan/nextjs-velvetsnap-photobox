@@ -242,7 +242,7 @@ export default function HistoryPage() {
                       const res = await adminFetch(`/api/transactions/${tx._id}`);
                       const data = await res.json();
                       if (data.success) setSelectedTx(data.data);
-                    } catch {}
+                    } catch (e) { console.error('fetch transaction detail failed', e); }
                     setModalLoading(false);
                   }}>
                     <td>

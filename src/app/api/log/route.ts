@@ -11,7 +11,8 @@ export async function POST(request: NextRequest) {
       console.log(prefix, message);
     }
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (e) {
+    console.error('/api/log error:', e);
     return NextResponse.json({ success: false });
   }
 }
