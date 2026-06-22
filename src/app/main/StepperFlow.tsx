@@ -265,6 +265,11 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     </div>
   ) : null;
 
+  const handlePaymentSuccess = useCallback((id: string) => {
+    setTxId(id);
+    setStep(5);
+  }, []);
+
   let content: React.ReactNode = null;
 
   if (step === 1) content = <TemplateStep templates={cachedTemplates || []} loading={templatesLoading} onSelect={handleSelectTemplate} onBack={() => setStep(0)} />;
@@ -312,7 +317,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       captures={captures}
       templateId={templateId || 't1'}
       compositedImage={compositedImage}
-      onSuccess={(id) => { setTxId(id); setStep(5); }}
+      onSuccess={handlePaymentSuccess}
       onBack={() => setStep(3)}
     />
   );
