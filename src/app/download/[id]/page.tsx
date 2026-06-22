@@ -70,7 +70,9 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             <div className={styles.grid}>
               {tx.captures.map((url: string, i: number) => (
                 <div key={i} className={styles.thumbCard}>
-                  <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="150px" />
+                  <div className={styles.thumbWrap}>
+                    <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="(max-width:640px) 50vw, 200px" />
+                  </div>
                   <DownloadBtn url={url} label={`Photo ${i + 1}`} />
                 </div>
               ))}
