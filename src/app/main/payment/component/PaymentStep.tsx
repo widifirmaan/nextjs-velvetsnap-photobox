@@ -227,6 +227,7 @@ export default function PaymentStep({
       Math.random().toString(36).substring(2);
     sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, sessionId);
     const orderId = 'BYPASS_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    let txId = 'bypass_' + Date.now();
     try {
       const { captures: uploadedCaptures, finalImage: uploadedFinal } = await uploadImagesFn.current();
       const res = await fetch('/api/transactions', {
@@ -240,11 +241,12 @@ export default function PaymentStep({
       });
       const data = await res.json();
       if (data.success && data.data?._id) {
+        txId = data.data._id;
         sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, data.data._id);
       }
     } catch (e) { console.error('Bypass upload failed', e); }
     setPaid(true);
-    setTimeout(() => onSuccess('bypass_' + Date.now()), PAYMENT_SUCCESS_DELAY);
+    setTimeout(() => onSuccess(txId), PAYMENT_SUCCESS_DELAY);
   }, [paid, templateId, price, onSuccess, setPaid, setErrMsg]);
 
   return (
