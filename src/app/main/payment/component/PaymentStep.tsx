@@ -222,11 +222,12 @@ export default function PaymentStep({
   const handleBypass = useCallback(async () => {
     if (paid) return;
     setErrMsg(null);
+    const now = Date.now();
     const sessionId = sessionStorage.getItem(STORAGE_KEYS.PHOTOBOOTH_SESSION) ||
       (typeof crypto !== 'undefined' && crypto.randomUUID?.()) ||
       Math.random().toString(36).substring(2);
     sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, sessionId);
-    const orderId = 'BYPASS_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    const orderId = 'BYPASS_' + now + '_' + Math.random().toString(36).slice(2, 6);
     try {
       const { captures: uploadedCaptures, finalImage: uploadedFinal } = await uploadImagesFn.current();
       const res = await fetch('/api/transactions', {
@@ -242,9 +243,12 @@ export default function PaymentStep({
       if (data.success && data.data?._id) {
         sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, data.data._id);
       }
-    } catch (e) { console.error('Bypass upload failed', e); }
-    setPaid(true);
-    setTimeout(() => onSuccess('bypass_' + Date.now()), PAYMENT_SUCCESS_DELAY);
+      setPaid(true);
+      setTimeout(() => onSuccess('bypass_' + now), PAYMENT_SUCCESS_DELAY);
+    } catch (e) {
+      console.error('Bypass upload failed', e);
+      setErrMsg('Bypass failed: ' + (e instanceof Error ? e.message : String(e)));
+    }
   }, [paid, templateId, price, onSuccess, setPaid, setErrMsg]);
 
   return (
