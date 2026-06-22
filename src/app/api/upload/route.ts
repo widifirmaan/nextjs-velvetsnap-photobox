@@ -1,17 +1,11 @@
 import { NextResponse } from 'next/server';
 import { uploadBase64, isBase64 } from '@/lib/cloudinary';
-import { getSession } from '@/lib/require-admin';
 export const runtime = 'nodejs';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 export async function POST(req: Request) {
   try {
-    const session = await getSession(req);
-    if (!session.token) {
-      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { dataUri, folder, publicId } = await req.json();
     if (!dataUri || !isBase64(dataUri)) {
       return NextResponse.json({ success: false, error: 'Invalid data URI' }, { status: 400 });
