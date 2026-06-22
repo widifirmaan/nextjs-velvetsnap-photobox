@@ -498,9 +498,9 @@ function StripsStudioPage() {
       } else {
         setElements((prev) => [...prev, {
           id, type: 'background',
-          x: -60, y: -60,
-          width: canvasSize.w + 120,
-          height: canvasSize.h + 120,
+          x: -300, y: -300,
+          width: canvasSize.w + 600,
+          height: canvasSize.h + 600,
           rotation: 0,
           zIndex: -1,
           visible: true,
