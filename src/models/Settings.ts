@@ -56,7 +56,7 @@ const SettingsSchema = new Schema<ISettings>({
     type: {
       password: { type: String, default: '', select: false },
       passwordSalt: { type: String, default: '', select: false },
-      session: { type: String, default: '', select: false },
+      session: { type: String, default: '' },
     },
     default: {},
   },

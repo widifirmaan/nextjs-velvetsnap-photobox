@@ -27,7 +27,7 @@ export async function getSession(req: Request): Promise<SessionInfo> {
     await connectDB();
 
     // Check root session
-    const settings = await Settings.findOne({}).select('+security').lean();
+    const settings = await Settings.findOne({}).lean();
     const rootToken = settings?.security?.session || settings?.adminSession;
     if (rootToken && rootToken === token) {
       return { token, isRoot: true, accountId: null, username: 'root' };

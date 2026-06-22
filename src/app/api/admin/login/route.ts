@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     // Root login
     if (!username || username === 'root') {
-      let settings = await Settings.findOne({}).select('+security');
+      let settings = await Settings.findOne({}).select('+security.password +security.passwordSalt');
       if (!settings) {
         settings = await Settings.create({});
       }
@@ -76,7 +76,7 @@ export async function DELETE(req: Request) {
     if (token) {
       await connectDB();
       // Clear root session
-      const settings = await Settings.findOne({}).select('+security');
+      const settings = await Settings.findOne({}).select('+security.password +security.passwordSalt');
       if (settings) {
         const existingToken = settings.security?.session || settings.adminSession;
         if (existingToken === token) {

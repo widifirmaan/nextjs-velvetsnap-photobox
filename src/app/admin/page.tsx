@@ -20,7 +20,7 @@ async function getAdminSession() {
 
   await connectDB();
 
-  const settings = await Settings.findOne({}).select('+security').lean();
+  const settings = await Settings.findOne({}).lean();
   const rootToken = settings?.security?.session || settings?.adminSession;
   if (rootToken === adminSession.value) {
     return { isRoot: true, accountId: null, username: 'root' };
