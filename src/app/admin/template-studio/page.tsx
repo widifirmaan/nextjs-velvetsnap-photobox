@@ -19,7 +19,7 @@ import ElementToolbar from './component/ElementToolbar';
 import LayerPanel from './component/LayerPanel';
 import PropertiesPanel from './component/PropertiesPanel';
 import AssetSearch from './component/AssetSearch';
-import { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT } from '@/lib/constants';
+import { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT, CHROMA_KEY_TARGET, CHROMA_KEY_THRESHOLD } from '@/lib/constants';
 import { adminFetch } from '@/lib/admin-fetch';
 import styles from './page.module.css';
 
@@ -51,11 +51,12 @@ function removeChromaKey(dataUrl: string, targetW = DEFAULT_CANVAS_W, targetH = 
         ctx.drawImage(img, 0, 0, targetW, targetH);
         const imgData = ctx.getImageData(0, 0, targetW, targetH);
         const d = imgData.data;
-        const targetR = 0, targetG = 191, targetB = 99;
+        const [targetR, targetG, targetB] = CHROMA_KEY_TARGET;
+        const threshold2 = CHROMA_KEY_THRESHOLD;
         for (let i = 0; i < d.length; i += 4) {
           const r = d[i], g = d[i + 1], b = d[i + 2];
           const dr = r - targetR, dg = g - targetG, db = b - targetB;
-          if (dr * dr + dg * dg + db * db < 1600) d[i + 3] = 0;
+          if (dr * dr + dg * dg + db * db < threshold2) d[i + 3] = 0;
         }
         ctx.putImageData(imgData, 0, 0);
         resolve(canvas.toDataURL('image/png'));
@@ -76,11 +77,12 @@ function detectTransparentSlots(imgEl: HTMLImageElement, cw = DEFAULT_CANVAS_W, 
   try { imgData = ctx.getImageData(0, 0, cw, ch); } catch { return []; }
   const data = imgData.data;
   const grid: boolean[] = new Array(cw * ch);
-  const targetR = 0, targetG = 191, targetB = 99;
+  const [targetR, targetG, targetB] = CHROMA_KEY_TARGET;
+  const threshold2 = CHROMA_KEY_THRESHOLD;
   for (let i = 0; i < data.length; i += 4) {
     const a = data[i + 3];
     const dr = data[i] - targetR, dg = data[i + 1] - targetG, db = data[i + 2] - targetB;
-    grid[i / 4] = a < 50 || (dr * dr + dg * dg + db * db) < 1600;
+    grid[i / 4] = a < 50 || (dr * dr + dg * dg + db * db) < threshold2;
   }
   const visited = new Uint8Array(cw * ch);
   const rects: ISlot[] = [];
@@ -231,7 +233,7 @@ function StripsStudioPage() {
       return;
     }
 
-    fetch(`/api/templates/thumbnails?id=${editIdParam}`)
+    adminFetch(`/api/templates/thumbnails?id=${editIdParam}`)
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data?.length) {
@@ -247,7 +249,7 @@ function StripsStudioPage() {
           const elementsData = data.templateData?.elements || data.elements;
           if (elementsData?.length) {
             setElements(elementsData);
-            const slotEls = elementsData.filter((el: any) => el.id?.startsWith('slot-'));
+            const slotEls = elementsData.filter((el: IStripElement) => el.id?.startsWith('slot-'));
             if (slotEls?.length) setSlotCount(slotEls.length);
           } else if ((data.templateFull || data.fullresUrl) && (data.templateData?.slotsLayout || data.slotsLayout)?.length) {
             const legacyUrl = data.templateFull || data.fullresUrl;
@@ -257,7 +259,7 @@ function StripsStudioPage() {
               width: cw, height: ch, rotation: 0, zIndex: 0,
               visible: true, props: { stickerUrl: legacyUrl },
             };
-            const photoSlots: IStripElement[] = legacySlots.map((s: any, i: number) => ({
+            const photoSlots: IStripElement[] = legacySlots.map((s: { x: number; y: number; w: number; h: number }, i: number) => ({
               id: 'slot-' + uuid(), type: 'photo-slot' as const,
               x: (s.x / 100) * cw, y: (s.y / 100) * ch,
               width: (s.w / 100) * cw, height: (s.h / 100) * ch,
@@ -345,7 +347,7 @@ function StripsStudioPage() {
   };
 
   const uploadBase64Client = async (dataUri: string, folder: string, publicId?: string): Promise<string> => {
-    const body: Record<string, any> = { dataUri, folder };
+    const body: Record<string, unknown> = { dataUri, folder };
     if (publicId) body.publicId = publicId;
     const res = await adminFetch('/api/upload', {
       method: 'POST',
@@ -426,7 +428,7 @@ function StripsStudioPage() {
         w: Math.round((el.width / canvasSize.w) * 1000) / 10,
         h: Math.round((el.height / canvasSize.h) * 1000) / 10,
       }));
-      const body: Record<string, any> = {
+      const body: Record<string, unknown> = {
         templateName: templateName,
         templateDesc: templateDesc || 'Designed in Strips Studio',
         templatePrice: templatePrice,
@@ -539,7 +541,7 @@ function StripsStudioPage() {
     setElements((prev) => prev.map((el) => (el.id === id ? { ...el, ...patch } : el)));
   };
 
-  const updateElementProps = (id: string, props: Record<string, any>) => {
+  const updateElementProps = (id: string, props: Record<string, unknown>) => {
     setElements((prev) =>
       prev.map((el) => (el.id === id ? { ...el, props: { ...el.props, ...props } } : el))
     );

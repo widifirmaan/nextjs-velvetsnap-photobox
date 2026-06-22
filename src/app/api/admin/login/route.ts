@@ -5,6 +5,7 @@ import Account from '@/models/Account';
 import { hashPassword, verifyPassword, generateSessionToken } from '@/lib/auth';
 import { getAdminToken } from '@/lib/require-admin';
 import { apiError } from '@/lib/api-utils';
+import { COOKIE_NAME, COOKIE_BASE } from '@/lib/constants';
 
 export async function POST(req: Request) {
   try {
@@ -17,14 +18,14 @@ export async function POST(req: Request) {
 
     // Root login
     if (!username || username === 'root') {
-      let settings = await Settings.findOne({});
+      let settings = await Settings.findOne({}).select('+security');
       if (!settings) {
         settings = await Settings.create({});
       }
 
       // migrate old top-level fields to security nested object
       if (settings.adminPassword && !settings.security?.password) {
-        settings.security = { password: settings.adminPassword, passwordSalt: settings.adminPasswordSalt, session: settings.adminSession || '', sessionExpires: null };
+        settings.security = { password: settings.adminPassword, passwordSalt: settings.adminPasswordSalt || '', session: settings.adminSession || '' };
       } else if (!settings.security?.password) {
         const { hash, salt } = hashPassword('root');
         settings.security = { ...settings.security, password: hash, passwordSalt: salt };
@@ -32,9 +33,9 @@ export async function POST(req: Request) {
       await settings.save();
 
       const pwHash = settings.security?.password;
-      const pwSalt = settings.security?.passwordSalt;
-      if (!verifyPassword(password, pwHash, pwSalt)) {
-        return NextResponse.json({ success: false, error: 'Invalid password' }, { status: 401 });
+      const pwSalt = settings.security?.passwordSalt || '';
+      if (!pwHash || !verifyPassword(password, pwHash, pwSalt)) {
+        return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 });
       }
 
       const token = generateSessionToken();
@@ -42,18 +43,18 @@ export async function POST(req: Request) {
       await settings.save();
 
       const res = NextResponse.json({ success: true, token, isRoot: true, username: 'root' });
-      res.cookies.set('admin_session', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+      res.cookies.set(COOKIE_NAME, token, { ...COOKIE_BASE, secure: process.env.NODE_ENV === 'production' });
       return res;
     }
 
     // Account login
     const account = await Account.findOne({ username });
     if (!account) {
-      return NextResponse.json({ success: false, error: 'Account not found' }, { status: 401 });
+      return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 });
     }
 
-    if (!verifyPassword(password, account.password, account.passwordSalt)) {
-      return NextResponse.json({ success: false, error: 'Invalid password' }, { status: 401 });
+    if (!verifyPassword(password, account.password, account.passwordSalt || '')) {
+      return NextResponse.json({ success: false, error: 'Invalid credentials' }, { status: 401 });
     }
 
     const token = generateSessionToken();
@@ -61,7 +62,7 @@ export async function POST(req: Request) {
     await account.save();
 
     const res = NextResponse.json({ success: true, token, isRoot: false, accountId: account._id.toString(), username: account.username });
-    res.cookies.set('admin_session', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+    res.cookies.set(COOKIE_NAME, token, { ...COOKIE_BASE, secure: process.env.NODE_ENV === 'production' });
     return res;
   } catch (error: unknown) {
     return apiError(error);
@@ -71,11 +72,11 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const token = getAdminToken(req);
-    await connectDB();
 
     if (token) {
+      await connectDB();
       // Clear root session
-      const settings = await Settings.findOne({});
+      const settings = await Settings.findOne({}).select('+security');
       if (settings) {
         const existingToken = settings.security?.session || settings.adminSession;
         if (existingToken === token) {
@@ -89,7 +90,7 @@ export async function DELETE(req: Request) {
     }
 
     const res = NextResponse.json({ success: true });
-    res.cookies.set('admin_session', '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 0 });
+    res.cookies.set(COOKIE_NAME, '', { ...COOKIE_BASE, secure: process.env.NODE_ENV === 'production', maxAge: 0 });
     return res;
   } catch (error: unknown) {
     return apiError(error);

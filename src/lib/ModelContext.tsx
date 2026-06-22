@@ -54,7 +54,7 @@ export function ModelProvider({ children }: { children: React.ReactNode }) {
   const [errorMessage, setErrorMessage] = useState('');
   const loaded = useRef(false);
 
-  const log = useCallback(async (level: string, message: string, data?: any) => {
+  const log = useCallback(async (level: string, message: string, data?: unknown) => {
     try {
       await fetch('/api/log', {
         method: 'POST',

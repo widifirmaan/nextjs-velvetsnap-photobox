@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, Loader2, Image, Timer, Lock, Check, MapPin, Plus, Trash2, CheckCircle, FileText, Upload, Layout } from 'lucide-react';
 import { adminFetch } from '@/lib/admin-fetch';
-import { STORAGE_KEYS } from '@/lib/constants';
+import { STORAGE_KEYS, LOGOUT_REDIRECT_DELAY, SAVED_MSG_TIMEOUT } from '@/lib/constants';
 import { AdminConfirmModal, AdminModal, AdminPageHeader } from '@/app/admin/components';
 import styles from './page.module.css';
 
@@ -106,7 +106,7 @@ export default function SettingsPage() {
   const handleAuthFail = () => {
     setAuthErr(true);
     adminFetch('/api/admin/login', { method: 'DELETE' });
-    setTimeout(() => router.push('/admin/login'), 1500);
+    setTimeout(() => router.push('/admin/login'), LOGOUT_REDIRECT_DELAY);
   };
 
   useEffect(() => {
@@ -151,7 +151,7 @@ export default function SettingsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const updateSection = (section: keyof SettingsData, field: string, value: any) => {
+  const updateSection = (section: keyof SettingsData, field: string, value: unknown) => {
     setForm((prev) => ({
       ...prev,
       [section]: { ...(prev[section] as any), [field]: value },
@@ -159,7 +159,7 @@ export default function SettingsPage() {
     setSaved(false);
   };
 
-  const setRootField = (field: keyof Omit<SettingsData, 'header' | 'footer' | 'system'>, value: any) => {
+  const setRootField = (field: keyof Omit<SettingsData, 'header' | 'footer' | 'system'>, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setSaved(false);
   };
@@ -196,7 +196,7 @@ export default function SettingsPage() {
       });
       if (res.status === 401) { handleAuthFail(); setPassSaving(false); return; }
       const json = await res.json();
-      if (json.success) { setPassSaved(true); setNewPass(''); setTimeout(() => setPassSaved(false), 3000); }
+      if (json.success) { setPassSaved(true); setNewPass(''); setTimeout(() => setPassSaved(false), SAVED_MSG_TIMEOUT); }
       else setPassErr(json.error || 'Gagal');
     } catch { setPassErr('Network error'); }
     setPassSaving(false);

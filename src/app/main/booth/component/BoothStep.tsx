@@ -3,20 +3,22 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { flipImage } from '@/lib/canvas-utils';
 import { useCameraDevices, useCountdown } from '@/lib/hooks';
-import Webcam from 'react-webcam';
+import type Webcam from 'react-webcam';
+import dynamic from 'next/dynamic';
 import StepperBar from '../../StepperBar';
 import { TemplateData } from '../../types';
-import Viewfinder from './Viewfinder';
 import BoothPreview from './BoothPreview';
 import BoothControls from './BoothControls';
 import styles from '@/app/main/page.module.css';
 
+const Viewfinder = dynamic(() => import('./Viewfinder'), { ssr: false });
+
 export default function BoothStep({
-  templateId, templateName, slotsCount, filledCount, captures,
+  templateName, slotsCount, filledCount, captures,
   onAddCapture, onDeleteCapture, templateData, keyedFrameImage, frameRatio,
   stripLoading, onNext, onBack,
 }: {
-  templateId: string; templateName: string; slotsCount: number; filledCount: number; captures: string[];
+  templateName: string; slotsCount: number; filledCount: number; captures: string[];
   onAddCapture: (url: string, slotIdx?: number) => void; onDeleteCapture: (idx: number) => void;
   templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
   stripLoading: boolean; onNext: () => void; onBack: () => void;
@@ -27,7 +29,7 @@ export default function BoothStep({
   const [dslrCapturing, setDslrCapturing] = useState(false);
 
   const {
-    deviceId, cameraType, setCameraType,
+    deviceId, cameraType, setCameraType: _setCameraType,
     availableCams, showCamMenu, setShowCamMenu, camMenuRef,
     isFrontCamera, handleSwitchCamera,
   } = useCameraDevices();

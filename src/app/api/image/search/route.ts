@@ -28,7 +28,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const results = (data.hits || []).map((item: any) => ({
+    const results = ((data.hits || []) as { largeImageURL: string; previewURL: string; tags: string; pageURL: string }[]).map((item) => ({
       url: item.largeImageURL,
       thumbnail: item.previewURL,
       title: item.tags,

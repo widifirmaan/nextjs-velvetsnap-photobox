@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Settings from '@/models/Settings';
 import Account from '@/models/Account';
+import { COOKIE_NAME } from '@/lib/constants';
 
-export interface SessionInfo {
+interface SessionInfo {
   token: string | null;
   isRoot: boolean;
   accountId: string | null;
@@ -14,7 +15,7 @@ export function getAdminToken(req: Request): string | null {
   const auth = req.headers.get('authorization') || '';
   if (auth.startsWith('Bearer ')) return auth.slice(7);
   const cookie = req.headers.get('cookie') || '';
-  const match = cookie.match(/(?:^|;\s*)admin_session=([^;]*)/);
+  const match = cookie.match(new RegExp(`(?:^|;\\s*)${COOKIE_NAME}=([^;]*)`));
   return match ? match[1] : null;
 }
 
@@ -26,7 +27,7 @@ export async function getSession(req: Request): Promise<SessionInfo> {
     await connectDB();
 
     // Check root session
-    const settings = await Settings.findOne({}).lean();
+    const settings = await Settings.findOne({}).select('+security').lean();
     const rootToken = settings?.security?.session || settings?.adminSession;
     if (rootToken && rootToken === token) {
       return { token, isRoot: true, accountId: null, username: 'root' };
@@ -44,10 +45,10 @@ export async function getSession(req: Request): Promise<SessionInfo> {
   }
 }
 
-export async function requireAdmin(req: Request): Promise<NextResponse | null> {
+export async function requireRoot(req: Request): Promise<NextResponse | null> {
   const session = await getSession(req);
-  if (!session.token) {
-    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  if (!session.isRoot) {
+    return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
   }
   return null;
 }

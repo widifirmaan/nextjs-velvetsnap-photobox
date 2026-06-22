@@ -10,19 +10,17 @@ export default function EditorStep({
   captures, templateData, keyedFrameImage, frameRatio,
   photoAdjust, setPhotoAdjust,
   selectedSlotIdx, setSelectedSlotIdx,
-  selectedFilter, setSelectedFilter,
+  selectedFilter,
   onNext, onBack,
 }: {
   captures: string[]; templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
   photoAdjust: PhotoAdjust[];
   setPhotoAdjust: React.Dispatch<React.SetStateAction<PhotoAdjust[]>>;
   selectedSlotIdx: number; setSelectedSlotIdx: (v: number) => void;
-  selectedFilter: string; setSelectedFilter: (v: string) => void;
+  selectedFilter: string;
   onNext: () => void; onBack: () => void;
 }) {
   const handleRetake = () => onBack();
-
-  const hasTemplate = templateData && templateData.templateFull && templateData.templateData.slotsLayout && templateData.templateData.slotsLayout.length > 0;
 
   const sel = photoAdjust[selectedSlotIdx] || DEFAULT_ADJUST;
 

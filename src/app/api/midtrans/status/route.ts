@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
     await connectDB();
 
-    let filter: Record<string, any> = {};
+    const filter: Record<string, any> = {};
     if (orderId) filter.orderId = orderId;
     else filter.sessionId = sessionId;
 

@@ -62,4 +62,6 @@ const AccountSchema = new Schema<IAccount>({
   },
 }, { timestamps: true });
 
+AccountSchema.index({ session: 1 });
+
 export default mongoose.models.Account || mongoose.model<IAccount>('Account', AccountSchema);

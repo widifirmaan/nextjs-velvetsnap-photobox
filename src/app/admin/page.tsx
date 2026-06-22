@@ -1,24 +1,26 @@
 import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import Transaction from '@/models/Transaction';
+import Settings from '@/models/Settings';
 import Account from '@/models/Account';
 import { cookies } from 'next/headers';
-import Settings from '@/models/Settings';
 import Link from 'next/link';
 import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'lucide-react';
 import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
 import MobileActions from './MobileActions';
 import styles from './page.module.css';
+import { COOKIE_NAME } from '@/lib/constants';
 
 export const revalidate = 60;
 
-async function getSession() {
+async function getAdminSession() {
   const cookieStore = await cookies();
-  const adminSession = cookieStore.get('admin_session');
+  const adminSession = cookieStore.get(COOKIE_NAME);
   if (!adminSession?.value) return { isRoot: false, accountId: null, username: null };
 
   await connectDB();
-  const settings = await Settings.findOne({}).lean();
+
+  const settings = await Settings.findOne({}).select('+security').lean();
   const rootToken = settings?.security?.session || settings?.adminSession;
   if (rootToken === adminSession.value) {
     return { isRoot: true, accountId: null, username: 'root' };
@@ -34,15 +36,15 @@ async function getSession() {
 
 export default async function AdminDashboard() {
   await connectDB();
-  const session = await getSession();
+  const session = await getAdminSession();
 
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
   const weekStart = new Date(todayStart);
   weekStart.setDate(weekStart.getDate() - 6);
 
-  const txFilter: any = {};
-  const tmplFilter: any = {};
+  const txFilter: Record<string, string> = {};
+  const tmplFilter: Record<string, string> = {};
 
   if (session.isRoot) {
     // Root sees all
@@ -82,7 +84,7 @@ export default async function AdminDashboard() {
   const todayStr = todayStart.toISOString().split('T')[0];
   const revenue = aggResult[0]?.allTime?.[0]?.total || 0;
   const dailyRevenueAgg = aggResult[0]?.last7Days || [];
-  const todayAgg = dailyRevenueAgg.find((r: any) => r._id === todayStr);
+  const todayAgg = dailyRevenueAgg.find((r: { _id: string; total: number }) => r._id === todayStr);
   const todayRevenue = todayAgg?.total || 0;
 
   const dailyData = [];
@@ -91,7 +93,7 @@ export default async function AdminDashboard() {
     const d = new Date(todayStart);
     d.setDate(d.getDate() - i);
     const dateStr = d.toISOString().split('T')[0];
-    const found = dailyRevenueAgg.find((r: any) => (r._id || r.k) === dateStr);
+    const found = dailyRevenueAgg.find((r: { _id?: string; k?: string; total: number }) => (r._id || r.k) === dateStr);
     const total = found?.total || 0;
     if (total > maxRevenue) maxRevenue = total;
     dailyData.push({

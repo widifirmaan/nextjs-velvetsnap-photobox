@@ -26,15 +26,12 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
 }) {
   const [slideIdx, setSlideIdx] = useState(0);
   const [tooltipVisible, setTooltipVisible] = useState(false);
-  const [smallViewport, setSmallViewport] = useState(false);
   const smallVpRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const check = () => {
-      const v = window.innerWidth < 768;
-      setSmallViewport(v);
-      smallVpRef.current = v;
+      smallVpRef.current = window.innerWidth < 768;
     };
     check();
     window.addEventListener('resize', check);

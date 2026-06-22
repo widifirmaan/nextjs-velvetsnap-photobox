@@ -1,16 +1,14 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Account from '@/models/Account';
-import { getSession } from '@/lib/require-admin';
-import { hashPassword, generateSessionToken } from '@/lib/auth';
+import { requireRoot } from '@/lib/require-admin';
+import { hashPassword } from '@/lib/auth';
 import { apiError } from '@/lib/api-utils';
 
 export async function GET(req: Request) {
   try {
-    const session = await getSession(req);
-    if (!session.isRoot) {
-      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
-    }
+    const forbidden = await requireRoot(req);
+    if (forbidden) return forbidden;
 
     await connectDB();
     const accounts = await Account.find({})
@@ -26,10 +24,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const session = await getSession(req);
-    if (!session.isRoot) {
-      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
-    }
+    const forbidden = await requireRoot(req);
+    if (forbidden) return forbidden;
 
     const { username, password } = await req.json();
     if (!username || username.trim().length < 2) {

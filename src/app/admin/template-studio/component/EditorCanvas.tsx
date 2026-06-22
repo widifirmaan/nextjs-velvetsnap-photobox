@@ -250,7 +250,7 @@ const EditorCanvas = forwardRef<EditorCanvasHandle, EditorCanvasProps>(function 
     guideLayerRef.current?.batchDraw();
   }, [elements, others, canvasSize, clampBg]);
 
-  const handleTransformMove = useCallback((e: Konva.KonvaEventObject<Event>) => {
+  const handleTransformMove = useCallback((_e: Konva.KonvaEventObject<Event>) => {
     if (!selectedId) return;
     const node = trRef.current?.nodes()?.[0];
     if (!node) return;
@@ -378,7 +378,6 @@ export default EditorCanvas;
 
 function CanvasElement({
   element,
-  isSelected,
   onSelect,
   onDragEnd,
   onDragMove,

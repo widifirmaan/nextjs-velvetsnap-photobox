@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
-import { getSession, buildAccountFilter } from '@/lib/require-admin';
+import { buildAccountFilter } from '@/lib/require-admin';
 import { v4 as uuidv4 } from 'uuid';
 import { apiError } from '@/lib/api-utils';
 
@@ -54,13 +54,10 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get('limit') || '12');
     const skip = (page - 1) * limit;
 
-    const transactions = await Transaction.find(filter)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    const total = await Transaction.countDocuments(filter);
+    const [transactions, total] = await Promise.all([
+      Transaction.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      Transaction.countDocuments(filter),
+    ]);
 
     return NextResponse.json({
       success: true,

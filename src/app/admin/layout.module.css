@@ -80,14 +80,6 @@
   to { transform: translateX(100%); }
 }
 
-.hamburger {
-  display: none;
-}
-
-.overlay {
-  display: none;
-}
-
 .sidebar {
   width: 260px;
   border-radius: 0;

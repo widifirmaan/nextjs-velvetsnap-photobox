@@ -17,8 +17,6 @@ export async function POST(req: Request) {
     const statusCode = body.status_code;
     const signatureKey = body.signature_key;
 
-    console.log('Midtrans notification:', { orderId, transactionStatus, transactionId, paymentType });
-
     if (!orderId) {
       return NextResponse.json({ success: false, error: 'Missing order_id' }, { status: 400 });
     }

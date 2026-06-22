@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import { Download, Printer, Home as HomeIcon, Smartphone } from 'lucide-react';
+import { PRINT_WINDOW_DELAY } from '@/lib/constants';
 import styles from '@/app/main/page.module.css';
 
 export default function ResultActions({
@@ -46,7 +47,7 @@ export default function ResultActions({
         @media print{body{background:none}}
       </style></head><body><img src="${compositedImage}" /></body></html>`);
       win.document.close();
-      setTimeout(() => { win.focus(); win.print(); }, 500);
+      setTimeout(() => { win.focus(); win.print(); }, PRINT_WINDOW_DELAY);
     };
     img.src = compositedImage;
   };

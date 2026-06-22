@@ -12,7 +12,11 @@ export function hashPassword(password: string, salt?: string) {
 
 export function verifyPassword(password: string, hash: string, salt: string) {
   const { hash: h } = hashPassword(password, salt);
-  return h === hash;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(h), Buffer.from(hash));
+  } catch {
+    return false;
+  }
 }
 
 export function generateSessionToken() {

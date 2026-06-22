@@ -3,6 +3,8 @@ import connectDB from '@/lib/db';
 import Template from '@/models/Template';
 import { uploadBase64 } from '@/lib/cloudinary';
 import { apiError } from '@/lib/api-utils';
+import { buildAccountFilter } from '@/lib/require-admin';
+import type { IStripElement } from '@/models/Template';
 
 async function urlToBase64(url: string): Promise<string | null> {
   try {
@@ -19,11 +21,12 @@ async function urlToBase64(url: string): Promise<string | null> {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     await connectDB();
-    const templates = await Template.find({}).lean();
-    const results: any[] = [];
+    const accountFilter = await buildAccountFilter(req);
+    const templates = await Template.find(accountFilter).lean();
+    const results: { id: string; name: string; status: string; errors?: string[] }[] = [];
 
     for (const doc of templates) {
       const id = doc._id.toString();
@@ -35,9 +38,9 @@ export async function GET() {
       try {
         const fullUrl: string = doc.templateFull || doc.fullresUrl || '';
         const thumbUrl: string = doc.templateThumb || doc.thumbUrl || '';
-        const els: any[] = doc.templateData?.elements || doc.elements || [];
+        const els: IStripElement[] = (doc.templateData?.elements || doc.elements || []) as IStripElement[];
 
-        const updateFields: Record<string, any> = {};
+        const updateFields: Record<string, unknown> = {};
         const updatedElements = JSON.parse(JSON.stringify(els));
 
         if (fullUrl && fullUrl.includes('res.cloudinary.com')) {

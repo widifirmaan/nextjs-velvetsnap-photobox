@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Camera, Loader2, Search, X, Trash2, Printer, ImageIcon, Eye, EyeOff } from 'lucide-react';
 import { AdminPageHeader, AdminBadge, AdminEmptyState, AdminModal, AdminConfirmModal } from '@/app/admin/components';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from './page.module.css';
 
 interface Transaction {
@@ -49,7 +50,7 @@ export default function HistoryPage() {
       if (fromDate) params.set('from', fromDate);
       if (toDate) params.set('to', toDate);
 
-      const res = await fetch(`/api/transactions?${params.toString()}`);
+      const res = await adminFetch(`/api/transactions?${params.toString()}`);
       const data = await res.json();
       if (data.success) {
         setTransactions(data.data || []);
@@ -76,7 +77,7 @@ export default function HistoryPage() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      const res = await fetch(`/api/transactions?id=${deleteTarget}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/transactions?id=${deleteTarget}`, { method: 'DELETE' });
       const data = await res.json();
       if (data.success) {
         setTransactions((prev) => prev.filter((t) => t._id !== deleteTarget));
@@ -154,7 +155,7 @@ export default function HistoryPage() {
     setTogglingId(tx._id);
     setTransactions((prev) => prev.map((t) => t._id === tx._id ? { ...t, showInCarousel: next } : t));
     try {
-      const res = await fetch(`/api/transactions/${tx._id}`, {
+      const res = await adminFetch(`/api/transactions/${tx._id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ showInCarousel: next }),
@@ -238,7 +239,7 @@ export default function HistoryPage() {
                     setSelectedTx(null);
                     setModalLoading(true);
                     try {
-                      const res = await fetch(`/api/transactions/${tx._id}`);
+                      const res = await adminFetch(`/api/transactions/${tx._id}`);
                       const data = await res.json();
                       if (data.success) setSelectedTx(data.data);
                     } catch {}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, XCircle, Play } from 'lucide-react';
 import { renderStripFrame, removeGreenScreen } from '@/lib/canvas-utils';
 import type { IStripElement } from '@/models/Template';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from './page.module.css';
 
 const HI_RES_MULTIPLIER = 3;
@@ -33,7 +34,7 @@ export default function ReprocessTemplatesPage() {
   const [running, setRunning] = useState(false);
 
   useEffect(() => {
-    fetch('/api/templates/list')
+    adminFetch('/api/templates/list')
       .then((r) => r.json())
       .then((res) => {
         const list = (res.success ? res.data : []) as TemplateItem[];
@@ -64,7 +65,7 @@ export default function ReprocessTemplatesPage() {
       const cleanB64 = await removeGreenScreen(frameB64, maxW);
 
       // Step 3: Upload to Cloudinary
-      const uploadRes = await fetch('/api/upload', {
+      const uploadRes = await adminFetch('/api/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ dataUri: cleanB64, folder: 'velvetsnap/templates' }),
@@ -73,7 +74,7 @@ export default function ReprocessTemplatesPage() {
       if (!uploadData.success) throw new Error(uploadData.error || 'Upload failed');
 
       // Step 4: Update template with new templateFull URL
-      const updateRes = await fetch(`/api/templates/${t._id}`, {
+      const updateRes = await adminFetch(`/api/templates/${t._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

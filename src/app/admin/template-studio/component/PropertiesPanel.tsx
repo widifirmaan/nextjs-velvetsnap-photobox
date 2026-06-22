@@ -65,7 +65,7 @@ interface PropertiesPanelProps {
   selected: IStripElement | null;
   slotCount: number;
   onSetSlotCount: (n: number) => void;
-  onUpdateProps: (props: Record<string, any>) => void;
+  onUpdateProps: (props: Record<string, unknown>) => void;
   onUpdate: (patch: Partial<IStripElement>) => void;
   onDelete: () => void;
   onBringForward: () => void;
@@ -113,8 +113,8 @@ export default function PropertiesPanel({
 
   const p = selected.props;
 
-  const set = (key: string, value: any) => onUpdateProps({ [key]: value });
-  const setEl = (key: string, value: any) => onUpdate({ [key]: value });
+  const set = (key: string, value: unknown) => onUpdateProps({ [key]: value });
+  const setEl = (key: string, value: unknown) => onUpdate({ [key]: value });
 
   return (
     <aside className="properties-panel">

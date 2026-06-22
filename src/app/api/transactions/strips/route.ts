@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
-import { getSession, buildAccountFilter } from '@/lib/require-admin';
+import { buildAccountFilter } from '@/lib/require-admin';
 import { apiError } from '@/lib/api-utils';
 
 export async function GET(req: Request) {
@@ -13,6 +13,7 @@ export async function GET(req: Request) {
     if (accountFilter.accountId) filter.accountId = accountFilter.accountId;
 
     const transactions = await Transaction.find(filter)
+      .select('_id sessionId finalImage')
       .sort({ createdAt: -1 })
       .limit(7)
       .lean();

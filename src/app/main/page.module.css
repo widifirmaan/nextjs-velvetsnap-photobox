@@ -280,12 +280,6 @@
   min-height: 0;
 }
 
-.cardSmallDesktop {
-  display: block;
-}
-
-
-
 .cardSmallRow {
   display: none;
 }
@@ -405,12 +399,6 @@
 }
 
 
-
-.heroCard :global(img) {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
 
 .introCta {
   display: inline-flex;
@@ -596,6 +584,15 @@
 }
 
 /* ── Fan Strips Layout ── */
+.fanViewport {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
 .fanTrack {
   flex: 1;
   display: flex;
@@ -682,18 +679,6 @@
   .colCenter {
     display: none;
   }
-  /* .cardSmallDesktop {
-    display: none;
-  }
-  .cardSmallRow {
-    display: flex;
-    grid-row: 2;
-    gap: 10px;
-  }
-  .cardSmallRow > * {
-    flex: 1;
-    min-width: 0;
-  } */
   .colRight {
     grid-column: 1;
     grid-row: 3;
@@ -759,15 +744,6 @@
   .logoTitle {
     font-size: 16px;
   } */
-  .stripFront {
-    max-width: 70%;
-  }
-  .stripBack {
-    left: 5%;
-  }
-  .stripBackR {
-    right: 5%;
-  }
   .footerText {
     font-size: 9px;
     padding-bottom: 0;
@@ -1479,13 +1455,6 @@
 
 
 
-.editorSlotThumb:hover {
-  transform: scale(1.05);
-}
-
-
-
-
 
 
 
@@ -1793,10 +1762,6 @@
   .editorSidebar .editorSlider::-moz-range-thumb {
     width: 20px;
     height: 20px;
-  }
-  .editorSidebar .editorSlotThumb {
-    width: 48px;
-    height: 48px;
   }
   .resultLayout {
     flex-direction: row;

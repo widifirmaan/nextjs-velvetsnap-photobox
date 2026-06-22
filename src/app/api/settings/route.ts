@@ -5,7 +5,7 @@ import Account from '@/models/Account';
 import { getSession } from '@/lib/require-admin';
 import { apiError } from '@/lib/api-utils';
 
-const SENSITIVE_PATHS = ['security.password', 'security.passwordSalt', 'security.session', 'security.sessionExpires'];
+const SENSITIVE_PATHS = ['security.password', 'security.passwordSalt', 'security.session'];
 const SENSITIVE_FLAT = ['adminPassword', 'adminPasswordSalt', 'adminSession', 'adminSessionExpires'];
 const DEAD_FLAT = ['fontFamily', 'headingFontFamily', 'headingFontSize', 'bodyFontSize', 'textAlign', '__v'];
 
@@ -22,7 +22,7 @@ const OLD_FLAT_TO_NESTED: Record<string, [string, string]> = {
   adminPassword: ['security', 'password'],
   adminPasswordSalt: ['security', 'passwordSalt'],
   adminSession: ['security', 'session'],
-  adminSessionExpires: ['security', 'sessionExpires'],
+
 };
 
 function cleanDoc(doc: Record<string, any>) {
@@ -83,6 +83,7 @@ async function getOrCreateRoot() {
 
 export async function GET(req: Request) {
   try {
+    await connectDB();
     const { searchParams } = new URL(req.url);
     const session = await getSession(req);
 
@@ -90,7 +91,6 @@ export async function GET(req: Request) {
     const qAccountId = searchParams.get('accountId');
     if (qAccountId || (session.accountId && !session.isRoot)) {
       const accountId = qAccountId || session.accountId;
-      await connectDB();
       const account = await Account.findById(accountId).lean();
       if (account) {
         return NextResponse.json({ success: true, data: mapAccountSettings(account) }, {
@@ -100,7 +100,7 @@ export async function GET(req: Request) {
     }
 
     // Root or public → return root settings
-    const doc = await getOrCreateRoot();
+    const doc = await getOrCreateRoot(); // connectDB already called above
     return NextResponse.json({ success: true, data: cleanDoc(doc) }, {
       headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate' },
     });
@@ -111,11 +111,11 @@ export async function GET(req: Request) {
 
 export async function PUT(req: Request) {
   try {
+    await connectDB();
     const session = await getSession(req);
 
     // Account user → save to account settings
     if (session.accountId && !session.isRoot) {
-      await connectDB();
       const body = await req.json();
       const $set: Record<string, any> = {};
       for (const [key, val] of Object.entries(body)) {
@@ -127,13 +127,12 @@ export async function PUT(req: Request) {
           $set[`settings.${key}`] = val;
         }
       }
-      await Account.findByIdAndUpdate(session.accountId, { $set });
-      const account = await Account.findById(session.accountId).lean();
+      const account = await Account.findByIdAndUpdate(session.accountId, { $set }, { new: true }).lean();
       return NextResponse.json({ success: true, data: mapAccountSettings(account) });
     }
 
     // Root → save to root settings (existing behavior)
-    await connectDB();
+    // connectDB already called above
     const body = await req.json();
     for (const path of SENSITIVE_PATHS) {
       const parts = path.split('.');
@@ -149,8 +148,7 @@ export async function PUT(req: Request) {
         $set[key] = val;
       }
     }
-    await Settings.collection.updateOne({}, { $set }, { upsert: true });
-    const doc = await Settings.collection.findOne({});
+    const doc = await Settings.collection.findOneAndUpdate({}, { $set }, { upsert: true, returnDocument: 'after' });
     return NextResponse.json({ success: true, data: cleanDoc(doc as any) });
   } catch (error: unknown) {
     return apiError(error);

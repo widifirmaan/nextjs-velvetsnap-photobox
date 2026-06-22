@@ -1,5 +1,5 @@
 import type { ISlot, IStripElement } from '@/app/main/types';
-import { loadImage, loadImages, flipImageHorizontal, calcCoverFit, applyPhotoAdjustment } from './image-utils';
+import { loadImage, loadImages, flipImageHorizontal, applyPhotoAdjustment } from './image-utils';
 import { drawSlotShape, clipSlotShape } from './shapes';
 import {
   CHROMA_KEY_GREEN, CHROMA_KEY_TARGET, CHROMA_KEY_THRESHOLD,
@@ -33,29 +33,28 @@ export async function composeFrameImage(
         ctx.fillStyle = color || '#ffffff';
         ctx.fillRect(0, 0, cw, ch);
 
-        const photoLoads: Promise<void>[] = [];
         for (let idx = 0; idx < slots.length; idx++) {
           const slot = slots[idx];
           const src = captures[idx];
           if (!src) continue;
 
-          photoLoads.push((async () => {
+          try {
+            const photo = await loadImage(src);
             const sx = (slot.x / 100) * cw;
             const sy = (slot.y / 100) * ch;
             const sw = (slot.w / 100) * cw;
             const sh = (slot.h / 100) * ch;
 
-            const photo = await loadImage(src);
             ctx.save();
             ctx.beginPath();
             ctx.rect(sx, sy, sw, sh);
             ctx.clip();
-
             applyPhotoAdjustment(ctx, photo, sx, sy, sw, sh, adjust[idx] || { scale: 1, x: 0, y: 0 });
             ctx.restore();
-          })());
+          } catch {
+            continue;
+          }
         }
-        await Promise.all(photoLoads);
 
         ctx.drawImage(frameImg, 0, 0, cw, ch);
         resolve(canvas.toDataURL('image/jpeg', COMPOSE_JPEG_QUALITY));

@@ -143,18 +143,6 @@
   color: var(--accent-color);
 }
 
-.viewAll {
-  font-size: 12px;
-  color: var(--accent-color);
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity var(--transition-fast);
-}
-
-.viewAll:hover {
-  opacity: 0.7;
-}
-
 /* Mobile-only actions */
 .mobileActions {
   display: none;
@@ -342,9 +330,5 @@
   .sectionTitle {
     font-size: 12px;
     margin-bottom: 6px;
-  }
-
-  .viewAll {
-    font-size: 10px;
   }
 }

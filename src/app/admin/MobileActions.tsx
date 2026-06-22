@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LogOut, ExternalLink } from 'lucide-react';
-import { clearAdminSession } from '@/lib/admin-fetch';
+import { adminFetch, clearAdminSession } from '@/lib/admin-fetch';
 import styles from './page.module.css';
 
 export default function MobileActions() {
@@ -18,7 +18,7 @@ export default function MobileActions() {
       <button
         onClick={() => {
           clearAdminSession();
-          fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
+          adminFetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
         }}
         className={`card card-sm ${styles.mobileActionBtn}`}
       >

@@ -34,7 +34,7 @@ async function captureViaDigiCamControl(): Promise<string> {
 export async function POST() {
   try {
     let dataUrl: string | null = null;
-    let errors: string[] = [];
+    const errors: string[] = [];
 
     // Try gphoto2 first
     try {

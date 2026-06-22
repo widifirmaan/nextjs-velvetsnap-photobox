@@ -39,13 +39,17 @@ export default function Home() {
   const [tmplCount, setTmplCount] = useState(0);
   const [branding, setBranding] = useState<Branding>(defaultBranding);
   const [refreshKey, setRefreshKey] = useState(0);
+  const refreshTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [morphOrigin, setMorphOrigin] = useState<{x: number; y: number} | null>(null);
   const [btnMorph, setBtnMorph] = useState<{
     x: number; y: number; w: number; h: number; phase: 'pill' | 'circle' | 'expand';
   } | null>(null);
   const [clipStage, setClipStage] = useState<'init' | 'expand' | null>(null);
 
-  const handleRefresh = useCallback(() => setRefreshKey((k) => k + 1), []);
+  const handleRefresh = useCallback(() => {
+    if (refreshTimer.current) clearTimeout(refreshTimer.current);
+    refreshTimer.current = setTimeout(() => setRefreshKey((k) => k + 1), 300);
+  }, []);
 
   const getAccountParam = () => {
     if (typeof window === 'undefined') return '';

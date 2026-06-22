@@ -22,7 +22,7 @@ export async function PUT(req: Request) {
     const { hash, salt } = hashPassword(password);
 
     if (session.isRoot) {
-      const settings = await Settings.findOne({});
+      const settings = await Settings.findOne({}).select('+security');
       if (settings) {
         settings.security = { ...settings.security, password: hash, passwordSalt: salt };
         await settings.save();

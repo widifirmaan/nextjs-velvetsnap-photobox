@@ -17,31 +17,6 @@
   overflow: hidden;
 }
 
-.headerActions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.nameField input {
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: 1px solid var(--mn-border);
-  background: #fff;
-  color: var(--text-primary);
-  font-family: inherit;
-  font-size: 15px;
-  min-width: 240px;
-  word-break: break-word;
-  max-width: 100%;
-}
-
-.nameField input:focus {
-  outline: none;
-  border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);
-}
-
 .editorLayout {
   display: grid;
   grid-template-columns: 200px 1fr 280px;
@@ -77,38 +52,6 @@
   padding-right: 4px;
 }
 
-.bottomBar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 20px 0;
-  margin-top: 24px;
-  border-top: 1px solid var(--mn-border);
-}
-
-.modelStatus {
-  font-size: 12px;
-  min-width: 160px;
-  text-align: center;
-}
-
-.modelLoading {
-  color: var(--text-muted);
-  animation: pulse 1.5s ease-in-out infinite;
-}
-
-.modelReady {
-  color: var(--accent-color, #C5D89D);
-  font-weight: 600;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-/* Mobile toolbar */
 .mobileToolbar {
   display: none;
   position: fixed;
@@ -127,22 +70,6 @@
 }
 
 @media (max-width: 768px) {
-  .headerActions {
-    width: 100%;
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .nameField {
-    width: 100%;
-  }
-  
-  .nameField input {
-    width: 100%;
-    min-width: unset;
-    font-size: 16px;
-  }
-  
   .editorLayout {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -492,15 +419,5 @@
   opacity: 0.4;
 }
 
-@media (max-width: 480px) {
-  .nameField input {
-    font-size: 16px;
-    padding: 12px;
-  }
-  
-  .headerActions button {
-    width: 100%;
-  }
-  
-}
+
 

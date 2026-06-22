@@ -60,7 +60,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       }
     }
 
-    const update: any = {
+    const update: Record<string, unknown> = {
       templateName: body.templateName || body.name,
       templateDesc: body.templateDesc ?? body.description,
       templatePrice: body.templatePrice ?? body.price,

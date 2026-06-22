@@ -2,32 +2,43 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Layers, Server, Clock, Film, Loader2, LogOut, Settings2, User, Users } from 'lucide-react';
+import { LayoutDashboard, Layers, Server, Clock, Film, Loader2, LogOut, Settings2, User, Users, type LucideIcon } from 'lucide-react';
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { STORAGE_KEYS } from '@/lib/constants';
-import { clearAdminSession } from '@/lib/admin-fetch';
+import { STORAGE_KEYS, CURTAIN_ANIM_DELAY, CURTAIN_FALLBACK_TIMEOUT } from '@/lib/constants';
+import { adminFetch, clearAdminSession, syncAdminSession } from '@/lib/admin-fetch';
+
+interface NavLink {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
   const [curtainPhase, setCurtainPhase] = useState<'idle' | 'closing' | 'opening'>('idle');
-  const [authed, setAuthed] = useState(false);
-  const [isRoot, setIsRoot] = useState(true);
-  const [username, setUsername] = useState('');
+  const [authed] = useState(
+    pathname === '/admin/login' ||
+    (typeof window !== 'undefined' && !!sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN))
+  );
+  const [isRoot, setIsRoot] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return sessionStorage.getItem(STORAGE_KEYS.ADMIN_IS_ROOT) === '1';
+  });
+  const [username, setUsername] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    return sessionStorage.getItem(STORAGE_KEYS.ADMIN_USERNAME) || '';
+  });
+  const [pendingNav, setPendingNav] = useState(false);
   const targetRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (pathname === '/admin/login') { setAuthed(true); return; }
+    if (pathname === '/admin/login') return;
     const token = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
     if (token) {
-      setAuthed(true);
-      const savedRoot = sessionStorage.getItem(STORAGE_KEYS.ADMIN_IS_ROOT);
-      const savedUser = sessionStorage.getItem(STORAGE_KEYS.ADMIN_USERNAME);
-      if (savedRoot !== null) setIsRoot(savedRoot === '1');
-      if (savedUser) setUsername(savedUser);
-      fetch('/api/admin/session', { headers: { Authorization: 'Bearer ' + token } })
+      adminFetch('/api/admin/session')
         .then((r) => {
           if (r.ok) return r.json();
           sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN);
@@ -40,15 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           if (data) {
             setIsRoot(data.isRoot);
             setUsername(data.username || '');
-            sessionStorage.setItem(STORAGE_KEYS.ADMIN_IS_ROOT, data.isRoot ? '1' : '0');
-            if (data.accountId) sessionStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, data.accountId);
-            if (data.username) sessionStorage.setItem(STORAGE_KEYS.ADMIN_USERNAME, data.username);
-            // Sync to localStorage for kiosk pages
-            if (data.accountId && !data.isRoot) {
-              localStorage.setItem(STORAGE_KEYS.ACCOUNT, data.accountId);
-            } else {
-              localStorage.removeItem(STORAGE_KEYS.ACCOUNT);
-            }
+            syncAdminSession(data);
           }
         })
         .catch(() => {
@@ -58,14 +61,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           router.replace('/admin/login');
         });
     } else {
-      fetch('/api/admin/session')
-        .then((r) => { if (r.ok) { setAuthed(true); } else router.replace('/admin/login'); })
-        .catch(() => router.replace('/admin/login'));
+      router.replace('/admin/login');
     }
   }, [pathname, router]);
 
   useEffect(() => {
-    fetch('/api/settings')
+    adminFetch('/api/settings')
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data?.system?.accentColor) {
@@ -80,23 +81,48 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       const t = setTimeout(() => {
         const href = targetRef.current;
         if (href) {
-          targetRef.current = null;
           router.push(href);
-          setCurtainPhase('opening');
+          setPendingNav(true);
         }
-      }, 400);
+      }, CURTAIN_ANIM_DELAY);
       return () => clearTimeout(t);
     }
     if (curtainPhase === 'opening') {
       const t = setTimeout(() => {
         setCurtainPhase('idle');
         setNavigating(false);
-      }, 400);
+      }, CURTAIN_ANIM_DELAY);
       return () => clearTimeout(t);
     }
   }, [curtainPhase, router]);
 
-  const rootNavLinks = [
+  useEffect(() => {
+    if (!pendingNav || !targetRef.current) return;
+    const target = targetRef.current;
+    const matches = target === '/admin' ? pathname === '/admin' : pathname === target || pathname.startsWith(target + '/');
+    if (matches) {
+      targetRef.current = null;
+      setPendingNav(false);
+      setCurtainPhase('opening');
+    }
+  }, [pathname, pendingNav]);
+
+  useEffect(() => {
+    if (!pendingNav) return;
+    const t = setTimeout(() => {
+      targetRef.current = null;
+      setPendingNav(false);
+      setCurtainPhase('opening');
+    }, CURTAIN_FALLBACK_TIMEOUT);
+    return () => clearTimeout(t);
+  }, [pendingNav]);
+
+  const isActive = useCallback((href: string) => {
+    if (href === '/admin') return pathname === '/admin';
+    return pathname === href || pathname.startsWith(href + '/');
+  }, [pathname]);
+
+  const rootNavLinks: NavLink[] = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/history', label: 'History', icon: Clock },
     { href: '/admin/templates', label: 'Templates', icon: Layers },
@@ -106,19 +132,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/settings', label: 'Settings', icon: Settings2 },
   ];
 
-  const accountNavLinks = [
+  const accountNavLinks: NavLink[] = [
     { href: '/admin', label: 'Overview', icon: LayoutDashboard },
     { href: '/admin/history', label: 'History', icon: Clock },
     { href: '/admin/templates', label: 'Templates', icon: Layers },
     { href: '/admin/settings', label: 'My Settings', icon: Settings2 },
   ];
 
-  const navLinks = isRoot ? rootNavLinks : accountNavLinks;
-
-  const isActive = (href: string) => {
-    if (href === '/admin') return pathname === '/admin';
-    return pathname === href || pathname.startsWith(href + '/');
-  };
+  const navLinks: NavLink[] = isRoot ? rootNavLinks : accountNavLinks;
 
   const handleNavClick = useCallback((e: React.MouseEvent, href: string) => {
     e.preventDefault();
@@ -131,10 +152,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = () => {
     clearAdminSession();
-    fetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
+    adminFetch('/api/admin/login', { method: 'DELETE' }).then(() => router.push('/admin/login'));
   };
 
-  const renderNavLink = (link: { href: string; label: string; icon: any }) => {
+  const renderNavLink = (link: NavLink) => {
     const Icon = link.icon;
     return (
       <Link
@@ -149,7 +170,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   };
 
-  const renderBottomNavItem = (link: { href: string; label: string; icon: any }) => {
+  const renderBottomNavItem = (link: NavLink) => {
     const Icon = link.icon;
     return (
       <Link

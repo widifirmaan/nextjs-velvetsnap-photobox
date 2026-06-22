@@ -3,10 +3,12 @@ import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/cloudinary';
 import { apiError } from '@/lib/api-utils';
-async function runMigration() {
+import { buildAccountFilter } from '@/lib/require-admin';
+
+async function runMigration(accountFilter: Record<string, unknown>) {
   await connectDB();
 
-  const allTxs = await Transaction.find({}).lean();
+  const allTxs = await Transaction.find(accountFilter).lean();
   let migratedCount = 0;
   let failedCount = 0;
 
@@ -54,7 +56,8 @@ async function runMigration() {
 
 export async function GET(req: Request) {
   try {
-    const result = await runMigration();
+    const accountFilter = await buildAccountFilter(req);
+    const result = await runMigration(accountFilter);
     return NextResponse.json({ success: true, ...result });
   } catch (error: unknown) {
     return apiError(error);
@@ -63,7 +66,8 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    const result = await runMigration();
+    const accountFilter = await buildAccountFilter(req);
+    const result = await runMigration(accountFilter);
     return NextResponse.json({ success: true, ...result });
   } catch (error: unknown) {
     return apiError(error);

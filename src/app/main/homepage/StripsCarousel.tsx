@@ -40,7 +40,6 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
   const updateTransforms = useCallback(() => {
     const c = trackRef.current;
     if (!c) return;
-    const absPos = Math.abs(posRef.current);
     if (smallVpRef.current) {
       slideRefs.current.forEach((el) => {
         if (!el) return;
@@ -117,13 +116,6 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
 
   useEffect(() => {
     if (!strips.length || !onReady) return;
-    const total = Math.min(strips.length, 10) * 3;
-    const check = () => {
-      if (loadedCount.current >= total && !readyRef.current) {
-        readyRef.current = true;
-        onReady();
-      }
-    };
     const fallback = setTimeout(() => {
       if (!readyRef.current) {
         readyRef.current = true;
@@ -213,7 +205,7 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
               <img
                 key={`${s._id}-${i}`}
                 ref={(el) => { slideRefs.current[i] = el; }}
-                src={s.finalImage}
+                src={s.finalImage?.replace('/image/upload/', '/image/upload/f_auto,q_auto/') || ''}
                 alt=""
                 className={styles.fanSlide}
                 draggable={false}

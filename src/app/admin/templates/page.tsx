@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { AdminPageHeader, AdminTableCard, AdminConfirmModal } from '@/app/admin/components';
+import { adminFetch } from '@/lib/admin-fetch';
+import type { IStripElement } from '@/models/Template';
 import styles from './page.module.css';
 
 interface TemplateData {
@@ -18,7 +20,7 @@ interface TemplateData {
   templateData?: {
     canvasWidth?: number;
     canvasHeight?: number;
-    elements?: any[];
+    elements?: IStripElement[];
     color?: string;
     slots?: number;
   };
@@ -36,7 +38,7 @@ export default function TemplatesAdmin() {
   const fetchTemplates = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/templates/list', { cache: 'no-store' });
+      const res = await adminFetch('/api/templates/list', { cache: 'no-store' });
       const data = await res.json();
       if (data.success) setTemplates(data.data || []);
     } catch (err) {
@@ -54,7 +56,7 @@ export default function TemplatesAdmin() {
     if (!deleteTarget) return;
     setDeleteLoading(true);
     try {
-      const res = await fetch(`/api/templates/${deleteTarget}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/templates/${deleteTarget}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(res.statusText);
       setDeleteTarget(null);
       const removedId = deleteTarget;
@@ -69,7 +71,7 @@ export default function TemplatesAdmin() {
 
   const handleToggleActive = async (t: TemplateData) => {
     try {
-      await fetch(`/api/templates/${t._id}`, {
+      await adminFetch(`/api/templates/${t._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !t.isActive }),

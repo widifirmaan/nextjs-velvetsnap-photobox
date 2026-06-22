@@ -11,7 +11,7 @@ export interface ISettings extends Document {
   header: { location: string; navItems: string };
   footer: { text: string };
   system: { primaryColor: string; accentColor: string; showPreloader: boolean; showStrips: boolean; slideshowInterval: number; sessionTimer: number };
-  security: { password: string; passwordSalt: string; session: string; sessionExpires: Date | null };
+  security: { password: string; passwordSalt: string; session: string };
 }
 
 const SettingsSchema = new Schema<ISettings>({
@@ -54,10 +54,9 @@ const SettingsSchema = new Schema<ISettings>({
   },
   security: {
     type: {
-      password: { type: String, default: '' },
-      passwordSalt: { type: String, default: '' },
-      session: { type: String, default: '' },
-      sessionExpires: { type: Date, default: null },
+      password: { type: String, default: '', select: false },
+      passwordSalt: { type: String, default: '', select: false },
+      session: { type: String, default: '', select: false },
     },
     default: {},
   },

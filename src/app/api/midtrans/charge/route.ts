@@ -39,9 +39,10 @@ export async function POST(req: Request) {
       },
     };
 
-    const midtransResponse = await snap.createTransaction(parameter);
-
-    const existing = await Transaction.findOne({ sessionId });
+    const [midtransResponse, existing] = await Promise.all([
+      snap.createTransaction(parameter),
+      Transaction.findOne({ sessionId }),
+    ]);
 
     let tx;
     if (existing) {

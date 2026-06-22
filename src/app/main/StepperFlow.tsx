@@ -20,7 +20,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   const [captures, setCaptures] = useState<string[]>([]);
   const [photoAdjust, setPhotoAdjust] = useState<PhotoAdjust[]>([]);
   const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
-  const [selectedFilter, setSelectedFilter] = useState('none');
   const [keyedFrameImage, setKeyedFrameImage] = useState('');
   const [frameRatio, setFrameRatio] = useState(2 / 3);
   const [stripLoading, setStripLoading] = useState(false);
@@ -31,6 +30,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
   const [txId, setTxId] = useState<string | null>(null);
   const [cachedTemplates, setCachedTemplates] = useState<TemplateData[] | null>(null);
   const [templatesLoading, setTemplatesLoading] = useState(true);
+  const selectedFilter = 'none';
   const [timeLeft, setTimeLeft] = useState(sessionTimer);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const compositingId = useRef(0);
@@ -103,18 +103,14 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   const handleSelectTemplate = useCallback((id: string, data?: TemplateData, keyedUrl?: string) => {
     setTemplateId(id);
-    setStripLoading(true);
     setStep(2);
     const cw = data?.templateData?.canvasWidth || 1000;
     const ch = data?.templateData?.canvasHeight || 3000;
     setFrameRatio(cw / ch);
-    if (keyedUrl) {
-      setKeyedFrameImage(keyedUrl);
-    }
     if (data) {
       setTemplateData(data);
       setPrice(data.templatePrice ?? 35000);
-      if (data.templateFull) {
+      if (data.templateFull && !keyedUrl) {
         setKeyedFrameImage(data.templateFull);
       }
     } else if (keyedUrl && cachedTemplates) {
@@ -124,7 +120,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         setPrice(found.templatePrice ?? 35000);
       }
     }
-    setStripLoading(false);
   }, [setStep, cachedTemplates]);
 
   // Background chroma-key render when template changes
@@ -216,16 +211,13 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     });
   }, []);
 
-  const handleDeleteCapture = (idx: number) => {
+  const handleDeleteCapture = useCallback((idx: number) => {
     setCaptures((prev) => { const n = [...prev]; n[idx] = ''; return n; });
-  };
-
-  useEffect(() => {
-    setPhotoAdjust(prev => captures.map((_, i) => prev[i] || { ...DEFAULT_ADJUST }));
-  }, [captures]);
+  }, []);
 
   useEffect(() => {
     if (!captures.length || !templateData?.templateData?.slotsLayout?.length) return;
+    const adjs = captures.map((_, i) => photoAdjust[i] || { ...DEFAULT_ADJUST });
     const outW = templateData.templateData?.canvasWidth || 1000;
     const frameSrc = keyedFrameImage || templateData.templateFull || '';
     const hasPreComposed = !!frameSrc;
@@ -233,11 +225,11 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     if (!hasPreComposed && templateData.templateData?.type === 'strip' && templateData.templateData?.elements?.length) {
       composeStripImage(
         templateData.templateData?.elements, templateData.templateData?.color || '#ffffff',
-        captures, photoAdjust,
+        captures, adjs,
         outW, templateData.templateData?.canvasHeight || 3000, outW,
       ).then(result => { if (compositingId.current === id) setCompositedImage(result); }).catch(e => console.error('composeStripImage failed', e));
     } else if (frameSrc) {
-      composeFrameImage(frameSrc, templateData.templateData?.slotsLayout, captures, photoAdjust, templateData.templateData?.color || '#ffffff', outW)
+      composeFrameImage(frameSrc, templateData.templateData?.slotsLayout, captures, adjs, templateData.templateData?.color || '#ffffff', outW)
         .then(result => { if (compositingId.current === id) setCompositedImage(result); })
         .catch(e => console.error('composeFrameImage failed', e));
     }
@@ -266,7 +258,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   if (step === 2) content = (
     <BoothStep
-      templateId={templateId || 't1'}
       templateName={templateData?.templateName || TEMPLATE_CONFIGS[templateId || '']?.name || ''}
       slotsCount={slotsCount}
       filledCount={filledCount}
@@ -293,7 +284,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       selectedSlotIdx={selectedSlotIdx}
       setSelectedSlotIdx={setSelectedSlotIdx}
       selectedFilter={selectedFilter}
-      setSelectedFilter={setSelectedFilter}
       onNext={() => setStep(4)}
       onBack={() => setStep(2)}
     />
@@ -306,7 +296,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
       setPaid={setPaid}
       errMsg={errMsg}
       setErrMsg={setErrMsg}
-      captcha={captures}
+      captures={captures}
       templateId={templateId || 't1'}
       compositedImage={compositedImage}
       onSuccess={(id) => { setTxId(id); setStep(5); }}

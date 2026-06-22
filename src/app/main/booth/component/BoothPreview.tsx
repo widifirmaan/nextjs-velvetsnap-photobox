@@ -105,7 +105,7 @@ export default function BoothPreview({
                 </div>
               );
             })}
-            {keyedFrameImage && <img src={keyedFrameImage} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />}
+            {keyedFrameImage && <img src={keyedFrameImage?.includes('res.cloudinary.com') ? keyedFrameImage.replace('/image/upload/', '/image/upload/f_auto,q_auto/') : keyedFrameImage} alt="" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />}
           </div>
           {filledCount === slotsCount && (
             <button className={styles.boothProceedBtn} onClick={onNext}><Check size={16} /> Edit</button>

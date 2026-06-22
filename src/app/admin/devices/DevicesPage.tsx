@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Camera, Save, Monitor, Printer, RefreshCw, CheckCircle, Usb } from 'lucide-react';
 import AdminPageHeader from '@/app/admin/components/AdminPageHeader';
 import styles from './page.module.css';
-import { STORAGE_KEYS } from '@/lib/constants';
+import { STORAGE_KEYS, SAVED_MSG_TIMEOUT } from '@/lib/constants';
+import { adminFetch } from '@/lib/admin-fetch';
 
 interface DeviceSettings {
   cameraType: 'webcam' | 'dslr';
@@ -87,17 +88,17 @@ export default function DevicesPage() {
   const handleSave = () => {
     saveSettings(settings);
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setTimeout(() => setSaved(false), SAVED_MSG_TIMEOUT);
   };
 
   const testDslr = async () => {
     setDslrTesting(true);
     setDslrStatus(null);
     try {
-      const res = await fetch('/api/camera/list');
+      const res = await adminFetch('/api/camera/list');
       const data = await res.json();
       if (data.cameras?.length > 0) {
-        setDslrStatus(`✅ Terdeteksi: ${data.cameras.map((c: any) => c.name).join(', ')}`);
+        setDslrStatus(`✅ Terdeteksi: ${(data.cameras as { name: string }[]).map((c) => c.name).join(', ')}`);
       } else {
         setDslrStatus('❌ Tidak ada kamera USB terdeteksi. Pastikan driver (gphoto2 / DigiCamControl) terinstall.');
       }

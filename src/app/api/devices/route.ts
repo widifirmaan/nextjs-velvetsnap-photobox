@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Device from '@/models/Device';
 import { apiError } from '@/lib/api-utils';
-export async function GET(req: Request) {
+export async function GET(_req: Request) {
   try {
     await connectDB();
     const devices = await Device.find({});

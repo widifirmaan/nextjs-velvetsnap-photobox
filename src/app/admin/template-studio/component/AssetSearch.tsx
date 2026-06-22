@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { Search, FolderUp, Palette, X } from 'lucide-react';
 import { useModel } from '@/lib/ModelContext';
+import { adminFetch } from '@/lib/admin-fetch';
 import styles from './AssetSearch.module.css';
 
 interface AssetSearchProps {
@@ -29,9 +30,9 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const requestId = useRef(0);
 
-  const log = useCallback(async (level: string, message: string, data?: any) => {
+  const log = useCallback(async (level: string, message: string, data?: unknown) => {
     try {
-      await fetch('/api/log', {
+      await adminFetch('/api/log', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ level, message, data }),
@@ -113,7 +114,7 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
     }
     setImageError('');
     try {
-      const res = await fetch('/api/image/search', {
+      const res = await adminFetch('/api/image/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: q, page: p }),

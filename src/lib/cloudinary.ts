@@ -33,7 +33,7 @@ export async function uploadBase64Array(dataUris: string[], folder = 'velvetsnap
 
 export { getHighResUrl, isBase64, getOptimizedUrl } from './cloudinary-url';
 
-export async function deleteImage(url: string): Promise<void> {
+async function deleteImage(url: string): Promise<void> {
   if (!url || !url.includes('res.cloudinary.com')) return;
   try {
     const parts = url.split('/');
