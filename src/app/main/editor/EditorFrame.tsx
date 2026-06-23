@@ -16,7 +16,7 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     elRef.current?.setPointerCapture(e.pointerId);
-    const maxT = Math.max(0, ((adjust.scale || 1) - 1) / 2 * 100);
+    const maxT = Math.max(0, (1 - 1 / (adjust.scale || 1)) / 2 * 100);
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,

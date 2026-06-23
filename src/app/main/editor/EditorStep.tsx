@@ -28,6 +28,17 @@ export default function EditorStep({
     setPhotoAdjust((prev) => {
       const next = prev.map((a) => ({ ...a }));
       if (!next[idx]) next[idx] = { ...DEFAULT_ADJUST };
+      if ('scale' in patch) {
+        const s = patch.scale || 1;
+        const maxT = Math.max(0, (1 - 1 / s) / 2 * 100);
+        next[idx].x = Math.max(-maxT, Math.min(maxT, next[idx].x || 0));
+        next[idx].y = Math.max(-maxT, Math.min(maxT, next[idx].y || 0));
+      } else {
+        const s = next[idx].scale || 1;
+        const maxT = Math.max(0, (1 - 1 / s) / 2 * 100);
+        if ('x' in patch) patch.x = Math.max(-maxT, Math.min(maxT, patch.x!));
+        if ('y' in patch) patch.y = Math.max(-maxT, Math.min(maxT, patch.y!));
+      }
       Object.assign(next[idx], patch);
       return next;
     });
