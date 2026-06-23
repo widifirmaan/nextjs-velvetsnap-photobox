@@ -63,15 +63,6 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
           filter: cssFilter,
           userSelect: 'none', WebkitUserSelect: 'none',
         }} />
-      {selected && (
-        <div style={{
-          position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: 4,
-          background: 'rgba(255,255,255,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          pointerEvents: 'none', zIndex: 5, boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-        }}>
-          <Pencil size={13} color="#333" />
-        </div>
-      )}
     </div>
   );
 }
@@ -116,6 +107,20 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
           })}
           <img src={keyedFrameImage?.includes('res.cloudinary.com') ? keyedFrameImage.replace('/image/upload/', '/image/upload/f_auto,q_auto/') : (keyedFrameImage || templateData.templateFull?.replace('/image/upload/', '/image/upload/f_auto,q_auto/') || '')} alt="Frame"
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }} />
+          {selectedSlotIdx >= 0 && selectedSlotIdx < (templateData.templateData.slotsLayout?.length || 0) && (() => {
+            const s = templateData.templateData.slotsLayout[selectedSlotIdx];
+            return (
+              <div style={{
+                position: 'absolute', left: `${s.x + s.w}%`, top: `${s.y}%`,
+                width: 24, height: 24, borderRadius: 4, zIndex: 3,
+                background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                pointerEvents: 'none', boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                transform: 'translate(-50%, 4px)',
+              }}>
+                <Pencil size={14} color="#333" />
+              </div>
+            );
+          })()}
         </div>
       ) : (
         <div className={styles.editorSimplePreview}>
