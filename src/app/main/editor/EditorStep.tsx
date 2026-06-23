@@ -56,6 +56,7 @@ export default function EditorStep({
           setSelectedSlotIdx={setSelectedSlotIdx}
           selectedFilter={selectedFilter}
           slotCssFilter={slotCssFilter}
+          onAdjustSlot={updateSlot}
         />
         <div className={styles.editorSidebar}>
           <button className={styles.boothBtnSecondary} onClick={handleRetake} style={{ alignSelf: 'flex-start' }}>

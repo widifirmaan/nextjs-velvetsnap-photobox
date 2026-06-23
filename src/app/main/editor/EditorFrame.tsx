@@ -1,9 +1,74 @@
 'use client';
+import { useRef, useCallback } from 'react';
 import { Pencil } from 'lucide-react';
-import { TemplateData, PhotoAdjust } from '../types';
+import { TemplateData, PhotoAdjust, DEFAULT_ADJUST } from '../types';
 import styles from '@/app/main/page.module.css';
 
-export default function EditorFrame({ captures, templateData, keyedFrameImage, frameRatio, photoAdjust, selectedSlotIdx, setSelectedSlotIdx, selectedFilter, slotCssFilter }: {
+function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFilter, onSelect, onAdjust }: {
+  src: string; slotIdx: number; selected: boolean; adjust: PhotoAdjust;
+  cssFilter: string; selectedFilter: string;
+  onSelect: () => void; onAdjust: (idx: number, patch: Partial<PhotoAdjust>) => void;
+}) {
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; moving: boolean }>({ startX: 0, startY: 0, origX: 0, origY: 0, moving: false });
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: adjust.x || 0,
+      origY: adjust.y || 0,
+      moving: false,
+    };
+  }, [adjust.x, adjust.y]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (dragRef.current.startX === 0 && dragRef.current.startY === 0) return;
+    const el = e.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    const dx = ((e.clientX - dragRef.current.startX) / rect.width) * 100;
+    const dy = ((e.clientY - dragRef.current.startY) / rect.height) * 100;
+    if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) dragRef.current.moving = true;
+    onAdjust(slotIdx, { x: dragRef.current.origX + dx, y: dragRef.current.origY + dy });
+  }, [slotIdx, onAdjust]);
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    if (!dragRef.current.moving) onSelect();
+    dragRef.current.startX = 0;
+    dragRef.current.startY = 0;
+  }, [onSelect]);
+
+  return (
+    <div
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', cursor: 'grab', touchAction: 'none' }}
+    >
+      <img src={src} alt={`Slot ${slotIdx}`}
+        draggable={false}
+        className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
+        style={{
+          width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none',
+          transform: `scale(${adjust.scale || 1}) translate(${adjust.x || 0}%, ${adjust.y || 0}%)`,
+          transformOrigin: 'center',
+          filter: cssFilter,
+          userSelect: 'none', WebkitUserSelect: 'none',
+        }} />
+      {selected && (
+        <div style={{
+          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.25)', pointerEvents: 'none', border: '2px solid #fff', borderRadius: '2px',
+        }}>
+          <Pencil size={28} color="#fff" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function EditorFrame({ captures, templateData, keyedFrameImage, frameRatio, photoAdjust, selectedSlotIdx, setSelectedSlotIdx, selectedFilter, slotCssFilter, onAdjustSlot }: {
   captures: string[];
   templateData: TemplateData | null;
   keyedFrameImage: string;
@@ -13,6 +78,7 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
   setSelectedSlotIdx: (idx: number) => void;
   selectedFilter: string;
   slotCssFilter: (idx: number) => string;
+  onAdjustSlot: (idx: number, patch: Partial<PhotoAdjust>) => void;
 }) {
   return (
     <div className={styles.editorPreview}>
@@ -22,31 +88,21 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
             const src = captures[idx];
             if (!src) return null;
             return (
-              <div key={idx} onClick={() => setSelectedSlotIdx(idx)} style={{
+              <div key={idx} style={{
                 position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`,
                 width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden', zIndex: 1,
-                cursor: 'pointer', borderRadius: '2px',
+                borderRadius: '2px',
               }}>
-                <div
-                  style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}
-                >
-                  <img src={src} alt={`Slot ${idx}`}
-                    className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
-                    style={{
-                      width: '100%', height: '100%', objectFit: 'cover',
-                      transform: `scale(${photoAdjust[idx]?.scale || 1}) translate(${photoAdjust[idx]?.x || 0}%, ${photoAdjust[idx]?.y || 0}%)`,
-                      transformOrigin: 'center', pointerEvents: 'none',
-                      filter: slotCssFilter(idx),
-                    }} />
-                  {selectedSlotIdx === idx && (
-                    <div style={{
-                      position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      background: 'rgba(0,0,0,0.25)', pointerEvents: 'none',
-                    }}>
-                      <Pencil size={28} color="#fff" />
-                    </div>
-                  )}
-                </div>
+                <DraggablePhoto
+                  src={src}
+                  slotIdx={idx}
+                  selected={selectedSlotIdx === idx}
+                  adjust={photoAdjust[idx] || DEFAULT_ADJUST}
+                  cssFilter={slotCssFilter(idx)}
+                  selectedFilter={selectedFilter}
+                  onSelect={() => setSelectedSlotIdx(idx)}
+                  onAdjust={onAdjustSlot}
+                />
               </div>
             );
           })}
@@ -57,8 +113,9 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
         <div className={styles.editorSimplePreview}>
           {captures.map((src, i) => (
             <img key={i} src={src} alt={`shot ${i}`}
+              draggable={false}
               className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
-              style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: slotCssFilter(i) }} />
+              style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: slotCssFilter(i), userSelect: 'none', WebkitUserSelect: 'none' }} />
           ))}
         </div>
       )}
