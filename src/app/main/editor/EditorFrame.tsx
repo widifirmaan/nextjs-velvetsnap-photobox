@@ -9,10 +9,11 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
   cssFilter: string; selectedFilter: string;
   onSelect: () => void; onAdjust: (idx: number, patch: Partial<PhotoAdjust>) => void;
 }) {
+  const elRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; moving: boolean }>({ startX: 0, startY: 0, origX: 0, origY: 0, moving: false });
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    elRef.current?.setPointerCapture(e.pointerId);
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,
@@ -33,7 +34,7 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
   }, [slotIdx, onAdjust]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+    elRef.current?.releasePointerCapture(e.pointerId);
     if (!dragRef.current.moving) onSelect();
     dragRef.current.startX = 0;
     dragRef.current.startY = 0;
@@ -41,10 +42,16 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
 
   return (
     <div
+      ref={elRef}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', cursor: 'grab', touchAction: 'none' }}
+      style={{
+        width: '100%', height: '100%', position: 'relative', overflow: 'hidden', cursor: 'grab', touchAction: 'none',
+        outline: selected ? '3px solid #fff' : 'none',
+        outlineOffset: '-3px',
+        borderRadius: '2px',
+      }}
     >
       <img src={src} alt={`Slot ${slotIdx}`}
         draggable={false}
@@ -58,10 +65,11 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
         }} />
       {selected && (
         <div style={{
-          position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: 'rgba(0,0,0,0.25)', pointerEvents: 'none', border: '2px solid #fff', borderRadius: '2px',
+          position: 'absolute', top: 4, right: 4, width: 22, height: 22, borderRadius: 4,
+          background: 'rgba(255,255,255,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          pointerEvents: 'none', zIndex: 5, boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
         }}>
-          <Pencil size={28} color="#fff" />
+          <Pencil size={13} color="#333" />
         </div>
       )}
     </div>
