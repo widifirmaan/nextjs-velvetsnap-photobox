@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Layers, Server, Clock, Film, Loader2, LogOut, Settings2, User, Users, type LucideIcon } from 'lucide-react';
 import styles from './layout.module.css';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { STORAGE_KEYS, CURTAIN_ANIM_DELAY, CURTAIN_FALLBACK_TIMEOUT } from '@/lib/constants';
 import { adminFetch, clearAdminSession, syncAdminSession } from '@/lib/admin-fetch';
 
@@ -19,9 +19,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [navigating, setNavigating] = useState(false);
   const [curtainPhase, setCurtainPhase] = useState<'idle' | 'closing' | 'opening'>('idle');
-  const [authed] = useState(
-    pathname === '/admin/login' ||
-    (typeof window !== 'undefined' && !!sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN))
+  const authed = useMemo(
+    () => pathname === '/admin/login' ||
+      (typeof window !== 'undefined' && !!sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION_TOKEN)),
+    [pathname]
   );
   const [isRoot, setIsRoot] = useState(() => {
     if (typeof window === 'undefined') return false;
