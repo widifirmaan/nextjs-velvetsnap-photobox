@@ -10,18 +10,22 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
   onSelect: () => void; onAdjust: (idx: number, patch: Partial<PhotoAdjust>) => void;
 }) {
   const elRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; moving: boolean }>({ startX: 0, startY: 0, origX: 0, origY: 0, moving: false });
+  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number; maxT: number; moving: boolean }>({ startX: 0, startY: 0, origX: 0, origY: 0, maxT: 0, moving: false });
+
+  const clamp = (v: number, max: number) => Math.max(-max, Math.min(max, v));
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     elRef.current?.setPointerCapture(e.pointerId);
+    const maxT = Math.max(0, ((adjust.scale || 1) - 1) / 2 * 100);
     dragRef.current = {
       startX: e.clientX,
       startY: e.clientY,
       origX: adjust.x || 0,
       origY: adjust.y || 0,
+      maxT,
       moving: false,
     };
-  }, [adjust.x, adjust.y]);
+  }, [adjust.x, adjust.y, adjust.scale]);
 
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (dragRef.current.startX === 0 && dragRef.current.startY === 0) return;
@@ -30,7 +34,10 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFil
     const dx = ((e.clientX - dragRef.current.startX) / rect.width) * 100;
     const dy = ((e.clientY - dragRef.current.startY) / rect.height) * 100;
     if (Math.abs(dx) > 0.3 || Math.abs(dy) > 0.3) dragRef.current.moving = true;
-    onAdjust(slotIdx, { x: dragRef.current.origX + dx, y: dragRef.current.origY + dy });
+    onAdjust(slotIdx, {
+      x: clamp(dragRef.current.origX + dx, dragRef.current.maxT),
+      y: clamp(dragRef.current.origY + dy, dragRef.current.maxT),
+    });
   }, [slotIdx, onAdjust]);
 
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
