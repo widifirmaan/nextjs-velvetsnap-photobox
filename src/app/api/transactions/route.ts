@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
-import { buildAccountFilter } from '@/lib/require-admin';
+import { buildAccountFilter, getSession } from '@/lib/require-admin';
 import { v4 as uuidv4 } from 'uuid';
 import { apiError } from '@/lib/api-utils';
 
@@ -64,6 +64,35 @@ export async function GET(req: Request) {
       data: transactions,
       pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
+  } catch (error: unknown) {
+    return apiError(error);
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'id is required' }, { status: 400 });
+    }
+
+    await connectDB();
+    const session = await getSession(req);
+    if (!session.token) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const existing = await Transaction.findById(id).lean();
+    if (!existing) {
+      return NextResponse.json({ success: false, error: 'Transaction not found' }, { status: 404 });
+    }
+    if (session.accountId && existing.accountId && existing.accountId !== session.accountId) {
+      return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 });
+    }
+
+    await Transaction.findByIdAndDelete(id);
+    return NextResponse.json({ success: true });
   } catch (error: unknown) {
     return apiError(error);
   }
