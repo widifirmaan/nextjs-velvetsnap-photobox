@@ -15,20 +15,20 @@ function splitTitle(appName: string): [string, string] {
 export default function HomeHeader({ appName, location, navItems, tagline }: {
   appName?: string; location?: string; navItems?: { label: string; url: string }[]; tagline?: string;
 }) {
-  const [time, setTime] = useState(() =>
-    new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  );
-  const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-  });
+  const [time, setTime] = useState('');
+  const [today, setToday] = useState('');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const update = () => {
-      const now = new Date();
-      setTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    };
-    update();
-    const id = setInterval(update, 1000);
+    const now = new Date();
+    setTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    setToday(now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
+    setMounted(true);
+
+    const id = setInterval(() => {
+      const n = new Date();
+      setTime(n.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    }, 1000);
     return () => clearInterval(id);
   }, []);
 
@@ -37,8 +37,8 @@ export default function HomeHeader({ appName, location, navItems, tagline }: {
   return (
     <div className={styles.newspaperHeader}>
       <div className={styles.mastheadMeta}>
-        <span>{time}</span>
-        <span>{today}</span>
+        <span>{mounted ? time : '--:--:--'}</span>
+        <span>{mounted ? today : ''}</span>
         <span>{(location || 'Jakarta')} — Edition</span>
       </div>
       <div className={styles.mastheadRule} />
