@@ -39,7 +39,7 @@ export default function TemplateStep({ templates, selectedId, onSelect, onBack, 
             </p>
           </div>
         ) : (
-          <div className={styles.templateGrid} style={{ overflowY: 'auto', flex: 1 }}>
+          <div className={styles.templateGrid}>
             {templates.map((t) => (
               <TemplateCard key={t._id || t.templateId} template={t}
                 selected={t._id === selectedId || t.templateId === selectedId}
