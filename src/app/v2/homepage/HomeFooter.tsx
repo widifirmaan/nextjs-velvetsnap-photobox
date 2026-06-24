@@ -1,11 +1,15 @@
 'use client';
+import styles from '../page.module.css';
 
-export default function HomeFooter() {
+export default function HomeFooter({ footerText }: { footerText?: string }) {
+  const year = new Date().getFullYear();
   return (
-    <div style={{ borderTop: '3px solid var(--np-border)', padding: '16px 24px', textAlign: 'center', marginTop: 'auto' }}>
-      <span style={{ fontFamily: 'var(--font-body)', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--np-text-muted)' }}>
-        © 2024 VELVETSNAP CO. — ALL RIGHTS RESERVED
-      </span>
+    <div className={styles.newspaperFooter}>
+      <div className={styles.mastheadMeta}>
+        <span>© {year}</span>
+        <span>{footerText || 'VelvetSnap Photobooth Platform'}</span>
+        <a href="/admin/login" className={styles.mastheadLink}>Admin</a>
+      </div>
     </div>
   );
 }

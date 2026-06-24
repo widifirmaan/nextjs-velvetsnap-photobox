@@ -118,7 +118,7 @@ export default function PaymentStep({ price, captures, sessionId, onSuccess, onB
       </div>
       <div className={styles.paymentLayout}>
         <div className={styles.paymentCard}>
-          <h3>COMPLETE PAYMENT</h3>
+          <h3>Complete Payment</h3>
           <div className={styles.paymentPrice}>Rp {price.toLocaleString('id-ID')}</div>
           {payTimeout ? (
             <p className={styles.paymentStatus} style={{ color: 'var(--np-accent)' }}>

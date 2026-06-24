@@ -26,7 +26,7 @@ export default function ResultStep({ image, orderId, onStartOver }: {
 
   return (
     <div className={styles.resultLayout}>
-      <h2 className={styles.resultHeadline}>YOUR PHOTO IS READY</h2>
+      <h2 className={styles.resultHeadline}>Your Photo Is Ready</h2>
       {image ? (
         <div className={styles.resultImage}>
           <img src={image} alt="Final result" />

@@ -10,7 +10,7 @@ export default function TemplateStep({ templates, selectedId, onSelect, onNext, 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '16px 24px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h3 className={styles.sectionHeadline}>CHOOSE YOUR FRAME</h3>
+        <h3 className={styles.sectionHeadline}>Choose Your Frame</h3>
         {selectedId && (
           <button className={styles.boothBtn} onClick={onNext} style={{ padding: '8px 20px', fontSize: 11 }}>
             NEXT →
