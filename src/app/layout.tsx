@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { ModelProvider } from '@/lib/ModelContext';
 
@@ -33,20 +34,16 @@ export default function RootLayout({
         <ModelProvider>
           {children}
         </ModelProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(regs) {
-                  regs.forEach(function(r) { r.unregister(); });
-                });
-                caches.keys().then(function(keys) {
-                  keys.forEach(function(k) { caches.delete(k); });
-                });
-              }
-            `,
-          }}
-        />
+        <Script id="sw-cleanup" strategy="afterInteractive">
+          {`if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              regs.forEach(function(r) { r.unregister(); });
+            });
+            caches.keys().then(function(keys) {
+              keys.forEach(function(k) { caches.delete(k); });
+            });
+          }`}
+        </Script>
       </body>
     </html>
   );
