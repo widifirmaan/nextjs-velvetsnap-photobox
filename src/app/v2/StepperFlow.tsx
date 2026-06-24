@@ -71,35 +71,32 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
     }
   }, [cachedTemplates]);
 
-  const handleTemplateSelect = useCallback(async (id: string) => {
+  const handleTemplateSelect = useCallback((id: string, fullData?: TemplateData) => {
+    const tmpl = fullData || (cachedTemplates || []).find(t => t._id === id || t.templateId === id);
+    if (!tmpl) return;
     setTemplateId(id);
-    try {
-      const res = await fetch(`/api/templates/${id}`);
-      const data = await res.json();
-      if (data.success) {
-        const tmpl: TemplateData = data.data;
-        setTemplateData(tmpl);
-        setPrice(tmpl.templatePrice || 35000);
-        const td = tmpl.templateData;
-        if (td?.type === 'strip' && td.elements) {
-          const cw = td.canvasWidth || 1000;
-          const ch = td.canvasHeight || 3000;
-          stripElementsToSlotsLayout(td.elements, cw, ch);
-          if (td.slotsLayout && td.slotsLayout.length === 0) {
-            td.slotsLayout.push(...stripElementsToSlotsLayout(td.elements, cw, ch));
-          } else if (!td.slotsLayout) {
-            (td as unknown as Record<string, unknown>).slotsLayout = stripElementsToSlotsLayout(td.elements, cw, ch);
-          }
-          setKeyedFrameImage('');
-          setFrameRatio(td.canvasWidth && td.canvasHeight ? td.canvasWidth / td.canvasHeight : 2 / 3);
-        } else {
-          setKeyedFrameImage('');
-          setFrameRatio(td?.canvasWidth && td?.canvasHeight ? td.canvasWidth / td.canvasHeight : 2 / 3);
-        }
-        setErrMsg(null);
+    setTemplateData(tmpl);
+    setPrice(tmpl.templatePrice || 35000);
+    const td = tmpl.templateData;
+    if (td?.type === 'strip' && td.elements) {
+      const cw = td.canvasWidth || 1000;
+      const ch = td.canvasHeight || 3000;
+      const computed = stripElementsToSlotsLayout(td.elements, cw, ch);
+      if (td.slotsLayout && td.slotsLayout.length === 0) {
+        td.slotsLayout.push(...computed);
+      } else if (!td.slotsLayout) {
+        (td as unknown as Record<string, unknown>).slotsLayout = computed;
       }
-    } catch (e) { console.error('template fetch failed', e); setErrMsg('Failed to load template'); }
-  }, []);
+      setKeyedFrameImage('');
+      setFrameRatio(td.canvasWidth && td.canvasHeight ? td.canvasWidth / td.canvasHeight : 2 / 3);
+    } else {
+      setKeyedFrameImage('');
+      setFrameRatio(td?.canvasWidth && td?.canvasHeight ? td.canvasWidth / td.canvasHeight : 2 / 3);
+    }
+    setErrMsg(null);
+    setStep(1);
+    setCaptures([]);
+  }, [cachedTemplates, setStep]);
 
   const handleCaptures = useCallback((caps: string[]) => {
     setCaptures(caps);
@@ -205,8 +202,8 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
         <TemplateStep
           templates={cachedTemplates || []}
           selectedId={templateId}
-          onSelect={handleTemplateSelect}
-          onNext={() => { if (templateId) { setStep(1); setCaptures([]); } }}
+          onSelect={(id, data) => handleTemplateSelect(id, data)}
+          onBack={() => setStep(-1)}
           loading={templatesLoading}
         />
       )}

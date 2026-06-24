@@ -508,14 +508,34 @@
   flex: 1;
 }
 
+.templateCardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  border-top: 1px solid var(--np-border);
+  padding-top: 6px;
+}
+
 .templateCardPrice {
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
   color: var(--np-accent);
-  margin-top: auto;
-  border-top: 1px solid var(--np-border);
-  padding-top: 6px;
+}
+
+.slotDots {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.slotDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--np-text-muted);
+  border: 1px solid var(--np-border);
 }
 
 /* ── Booth / Camera Step ── */
