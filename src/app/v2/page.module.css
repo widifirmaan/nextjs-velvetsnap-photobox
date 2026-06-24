@@ -27,76 +27,6 @@
   z-index: 9999;
 }
 
-/* ── Stepper Bar ── */
-.stepperBar {
-  display: flex;
-  justify-content: center;
-  gap: 0;
-  padding: 20px 24px 16px;
-  border-bottom: 3px solid var(--np-border);
-  background: var(--np-card);
-  position: relative;
-}
-
-.stepperBar::after {
-  content: '';
-  position: absolute;
-  bottom: -6px; left: 0; right: 0;
-  height: 3px;
-  background: var(--np-border);
-}
-
-.stepDot {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 16px;
-  font-family: var(--font-body);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--np-text-muted);
-  border-right: 2px solid var(--np-border);
-  transition: all 0.15s;
-  position: relative;
-}
-
-.stepDot:last-child {
-  border-right: none;
-}
-
-.stepDotActive {
-  color: var(--np-accent);
-  background: rgba(199,62,62,0.06);
-}
-
-.stepDotActive::before {
-  content: '▸ ';
-  font-size: 14px;
-}
-
-.stepDotDone {
-  color: var(--np-text);
-}
-
-.stepDotNumber {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border: 2px solid currentColor;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.stepDotActive .stepDotNumber {
-  background: var(--np-accent);
-  color: #fff;
-  border-color: var(--np-accent);
-}
-
 /* ── Homepage ── */
 .homepage {
   flex: 1;
@@ -1048,16 +978,6 @@
 
   .templateGrid {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stepperBar {
-    flex-wrap: wrap;
-    gap: 0;
-  }
-
-  .stepDot {
-    font-size: 10px;
-    padding: 4px 10px;
   }
 }
 
