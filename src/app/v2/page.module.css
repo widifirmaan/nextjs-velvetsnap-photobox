@@ -37,15 +37,25 @@
 }
 
 .pageFlipOut {
-  animation: pageFlip 0.8s ease-in forwards;
-  transform-origin: left center;
+  animation: pageFlipOut 0.8s ease-in forwards;
   pointer-events: none;
 }
 
-@keyframes pageFlip {
+.pageFlipBack {
+  animation: pageFlipBack 0.8s ease-in forwards;
+  pointer-events: none;
+}
+
+@keyframes pageFlipOut {
   0% { transform: rotateY(0deg) scaleX(1); opacity: 1; }
   30% { transform: rotateY(-15deg) scaleX(0.98); opacity: 0.9; }
   100% { transform: rotateY(-120deg) scaleX(0.9); opacity: 0; }
+}
+
+@keyframes pageFlipBack {
+  0% { transform: rotateY(0deg) scaleX(1); opacity: 1; }
+  30% { transform: rotateY(15deg) scaleX(0.98); opacity: 0.9; }
+  100% { transform: rotateY(120deg) scaleX(0.9); opacity: 0; }
 }
 
 /* ── Newspaper Masthead ── */

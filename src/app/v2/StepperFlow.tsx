@@ -12,8 +12,8 @@ import EditorStep from './editor/EditorStep';
 import PaymentStep from './payment/component/PaymentStep';
 import ResultStep from './result/component/ResultStep';
 
-export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, appName }: {
-  step: number; setStep: (s: number) => void; onRefresh?: () => void; sessionTimer: number; appName?: string;
+export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, appName, onBackToHome }: {
+  step: number; setStep: (s: number) => void; onRefresh?: () => void; sessionTimer: number; appName?: string; onBackToHome?: () => void;
 }) {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
@@ -186,7 +186,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, ap
 
   return (
     <div className={styles.stepPage}>
-      <StepperBar current={step} total={5} onBack={step === 0 ? () => setStep(-1) : undefined} />
+      <StepperBar current={step} total={5} onBack={step === 0 ? (onBackToHome || (() => setStep(-1))) : undefined} />
       {sessionTimer > 0 && step > 0 && step < 4 && (
         <div style={{ position: 'fixed', top: 12, right: 16, zIndex: 100, display: 'flex', alignItems: 'center', gap: 6, background: 'var(--np-card)', border: '2px solid var(--np-border)', padding: '4px 10px', fontFamily: 'var(--font-body)', fontSize: 11, boxShadow: 'var(--np-shadow-sm)' }}>
           <Timer size={14} /> {formatTime(timeLeft)}
