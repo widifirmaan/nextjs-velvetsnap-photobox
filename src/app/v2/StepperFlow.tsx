@@ -65,7 +65,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, ap
         setCachedTemplates(list);
         const raw = JSON.stringify(list);
         if (raw.length < 4_000_000) { try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, raw); } catch {} }
-      }).catch(() => {}).finally(() => setTemplatesLoading(false));
+      }).catch((e) => { console.error('template fetch failed', e); setCachedTemplates([]); }).finally(() => setTemplatesLoading(false));
     } else {
       setTemplatesLoading(false);
     }
