@@ -17,7 +17,7 @@ export default function StepperBar({ current, total, onBack }: {
 }) {
   return (
     <div className={styles.newspaperHeader}>
-      <div className={styles.mastheadMeta}>
+      <div className={styles.mastheadMeta} style={{ alignItems: 'center' }}>
         <span>STEP {roman[current]} OF {roman[total - 1]}</span>
         <span>{current > 0 ? `${current} DONE` : ''}</span>
         <span>{labels[current]}</span>
@@ -43,13 +43,14 @@ export default function StepperBar({ current, total, onBack }: {
         <p className={styles.mastheadTagline} style={{ fontSize: 11 }}>{taglines[current]}</p>
       </div>
       <div className={styles.mastheadRule} />
-      <div className={styles.mastheadMeta} style={{ justifyContent: 'center', gap: 16, fontSize: 11 }}>
+      <div className={styles.mastheadMeta} style={{ justifyContent: 'center', gap: 16, fontSize: 11, alignItems: 'center' }}>
         {labels.slice(0, total).map((l, i) => (
           <span key={i} style={{
             color: i === current ? 'var(--np-accent)' : i < current ? 'var(--np-text)' : 'var(--np-text-muted)',
             fontWeight: i === current ? 700 : 400,
+            display: 'inline-flex', alignItems: 'center', gap: 2,
           }}>
-            {i < current ? '✓ ' : ''}{roman[i]}. {l}
+            {i < current ? <span style={{ lineHeight: 1 }}>✓</span> : ''}{roman[i]}. {l}
           </span>
         ))}
       </div>
