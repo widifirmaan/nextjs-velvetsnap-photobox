@@ -1,23 +1,17 @@
 'use client';
-import { ArrowLeft } from 'lucide-react';
 import styles from '../page.module.css';
 import TemplateCard from './TemplateCard';
 import NewspaperSection from '../homepage/NewspaperSection';
 import type { TemplateData } from '../types';
 
-export default function TemplateStep({ templates, selectedId, onSelect, onBack, loading }: {
+export default function TemplateStep({ templates, selectedId, onSelect, loading }: {
   templates: TemplateData[]; selectedId: string | null;
-  onSelect: (id: string, data: TemplateData) => void; onBack?: () => void; loading: boolean;
+  onSelect: (id: string, data: TemplateData) => void; loading: boolean;
 }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <NewspaperSection>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid var(--np-border)', marginBottom: 8 }}>
-          {onBack && (
-            <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', color: 'var(--np-text)' }}>
-              <ArrowLeft size={16} />
-            </button>
-          )}
           <h3 className={styles.sectionHeadline} style={{ marginBottom: 0, borderBottom: 'none', padding: 0 }}>Pilih Bingkai Foto</h3>
         </div>
         {loading ? (

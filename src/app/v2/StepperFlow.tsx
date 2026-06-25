@@ -186,7 +186,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
 
   return (
     <div className={styles.stepPage}>
-      <StepperBar current={step} total={5} />
+      <StepperBar current={step} total={5} onBack={step === 0 ? () => setStep(-1) : undefined} />
       {sessionTimer > 0 && step > 0 && step < 4 && (
         <div style={{ position: 'fixed', top: 12, right: 16, zIndex: 100, display: 'flex', alignItems: 'center', gap: 6, background: 'var(--np-card)', border: '2px solid var(--np-border)', padding: '4px 10px', fontFamily: 'var(--font-body)', fontSize: 11, boxShadow: 'var(--np-shadow-sm)' }}>
           <Timer size={14} /> {formatTime(timeLeft)}
@@ -203,7 +203,6 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
           templates={cachedTemplates || []}
           selectedId={templateId}
           onSelect={(id, data) => handleTemplateSelect(id, data)}
-          onBack={() => setStep(-1)}
           loading={templatesLoading}
         />
       )}
