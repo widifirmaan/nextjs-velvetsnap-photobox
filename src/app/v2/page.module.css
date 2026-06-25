@@ -413,7 +413,8 @@
 
 .templateCardImg {
   width: 100%;
-  aspect-ratio: 1/3;
+  flex: 1;
+  min-height: 0;
   object-fit: contain;
   background: var(--np-bg);
   border-bottom: 2px solid var(--np-border);
@@ -422,7 +423,7 @@
 
 .templateCardBody {
   padding: 12px;
-  flex: 1;
+  flex: none;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -443,7 +444,6 @@
   font-size: 10px;
   color: var(--np-text-secondary);
   line-height: 1.4;
-  flex: 1;
 }
 
 .templateCardFooter {
