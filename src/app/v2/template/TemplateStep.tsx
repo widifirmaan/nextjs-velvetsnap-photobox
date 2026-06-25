@@ -11,7 +11,7 @@ export default function TemplateStep({ templates, selectedId, onSelect, onBack, 
 }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <NewspaperSection label="PILIHAN">
+      <NewspaperSection>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid var(--np-border)', marginBottom: 8 }}>
           {onBack && (
             <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', display: 'flex', alignItems: 'center', color: 'var(--np-text)' }}>
