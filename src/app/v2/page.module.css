@@ -36,6 +36,18 @@
   height: 100%;
 }
 
+.pageFlipOut {
+  animation: pageFlip 0.8s ease-in forwards;
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+@keyframes pageFlip {
+  0% { transform: rotateY(0deg) scaleX(1); opacity: 1; }
+  30% { transform: rotateY(-15deg) scaleX(0.98); opacity: 0.9; }
+  100% { transform: rotateY(-120deg) scaleX(0.9); opacity: 0; }
+}
+
 /* ── Newspaper Masthead ── */
 .newspaperHeader {
   text-align: center;

@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { STORAGE_KEYS } from '@/lib/constants';
 import styles from './page.module.css';
 import StepperFlow from './StepperFlow';
@@ -9,6 +9,8 @@ export default function V2Page() {
   const [step, setStep] = useState(-1);
   const [sessionTimer, setSessionTimer] = useState(600);
   const [appName, setAppName] = useState('VelvetSnap');
+  const [flipping, setFlipping] = useState(false);
+  const flipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     try {
@@ -21,16 +23,24 @@ export default function V2Page() {
         if (data.data.appName) setAppName(data.data.appName);
       }
     }).catch(() => {});
+    return () => { if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; } };
+  }, []);
+
+  const handleStart = useCallback(() => {
+    setFlipping(true);
+    flipTimer.current = setTimeout(() => { setStep(0); setFlipping(false); }, 800);
   }, []);
 
   const handleRefresh = useCallback(() => {
     try { sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
   }, []);
 
-  if (step === -1) {
+  if (step === -1 || flipping) {
     return (
-      <div className={styles.stepPage}>
-        <HomePage onStart={() => setStep(0)} />
+      <div className={styles.stepPage} style={{ perspective: '1600px' }}>
+        <div className={`${styles.homepage} ${flipping ? styles.pageFlipOut : ''}`}>
+          <HomePage onStart={handleStart} />
+        </div>
       </div>
     );
   }
