@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import styles from '../page.module.css';
+import Masthead from '../Masthead';
 
 function splitTitle(appName: string): [string, string] {
   let caps = 0;
@@ -35,21 +36,15 @@ export default function HomeHeader({ appName, location, navItems, tagline }: {
   const [accent, rest] = splitTitle(appName || 'VelvetSnap');
 
   return (
-    <div className={styles.newspaperHeader}>
-      <div className={styles.mastheadMeta}>
+    <Masthead
+      top={<>
         <span>{mounted ? time : '--:--:--'}</span>
         <span>{mounted ? today : ''}</span>
         <span>{(location || 'Jakarta')} — Edition</span>
-      </div>
-      <div className={styles.mastheadRule} />
-      <h1 className={styles.mastheadTitle}>
-        <span className={styles.mastheadAccent}>{accent}</span>{rest}
-      </h1>
-      <p className={styles.mastheadTagline}>
-        {tagline || 'The photobooth that freezes time'}
-      </p>
-      <div className={styles.mastheadRule} />
-      <div className={styles.mastheadMeta}>
+      </>}
+      title={<><span className={styles.mastheadAccent}>{accent}</span>{rest}</>}
+      tagline={tagline || 'The photobooth that freezes time'}
+      bottom={<>
         <span>Price Rp 35.000</span>
         <span>Est. 2024</span>
         <span className={styles.navItems}>
@@ -57,7 +52,7 @@ export default function HomeHeader({ appName, location, navItems, tagline }: {
             <a key={i} href={item.url} className={styles.mastheadLink}>{item.label}</a>
           ))}
         </span>
-      </div>
-    </div>
+      </>}
+    />
   );
 }

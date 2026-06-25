@@ -383,8 +383,8 @@
 
 .templateGrid {
   display: flex;
-  gap: 16px;
-  padding: 12px 0;
+  gap: 12px;
+  padding: 8px 0;
   min-height: 0;
   overflow-x: auto;
   overflow-y: hidden;
