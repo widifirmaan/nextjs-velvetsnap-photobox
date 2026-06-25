@@ -56,6 +56,17 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, ap
 
   useEffect(() => {
     if (cachedTemplates) { setTemplatesLoading(false); return; }
+
+    // Check global promise first (like v1)
+    const globalPromise = typeof window !== 'undefined' ? (window as any).__templatePromise : null;
+    if (globalPromise && typeof globalPromise.then === 'function') {
+      globalPromise.then((list: TemplateData[]) => {
+        if (Array.isArray(list) && list.length) { setCachedTemplates(list); }
+        setTemplatesLoading(false);
+      }).catch(() => setTemplatesLoading(false));
+      return;
+    }
+
     const stored = typeof window !== 'undefined' && sessionStorage.getItem(STORAGE_KEYS.TEMPLATES);
     let cached = false;
     if (stored) { try { const parsed = JSON.parse(stored); if (Array.isArray(parsed)) { setCachedTemplates(parsed); cached = true; } } catch {} }

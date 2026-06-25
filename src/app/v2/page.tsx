@@ -23,6 +23,18 @@ export default function V2Page() {
         if (data.data.appName) setAppName(data.data.appName);
       }
     }).catch(() => {});
+
+    // Preload templates like v1: cache in sessionStorage + global promise
+    const tmplPromise = fetch('/api/templates/list')
+      .then(r => r.json())
+      .then(data => {
+        const list = data.data || data.templates || [];
+        try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch {}
+        return list;
+      })
+      .catch((e) => { console.error('preload templates failed', e); return []; });
+    if (typeof window !== 'undefined') (window as any).__templatePromise = tmplPromise;
+
     return () => { if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; } };
   }, []);
 
@@ -43,9 +55,13 @@ export default function V2Page() {
 
   return (
     <div className={styles.stepPage} style={{ perspective: '1600px' }}>
-      {step === -1 ? (
+      {/* HomePage always mounted like v1, hidden when stepper is visible */}
+      <div style={{ display: step !== -1 ? 'none' : undefined, height: '100%' }}>
         <HomePage onStart={handleStart} />
-      ) : (
+      </div>
+
+      {/* StepperFlow mounts only when needed */}
+      {step !== -1 && (
         <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh}
           sessionTimer={sessionTimer} appName={appName} onBackToHome={handleBack} />
       )}
