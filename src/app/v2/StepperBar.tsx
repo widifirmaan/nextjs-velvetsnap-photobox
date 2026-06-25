@@ -43,7 +43,7 @@ export default function StepperBar({ current, total, onBack }: {
         <p className={styles.mastheadTagline} style={{ fontSize: 11 }}>{taglines[current]}</p>
       </div>
       <div className={styles.mastheadRule} />
-      <div className={styles.mastheadMeta} style={{ fontSize: 11 }}>
+      <div className={styles.mastheadMeta} style={{ justifyContent: 'center', gap: 16, fontSize: 11 }}>
         {labels.slice(0, total).map((l, i) => (
           <span key={i} style={{
             color: i === current ? 'var(--np-accent)' : i < current ? 'var(--np-text)' : 'var(--np-text-muted)',
