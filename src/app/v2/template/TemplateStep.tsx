@@ -4,9 +4,9 @@ import TemplateCard from './TemplateCard';
 import NewspaperSection from '../homepage/NewspaperSection';
 import type { TemplateData } from '../types';
 
-export default function TemplateStep({ templates, selectedId, onSelect, loading }: {
+export default function TemplateStep({ templates, selectedId, onSelect, loading, appName }: {
   templates: TemplateData[]; selectedId: string | null;
-  onSelect: (id: string, data: TemplateData) => void; loading: boolean;
+  onSelect: (id: string, data: TemplateData) => void; loading: boolean; appName?: string;
 }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -41,7 +41,7 @@ export default function TemplateStep({ templates, selectedId, onSelect, loading 
       </NewspaperSection>
       <div className={styles.newspaperFooter}>
         <div className={styles.mastheadMeta}>
-          <span>Pilih bingkai untuk memulai</span>
+          <span>Powered by {appName || 'VelvetSnap'}</span>
           <span>—</span>
           <span>{templates.length} bingkai tersedia</span>
         </div>

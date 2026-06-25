@@ -12,8 +12,8 @@ import EditorStep from './editor/EditorStep';
 import PaymentStep from './payment/component/PaymentStep';
 import ResultStep from './result/component/ResultStep';
 
-export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: {
-  step: number; setStep: (s: number) => void; onRefresh?: () => void; sessionTimer: number;
+export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, appName }: {
+  step: number; setStep: (s: number) => void; onRefresh?: () => void; sessionTimer: number; appName?: string;
 }) {
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
@@ -204,6 +204,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer }: 
           selectedId={templateId}
           onSelect={(id, data) => handleTemplateSelect(id, data)}
           loading={templatesLoading}
+          appName={appName}
         />
       )}
 

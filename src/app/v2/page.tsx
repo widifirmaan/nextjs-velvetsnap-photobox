@@ -8,6 +8,7 @@ import HomePage from './homepage/HomePage';
 export default function V2Page() {
   const [step, setStep] = useState(-1);
   const [sessionTimer, setSessionTimer] = useState(600);
+  const [appName, setAppName] = useState('VelvetSnap');
 
   useEffect(() => {
     try {
@@ -15,8 +16,9 @@ export default function V2Page() {
       if (!stored) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, `session_${Date.now()}`);
     } catch {}
     fetch('/api/settings').then(r => r.json()).then(data => {
-      if (data.success && data.data?.system) {
-        setSessionTimer(data.data.system.sessionTimer || 600);
+      if (data.success && data.data) {
+        if (data.data.system) setSessionTimer(data.data.system.sessionTimer || 600);
+        if (data.data.appName) setAppName(data.data.appName);
       }
     }).catch(() => {});
   }, []);
@@ -34,6 +36,6 @@ export default function V2Page() {
   }
 
   return (
-    <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh} sessionTimer={sessionTimer} />
+    <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh} sessionTimer={sessionTimer} appName={appName} />
   );
 }
