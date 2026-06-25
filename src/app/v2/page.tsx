@@ -11,7 +11,6 @@ export default function V2Page() {
   const [appName, setAppName] = useState('VelvetSnap');
   const [flipDir, setFlipDir] = useState<'none' | 'forward' | 'backward'>('none');
   const flipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const overlayStep = useRef(-1);
 
   useEffect(() => {
     try {
@@ -28,49 +27,39 @@ export default function V2Page() {
   }, []);
 
   const handleStart = useCallback(() => {
-    overlayStep.current = -1;
     setStep(0);
     setFlipDir('forward');
-    flipTimer.current = setTimeout(() => { setFlipDir('none'); }, 800);
+    flipTimer.current = setTimeout(() => { setFlipDir('none'); }, 600);
   }, []);
 
   const handleBack = useCallback(() => {
-    overlayStep.current = step;
-    setStep(-1);
+    flipTimer.current = setTimeout(() => { setStep(-1); setFlipDir('none'); }, 600);
     setFlipDir('backward');
-    flipTimer.current = setTimeout(() => { setFlipDir('none'); }, 800);
-  }, [step]);
+  }, []);
 
   const handleRefresh = useCallback(() => {
     try { sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
   }, []);
 
-  const showStepper = flipDir === 'forward' || (flipDir === 'none' && step >= 0);
-
   return (
     <div className={styles.stepPage} style={{ perspective: '1600px' }}>
-      {showStepper ? (
+      {step === -1 ? (
+        <HomePage onStart={handleStart} />
+      ) : (
         <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh}
           sessionTimer={sessionTimer} appName={appName} onBackToHome={handleBack} />
-      ) : (
-        <HomePage onStart={handleStart} />
       )}
 
-      {/* Overlay for forward flip — HomePage flips out to left */}
       {flipDir === 'forward' && (
         <div className={styles.pageFlipOut}
-          style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--np-bg)', transformOrigin: 'left center' }}>
-          <HomePage onStart={() => {}} />
-        </div>
+          style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--np-bg)',
+            transformOrigin: 'left center', pointerEvents: 'none' }} />
       )}
 
-      {/* Overlay for backward flip — StepperFlow flips out to right */}
       {flipDir === 'backward' && (
         <div className={styles.pageFlipBack}
-          style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--np-bg)', transformOrigin: 'right center' }}>
-          <StepperFlow step={overlayStep.current} setStep={setStep} onRefresh={handleRefresh}
-            sessionTimer={sessionTimer} appName={appName} onBackToHome={handleBack} />
-        </div>
+          style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--np-bg)',
+            transformOrigin: 'right center', pointerEvents: 'none' }} />
       )}
     </div>
   );
