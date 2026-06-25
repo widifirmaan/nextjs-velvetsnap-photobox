@@ -11,9 +11,6 @@ export default function TemplateStep({ templates, selectedId, onSelect, loading 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <NewspaperSection>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 0', borderBottom: '1px solid var(--np-border)', marginBottom: 8 }}>
-          <h3 className={styles.sectionHeadline} style={{ marginBottom: 0, borderBottom: 'none', padding: 0 }}>Pilih Bingkai Foto</h3>
-        </div>
         {loading ? (
           <div className={styles.templateGrid}>
             {[1,2,3,4].map((i) => (
