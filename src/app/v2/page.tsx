@@ -11,6 +11,7 @@ export default function V2Page() {
   const [appName, setAppName] = useState('VelvetSnap');
   const [flipDir, setFlipDir] = useState<'none' | 'forward' | 'backward'>('none');
   const flipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const overlayStep = useRef(-1);
 
   useEffect(() => {
     try {
@@ -27,14 +28,18 @@ export default function V2Page() {
   }, []);
 
   const handleStart = useCallback(() => {
+    overlayStep.current = -1;
+    setStep(0);
     setFlipDir('forward');
-    flipTimer.current = setTimeout(() => { setStep(0); setFlipDir('none'); }, 800);
+    flipTimer.current = setTimeout(() => { setFlipDir('none'); }, 800);
   }, []);
 
   const handleBack = useCallback(() => {
+    overlayStep.current = step;
+    setStep(-1);
     setFlipDir('backward');
-    flipTimer.current = setTimeout(() => { setStep(-1); setFlipDir('none'); }, 800);
-  }, []);
+    flipTimer.current = setTimeout(() => { setFlipDir('none'); }, 800);
+  }, [step]);
 
   const handleRefresh = useCallback(() => {
     try { sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
@@ -63,7 +68,7 @@ export default function V2Page() {
       {flipDir === 'backward' && (
         <div className={styles.pageFlipBack}
           style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--np-bg)', transformOrigin: 'right center' }}>
-          <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh}
+          <StepperFlow step={overlayStep.current} setStep={setStep} onRefresh={handleRefresh}
             sessionTimer={sessionTimer} appName={appName} onBackToHome={handleBack} />
         </div>
       )}
