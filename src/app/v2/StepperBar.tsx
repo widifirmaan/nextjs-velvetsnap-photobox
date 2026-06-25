@@ -29,7 +29,7 @@ export default function StepperBar({ current, total, onBack }: {
             background: 'none', border: '2px solid var(--np-border)', cursor: 'pointer',
             padding: '4px 8px', display: 'flex', alignItems: 'center', color: 'var(--np-text)',
             fontSize: 11, fontFamily: 'var(--font-body)', lineHeight: 1,
-            position: 'absolute', left: 0,
+            position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
           }}>
             <ArrowLeft size={28} />
           </button>
