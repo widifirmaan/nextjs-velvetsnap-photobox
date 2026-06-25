@@ -27,11 +27,11 @@ export default function StepperBar({ current, total, onBack }: {
         {onBack && (
           <button onClick={onBack} style={{
             background: 'none', border: '2px solid var(--np-border)', cursor: 'pointer',
-            padding: '2px 6px', display: 'flex', alignItems: 'center', color: 'var(--np-text)',
+            padding: '4px 8px', display: 'flex', alignItems: 'center', color: 'var(--np-text)',
             fontSize: 11, fontFamily: 'var(--font-body)', lineHeight: 1,
             position: 'absolute', left: 0,
           }}>
-            <ArrowLeft size={14} />
+            <ArrowLeft size={28} />
           </button>
         )}
         <h1 className={styles.mastheadTitle} style={{ fontSize: 'clamp(24px,5vw,44px)', margin: '1px 0' }}>
