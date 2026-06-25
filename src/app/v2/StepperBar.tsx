@@ -18,24 +18,27 @@ export default function StepperBar({ current, total, onBack }: {
   return (
     <div className={styles.newspaperHeader}>
       <div className={styles.mastheadMeta}>
-        {onBack && (
-          <button onClick={onBack} style={{
-            background: 'none', border: '2px solid var(--np-border)', cursor: 'pointer',
-            padding: '2px 6px', display: 'flex', alignItems: 'center', color: 'var(--np-text)',
-            fontSize: 11, fontFamily: 'var(--font-body)', gap: 4, lineHeight: 1,
-          }}>
-            <ArrowLeft size={14} />
-          </button>
-        )}
         <span>STEP {roman[current]} OF {roman[total - 1]}</span>
         <span>{current > 0 ? `${current} DONE` : ''}</span>
         <span>{labels[current]}</span>
       </div>
       <div className={styles.mastheadRule} />
-      <h1 className={styles.mastheadTitle} style={{ fontSize: 'clamp(24px,5vw,44px)', margin: '1px 0' }}>
-        <span className={styles.mastheadAccent}>{roman[current]}</span>{' '}
-        {labels[current]}
-      </h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+        {onBack && (
+          <button onClick={onBack} style={{
+            background: 'none', border: '2px solid var(--np-border)', cursor: 'pointer',
+            padding: '2px 6px', display: 'flex', alignItems: 'center', color: 'var(--np-text)',
+            fontSize: 11, fontFamily: 'var(--font-body)', lineHeight: 1,
+            position: 'absolute', left: 0,
+          }}>
+            <ArrowLeft size={14} />
+          </button>
+        )}
+        <h1 className={styles.mastheadTitle} style={{ fontSize: 'clamp(24px,5vw,44px)', margin: '1px 0' }}>
+          <span className={styles.mastheadAccent}>{roman[current]}</span>{' '}
+          {labels[current]}
+        </h1>
+      </div>
       <p className={styles.mastheadTagline} style={{ fontSize: 11 }}>{taglines[current]}</p>
       <div className={styles.mastheadRule} />
       <div className={styles.mastheadMeta} style={{ fontSize: 11 }}>
