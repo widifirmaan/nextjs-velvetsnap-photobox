@@ -1,45 +1,37 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import styles from '../../page.module.css';
 import ResultActions from './ResultActions';
+import { downloadImageAsBlob } from '@/lib/download-utils';
 
 export default function ResultStep({ image, orderId, onStartOver }: {
   image: string | null; orderId: string; onStartOver: () => void;
 }) {
   const [downloading, setDownloading] = useState(false);
 
-  const handleDownload = useCallback(async () => {
+  const handleDownload = async () => {
     if (!image || downloading) return;
     setDownloading(true);
     try {
-      const res = await fetch(image);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `velvetsnap-${orderId}.jpg`;
-      a.click();
-      URL.revokeObjectURL(url);
+      await downloadImageAsBlob(image, `velvetsnap-${orderId || 'photo'}.jpg`);
     } catch (e) { console.error('download failed', e); }
     setDownloading(false);
-  }, [image, orderId, downloading]);
+  };
 
   return (
     <div className={styles.resultLayout}>
-      <h2 className={styles.resultHeadline}>Your Photo Is Ready</h2>
+      <div className={styles.resultHeadline}>YOUR MEMORIES, PRINTED IN TIME</div>
       {image ? (
         <div className={styles.resultImage}>
-          <img src={image} alt="Final result" />
+          <img src={image} alt="Your photobooth strip" />
         </div>
       ) : (
-        <div className={styles.resultImage} style={{ aspectRatio: '2/3', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--np-card)' }}>
-          <span style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--np-text-muted)' }}>RENDERING...</span>
-        </div>
+        <div className={styles.skeleton} style={{ width: '100%', maxWidth: 400, aspectRatio: '3/4' }} />
       )}
-      <ResultActions onDownload={handleDownload} onStartOver={onStartOver} />
-      <p style={{ fontFamily: 'var(--font-body)', fontSize: 9, color: 'var(--np-text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-        Order #{orderId.slice(0, 12)}...
-      </p>
+      <ResultActions
+        onDownload={handleDownload}
+        onStartOver={onStartOver}
+      />
     </div>
   );
 }

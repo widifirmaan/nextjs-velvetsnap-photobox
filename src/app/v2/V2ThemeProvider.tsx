@@ -1,6 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { vintageAccent } from '@/lib/vintage-theme';
+import { useThemeAccent } from '@/lib/useThemeAccent';
 
 const defaultVars: Record<string, string> = {
   '--font-heading': 'var(--font-unifraktur, UnifrakturMaguntia, serif)',
@@ -21,22 +20,8 @@ const defaultVars: Record<string, string> = {
 };
 
 export default function V2ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [vars, setVars] = useState(defaultVars);
-
-  useEffect(() => {
-    fetch('/api/settings')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          const ac = data.data?.system?.accentColor as string | undefined;
-          if (ac) {
-            const { accent, accentHover } = vintageAccent(ac);
-            setVars(prev => ({ ...prev, '--np-accent': accent, '--np-accent-hover': accentHover }));
-          }
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const { accent, accentHover } = useThemeAccent();
+  const vars = { ...defaultVars, '--np-accent': accent, '--np-accent-hover': accentHover };
 
   return <div style={vars as React.CSSProperties}>{children}</div>;
 }

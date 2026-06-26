@@ -1,24 +1,29 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import styles from '../page.module.css';
 import HomeHeader from './HomeHeader';
 import HomeFooter from './HomeFooter';
 import NewspaperSection from './NewspaperSection';
 import V2Preloader from './V2Preloader';
 import type { StripResult } from '../types';
+import { getOptimizedUrl } from '@/lib/cloudinary-url';
 
-export default function HomePage({ onStart }: { onStart: () => void }) {
-  const [strips, setStrips] = useState<StripResult[]>([]);
-  const [heroImage, setHeroImage] = useState('');
-  const [cardHtml, setCardHtml] = useState('');
-  const [appName, setAppName] = useState('');
-  const [appTagline, setAppTagline] = useState('');
-  const [heroSubtitle, setHeroSubtitle] = useState('');
-  const [navItems, setNavItems] = useState<{ label: string; url: string }[]>([]);
-  const [location, setLocation] = useState('');
-  const [footerText, setFooterText] = useState('');
-  const [loaded, setLoaded] = useState(false);
-  const pendingRef = useRef(2);
+export default function HomePage({
+  onStart, strips, appName, appTagline, heroSubtitle, heroImage,
+  cardHtml, navItems, location, footerText, loaded,
+}: {
+  onStart: () => void;
+  strips: StripResult[];
+  appName: string;
+  appTagline: string;
+  heroSubtitle: string;
+  heroImage: string;
+  cardHtml: string;
+  navItems: { label: string; url: string }[];
+  location: string;
+  footerText: string;
+  loaded: boolean;
+}) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const autoScrollRef = useRef(0);
   const pausedRef = useRef(false);
@@ -38,64 +43,16 @@ export default function HomePage({ onStart }: { onStart: () => void }) {
     return () => cancelAnimationFrame(autoScrollRef.current);
   }, [strips.length]);
 
-  /* ── SECTION 1: Data Fetching ── */
-  useEffect(() => {
-    const tryDone = () => {
-      pendingRef.current--;
-      if (pendingRef.current <= 0) setLoaded(true);
-    };
-
-    fetch('/api/settings')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success) {
-          if (data.data?.appName) setAppName(data.data.appName);
-          if (data.data?.appTagline) setAppTagline(data.data.appTagline);
-          if (data.data?.heroSubtitle) setHeroSubtitle(data.data.heroSubtitle);
-          if (data.data?.header?.location) setLocation(data.data.header.location);
-          if (data.data?.header?.navItems) {
-            try { setNavItems(JSON.parse(data.data.header.navItems)); } catch {}
-          }
-          if (data.data?.slideshowImages?.length) {
-            setHeroImage(data.data.slideshowImages[0]);
-          }
-          if (data.data?.cardSmallHtml) {
-            setCardHtml(data.data.cardSmallHtml);
-          }
-          if (data.data?.footer?.text) setFooterText(data.data.footer.text);
-        }
-      })
-      .catch(() => {})
-      .finally(tryDone);
-
-    fetch('/api/transactions/strips')
-      .then(r => r.json())
-      .then(data => {
-        if (data.success && Array.isArray(data.data)) {
-          setStrips(data.data.slice(0, 10));
-        }
-      })
-      .catch(() => {})
-      .finally(tryDone);
-  }, []);
-
   return (
     <div className={styles.homepage}>
       <V2Preloader ready={loaded} appName={appName} tagline={appTagline} />
 
-      {/* ═══════════════════════════════════════════════
-          SECTION 2: MASTHEAD — Newspaper Header
-          ═══════════════════════════════════════════════ */}
       <HomeHeader appName={appName} location={location} navItems={navItems} tagline={appTagline} />
 
-      {/* ═══════════════════════════════════════════════
-          SECTION 3: LEAD STORY — 3-Column Grid
-          Contains: Steps | Carousel | CTA
-          ═══════════════════════════════════════════════ */}
       <NewspaperSection>
         <div className={styles.leadStoryGrid}>
 
-          {/* ── Col 1: Photobooth Steps ── */}
+          {/* Col 1: Photobooth Steps */}
           <div>
             <div className={styles.stepsList}>
               {[
@@ -119,7 +76,7 @@ export default function HomePage({ onStart }: { onStart: () => void }) {
             </div>
           </div>
 
-          {/* ── Col 2: Recent Photo Strips Carousel (horizontal scroll) ── */}
+          {/* Col 2: Recent Photo Strips Carousel */}
           <div>
             <div
               ref={carouselRef}
@@ -132,7 +89,7 @@ export default function HomePage({ onStart }: { onStart: () => void }) {
                   [...strips, ...strips].map((s, i) => (
                     <img
                       key={`${s._id}-${i}`}
-                      src={s.finalImage?.replace('/image/upload/', '/image/upload/f_auto,q_auto/') || ''}
+                      src={getOptimizedUrl(s.finalImage || '', 150, 400)}
                       alt=""
                       className={styles.carouselSlide}
                       draggable={false}
@@ -147,7 +104,7 @@ export default function HomePage({ onStart }: { onStart: () => void }) {
             </div>
           </div>
 
-          {/* ── Col 3: Call-to-Action (text + byline + image + start button) ── */}
+          {/* Col 3: Call-to-Action */}
           <div>
             <p className={styles.leadStoryBody}>
               {heroSubtitle || 'Step into our studio at the press of a button. The booth handles the rest — from countdown to composition, delivery to download.'}
@@ -164,11 +121,7 @@ export default function HomePage({ onStart }: { onStart: () => void }) {
         </div>
       </NewspaperSection>
 
-      {/* ═══════════════════════════════════════════════
-          SECTION 4: FOOTER
-          ═══════════════════════════════════════════════ */}
       <HomeFooter footerText={footerText} />
-
     </div>
   );
 }

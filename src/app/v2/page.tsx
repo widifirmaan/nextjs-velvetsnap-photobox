@@ -1,51 +1,25 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { STORAGE_KEYS } from '@/lib/constants';
 import styles from './page.module.css';
 import StepperFlow from './StepperFlow';
 import HomePage from './homepage/HomePage';
+import { useAppData } from '@/lib/useAppData';
 
 export default function V2Page() {
-  const [step, setStep] = useState(-1);
-  const [sessionTimer, setSessionTimer] = useState(600);
-  const [appName, setAppName] = useState('VelvetSnap');
+  const [step, setStep] = useState(0);
   const [flipDir, setFlipDir] = useState<'none' | 'forward' | 'backward'>('none');
   const flipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem(STORAGE_KEYS.PHOTOBOOTH_SESSION);
-      if (!stored) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, `session_${Date.now()}`);
-    } catch {}
-    fetch('/api/settings').then(r => r.json()).then(data => {
-      if (data.success && data.data) {
-        if (data.data.system) setSessionTimer(data.data.system.sessionTimer || 600);
-        if (data.data.appName) setAppName(data.data.appName);
-      }
-    }).catch(() => {});
-
-    // Preload templates like v1: cache in sessionStorage + global promise
-    const tmplPromise = fetch('/api/templates/list')
-      .then(r => r.json())
-      .then(data => {
-        const list = data.data || data.templates || [];
-        try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch {}
-        return list;
-      })
-      .catch((e) => { console.error('preload templates failed', e); return []; });
-    if (typeof window !== 'undefined') (window as any).__templatePromise = tmplPromise;
-
-    return () => { if (flipTimer.current) { clearTimeout(flipTimer.current); flipTimer.current = null; } };
-  }, []);
+  const appData = useAppData();
 
   const handleStart = useCallback(() => {
-    setStep(0);
+    setStep(1);
     setFlipDir('forward');
     flipTimer.current = setTimeout(() => { setFlipDir('none'); }, 600);
   }, []);
 
   const handleBack = useCallback(() => {
-    flipTimer.current = setTimeout(() => { setStep(-1); setFlipDir('none'); }, 600);
+    flipTimer.current = setTimeout(() => { setStep(0); setFlipDir('none'); }, 600);
     setFlipDir('backward');
   }, []);
 
@@ -55,15 +29,25 @@ export default function V2Page() {
 
   return (
     <div className={styles.stepPage} style={{ perspective: '1600px' }}>
-      {/* HomePage always mounted like v1, hidden when stepper is visible */}
-      <div style={{ display: step !== -1 ? 'none' : undefined, height: '100%' }}>
-        <HomePage onStart={handleStart} />
+      <div style={{ display: step !== 0 ? 'none' : undefined, height: '100%' }}>
+        <HomePage
+          onStart={handleStart}
+          strips={appData.strips}
+          appName={appData.appName}
+          appTagline={appData.appTagline}
+          heroSubtitle={appData.heroSubtitle}
+          heroImage={appData.heroImage}
+          cardHtml={appData.cardHtml}
+          navItems={appData.navItems}
+          location={appData.location}
+          footerText={appData.footerText}
+          loaded={appData.loaded}
+        />
       </div>
 
-      {/* StepperFlow mounts only when needed */}
-      {step !== -1 && (
+      {step !== 0 && (
         <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh}
-          sessionTimer={sessionTimer} appName={appName} onBackToHome={handleBack} />
+          sessionTimer={appData.sessionTimer} appName={appData.appName} onBackToHome={handleBack} />
       )}
 
       {flipDir === 'forward' && (

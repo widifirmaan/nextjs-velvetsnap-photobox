@@ -16,6 +16,27 @@ export function loadImages(urls: string[], crossOrigin = 'anonymous'): Promise<(
   );
 }
 
+export function compressImage(dataUrl: string, maxDim = 1920, quality = 0.85): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxDim || h > maxDim) {
+        const s = Math.min(maxDim / w, maxDim / h);
+        w = Math.round(w * s);
+        h = Math.round(h * s);
+      }
+      const c = document.createElement('canvas');
+      c.width = w;
+      c.height = h;
+      c.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      resolve(c.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 export function flipImageHorizontal(dataUrl: string): Promise<string> {
   return new Promise((resolve) => {
     const img = new window.Image();

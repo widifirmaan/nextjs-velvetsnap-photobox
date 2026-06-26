@@ -90,6 +90,21 @@
   flex-shrink: 0;
 }
 
+.mastheadBackBtn {
+  transition: all 0.1s;
+  box-shadow: var(--np-shadow-sm);
+}
+
+.mastheadBackBtn:hover {
+  transform: translateY(-50%) translateX(-2px);
+  box-shadow: 5px 5px 0px var(--np-border);
+}
+
+.mastheadBackBtn:active {
+  transform: translateY(-50%) translateX(2px);
+  box-shadow: 1px 1px 0px var(--np-border);
+}
+
 .mastheadTitle {
   font-family: var(--font-heading);
   font-size: clamp(36px, 9vw, 72px);
@@ -262,6 +277,7 @@
 
 .carouselSlide {
   height: 100%;
+  width: auto;
   flex-shrink: 0;
   object-fit: contain;
   filter: sepia(0.4) contrast(0.9) saturate(0.8);
@@ -499,20 +515,74 @@
 }
 
 /* ── Booth / Camera Step ── */
-.boothLayout {
+.boothNewspaperGrid {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: 1.2fr 2fr 1.2fr;
+  border-top: 1px solid var(--np-border);
+  border-bottom: 1px solid var(--np-border);
+  min-height: 0;
 }
 
-.boothPreview {
+.boothNewspaperGrid > * {
+  padding: 12px;
+  border-right: 1px solid var(--np-border);
+  overflow: hidden;
+}
+
+.boothNewspaperGrid > *:last-child {
+  border-right: none;
+}
+
+/* Column 1 — Article */
+.boothArticleCol {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.boothArticleHeadline {
+  font-family: var(--font-body);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--np-text);
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.boothByline {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--np-text-muted);
+}
+
+.boothArticleText {
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--np-text-secondary);
+  text-align: justify;
+  margin: 0;
+}
+
+.boothDivider {
+  height: 1px;
+  background: var(--np-border);
+  margin: 4px 0;
+}
+
+/* Column 2 — Viewfinder + Capture */
+.boothViewfinderCol {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.boothViewfinderBox {
   position: relative;
   width: 100%;
-  max-width: 400px;
   aspect-ratio: 3/4;
   background: #000;
   border: 4px solid var(--np-border);
@@ -520,27 +590,137 @@
   overflow: hidden;
 }
 
-.boothPreview video,
-.boothPreview img {
+.boothViewfinderBox video,
+.boothViewfinderBox img,
+.boothViewfinderBox > div {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.boothOverlay {
+.boothViewfinderOverlay {
   position: absolute;
   inset: 0;
-  border: 3px solid rgba(255,255,255,0.3);
+  border: 3px solid rgba(255,255,255,0.25);
   pointer-events: none;
 }
 
-.boothControls {
+.boothBtnRow {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  flex-wrap: wrap;
   justify-content: center;
+}
+
+.boothBtnRow > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.boothModeToggle {
+  display: flex;
+  border: 3px solid var(--np-border);
+  box-shadow: var(--np-shadow-sm);
+  overflow: hidden;
+  flex: none;
+}
+
+.boothModeBtn {
+  padding: 14px 14px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border: none;
+  cursor: pointer;
+  background: var(--np-card);
+  color: var(--np-text-muted);
+  transition: all 0.1s;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.boothModeBtnActive {
+  background: var(--np-accent);
+  color: #fff;
+}
+
+.boothFlash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  z-index: 11;
+  animation: boothFlashAnim 0.15s ease-out;
+  pointer-events: none;
+}
+
+@keyframes boothFlashAnim {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.boothCamDropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  background: var(--np-card);
+  border: 3px solid var(--np-border);
+  box-shadow: var(--np-shadow);
+  min-width: 200px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.boothCamOption {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  font-family: var(--font-body);
+  font-size: 10px;
+  text-align: left;
+  letter-spacing: 0.04em;
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--np-border);
+  color: var(--np-text);
+  cursor: pointer;
+}
+
+.boothCamOption:last-child {
+  border-bottom: none;
+}
+
+.boothCamOption:hover {
+  background: var(--np-bg);
+}
+
+.boothCamOptionActive {
+  background: var(--np-bg);
+  font-weight: 700;
+  color: var(--np-accent);
+}
+
+.boothSlotUpload {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 2px dashed var(--np-text-muted);
+  cursor: pointer;
+  color: var(--np-text-muted);
+  transition: all 0.15s;
+  padding: 4px;
+}
+
+.boothSlotUpload:hover {
+  background: var(--np-card);
+  border-style: solid;
+  border-color: var(--np-accent);
+  color: var(--np-accent);
 }
 
 .boothBtn {
@@ -560,6 +740,7 @@
   background: var(--np-card);
   color: var(--np-text);
   box-shadow: var(--np-shadow-sm);
+  line-height: 1;
 }
 
 .boothBtn:hover {
@@ -597,6 +778,42 @@
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
+  width: fit-content;
+  height: fit-content;
+  text-align: center;
+}
+
+/* Column 3 — Strip Preview */
+.boothStripCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.boothStripCol > * {
+  margin: 0 auto;
+}
+
+.boothStripPreview {
+  position: relative;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  border: 4px solid var(--np-border);
+  box-shadow: var(--np-shadow);
+  background: var(--np-card);
+  overflow: hidden;
+}
+
+.boothStripPlaceholder {
+  width: 100%;
+  aspect-ratio: 1/3;
+  max-height: 100%;
+  border: 3px dashed var(--np-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Editor Step ── */
@@ -1029,8 +1246,21 @@
     padding: 20px;
   }
 
-  .boothLayout {
-    padding: 12px;
+  .boothNewspaperGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .boothNewspaperGrid > * {
+    border-right: none;
+    border-bottom: 1px solid var(--np-border);
+  }
+
+  .boothNewspaperGrid > *:last-child {
+    border-bottom: none;
+  }
+
+  .boothStripCol {
+    min-height: 200px;
   }
 
   .editorLayout {
