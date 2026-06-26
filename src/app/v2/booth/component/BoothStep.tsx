@@ -17,10 +17,11 @@ const LOREM = [
 ];
 
 export default function BoothStep({
-  totalSlots, appName, templateData, keyedFrameImage, frameRatio, stripLoading,
+  totalSlots, captures: initialCaptures, appName, templateData, keyedFrameImage, frameRatio, stripLoading,
   onCaptures, onNext,
 }: {
   totalSlots: number;
+  captures: string[];
   appName?: string;
   templateData: TemplateData | null;
   keyedFrameImage: string;
@@ -36,7 +37,7 @@ export default function BoothStep({
     deviceId, availableCams, showCamMenu, setShowCamMenu, camMenuRef,
     isFrontCamera, handleSwitchCamera,
     handleCapture, handleUpload, isDone,
-  } = useBoothCapture({ totalSlots, onCaptures });
+  } = useBoothCapture({ totalSlots, captures: initialCaptures, onCaptures });
 
   const slots = templateData?.templateData?.slotsLayout || [];
 

@@ -6,6 +6,7 @@ import { useCameraDevices, useCountdown } from './hooks';
 
 export interface BoothCaptureOptions {
   totalSlots: number;
+  captures?: string[];
   onCaptures: (caps: string[]) => void;
 }
 
@@ -33,13 +34,12 @@ export interface BoothCaptureResult {
   isDone: boolean;
 }
 
-export function useBoothCapture({ totalSlots, onCaptures }: BoothCaptureOptions): BoothCaptureResult {
-  const [captures, setCaptures] = useState<string[]>([]);
+export function useBoothCapture({ totalSlots, captures: initialCaptures, onCaptures }: BoothCaptureOptions): BoothCaptureResult {
+  const [captures, setCaptures] = useState<string[]>(initialCaptures || []);
   const [mirrored, setMirrored] = useState(true);
   const [captureMode, setCaptureMode] = useState<'manual' | 'auto'>('manual');
   const webcamRef = useRef<any>(null);
   const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const completedRef = useRef(false);
 
   const { deviceId, availableCams, showCamMenu, setShowCamMenu, camMenuRef, isFrontCamera, handleSwitchCamera } = useCameraDevices();
   const { countdown, flash, busy, runCountdown, runBatchCountdown } = useCountdown();
@@ -51,8 +51,7 @@ export function useBoothCapture({ totalSlots, onCaptures }: BoothCaptureOptions)
   }, [isFrontCamera]);
 
   useEffect(() => {
-    if (captures.length >= totalSlots && captures.every(Boolean) && !completedRef.current) {
-      completedRef.current = true;
+    if (captures.length >= totalSlots && captures.every(Boolean)) {
       onCaptures(captures);
     }
   }, [captures, totalSlots, onCaptures]);
@@ -99,7 +98,6 @@ export function useBoothCapture({ totalSlots, onCaptures }: BoothCaptureOptions)
   };
 
   const retake = useCallback(() => {
-    completedRef.current = false;
     setCaptures([]);
   }, []);
 

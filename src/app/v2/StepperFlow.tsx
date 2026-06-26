@@ -44,6 +44,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, ap
       {step === 2 && (
         <BoothStep
           totalSlots={f.slotsCount}
+          captures={f.captures}
           appName={appName}
           templateData={f.templateData}
           keyedFrameImage={f.keyedFrameImage}
