@@ -2,6 +2,7 @@
 import { useRef, useCallback } from 'react';
 import { Pencil } from 'lucide-react';
 import { TemplateData, PhotoAdjust, DEFAULT_ADJUST } from '../types';
+import { getAutoFormatUrl } from '@/lib/cloudinary-url';
 import styles from '../page.module.css';
 
 function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, onSelect, onAdjust }: {
@@ -63,7 +64,7 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
               </div>
             );
           })}
-          <img src={keyedFrameImage?.includes('res.cloudinary.com') ? keyedFrameImage.replace('/image/upload/', '/image/upload/f_auto,q_auto/') : (keyedFrameImage || templateData.templateFull?.replace('/image/upload/', '/image/upload/f_auto,q_auto/') || '')} alt="Frame"
+          <img src={getAutoFormatUrl(keyedFrameImage) || getAutoFormatUrl(templateData.templateFull || '') || ''} alt="Frame"
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 2, pointerEvents: 'none' }} />
           {selectedSlotIdx >= 0 && selectedSlotIdx < (templateData.templateData.slotsLayout?.length || 0) && (() => {
             const s = templateData.templateData.slotsLayout[selectedSlotIdx];

@@ -4,6 +4,7 @@ import { CameraIcon, RefreshCcw, FlipHorizontal, Check } from 'lucide-react';
 import styles from '../../page.module.css';
 import NewspaperSection from '../../homepage/NewspaperSection';
 import { useBoothCapture } from '@/lib/useBoothCapture';
+import { getAutoFormatUrl } from '@/lib/cloudinary-url';
 import { TemplateData, type ISlot } from '@/app/main/types';
 
 // @ts-ignore — react-webcam types incompatible with Next.js dynamic
@@ -139,9 +140,7 @@ export default function BoothStep({
                   );
                 })}
                 {keyedFrameImage && (
-                  <img src={keyedFrameImage?.includes('res.cloudinary.com')
-                    ? keyedFrameImage.replace('/image/upload/', '/image/upload/f_auto,q_auto/')
-                    : keyedFrameImage} alt=""
+                  <img src={getAutoFormatUrl(keyedFrameImage)} alt=""
                     style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
                 )}
               </div>

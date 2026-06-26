@@ -71,6 +71,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   };
 
   const startOver = useCallback(() => {
+    try { if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
     onRefresh?.();
     setStep(0);
     setCaptures([]);

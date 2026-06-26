@@ -1,6 +1,5 @@
 'use client';
 import { useCallback, useRef, useState } from 'react';
-import { STORAGE_KEYS } from '@/lib/constants';
 import styles from './page.module.css';
 import StepperFlow from './StepperFlow';
 import HomePage from './homepage/HomePage';
@@ -23,10 +22,6 @@ export default function V2Page() {
     setFlipDir('backward');
   }, []);
 
-  const handleRefresh = useCallback(() => {
-    try { sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
-  }, []);
-
   return (
     <div className={styles.stepPage} style={{ perspective: '1600px' }}>
       <div style={{ display: step !== 0 ? 'none' : undefined, height: '100%' }}>
@@ -46,7 +41,7 @@ export default function V2Page() {
       </div>
 
       {step !== 0 && (
-        <StepperFlow step={step} setStep={setStep} onRefresh={handleRefresh}
+        <StepperFlow step={step} setStep={setStep}
           sessionTimer={appData.sessionTimer} appName={appData.appName} onBackToHome={handleBack} />
       )}
 

@@ -13,6 +13,11 @@ export function getFullQualityUrl(url: string): string {
   return url.replace('/image/upload/', '/image/upload/q_100,fl_lossy=false/');
 }
 
+export function getAutoFormatUrl(url: string): string {
+  if (!url || !url.includes('res.cloudinary.com')) return url;
+  return url.replace('/image/upload/', '/image/upload/f_auto,q_auto/');
+}
+
 export function isBase64(str: string): boolean {
   return str.startsWith('data:');
 }
