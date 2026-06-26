@@ -40,6 +40,9 @@ export function useBoothCapture({ totalSlots, captures: initialCaptures, onCaptu
   const [captureMode, setCaptureMode] = useState<'manual' | 'auto'>('manual');
   const webcamRef = useRef<any>(null);
   const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const completedRef = useRef(
+    initialCaptures ? initialCaptures.length >= totalSlots && initialCaptures.every(Boolean) : false
+  );
 
   const { deviceId, availableCams, showCamMenu, setShowCamMenu, camMenuRef, isFrontCamera, handleSwitchCamera } = useCameraDevices();
   const { countdown, flash, busy, runCountdown, runBatchCountdown } = useCountdown();
@@ -52,7 +55,12 @@ export function useBoothCapture({ totalSlots, captures: initialCaptures, onCaptu
 
   useEffect(() => {
     if (captures.length >= totalSlots && captures.every(Boolean)) {
-      onCaptures(captures);
+      if (!completedRef.current) {
+        completedRef.current = true;
+        onCaptures(captures);
+      }
+    } else {
+      completedRef.current = false;
     }
   }, [captures, totalSlots, onCaptures]);
 
@@ -98,6 +106,7 @@ export function useBoothCapture({ totalSlots, captures: initialCaptures, onCaptu
   };
 
   const retake = useCallback(() => {
+    completedRef.current = false;
     setCaptures([]);
   }, []);
 

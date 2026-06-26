@@ -95,9 +95,9 @@ export default function BoothStep({
               </div>
               <div className={styles.boothModeToggle}>
                 <button className={`${styles.boothModeBtn} ${captureMode === 'manual' ? styles.boothModeBtnActive : ''}`}
-                  onClick={() => setCaptureMode('manual')} disabled={stripLoading}>M</button>
+                  onClick={() => setCaptureMode('manual')} disabled={busy || stripLoading}>M</button>
                 <button className={`${styles.boothModeBtn} ${captureMode === 'auto' ? styles.boothModeBtnActive : ''}`}
-                  onClick={() => setCaptureMode('auto')} disabled={stripLoading}>A</button>
+                  onClick={() => setCaptureMode('auto')} disabled={busy || stripLoading}>A</button>
               </div>
               <button className={`${styles.boothBtn} ${styles.boothBtnPrimary}`}
                 onClick={handleCapture} disabled={busy || isDone || stripLoading}>
@@ -105,7 +105,7 @@ export default function BoothStep({
                 {busy ? `${countdown || ''}` : `CAPTURE ${captures.length + 1}/${totalSlots}`}
               </button>
               {isFrontCamera && (
-                <button className={styles.boothBtn} onClick={() => setMirrored((v) => !v)} disabled={stripLoading}>
+                <button className={styles.boothBtn} onClick={() => setMirrored((v) => !v)} disabled={busy || stripLoading}>
                   <FlipHorizontal size={14} /> {mirrored ? 'MIRROR' : 'FLIP'}
                 </button>
               )}
@@ -129,7 +129,7 @@ export default function BoothStep({
                         <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                       ) : (
                       <button className={styles.boothSlotUpload} onClick={() => fileRefs.current[idx]?.click()}
-                        style={{ width: '100%', height: '100%', flexDirection: 'column', gap: 2 }} disabled={stripLoading}>
+                        style={{ width: '100%', height: '100%', flexDirection: 'column', gap: 2 }} disabled={busy || stripLoading}>
                         <span style={{ fontSize: 20, fontWeight: 900, lineHeight: 1 }}>+</span>
                         <span style={{ fontSize: 8, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>UPLOAD</span>
                         <input ref={(el) => { fileRefs.current[idx] = el; }}
