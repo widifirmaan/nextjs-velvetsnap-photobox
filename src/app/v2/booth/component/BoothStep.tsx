@@ -1,9 +1,12 @@
 'use client';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { CameraIcon, RefreshCcw, FlipHorizontal, Check } from 'lucide-react';
 import styles from '../../page.module.css';
 import NewspaperSection from '../../homepage/NewspaperSection';
-import { useBoothCapture } from '@/lib/useBoothCapture';
+import { useCameraDevices, useCountdown } from '@/lib/hooks';
+import { flipImage } from '@/lib/canvas-utils';
+import { compressImage } from '@/lib/image-utils';
 import { getAutoFormatUrl } from '@/lib/cloudinary-url';
 import { TemplateData, type ISlot } from '@/app/main/types';
 
@@ -17,29 +20,59 @@ const LOREM = [
 ];
 
 export default function BoothStep({
-  totalSlots, captures: initialCaptures, appName, templateData, keyedFrameImage, frameRatio, stripLoading,
-  onCaptures, onNext,
+  slotsCount, filledCount, captures,
+  onAddCapture, templateData, keyedFrameImage, frameRatio,
+  stripLoading, onNext, appName,
 }: {
-  totalSlots: number;
-  captures: string[];
-  appName?: string;
-  templateData: TemplateData | null;
-  keyedFrameImage: string;
-  frameRatio: number;
-  stripLoading: boolean;
-  onCaptures: (caps: string[]) => void;
-  onNext?: () => void;
+  slotsCount: number; filledCount: number; captures: string[];
+  onAddCapture: (url: string, slotIdx?: number) => void;
+  templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
+  stripLoading: boolean; onNext: () => void; appName?: string;
 }) {
-  const {
-    webcamRef, fileRefs, captures, mirrored, setMirrored,
-    captureMode, setCaptureMode,
-    countdown, flash, busy,
-    deviceId, availableCams, showCamMenu, setShowCamMenu, camMenuRef,
-    isFrontCamera, handleSwitchCamera,
-    handleCapture, handleUpload, isDone,
-  } = useBoothCapture({ totalSlots, captures: initialCaptures, onCaptures });
+  const webcamRef = useRef<any>(null);
+  const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [captureMode, setCaptureMode] = useState<'auto' | 'manual'>('manual');
+  const { deviceId, availableCams, showCamMenu, setShowCamMenu, camMenuRef, isFrontCamera, handleSwitchCamera } = useCameraDevices();
+  const { countdown, flash, busy, runCountdown, runBatchCountdown } = useCountdown();
+  const [mirrored, setMirrored] = useState(true);
+
+  useEffect(() => { setMirrored(isFrontCamera); }, [isFrontCamera]);
+
+  const capture = useCallback(async () => {
+    const imageSrc = webcamRef.current?.getScreenshot();
+    if (imageSrc) {
+      if (mirrored) flipImage(imageSrc).then((url) => onAddCapture(url));
+      else onAddCapture(imageSrc);
+    }
+  }, [webcamRef, mirrored, onAddCapture]);
+
+  const handleCapture = useCallback(async () => {
+    if (busy || (captures.length >= slotsCount)) return;
+    if (captureMode === 'auto') {
+      const remaining = slotsCount - captures.length;
+      if (remaining > 0) await runBatchCountdown(remaining, capture);
+    } else {
+      await runCountdown(capture);
+    }
+  }, [busy, captures.length, slotsCount, captureMode, runBatchCountdown, runCountdown, capture]);
+
+  const handleUpload = async (idx: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const dataUrl = reader.result as string;
+      if (dataUrl) {
+        const compressed = await compressImage(dataUrl);
+        onAddCapture(compressed, idx);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const slots = templateData?.templateData?.slotsLayout || [];
+  const isDone = captures.length >= slotsCount;
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -102,7 +135,7 @@ export default function BoothStep({
               <button className={`${styles.boothBtn} ${styles.boothBtnPrimary}`}
                 onClick={handleCapture} disabled={busy || isDone || stripLoading}>
                 <CameraIcon size={16} />
-                {busy ? `${countdown || ''}` : `CAPTURE ${captures.length + 1}/${totalSlots}`}
+                {busy ? `${countdown || ''}` : `CAPTURE ${filledCount + 1}/${slotsCount}`}
               </button>
               {isFrontCamera && (
                 <button className={styles.boothBtn} onClick={() => setMirrored((v) => !v)} disabled={busy || stripLoading}>
@@ -113,7 +146,7 @@ export default function BoothStep({
 
           </div>
 
-          {/* Column 3 — Strip Preview (merged 2 rows) */}
+          {/* Column 3 — Strip Preview */}
           <div className={styles.boothStripCol}>
             {slots.length > 0 ? (
               <div className={styles.boothStripPreview} style={{ aspectRatio: frameRatio || 1 / 3 }}>
@@ -165,7 +198,7 @@ export default function BoothStep({
       <div className={styles.newspaperFooter}>
         <div className={styles.mastheadMeta}>
           <span>Powered by {appName || 'VelvetSnap'}</span>
-          <span>{captures.length} / {totalSlots} shots</span>
+          <span>{filledCount} / {slotsCount} shots</span>
         </div>
       </div>
     </div>

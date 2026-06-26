@@ -43,14 +43,15 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, ap
 
       {step === 2 && (
         <BoothStep
-          totalSlots={f.slotsCount}
+          slotsCount={f.slotsCount}
+          filledCount={f.filledCount}
           captures={f.captures}
+          onAddCapture={f.handleAddCapture}
           appName={appName}
           templateData={f.templateData}
           keyedFrameImage={f.keyedFrameImage}
           frameRatio={f.frameRatio}
           stripLoading={f.stripLoading}
-          onCaptures={(caps) => caps.forEach((url, i) => f.handleAddCapture(url, i))}
           onNext={() => setStep(3)}
         />
       )}
