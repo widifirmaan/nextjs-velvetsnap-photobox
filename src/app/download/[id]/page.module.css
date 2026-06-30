@@ -96,18 +96,45 @@
 
 .previewInner {
   display: flex;
-  gap: 16px;
+  gap: 24px;
   align-items: flex-start;
   justify-content: center;
   width: 100%;
   height: 100%;
 }
 
+.stripCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.stripDownloadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
+  border: 3px solid var(--np-border, #1a1a1a);
+  background: var(--np-accent, #C5D89D);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: var(--np-shadow-sm, none);
+  line-height: 1;
+}
+
 .thumbGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  max-height: 100%;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
   align-content: center;
 }
 

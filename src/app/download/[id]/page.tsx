@@ -45,18 +45,6 @@ const V2_VARS: Record<string, string> = {
   '--font-body': 'var(--font-ebgaramond, EB Garamond, Georgia, serif)',
 };
 
-function DownloadBtn({ url, label }: { url: string; label: string; primary?: boolean }) {
-  const s: React.CSSProperties = {
-    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-    padding: '12px 20px', border: '3px solid var(--np-border)',
-    fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 700,
-    textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer',
-    transition: 'all 0.1s', lineHeight: 1, textDecoration: 'none',
-    color: '#fff', background: 'var(--np-accent)', boxShadow: 'var(--np-shadow-sm)',
-  };
-  return <a href={url} download style={s}><Download size={16} /> {label}</a>;
-}
-
 export default async function DownloadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [tx, themeRes] = await Promise.all([
@@ -108,14 +96,21 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
           <div className={styles.resultPreview}>
             <div className={styles.resultImage}>
               <div className={styles.previewInner}>
-                {tx.finalImage && (
-                  <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
-                    style={{
-                      objectFit: 'contain', maxWidth: '100%', maxHeight: '70dvh',
-                      height: 'auto', width: 'auto',
-                      ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
-                    }} />
-                )}
+                <div className={styles.stripCol}>
+                  {tx.finalImage && (
+                    <>
+                      <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
+                        style={{
+                          objectFit: 'contain', maxWidth: '100%', maxHeight: '60dvh',
+                          height: 'auto', width: 'auto',
+                          ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
+                        }} />
+                      <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
+                        <Download size={16} /> Download Strip
+                      </a>
+                    </>
+                  )}
+                </div>
                 {tx.captures?.length > 0 && (
                   <div className={styles.thumbGrid}>
                     {tx.captures.map((url: string, i: number) => (
@@ -137,9 +132,6 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, textAlign: 'center', flexShrink: 0 }}>
               Your Photos are Ready!
             </h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {tx.finalImage && <DownloadBtn url={tx.finalImage} label="Download Strip" primary />}
-            </div>
 
             {downloadUrl && (
               <div style={{ marginTop: 16, textAlign: 'center' }}>
