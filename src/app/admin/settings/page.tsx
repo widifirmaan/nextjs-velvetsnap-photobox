@@ -405,10 +405,7 @@ export default function SettingsPage() {
           <div className={styles.divider}>
             <div className="form-group">
               <label className="form-label">UI Theme</label>
-              <select className="form-input" value={form.uiTheme} onChange={(e) => setRootField('uiTheme', e.target.value)}>
-                <option value="v1">v1 (Classic)</option>
-                <option value="v2">v2 (Neobrutalism)</option>
-              </select>
+              <input className="form-input" value={form.uiTheme} onChange={(e) => setRootField('uiTheme', e.target.value)} placeholder="v1, v2, v3..." />
             </div>
           </div>
         </div>

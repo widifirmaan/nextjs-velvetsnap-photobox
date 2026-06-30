@@ -12,8 +12,9 @@ export async function middleware(request: NextRequest) {
     const apiUrl = new URL('/api/settings', request.url);
     const res = await fetch(apiUrl.toString(), { cache: 'no-store' });
     const data = await res.json();
-    const theme = data.data?.uiTheme === 'v2' ? '/v2' : '/v1';
-    return NextResponse.rewrite(new URL(theme, request.url));
+    const uiTheme: string = data.data?.uiTheme || 'v1';
+    const theme = /^v\d+$/.test(uiTheme) ? uiTheme : 'v1';
+    return NextResponse.rewrite(new URL(`/${theme}`, request.url));
   } catch {
     return NextResponse.rewrite(new URL('/v1', request.url));
   }

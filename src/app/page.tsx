@@ -7,8 +7,9 @@ export default async function Page() {
   try {
     const res = await fetch(`${base}/api/settings`, { cache: 'no-store' });
     const data = await res.json();
-    const theme = data.data?.uiTheme === 'v2' ? '/v2' : '/v1';
-    redirect(theme);
+    const uiTheme: string = data.data?.uiTheme || 'v1';
+    const theme = /^v\d+$/.test(uiTheme) ? uiTheme : 'v1';
+    redirect(`/${theme}`);
   } catch {
     redirect('/v1');
   }
