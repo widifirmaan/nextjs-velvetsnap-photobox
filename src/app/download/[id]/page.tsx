@@ -2,10 +2,14 @@ import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import { isValidObjectId } from 'mongoose';
 import NextImage from 'next/image';
-import { Download, Smartphone, Check } from 'lucide-react';
+import { Download, Smartphone } from 'lucide-react';
+import { UnifrakturMaguntia, EB_Garamond } from 'next/font/google';
 import styles from './page.module.css';
 import type { Metadata } from 'next';
 import DownloadQr from './DownloadQr';
+
+const unifraktur = UnifrakturMaguntia({ subsets: ['latin'], display: 'swap', variable: '--font-unifraktur', weight: '400' });
+const ebGaramond = EB_Garamond({ subsets: ['latin'], display: 'swap', variable: '--font-ebgaramond' });
 
 export const metadata: Metadata = {
   title: 'Download Your Photos',
@@ -37,12 +41,9 @@ const V2_VARS: Record<string, string> = {
   '--np-radius-sm': '0px',
   '--np-shadow': '6px 6px 0px #1a1a1a',
   '--np-shadow-sm': '3px 3px 0px #1a1a1a',
-  '--font-heading': 'UnifrakturMaguntia, serif',
-  '--font-body': 'EB Garamond, Georgia, serif',
+  '--font-heading': 'var(--font-unifraktur, UnifrakturMaguntia, serif)',
+  '--font-body': 'var(--font-ebgaramond, EB Garamond, Georgia, serif)',
 };
-
-const lab = ['Template', 'Photo', 'Edit', 'Pay', 'Cetak'];
-const rom = ['I', 'II', 'III', 'IV', 'V'];
 
 function DownloadBtn({ url, label }: { url: string; label: string; primary?: boolean }) {
   const s: React.CSSProperties = {
@@ -72,7 +73,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
 
   if (!tx) {
     return (
-      <div className={styles.stepPage} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
+      <div className={`${styles.stepPage}${isV2 ? ` ${unifraktur.variable} ${ebGaramond.variable}` : ''}`} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
         <div className={styles.stepContent}>
           <div className={styles.newspaperHeader}>
             <div className={styles.mastheadMeta}><span>DOWNLOAD</span><span>&nbsp;</span><span>Not Found</span></div>
@@ -90,31 +91,17 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className={styles.stepPage} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
+    <div className={`${styles.stepPage}${isV2 ? ` ${unifraktur.variable} ${ebGaramond.variable}` : ''}`} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
       <div className={styles.stepContent}>
         <div className={styles.newspaperHeader}>
           <div className={styles.mastheadMeta}>
             <span>DOWNLOAD</span>
             <span>{tx.captures?.length || 0} PHOTOS</span>
-            <span>Cetak</span>
           </div>
           <div className={styles.mastheadRule} />
           <h1 className={styles.mastheadTitle}>{appName.toUpperCase()}<span className={styles.mastheadAccent}> PHOTOS</span></h1>
           <p className={styles.mastheadTagline}>Download your photo strip and individual photos.</p>
           <div className={styles.mastheadRule} />
-          <div className={styles.mastheadMeta}>
-            <div style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
-              {lab.map((l, i) => (
-                <span key={i} style={{
-                  color: i < 4 ? 'var(--np-text)' : 'var(--np-accent)',
-                  fontWeight: i < 4 ? 400 : 700,
-                  display: 'inline-flex', alignItems: 'center', gap: 2,
-                }}>
-                  {i < 4 ? <Check size={12} /> : ''}{rom[i]}. {l}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className={styles.resultLayout}>
