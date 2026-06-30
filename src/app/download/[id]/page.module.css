@@ -136,7 +136,8 @@
 
 .downloadBtn {
   display: block;
-  width: 100%;
+  margin: 0 -3px;
+  width: calc(100% + 6px);
   border: 3px solid var(--np-border, #ccc);
   background: var(--np-accent, #C5D89D);
   color: #fff;
@@ -149,7 +150,7 @@
   letter-spacing: 0.06em;
   box-sizing: border-box;
   box-shadow: var(--np-shadow-sm, none);
-  padding: 6px 12px;
+  padding: 8px 12px;
   font-size: 11px;
 }
 
