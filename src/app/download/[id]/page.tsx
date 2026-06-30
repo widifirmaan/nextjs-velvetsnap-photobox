@@ -107,21 +107,29 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
         <div className={styles.resultLayout}>
           <div className={styles.resultPreview}>
             <div className={styles.resultImage}>
-              {tx.finalImage ? (
-                <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
-                  style={{
-                    objectFit: 'contain', maxWidth: '100%', maxHeight: '70dvh',
-                    height: 'auto', width: 'auto',
-                    ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
-                  }} />
-              ) : tx.captures?.length > 0 ? (
-                <div className={styles.thumbGrid}>
-                  {tx.captures.map((url: string, i: number) => (
-                    <NextImage key={i} src={url} alt={`Photo ${i + 1}`} width={200} height={266}
-                      style={{ objectFit: 'cover', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
-                  ))}
-                </div>
-              ) : null}
+              <div className={styles.previewInner}>
+                {tx.finalImage && (
+                  <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
+                    style={{
+                      objectFit: 'contain', maxWidth: '100%', maxHeight: '70dvh',
+                      height: 'auto', width: 'auto',
+                      ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
+                    }} />
+                )}
+                {tx.captures?.length > 0 && (
+                  <div className={styles.thumbGrid}>
+                    {tx.captures.map((url: string, i: number) => (
+                      <div key={i} className={styles.thumbCard}>
+                        <NextImage src={url} alt={`Photo ${i + 1}`} width={200} height={266}
+                          style={{ objectFit: 'cover', width: '100%', height: 'auto', display: 'block', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
+                        <a href={url} download className={styles.downloadBtn} style={{ fontSize: 10, padding: '4px 8px' }}>
+                          <Download size={12} /> Photo {i + 1}
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -131,9 +139,6 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {tx.finalImage && <DownloadBtn url={tx.finalImage} label="Download Strip" primary />}
-              {tx.captures?.map((url: string, i: number) => (
-                <DownloadBtn key={i} url={url} label={`Photo ${i + 1}`} />
-              ))}
             </div>
 
             {downloadUrl && (
