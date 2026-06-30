@@ -44,6 +44,11 @@ const V2_VARS: Record<string, string> = {
   '--font-body': 'EB Garamond, Georgia, serif',
 };
 
+const H1: React.CSSProperties = { fontFamily: 'var(--font-heading)', fontSize: 'clamp(32px,8vw,56px)', fontWeight: 900, lineHeight: 1, textAlign: 'center', margin: '2px 0', color: 'var(--np-text)' };
+const RULE: React.CSSProperties = { height: 1, background: 'var(--np-border)', margin: '4px 0', border: 'none', flexShrink: 0 };
+const META: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-body)', fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--np-text-muted)', padding: '0 4px', lineHeight: 1 };
+const LINK: React.CSSProperties = { color: 'var(--np-text)', textDecoration: 'none', borderBottom: '1px solid var(--np-border)' };
+
 function DownloadBtn({ url, label }: { url: string; label: string }) {
   return (
     <a href={url} download className={styles.downloadBtn} rel="noopener noreferrer">
@@ -64,50 +69,81 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
 
   const isV2 = themeRes === 'v2';
 
-  const content = !tx ? (
-    <>
-      <h1 className={styles.heading}>Photo not found</h1>
-      <p className={styles.subtitle}>This download link may be invalid or expired.</p>
-    </>
-  ) : (
-    <>
-      <h1 className={styles.heading}>Your Photos</h1>
-      <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
-
-      {tx.finalImage && (
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>Photo Strip</h2>
-          <div className={styles.imageWrap}>
-            <NextImage src={tx.finalImage} alt="Photo strip" className={styles.image} fill sizes="400px" />
-          </div>
-          <DownloadBtn url={tx.finalImage} label="Download Strip" />
+  if (!tx) {
+    return (
+      <div className={styles.page} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
+        <div className={styles.card}>
+          {isV2 && (
+            <>
+              <div style={META}><span>VelvetSnap Photobooth</span><span>Edition</span></div>
+              <hr style={RULE} />
+              <h1 style={H1}>PHOTO<span style={{ color: 'var(--np-accent)' }}> NOT</span> FOUND</h1>
+              <hr style={RULE} />
+            </>
+          )}
+          <h1 className={styles.heading}>Photo not found</h1>
+          <p className={styles.subtitle}>This download link may be invalid or expired.</p>
         </div>
-      )}
-
-      {tx.captures?.length > 0 && (
-        <div className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            <LucideImage size={18} /> Individual Photos ({tx.captures.length})
-          </h2>
-          <div className={styles.grid}>
-            {tx.captures.map((url: string, i: number) => (
-              <div key={i} className={styles.thumbCard}>
-                <div className={styles.thumbWrap}>
-                  <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="(max-width:640px) 50vw, 200px" />
-                </div>
-                <DownloadBtn url={url} label={`Photo ${i + 1}`} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </>
-  );
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
       <div className={styles.card}>
-        {content}
+        {isV2 && (
+          <>
+            <div style={META}><span>VelvetSnap Photobooth</span><span>Edition</span></div>
+            <hr style={RULE} />
+            <h1 style={H1}>YOUR<span style={{ color: 'var(--np-accent)' }}> PHOTOS</span></h1>
+            <hr style={RULE} />
+          </>
+        )}
+
+        {!isV2 && (
+          <>
+            <h1 className={styles.heading}>Your Photos</h1>
+            <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
+          </>
+        )}
+
+        {tx.finalImage && (
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>Photo Strip</h2>
+            <div className={styles.imageWrap}>
+              <NextImage src={tx.finalImage} alt="Photo strip" className={styles.image} fill sizes="400px" />
+            </div>
+            <DownloadBtn url={tx.finalImage} label="Download Strip" />
+          </div>
+        )}
+
+        {tx.captures?.length > 0 && (
+          <div className={styles.section}>
+            <h2 className={styles.sectionTitle}>
+              <LucideImage size={18} /> Individual Photos ({tx.captures.length})
+            </h2>
+            <div className={styles.grid}>
+              {tx.captures.map((url: string, i: number) => (
+                <div key={i} className={styles.thumbCard}>
+                  <div className={styles.thumbWrap}>
+                    <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="(max-width:640px) 50vw, 200px" />
+                  </div>
+                  <DownloadBtn url={url} label={`Photo ${i + 1}`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {isV2 && (
+          <div style={{ textAlign: 'center', padding: '4px 24px 8px', flexShrink: 0 }}>
+            <hr style={RULE} />
+            <div style={META}>
+              <span>VelvetSnap Photobooth</span>
+              <a href="/admin/login" style={LINK}>Admin</a>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
