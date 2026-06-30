@@ -23,6 +23,19 @@ async function getTransaction(id: string) {
   return tx ? JSON.parse(JSON.stringify(tx)) : null;
 }
 
+const V2_VARS = {
+  '--np-bg': '#f5f0e8',
+  '--np-card': '#faf6ef',
+  '--np-text': '#1a1a1a',
+  '--np-text-secondary': '#4a4a4a',
+  '--np-text-muted': '#8a8a8a',
+  '--np-border': '#1a1a1a',
+  '--np-accent': '#c73e3e',
+  '--np-accent-hover': '#a83232',
+  '--font-heading': 'UnifrakturMaguntia, serif',
+  '--font-body': 'EB Garamond, Georgia, serif',
+};
+
 function DownloadBtn({ url, label }: { url: string; label: string }) {
   return (
     <a href={url} download className={styles.downloadBtn} rel="noopener noreferrer">
@@ -33,11 +46,19 @@ function DownloadBtn({ url, label }: { url: string; label: string }) {
 
 export default async function DownloadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const tx = await getTransaction(id);
+  const [tx, themeRes] = await Promise.all([
+    getTransaction(id),
+    fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/api/settings`, { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((d) => d.data?.uiTheme || 'v1')
+      .catch(() => 'v1' as string),
+  ]);
+
+  const isV2 = themeRes === 'v2';
 
   if (!tx) {
     return (
-      <div className={styles.page}>
+      <div className={styles.page} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
         <div className={styles.card}>
           <h1 className={styles.heading}>Photo not found</h1>
           <p className={styles.subtitle}>This download link may be invalid or expired.</p>
@@ -47,10 +68,14 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
       <div className={styles.card}>
-        <h1 className={styles.heading}>Your Photos</h1>
-        <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
+        <div style={isV2 ? { fontFamily: 'var(--font-body)' } : undefined}>
+          <h1 className={styles.heading} style={isV2 ? { fontFamily: 'var(--font-heading)' } : undefined}>
+            Your Photos
+          </h1>
+          <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
+        </div>
 
         {tx.finalImage && (
           <div className={styles.section}>
