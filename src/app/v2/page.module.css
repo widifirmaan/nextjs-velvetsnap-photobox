@@ -1459,7 +1459,7 @@
   width: 240px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   flex-shrink: 0;
 }
 

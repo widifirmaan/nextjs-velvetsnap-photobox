@@ -62,8 +62,8 @@ export default function ResultStep({ compositedImage, onHome, txId }: {
           </div>
         </div>
         <div className={styles.resultSidebar}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 18, margin: 0, flexShrink: 0 }}>Your Photos are Ready!</h2>
-          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, textAlign: 'center', flexShrink: 0 }}>Your Photos are Ready!</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <button className={`${styles.boothBtn} ${styles.boothBtnPrimary}`} onClick={handleDownload}>
               <Download size={16} /> Download JPEG
             </button>
