@@ -62,11 +62,12 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
     getTransaction(id),
     fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/api/settings`, { cache: 'no-store' })
       .then((r) => r.json())
-      .then((d) => d.data?.uiTheme || 'v1')
-      .catch(() => 'v1' as string),
+      .then((d) => d.data || { uiTheme: 'v1' })
+      .catch(() => ({ uiTheme: 'v1' } as Record<string, unknown>)),
   ]);
 
-  const isV2 = themeRes === 'v2';
+  const isV2 = themeRes.uiTheme === 'v2';
+  const appName = (themeRes.appName as string) || 'VelvetSnap';
   const downloadUrl = tx && id ? `${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/download/${id}` : null;
 
   if (!tx) {
@@ -76,7 +77,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
           <div className={styles.newspaperHeader}>
             <div className={styles.mastheadMeta}><span>DOWNLOAD</span><span>&nbsp;</span><span>Not Found</span></div>
             <div className={styles.mastheadRule} />
-            <h1 className={styles.mastheadTitle}>PHOTO<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
+            <h1 className={styles.mastheadTitle}>{appName.toUpperCase()}<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
             {isV2 && <p className={styles.mastheadTagline}>This download link may be invalid or expired.</p>}
             <div className={styles.mastheadRule} />
           </div>
@@ -98,7 +99,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             <span>Cetak</span>
           </div>
           <div className={styles.mastheadRule} />
-          <h1 className={styles.mastheadTitle}>YOUR<span className={styles.mastheadAccent}> PHOTOS</span></h1>
+          <h1 className={styles.mastheadTitle}>{appName.toUpperCase()}<span className={styles.mastheadAccent}> PHOTOS</span></h1>
           <p className={styles.mastheadTagline}>Download your photo strip and individual photos.</p>
           <div className={styles.mastheadRule} />
           <div className={styles.mastheadMeta}>
