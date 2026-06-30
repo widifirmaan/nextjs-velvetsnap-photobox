@@ -95,12 +95,13 @@
 }
 
 .previewInner {
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  align-items: start;
   width: 100%;
-  height: 100%;
+  max-height: 70dvh;
 }
 
 .stripCol {
@@ -108,7 +109,8 @@
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  flex-shrink: 0;
+  grid-row: span 2;
+  max-width: 200px;
 }
 
 .stripDownloadBtn {
@@ -129,13 +131,6 @@
   cursor: pointer;
   box-shadow: var(--np-shadow-sm, none);
   line-height: 1;
-}
-
-.thumbGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  align-content: center;
 }
 
 .thumbCard {

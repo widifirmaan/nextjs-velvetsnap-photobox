@@ -96,34 +96,28 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
           <div className={styles.resultPreview}>
             <div className={styles.resultImage}>
               <div className={styles.previewInner}>
-                <div className={styles.stripCol}>
-                  {tx.finalImage && (
-                    <>
-                      <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
-                        style={{
-                          objectFit: 'contain', maxWidth: '100%', maxHeight: '60dvh',
-                          height: 'auto', width: 'auto',
-                          ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
-                        }} />
-                      <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
-                        <Download size={16} /> Download Strip
-                      </a>
-                    </>
-                  )}
-                </div>
-                {tx.captures?.length > 0 && (
-                  <div className={styles.thumbGrid}>
-                    {tx.captures.map((url: string, i: number) => (
-                      <div key={i} className={styles.thumbCard}>
-                        <NextImage src={url} alt={`Photo ${i + 1}`} width={200} height={266}
-                          style={{ objectFit: 'cover', width: '100%', height: 'auto', display: 'block', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
-                        <a href={url} download className={styles.downloadBtn}>
-                          <Download size={12} /> Photo {i + 1}
-                        </a>
-                      </div>
-                    ))}
+                {tx.finalImage && (
+                  <div className={styles.stripCol}>
+                    <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
+                      style={{
+                        objectFit: 'contain', maxWidth: '100%', maxHeight: '70dvh',
+                        height: 'auto', width: '100%',
+                        ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
+                      }} />
+                    <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
+                      <Download size={16} /> Download Strip
+                    </a>
                   </div>
                 )}
+                {tx.captures?.map((url: string, i: number) => (
+                  <div key={i} className={styles.thumbCard}>
+                    <NextImage src={url} alt={`Photo ${i + 1}`} width={200} height={266}
+                      style={{ objectFit: 'cover', width: '100%', height: 'auto', display: 'block', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
+                    <a href={url} download className={styles.downloadBtn}>
+                      <Download size={12} /> Photo {i + 1}
+                    </a>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
