@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
   txCount: number; tmplCount: number;

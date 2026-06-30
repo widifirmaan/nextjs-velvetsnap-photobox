@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { SlotDots } from '../StepperBar';
 import { getOptimizedUrl } from '@/lib/cloudinary-url';
 import type { TemplateData } from '../types';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 interface TemplateCardProps {
   template: TemplateData;

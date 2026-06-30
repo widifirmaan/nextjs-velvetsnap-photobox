@@ -2,7 +2,7 @@
 
 import { X, Check, Upload, Loader2 } from 'lucide-react';
 import { TemplateData, type ISlot } from '../../types';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import { UPLOAD_MAX_DIM, UPLOAD_JPEG_QUALITY } from '@/lib/constants';
 import { useRef } from 'react';
 

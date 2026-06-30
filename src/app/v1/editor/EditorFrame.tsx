@@ -2,7 +2,7 @@
 import { useRef, useCallback } from 'react';
 import { Pencil } from 'lucide-react';
 import { TemplateData, PhotoAdjust, DEFAULT_ADJUST } from '../types';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFilter, onSelect, onAdjust }: {
   src: string; slotIdx: number; selected: boolean; adjust: PhotoAdjust;

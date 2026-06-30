@@ -1,6 +1,6 @@
 'use client';
 import { Camera as CameraIcon, MessageCircle, Sparkles } from 'lucide-react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function HomeFooter({ branding }: { branding: { appName: string; footer: { text: string } } }) {
   return (

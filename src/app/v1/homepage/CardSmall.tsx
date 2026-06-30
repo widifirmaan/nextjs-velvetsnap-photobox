@@ -1,6 +1,6 @@
 'use client';
 import { Sparkles } from 'lucide-react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function CardSmall({ html }: { html?: string }) {
   return (

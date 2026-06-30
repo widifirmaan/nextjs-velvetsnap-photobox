@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowLeft, CameraIcon, RefreshCcw, FlipHorizontal, Loader2 } from 'lucide-react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function BoothControls({
   taking, dslrCapturing, busy, stripLoading, captureMode, filledCount, slotsCount,

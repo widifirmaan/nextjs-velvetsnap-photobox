@@ -1,6 +1,6 @@
 'use client';
 import { useMemo } from 'react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import { SAMPLE_IMAGES } from '../types';
 
 export default function SlideshowCard({ slideIdx, images, onStart }: {

@@ -2,7 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { Download, Printer, Home as HomeIcon, Smartphone } from 'lucide-react';
 import { PRINT_WINDOW_DELAY } from '@/lib/constants';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function ResultActions({
   compositedImage, onHome, txId,

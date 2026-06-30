@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import StepperBar from '../StepperBar';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import type { TemplateData } from '../types';
 import TemplateCard from './TemplateCard';
 

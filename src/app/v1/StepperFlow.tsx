@@ -1,6 +1,6 @@
 'use client';
 import { Timer } from 'lucide-react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import { usePhotoboothFlow } from '@/lib/usePhotoboothFlow';
 import { TEMPLATE_CONFIGS } from './types';
 import TemplateStep from './template/TemplateStep';

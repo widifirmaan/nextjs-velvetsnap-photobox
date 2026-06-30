@@ -1,5 +1,5 @@
 'use client';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function AdjustSlider({ label, value, min, max, onChange, display }: {
   label: string; value: number; min: number; max: number;

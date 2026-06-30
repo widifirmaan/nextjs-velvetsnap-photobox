@@ -9,7 +9,7 @@ import StepperBar from '../../StepperBar';
 import { TemplateData } from '../../types';
 import BoothPreview from './BoothPreview';
 import BoothControls from './BoothControls';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 const Viewfinder = dynamic(() => import('./Viewfinder'), { ssr: false });
 

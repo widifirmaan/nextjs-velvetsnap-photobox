@@ -3,7 +3,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import StepperBar from '../../StepperBar';
 import PaymentPending from './PaymentPending';
 import { usePaymentFlow } from '@/lib/usePaymentFlow';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function PaymentStep({
   price, paid: _paid, setPaid: _setPaid, errMsg: _errMsg, setErrMsg: _setErrMsg,

@@ -1,5 +1,5 @@
 import { Check } from 'lucide-react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import { STEP_LABELS } from './types';
 
 export function SlotDots({ count }: { count: number }) {

@@ -2,7 +2,7 @@
 
 import { CameraIcon, Loader2 } from 'lucide-react';
 import Webcam from 'react-webcam';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function Viewfinder({
   cameraType, countdown, flash, dslrCapturing, webcamRef, mirrored, deviceId,

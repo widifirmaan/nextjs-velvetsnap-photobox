@@ -2,7 +2,7 @@
 import { Loader2 } from 'lucide-react';
 import StepperBar from '../../StepperBar';
 import ResultActions from './ResultActions';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 
 export default function ResultStep({
   compositedImage, onHome, txId,

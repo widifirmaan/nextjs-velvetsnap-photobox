@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import { SAMPLE_IMAGES } from '../types';
 import type { StripResult } from '../types';
 import HomeHeader from './HomeHeader';

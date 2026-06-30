@@ -1,7 +1,7 @@
 'use client';
 import { useCallback, useEffect, useRef } from 'react';
 import { Camera as CameraIcon } from 'lucide-react';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import type { StripResult } from '../types';
 import { STRIPS_CAROUSEL_RESUME_DELAY, STRIPS_CAROUSEL_AUTO_START_DELAY, STRIPS_CAROUSEL_ONREADY_TIMEOUT } from '@/lib/constants';
 

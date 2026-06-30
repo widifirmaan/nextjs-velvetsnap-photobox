@@ -4,7 +4,7 @@ import StepperBar from '../StepperBar';
 import EditorFrame from './EditorFrame';
 import AdjustSlider from './AdjustSlider';
 import { TemplateData, PhotoAdjust, DEFAULT_ADJUST } from '../types';
-import styles from '@/app/main/page.module.css';
+import styles from '@/app/v1/page.module.css';
 import { clampPhotoAdjust, computeSlotCssFilter } from '@/lib/adjust-utils';
 
 export default function EditorStep({
