@@ -2,9 +2,10 @@ import connectDB from '@/lib/db';
 import Transaction from '@/models/Transaction';
 import { isValidObjectId } from 'mongoose';
 import NextImage from 'next/image';
-import { Download, Image as LucideImage } from 'lucide-react';
+import { Download, Smartphone } from 'lucide-react';
 import styles from './page.module.css';
 import type { Metadata } from 'next';
+import DownloadQr from './DownloadQr';
 
 export const metadata: Metadata = {
   title: 'Download Your Photos',
@@ -36,26 +37,13 @@ const V2_VARS: Record<string, string> = {
   '--np-radius-sm': '0px',
   '--np-shadow': '6px 6px 0px #1a1a1a',
   '--np-shadow-sm': '3px 3px 0px #1a1a1a',
-  '--np-card-border': '3px solid #1a1a1a',
-  '--np-image-border': '3px solid #1a1a1a',
-  '--np-thumb-border': '2px solid #1a1a1a',
-  '--np-btn-border': '3px solid #1a1a1a',
   '--font-heading': 'UnifrakturMaguntia, serif',
   '--font-body': 'EB Garamond, Georgia, serif',
 };
 
-const H1: React.CSSProperties = { fontFamily: 'var(--font-heading)', fontSize: 'clamp(32px,8vw,56px)', fontWeight: 900, lineHeight: 1, textAlign: 'center', margin: '2px 0', color: 'var(--np-text)' };
-const RULE: React.CSSProperties = { height: 1, background: 'var(--np-border)', margin: '4px 0', border: 'none', flexShrink: 0 };
 const META: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-body)', fontSize: 13, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--np-text-muted)', padding: '0 4px', lineHeight: 1 };
+const RULE: React.CSSProperties = { height: 1, background: 'var(--np-border)', margin: '4px 0', border: 'none', flexShrink: 0 };
 const LINK: React.CSSProperties = { color: 'var(--np-text)', textDecoration: 'none', borderBottom: '1px solid var(--np-border)' };
-
-function DownloadBtn({ url, label }: { url: string; label: string }) {
-  return (
-    <a href={url} download className={styles.downloadBtn} rel="noopener noreferrer">
-      <Download size={18} /> {label}
-    </a>
-  );
-}
 
 export default async function DownloadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -68,6 +56,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
   ]);
 
   const isV2 = themeRes === 'v2';
+  const downloadUrl = tx ? `${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/download/${id}` : null;
 
   if (!tx) {
     return (
@@ -77,7 +66,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             <>
               <div style={META}><span>VelvetSnap Photobooth</span><span>Edition</span></div>
               <hr style={RULE} />
-              <h1 style={H1}>PHOTO<span style={{ color: 'var(--np-accent)' }}> NOT</span> FOUND</h1>
+              <h1 className={styles.mastheadTitle}>PHOTO<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
               <hr style={RULE} />
             </>
           )}
@@ -88,63 +77,77 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
     );
   }
 
+  const BtnStyle: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '12px 20px', border: '3px solid var(--np-border)', fontFamily: 'var(--font-body)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer', transition: 'all 0.1s', lineHeight: 1, textDecoration: 'none', color: 'var(--np-text)', background: 'var(--np-card)', boxShadow: 'var(--np-shadow-sm)' };
+  const BtnPrimary: React.CSSProperties = { ...BtnStyle, background: 'var(--np-accent)', color: '#fff' };
+
   return (
-    <div className={styles.page} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
-      <div className={styles.card}>
-        {isV2 && (
-          <>
-            <div style={META}><span>VelvetSnap Photobooth</span><span>Edition</span></div>
-            <hr style={RULE} />
-            <h1 style={H1}>YOUR<span style={{ color: 'var(--np-accent)' }}> PHOTOS</span></h1>
-            <hr style={RULE} />
-          </>
-        )}
+    <div className={styles.page} style={isV2 ? { ...V2_VARS as React.CSSProperties, display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden' } : undefined}>
+      {isV2 && (
+        <div style={{ flexShrink: 0, textAlign: 'center', padding: '8px 24px 0' }}>
+          <div style={META}><span>VelvetSnap Photobooth</span><span>Edition</span></div>
+          <hr style={RULE} />
+          <h1 className={styles.mastheadTitle}>YOUR<span className={styles.mastheadAccent}> PHOTOS</span></h1>
+          <hr style={RULE} />
+        </div>
+      )}
 
-        {!isV2 && (
-          <>
-            <h1 className={styles.heading}>Your Photos</h1>
-            <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
-          </>
-        )}
+      {!isV2 && (
+        <div style={{ flexShrink: 0, padding: '24px 24px 0' }}>
+          <h1 className={styles.heading}>Your Photos</h1>
+          <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
+        </div>
+      )}
 
-        {tx.finalImage && (
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Photo Strip</h2>
-            <div className={styles.imageWrap}>
-              <NextImage src={tx.finalImage} alt="Photo strip" className={styles.image} fill sizes="400px" />
+      <div className={styles.resultLayout}>
+        <div className={styles.resultPreview}>
+          {tx.finalImage ? (
+            <div className={styles.resultImage}>
+              <NextImage src={tx.finalImage} alt="Photo strip" className={styles.resultImg} width={400} height={1200} style={{ objectFit: 'contain', maxWidth: '100%', maxHeight: '70dvh', height: 'auto', width: 'auto', border: isV2 ? '4px solid var(--np-border)' : 'none', boxShadow: isV2 ? 'var(--np-shadow)' : 'none' }} />
             </div>
-            <DownloadBtn url={tx.finalImage} label="Download Strip" />
-          </div>
-        )}
-
-        {tx.captures?.length > 0 && (
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>
-              <LucideImage size={18} /> Individual Photos ({tx.captures.length})
-            </h2>
-            <div className={styles.grid}>
+          ) : tx.captures?.length > 0 ? (
+            <div className={styles.thumbGrid}>
               {tx.captures.map((url: string, i: number) => (
-                <div key={i} className={styles.thumbCard}>
-                  <div className={styles.thumbWrap}>
-                    <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="(max-width:640px) 50vw, 200px" />
-                  </div>
-                  <DownloadBtn url={url} label={`Photo ${i + 1}`} />
-                </div>
+                <NextImage key={i} src={url} alt={`Photo ${i + 1}`} width={200} height={266} style={{ objectFit: 'cover', border: isV2 ? '2px solid var(--np-border)' : '1px solid #eee' }} />
               ))}
             </div>
-          </div>
-        )}
+          ) : null}
+        </div>
 
-        {isV2 && (
-          <div style={{ textAlign: 'center', padding: '4px 24px 8px', flexShrink: 0 }}>
-            <hr style={RULE} />
-            <div style={META}>
-              <span>VelvetSnap Photobooth</span>
-              <a href="/admin/login" style={LINK}>Admin</a>
-            </div>
+        <div className={styles.resultSidebar}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {tx.finalImage && (
+              <a href={tx.finalImage} download style={BtnPrimary}>
+                <Download size={16} /> Download Strip
+              </a>
+            )}
+            {tx.captures?.length > 0 && tx.captures.map((url: string, i: number) => (
+              <a key={i} href={url} download style={BtnStyle}>
+                <Download size={16} /> Photo {i + 1}
+              </a>
+            ))}
           </div>
-        )}
+
+          {downloadUrl && (
+            <div style={{ marginTop: 16, textAlign: 'center' }}>
+              <hr style={RULE} />
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 10, color: 'var(--np-text-muted)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <Smartphone size={14} /> Scan to download
+              </p>
+              <DownloadQr url={downloadUrl} />
+            </div>
+          )}
+        </div>
       </div>
+
+      {isV2 && (
+        <div className={styles.newspaperFooter}>
+          <hr style={RULE} />
+          <div style={META}>
+            <span>VelvetSnap Photobooth</span>
+            <a href="/admin/login" style={LINK}>Admin</a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
