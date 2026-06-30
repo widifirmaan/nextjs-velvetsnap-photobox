@@ -1,4 +1,4 @@
-import type { ISlot, IStripElement } from '@/app/main/types';
+import type { ISlot, IStripElement } from '@/app/v1/types';
 import { loadImage, loadImages, flipImageHorizontal, applyPhotoAdjustment } from './image-utils';
 import { drawSlotShape, clipSlotShape } from './shapes';
 import {

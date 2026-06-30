@@ -1,4 +1,4 @@
-import { DEFAULT_ADJUST, type PhotoAdjust } from '@/app/main/types';
+import { DEFAULT_ADJUST, type PhotoAdjust } from '@/app/v1/types';
 
 export function clampPhotoAdjust(prev: PhotoAdjust[], idx: number, patch: Partial<PhotoAdjust>): PhotoAdjust[] {
   const next = prev.map((a) => ({ ...a }));

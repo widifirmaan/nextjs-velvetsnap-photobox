@@ -68,6 +68,7 @@ function mapAccountSettings(account: any) {
       slideshowInterval: s.system?.slideshowInterval || 3000,
       sessionTimer: s.system?.sessionTimer ?? 600,
     },
+    uiTheme: s.uiTheme || 'v1',
   };
 }
 

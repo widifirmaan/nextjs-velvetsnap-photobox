@@ -39,7 +39,6 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     return [
-      { source: '/', destination: '/main' },
       { source: '/strips-studio', destination: '/admin/template-studio' },
     ];
   },

@@ -43,3 +43,12 @@ export interface PhotoAdjust {
 export const DEFAULT_ADJUST: PhotoAdjust = { scale: 1, x: 0, y: 0, brightness: 100, contrast: 100, saturation: 100, temperature: 0 };
 
 export const STEP_LABELS = ['Template', 'Photo', 'Edit', 'Pay', 'Cetak'];
+
+export const TEMPLATE_CONFIGS: Record<string, { name: string; slots: number }> = {
+  'newspaper': { name: 'Newspaper', slots: 4 },
+  'classic': { name: 'Classic', slots: 3 },
+  'polaroid': { name: 'Polaroid', slots: 2 },
+  't1': { name: 'Classic Strips', slots: 3 },
+  't2': { name: 'Retro Film', slots: 4 },
+  't3': { name: 'Newspaper', slots: 1 },
+};

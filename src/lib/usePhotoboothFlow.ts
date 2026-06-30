@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from './canvas-utils';
 import { getHighResUrl, getFullQualityUrl } from './cloudinary-url';
 import { STORAGE_KEYS, FRAME_RENDER_MAX_W } from './constants';
-import { TEMPLATE_CONFIGS, DEFAULT_ADJUST, type IStripElement, type TemplateData, type PhotoAdjust } from '@/app/main/types';
+import { TEMPLATE_CONFIGS, DEFAULT_ADJUST, type IStripElement, type TemplateData, type PhotoAdjust } from '@/app/v1/types';
 
 export interface PhotoboothFlowOptions {
   step: number;

@@ -1,49 +1,44 @@
 'use client';
+import { useCallback } from 'react';
+import { Loader2 } from 'lucide-react';
 import styles from '../page.module.css';
-import TemplateCard from './TemplateCard';
-import NewspaperSection from '../homepage/NewspaperSection';
 import type { TemplateData } from '../types';
+import TemplateCard from './TemplateCard';
 
-export default function TemplateStep({ templates, selectedId, onSelect, loading, appName }: {
-  templates: TemplateData[]; selectedId: string | null;
-  onSelect: (id: string, data: TemplateData) => void; loading: boolean; appName?: string;
+export default function TemplateStep({ templates, loading, onSelect }: {
+  templates: TemplateData[]; loading: boolean;
+  onSelect: (id: string, data?: TemplateData) => void;
 }) {
+  const handleCardClick = useCallback((t: TemplateData) => {
+    onSelect(t.templateId, t);
+  }, [onSelect]);
+
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <NewspaperSection>
-        {loading ? (
-          <div className={styles.templateGrid}>
-            {[1,2,3,4].map((i) => (
-              <div key={i} className={styles.templateCard}>
-                <div className={styles.templateCardImg} style={{ background: '#ddd' }} />
-                <div className={styles.templateCardBody}>
-                  <div className={styles.skeleton} style={{ width: '80%', height: 12, marginBottom: 4 }} />
-                  <div className={styles.skeleton} style={{ width: '60%', height: 10 }} />
-                </div>
-              </div>
-            ))}
+      <div style={{ padding: '12px 24px' }}>
+        <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 24, margin: 0 }}>Pilih Frame</h1>
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto', padding: '0 24px 24px' }}>
+        {loading && templates.length === 0 ? (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Loader2 className="spin" size={40} />
           </div>
         ) : templates.length === 0 ? (
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--np-text-muted)' }}>
-              Belum ada bingkai tersedia. Silakan cek kembali nanti.
-            </p>
+            <p style={{ fontFamily: 'var(--font-body)', fontSize: 12, color: 'var(--np-text-muted)' }}>No templates available</p>
           </div>
         ) : (
           <div className={styles.templateGrid}>
             {templates.map((t) => (
-              <TemplateCard key={t._id || t.templateId} template={t}
-                selected={t._id === selectedId || t.templateId === selectedId}
-                onSelect={(data) => onSelect(t._id || t.templateId, data)} />
+              <TemplateCard key={t._id || t.templateId} template={t} onSelect={handleCardClick} />
             ))}
           </div>
         )}
-      </NewspaperSection>
+      </div>
       <div className={styles.newspaperFooter}>
         <div className={styles.mastheadMeta}>
-          <span>Powered by {appName || 'VelvetSnap'}</span>
-          <span>—</span>
-          <span>{templates.length} bingkai tersedia</span>
+          <span>VelvetSnap Photobooth</span>
+          <a href="/admin/login" className={styles.mastheadLink}>Admin</a>
         </div>
       </div>
     </div>

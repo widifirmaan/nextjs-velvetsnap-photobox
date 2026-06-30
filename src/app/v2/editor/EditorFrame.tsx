@@ -5,9 +5,9 @@ import { TemplateData, PhotoAdjust, DEFAULT_ADJUST } from '../types';
 import { getAutoFormatUrl } from '@/lib/cloudinary-url';
 import styles from '../page.module.css';
 
-function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, onSelect, onAdjust }: {
+function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, selectedFilter, onSelect, onAdjust }: {
   src: string; slotIdx: number; selected: boolean; adjust: PhotoAdjust;
-  cssFilter: string;
+  cssFilter: string; selectedFilter: string;
   onSelect: () => void; onAdjust: (idx: number, patch: Partial<PhotoAdjust>) => void;
 }) {
   const elRef = useRef<HTMLDivElement>(null);
@@ -41,26 +41,27 @@ function DraggablePhoto({ src, slotIdx, selected, adjust, cssFilter, onSelect, o
     <div ref={elRef} onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp}
       style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', cursor: 'grab', touchAction: 'none', outline: selected ? '3px solid var(--np-accent)' : 'none', outlineOffset: '-3px' }}>
       <img src={src} alt={`Slot ${slotIdx}`} draggable={false}
-        style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', transform: `scale(${adjust.scale || 1}) translate(${adjust.x || 0}%, ${adjust.y || 0}%)`, transformOrigin: 'center', filter: cssFilter, userSelect: 'none' }} />
+        className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', transform: `scale(${adjust.scale || 1}) translate(${adjust.x || 0}%, ${adjust.y || 0}%)`, transformOrigin: 'center', filter: cssFilter, userSelect: 'none', WebkitUserSelect: 'none' }} />
     </div>
   );
 }
 
-export default function EditorFrame({ captures, templateData, keyedFrameImage, frameRatio, photoAdjust, selectedSlotIdx, setSelectedSlotIdx, slotCssFilter, onAdjustSlot }: {
+export default function EditorFrame({ captures, templateData, keyedFrameImage, frameRatio, photoAdjust, selectedSlotIdx, setSelectedSlotIdx, selectedFilter, slotCssFilter, onAdjustSlot }: {
   captures: string[]; templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
   photoAdjust: PhotoAdjust[]; selectedSlotIdx: number; setSelectedSlotIdx: (idx: number) => void;
-  slotCssFilter: (idx: number) => string; onAdjustSlot: (idx: number, patch: Partial<PhotoAdjust>) => void;
+  selectedFilter: string; slotCssFilter: (idx: number) => string; onAdjustSlot: (idx: number, patch: Partial<PhotoAdjust>) => void;
 }) {
   return (
     <div className={styles.editorPreview}>
       {templateData && templateData.templateFull && templateData.templateData.slotsLayout && templateData.templateData.slotsLayout.length > 0 ? (
-        <div className={styles.editorFrame} style={{ height: 'min(75vh, 600px)', aspectRatio: frameRatio, backgroundColor: templateData.templateData.color || '#fff' }}>
+        <div className={styles.editorFrame} style={{ aspectRatio: frameRatio, backgroundColor: templateData.templateData.color || '#fff' }}>
           {(templateData.templateData.slotsLayout || []).map((slot, idx) => {
             const src = captures[idx];
             if (!src) return null;
             return (
               <div key={idx} style={{ position: 'absolute', left: `${slot.x}%`, top: `${slot.y}%`, width: `${slot.w}%`, height: `${slot.h}%`, overflow: 'hidden', zIndex: 1 }}>
-                <DraggablePhoto src={src} slotIdx={idx} selected={selectedSlotIdx === idx} adjust={photoAdjust[idx] || DEFAULT_ADJUST} cssFilter={slotCssFilter(idx)} onSelect={() => setSelectedSlotIdx(idx)} onAdjust={onAdjustSlot} />
+                <DraggablePhoto src={src} slotIdx={idx} selected={selectedSlotIdx === idx} adjust={photoAdjust[idx] || DEFAULT_ADJUST} cssFilter={slotCssFilter(idx)} selectedFilter={selectedFilter} onSelect={() => setSelectedSlotIdx(idx)} onAdjust={onAdjustSlot} />
               </div>
             );
           })}
@@ -79,7 +80,8 @@ export default function EditorFrame({ captures, templateData, keyedFrameImage, f
         <div className={styles.editorSimplePreview}>
           {captures.map((src, i) => (
             <img key={i} src={src} alt={`shot ${i}`} draggable={false}
-              style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: slotCssFilter(i), userSelect: 'none' }} />
+              className={selectedFilter === 'grayscale' ? styles.filterGray : selectedFilter === 'sepia' ? styles.filterSepia : ''}
+              style={{ transform: `scale(${photoAdjust[i]?.scale || 1})`, filter: slotCssFilter(i), userSelect: 'none', WebkitUserSelect: 'none' }} />
           ))}
         </div>
       )}

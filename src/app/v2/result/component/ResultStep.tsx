@@ -1,37 +1,97 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { Loader2, Download, Printer, Home as HomeIcon, Smartphone } from 'lucide-react';
+import { PRINT_WINDOW_DELAY } from '@/lib/constants';
 import styles from '../../page.module.css';
-import ResultActions from './ResultActions';
-import { downloadImageAsBlob } from '@/lib/download-utils';
 
-export default function ResultStep({ image, orderId, onStartOver }: {
-  image: string | null; orderId: string; onStartOver: () => void;
+export default function ResultStep({ compositedImage, onHome, txId }: {
+  compositedImage: string | null; onHome: () => void; txId?: string | null;
 }) {
-  const [downloading, setDownloading] = useState(false);
+  const qrRef = useRef<HTMLCanvasElement>(null);
+  const downloadUrl = txId ? `${window.location.origin}/download/${txId}` : null;
 
-  const handleDownload = async () => {
-    if (!image || downloading) return;
-    setDownloading(true);
-    try {
-      await downloadImageAsBlob(image, `velvetsnap-${orderId || 'photo'}.jpg`);
-    } catch (e) { console.error('download failed', e); }
-    setDownloading(false);
+  useEffect(() => {
+    if (!qrRef.current || !downloadUrl) return;
+    import('qrcode').then((QRCode) => {
+      QRCode.toCanvas(qrRef.current!, downloadUrl, {
+        width: 140, margin: 2,
+        color: { dark: '#1d1d1f', light: '#ffffff' },
+      });
+    });
+  }, [downloadUrl]);
+
+  const handleDownload = () => {
+    if (!compositedImage) return;
+    const link = document.createElement('a');
+    link.download = `photobooth-${Date.now()}.jpg`;
+    link.href = compositedImage;
+    link.click();
+  };
+
+  const handlePrint = () => {
+    if (!compositedImage) return;
+    const img = new window.Image();
+    img.onload = () => {
+      const pw = img.naturalWidth;
+      const ph = img.naturalHeight;
+      const win = window.open('', '_blank');
+      if (!win) return;
+      win.document.write(`<!DOCTYPE html><html><head><style>
+        @page{margin:0;size:${pw}px ${ph}px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#000}
+        img{display:block;width:${pw}px;height:${ph}px;max-width:100vw;max-height:100vh;object-fit:contain}
+        @media print{body{background:none}}
+      </style></head><body><img src="${compositedImage}" /></body></html>`);
+      win.document.close();
+      setTimeout(() => { win.focus(); win.print(); }, PRINT_WINDOW_DELAY);
+    };
+    img.src = compositedImage;
   };
 
   return (
-    <div className={styles.resultLayout}>
-      <div className={styles.resultHeadline}>YOUR MEMORIES, PRINTED IN TIME</div>
-      {image ? (
-        <div className={styles.resultImage}>
-          <img src={image} alt="Your photobooth strip" />
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className={styles.resultLayout}>
+        <div className={styles.resultPreview}>
+          <div className={styles.resultImage}>
+            {compositedImage ? (
+              <img src={compositedImage} alt="Final strip" />
+            ) : (
+              <Loader2 className="spin" size={32} style={{ color: 'var(--np-accent)' }} />
+            )}
+          </div>
         </div>
-      ) : (
-        <div className={styles.skeleton} style={{ width: '100%', maxWidth: 400, aspectRatio: '3/4' }} />
-      )}
-      <ResultActions
-        onDownload={handleDownload}
-        onStartOver={onStartOver}
-      />
+        <div className={styles.resultSidebar}>
+          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 18, margin: 0, flexShrink: 0 }}>Your Photos are Ready!</h2>
+          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <button className={`${styles.boothBtn} ${styles.boothBtnPrimary}`} onClick={handleDownload}>
+              <Download size={16} /> Download JPEG
+            </button>
+            <button className={styles.boothBtn} onClick={handlePrint}>
+              <Printer size={16} /> Print
+            </button>
+            <button className={styles.boothBtn} onClick={onHome}>
+              <HomeIcon size={16} /> Home
+            </button>
+          </div>
+          {downloadUrl && (
+            <div style={{ marginTop: 16, textAlign: 'center' }}>
+              <div style={{ borderTop: '2px solid var(--np-border)', marginBottom: 12 }} />
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 10, color: 'var(--np-text-muted)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                <Smartphone size={14} /> Scan to download
+              </p>
+              <canvas ref={qrRef} className={styles.qrCanvas} style={{ border: '3px solid var(--np-border)', boxShadow: 'var(--np-shadow-sm)' }} />
+              <p style={{ fontFamily: 'var(--font-body)', fontSize: 9, color: 'var(--np-text-muted)', marginTop: 8, wordBreak: 'break-all' }}>{downloadUrl}</p>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className={styles.newspaperFooter}>
+        <div className={styles.mastheadMeta}>
+          <span>VelvetSnap Photobooth</span>
+          <a href="/admin/login" className={styles.mastheadLink}>Admin</a>
+        </div>
+      </div>
     </div>
   );
 }

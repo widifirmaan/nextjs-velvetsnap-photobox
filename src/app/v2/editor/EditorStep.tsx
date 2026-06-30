@@ -8,14 +8,20 @@ import { clampPhotoAdjust, computeSlotCssFilter } from '@/lib/adjust-utils';
 
 export default function EditorStep({
   captures, templateData, keyedFrameImage, frameRatio,
-  photoAdjust, setPhotoAdjust, selectedSlotIdx, setSelectedSlotIdx,
+  photoAdjust, setPhotoAdjust,
+  selectedSlotIdx, setSelectedSlotIdx,
+  selectedFilter,
   onNext, onBack,
 }: {
   captures: string[]; templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
-  photoAdjust: PhotoAdjust[]; setPhotoAdjust: React.Dispatch<React.SetStateAction<PhotoAdjust[]>>;
+  photoAdjust: PhotoAdjust[];
+  setPhotoAdjust: React.Dispatch<React.SetStateAction<PhotoAdjust[]>>;
   selectedSlotIdx: number; setSelectedSlotIdx: (v: number) => void;
+  selectedFilter: string;
   onNext: () => void; onBack: () => void;
 }) {
+  const handleRetake = () => onBack();
+
   const sel = photoAdjust[selectedSlotIdx] || DEFAULT_ADJUST;
 
   const updateSlot = (idx: number, patch: Partial<typeof sel>) => {
@@ -25,35 +31,53 @@ export default function EditorStep({
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div className={styles.editorLayout}>
-        <EditorFrame captures={captures} templateData={templateData} keyedFrameImage={keyedFrameImage} frameRatio={frameRatio}
-          photoAdjust={photoAdjust} selectedSlotIdx={selectedSlotIdx} setSelectedSlotIdx={setSelectedSlotIdx}
-          slotCssFilter={(idx: number) => computeSlotCssFilter(photoAdjust[idx])} onAdjustSlot={updateSlot} />
+        <EditorFrame
+          captures={captures}
+          templateData={templateData}
+          keyedFrameImage={keyedFrameImage}
+          frameRatio={frameRatio}
+          photoAdjust={photoAdjust}
+          selectedSlotIdx={selectedSlotIdx}
+          setSelectedSlotIdx={setSelectedSlotIdx}
+          selectedFilter={selectedFilter}
+          slotCssFilter={(idx: number) => computeSlotCssFilter(photoAdjust[idx])}
+          onAdjustSlot={updateSlot}
+        />
         <div className={styles.editorSidebar}>
-          <button className={styles.boothBtn} onClick={onBack} style={{ padding: '8px 16px', fontSize: 11, alignSelf: 'flex-start' }}>
-            <ArrowLeft size={14} /> BACK
+          <button className={styles.boothBtn} onClick={handleRetake} style={{ alignSelf: 'flex-start', padding: '8px 16px', fontSize: 11 }}>
+            <ArrowLeft size={14} /> Back
           </button>
+
           <div className={styles.editorAdjustSection}>
-            <h4>ADJUSTMENTS</h4>
-            <AdjustSlider label="ZOOM" value={Math.round(sel.scale * 100)} min={100} max={300}
-              onChange={(v) => updateSlot(selectedSlotIdx, { scale: v / 100 })} display={`${sel.scale.toFixed(1)}x`} />
-            <AdjustSlider label="BRIGHTNESS" value={sel.brightness} min={50} max={150}
+            <h4>Adjustments</h4>
+            <AdjustSlider label="Zoom" value={Math.round(sel.scale * 100)} min={100} max={300}
+              onChange={(v) => updateSlot(selectedSlotIdx, { scale: v / 100 })}
+              display={`${sel.scale.toFixed(1)}x`} />
+            <AdjustSlider label="Brightness" value={sel.brightness} min={50} max={150}
               onChange={(v) => updateSlot(selectedSlotIdx, { brightness: v })} />
-            <AdjustSlider label="CONTRAST" value={sel.contrast} min={50} max={150}
+            <AdjustSlider label="Contrast" value={sel.contrast} min={50} max={150}
               onChange={(v) => updateSlot(selectedSlotIdx, { contrast: v })} />
-            <AdjustSlider label="SATURATION" value={sel.saturation} min={0} max={200}
+            <AdjustSlider label="Saturation" value={sel.saturation} min={0} max={200}
               onChange={(v) => updateSlot(selectedSlotIdx, { saturation: v })} />
-            <AdjustSlider label="TEMP" value={sel.temperature} min={-100} max={100}
+            <AdjustSlider label="Temp" value={sel.temperature} min={-100} max={100}
               onChange={(v) => updateSlot(selectedSlotIdx, { temperature: v })}
-              display={`${sel.temperature > 0 ? 'WARM' : sel.temperature < 0 ? 'COLD' : 'NEUTRAL'}`} />
+              display={`${sel.temperature > 0 ? 'Warm' : sel.temperature < 0 ? 'Cold' : 'Neutral'}`} />
           </div>
+
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <button className={`${styles.boothBtn} ${styles.editorRetakeBtn}`} onClick={onBack}>
-              <RefreshCcw size={14} /> RETAKE ALL
+            <button className={`${styles.boothBtn} ${styles.editorRetakeBtn}`} onClick={handleRetake}>
+              <RefreshCcw size={14} /> Retake All
             </button>
-            <button className={`${styles.boothBtn} ${styles.boothBtnPrimary}`} onClick={onNext} style={{ width: '100%' }}>
-              <Check size={16} /> PROCEED TO PAY
+            <button className={`${styles.boothBtn} ${styles.boothBtnPrimary}`} onClick={onNext}>
+              <Check size={16} /> Proceed to Pay
             </button>
           </div>
+        </div>
+      </div>
+      <div className={styles.newspaperFooter}>
+        <div className={styles.mastheadMeta}>
+          <span>VelvetSnap Photobooth</span>
+          <a href="/admin/login" className={styles.mastheadLink}>Admin</a>
         </div>
       </div>
     </div>

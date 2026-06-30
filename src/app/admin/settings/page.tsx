@@ -21,6 +21,7 @@ interface SettingsData {
   cardSmallHtml: string;
   cardPromoHtml: string;
   slideshowImages: string[];
+  uiTheme: string;
 }
 
 const defaults: SettingsData = {
@@ -34,6 +35,7 @@ const defaults: SettingsData = {
   cardSmallHtml: '',
   cardPromoHtml: '',
   slideshowImages: [],
+  uiTheme: 'v1',
 };
 
 export default function SettingsPage() {
@@ -144,6 +146,7 @@ export default function SettingsPage() {
             cardSmallHtml: d.cardSmallHtml || '',
             cardPromoHtml: d.cardPromoHtml || '',
             slideshowImages: Array.isArray(d.slideshowImages) && d.slideshowImages.length ? d.slideshowImages : defaults.slideshowImages,
+            uiTheme: d.uiTheme || defaults.uiTheme,
           });
         }
       })
@@ -397,9 +400,18 @@ export default function SettingsPage() {
                 <div className={`flex-row ${styles.colorRow}`}>
                   <input type="color" value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} className={styles.colorPicker} />
                   <input className={`form-input ${styles.colorInput}`} value={form.system.accentColor} onChange={(e) => updateSection('system', 'accentColor', e.target.value)} />
-                </div>
-              </div>
             </div>
+          </div>
+          <div className={styles.divider}>
+            <div className="form-group">
+              <label className="form-label">UI Theme</label>
+              <select className="form-input" value={form.uiTheme} onChange={(e) => setRootField('uiTheme', e.target.value)}>
+                <option value="v1">v1 (Classic)</option>
+                <option value="v2">v2 (Neobrutalism)</option>
+              </select>
+            </div>
+          </div>
+        </div>
           </div>
           <div className={styles.divider}>
             <div className="flex-col">

@@ -42,7 +42,7 @@ export default function V2Page() {
 
       {step !== 0 && (
         <StepperFlow step={step} setStep={setStep}
-          sessionTimer={appData.sessionTimer} appName={appData.appName} onBackToHome={handleBack} />
+          sessionTimer={appData.sessionTimer} onBackToHome={handleBack} />
       )}
 
       {flipDir === 'forward' && (

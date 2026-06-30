@@ -12,11 +12,11 @@ const taglines = [
   'Cetak dan simpan hasilnya',
 ];
 
-export default function StepperBar({ current, total, onBack, timer }: {
-  current: number; total: number; onBack?: () => void; timer?: string;
+export default function StepperBar({ current, total, onBack }: {
+  current: number; total: number; onBack?: () => void;
 }) {
   return (
-    <Masthead
+    <Masthead onBack={onBack}
       top={<>
         <span>STEP {roman[current]} OF {roman[total - 1]}</span>
         <span>{current > 0 ? `${current} DONE` : ''}</span>
@@ -35,8 +35,6 @@ export default function StepperBar({ current, total, onBack, timer }: {
           </span>
         ))}
       </div>}
-      onBack={onBack}
-      timer={timer}
     />
   );
 }
