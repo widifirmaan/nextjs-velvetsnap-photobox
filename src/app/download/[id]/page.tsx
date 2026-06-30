@@ -122,7 +122,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
                       <div key={i} className={styles.thumbCard}>
                         <NextImage src={url} alt={`Photo ${i + 1}`} width={200} height={266}
                           style={{ objectFit: 'cover', width: '100%', height: 'auto', display: 'block', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
-                        <a href={url} download className={styles.downloadBtn} style={{ fontSize: 10, padding: '4px 8px' }}>
+                        <a href={url} download className={styles.downloadBtn}>
                           <Download size={12} /> Photo {i + 1}
                         </a>
                       </div>

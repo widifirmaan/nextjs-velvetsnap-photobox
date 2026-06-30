@@ -137,17 +137,20 @@
 .downloadBtn {
   display: block;
   width: 100%;
-  border: 2px solid var(--np-border, #ccc);
+  border: 3px solid var(--np-border, #ccc);
   background: var(--np-accent, #C5D89D);
   color: #fff;
   font-family: var(--font-body);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   text-align: center;
   text-decoration: none;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   box-sizing: border-box;
+  box-shadow: var(--np-shadow-sm, none);
+  padding: 6px 12px;
+  font-size: 11px;
 }
 
 .resultSidebar {
