@@ -23,7 +23,7 @@ async function getTransaction(id: string) {
   return tx ? JSON.parse(JSON.stringify(tx)) : null;
 }
 
-const V2_VARS = {
+const V2_VARS: Record<string, string> = {
   '--np-bg': '#f5f0e8',
   '--np-card': '#faf6ef',
   '--np-text': '#1a1a1a',
@@ -32,6 +32,14 @@ const V2_VARS = {
   '--np-border': '#1a1a1a',
   '--np-accent': '#c73e3e',
   '--np-accent-hover': '#a83232',
+  '--np-radius': '0px',
+  '--np-radius-sm': '0px',
+  '--np-shadow': '6px 6px 0px #1a1a1a',
+  '--np-shadow-sm': '3px 3px 0px #1a1a1a',
+  '--np-card-border': '3px solid #1a1a1a',
+  '--np-image-border': '3px solid #1a1a1a',
+  '--np-thumb-border': '2px solid #1a1a1a',
+  '--np-btn-border': '3px solid #1a1a1a',
   '--font-heading': 'UnifrakturMaguntia, serif',
   '--font-body': 'EB Garamond, Georgia, serif',
 };
@@ -56,54 +64,50 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
 
   const isV2 = themeRes === 'v2';
 
-  if (!tx) {
-    return (
-      <div className={styles.page} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
-        <div className={styles.card}>
-          <h1 className={styles.heading}>Photo not found</h1>
-          <p className={styles.subtitle}>This download link may be invalid or expired.</p>
+  const content = !tx ? (
+    <>
+      <h1 className={styles.heading}>Photo not found</h1>
+      <p className={styles.subtitle}>This download link may be invalid or expired.</p>
+    </>
+  ) : (
+    <>
+      <h1 className={styles.heading}>Your Photos</h1>
+      <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
+
+      {tx.finalImage && (
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>Photo Strip</h2>
+          <div className={styles.imageWrap}>
+            <NextImage src={tx.finalImage} alt="Photo strip" className={styles.image} fill sizes="400px" />
+          </div>
+          <DownloadBtn url={tx.finalImage} label="Download Strip" />
         </div>
-      </div>
-    );
-  }
+      )}
+
+      {tx.captures?.length > 0 && (
+        <div className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            <LucideImage size={18} /> Individual Photos ({tx.captures.length})
+          </h2>
+          <div className={styles.grid}>
+            {tx.captures.map((url: string, i: number) => (
+              <div key={i} className={styles.thumbCard}>
+                <div className={styles.thumbWrap}>
+                  <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="(max-width:640px) 50vw, 200px" />
+                </div>
+                <DownloadBtn url={url} label={`Photo ${i + 1}`} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
 
   return (
     <div className={styles.page} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
       <div className={styles.card}>
-        <div style={isV2 ? { fontFamily: 'var(--font-body)' } : undefined}>
-          <h1 className={styles.heading} style={isV2 ? { fontFamily: 'var(--font-heading)' } : undefined}>
-            Your Photos
-          </h1>
-          <p className={styles.subtitle}>Download your photo strip and individual photos.</p>
-        </div>
-
-        {tx.finalImage && (
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>Photo Strip</h2>
-            <div className={styles.imageWrap}>
-              <NextImage src={tx.finalImage} alt="Photo strip" className={styles.image} fill sizes="400px" />
-            </div>
-            <DownloadBtn url={tx.finalImage} label="Download Strip" />
-          </div>
-        )}
-
-        {tx.captures?.length > 0 && (
-          <div className={styles.section}>
-            <h2 className={styles.sectionTitle}>
-              <LucideImage size={18} /> Individual Photos ({tx.captures.length})
-            </h2>
-            <div className={styles.grid}>
-              {tx.captures.map((url: string, i: number) => (
-                <div key={i} className={styles.thumbCard}>
-                  <div className={styles.thumbWrap}>
-                    <NextImage src={url} alt={`Photo ${i + 1}`} className={styles.thumb} fill sizes="(max-width:640px) 50vw, 200px" />
-                  </div>
-                  <DownloadBtn url={url} label={`Photo ${i + 1}`} />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {content}
       </div>
     </div>
   );
