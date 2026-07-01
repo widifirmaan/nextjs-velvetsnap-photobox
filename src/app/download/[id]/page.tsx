@@ -87,7 +87,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             <span>{tx.captures?.length || 0} PHOTOS</span>
           </div>
           <div className={styles.mastheadRule} />
-          <h1 className={styles.mastheadTitle}>{appName.toUpperCase()}<span className={styles.mastheadAccent}> PHOTOS</span></h1>
+          <h1 className={styles.mastheadTitle}>{appName.toUpperCase()}</h1>
           <p className={styles.mastheadTagline}>Download your photo strip and individual photos.</p>
           <div className={styles.mastheadRule} />
         </div>
@@ -97,12 +97,13 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             <div className={styles.previewInner}>
                 {tx.finalImage && (
                   <div className={styles.stripCol}>
-                    <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
-                      style={{
-                        objectFit: 'contain', maxWidth: '100%', maxHeight: '100%',
-                        width: '100%', height: 'auto',
-                        ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
-                      }} />
+                    <div style={{
+                      flex: 1, minHeight: 0, position: 'relative', width: '100%',
+                      ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
+                    }}>
+                      <NextImage src={tx.finalImage} alt="Photo strip" fill
+                        style={{ objectFit: 'contain' }} />
+                    </div>
                     <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
                       <Download size={16} /> Download Strip
                     </a>
@@ -110,8 +111,13 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
                 )}
                 {tx.captures?.map((url: string, i: number) => (
                   <div key={i} className={styles.thumbCard}>
-                    <NextImage src={url} alt={`Photo ${i + 1}`} width={200} height={266}
-                      style={{ objectFit: 'cover', width: '100%', display: 'block', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
+                    <div style={{
+                      flex: 1, minHeight: 0, position: 'relative', width: '100%',
+                      ...(isV2 ? { border: '3px solid var(--np-border)', boxShadow: 'var(--np-shadow-sm)' } : {}),
+                    }}>
+                      <NextImage src={url} alt={`Photo ${i + 1}`} fill
+                        style={{ objectFit: 'cover' }} />
+                    </div>
                     <a href={url} download className={styles.downloadBtn}>
                       <Download size={12} /> Photo {i + 1}
                     </a>
