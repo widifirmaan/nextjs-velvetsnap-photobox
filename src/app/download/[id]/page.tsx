@@ -6,6 +6,7 @@ import { Download, Smartphone } from 'lucide-react';
 import { UnifrakturMaguntia, EB_Garamond } from 'next/font/google';
 import styles from './page.module.css';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import DownloadQr from './DownloadQr';
 
 const unifraktur = UnifrakturMaguntia({ subsets: ['latin'], display: 'swap', variable: '--font-unifraktur', weight: '400' });
@@ -47,16 +48,18 @@ const V2_VARS: Record<string, string> = {
 
 export default async function DownloadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const [tx, themeRes] = await Promise.all([
+  const [tx, themeRes, headersList] = await Promise.all([
     getTransaction(id),
     fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/api/settings`, { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => d.data || { uiTheme: 'v1' })
       .catch(() => ({ uiTheme: 'v1' } as Record<string, unknown>)),
+    headers(),
   ]);
 
   const isV2 = themeRes.uiTheme === 'v2';
   const appName = (themeRes.appName as string) || 'VelvetSnap';
+  const host = headersList.get('host') || 'localhost:3000';
   const downloadUrl = tx && id ? `${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/download/${id}` : null;
 
   if (!tx) {
@@ -64,7 +67,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
       <div className={`${styles.stepPage}${isV2 ? ` ${unifraktur.variable} ${ebGaramond.variable}` : ''}`} style={isV2 ? V2_VARS as React.CSSProperties : undefined}>
         <div className={styles.stepContent}>
           <div className={styles.newspaperHeader}>
-            <div className={styles.mastheadMeta}><span>DOWNLOAD</span><span>&nbsp;</span><span>Not Found</span></div>
+            <div className={styles.mastheadMeta}><span>{host.toUpperCase()}</span><span>&nbsp;</span><span>Not Found</span></div>
             <div className={styles.mastheadRule} />
             <h1 className={styles.mastheadTitle}>{appName}<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
             {isV2 && <p className={styles.mastheadTagline}>This download link may be invalid or expired.</p>}
@@ -83,7 +86,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
       <div className={styles.stepContent}>
         <div className={styles.newspaperHeader}>
           <div className={styles.mastheadMeta}>
-            <span>DOWNLOAD</span>
+            <span>{host.toUpperCase()}</span>
             <span>{tx.captures?.length || 0} PHOTOS</span>
           </div>
           <div className={styles.mastheadRule} />
