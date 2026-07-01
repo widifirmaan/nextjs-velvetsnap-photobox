@@ -66,7 +66,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
           <div className={styles.newspaperHeader}>
             <div className={styles.mastheadMeta}><span>DOWNLOAD</span><span>&nbsp;</span><span>Not Found</span></div>
             <div className={styles.mastheadRule} />
-            <h1 className={styles.mastheadTitle}>{appName.toUpperCase()}<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
+            <h1 className={styles.mastheadTitle}>{appName}<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
             {isV2 && <p className={styles.mastheadTagline}>This download link may be invalid or expired.</p>}
             <div className={styles.mastheadRule} />
           </div>
@@ -87,7 +87,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
             <span>{tx.captures?.length || 0} PHOTOS</span>
           </div>
           <div className={styles.mastheadRule} />
-          <h1 className={styles.mastheadTitle}>{appName.toUpperCase()}</h1>
+          <h1 className={styles.mastheadTitle}>{appName}</h1>
           <p className={styles.mastheadTagline}>Download your photo strip and individual photos.</p>
           <div className={styles.mastheadRule} />
         </div>
