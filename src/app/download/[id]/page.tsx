@@ -94,14 +94,13 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
 
         <div className={styles.resultLayout}>
           <div className={styles.resultPreview}>
-            <div className={styles.resultImage}>
-              <div className={styles.previewInner}>
+            <div className={styles.previewInner}>
                 {tx.finalImage && (
                   <div className={styles.stripCol}>
                     <NextImage src={tx.finalImage} alt="Photo strip" width={400} height={1200}
                       style={{
-                        objectFit: 'contain', maxWidth: '100%', maxHeight: '70dvh',
-                        height: 'auto', width: '100%',
+                        objectFit: 'contain', maxWidth: '100%', maxHeight: '100%',
+                        width: '100%', height: 'auto',
                         ...(isV2 ? { border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' } : {}),
                       }} />
                     <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
@@ -112,7 +111,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
                 {tx.captures?.map((url: string, i: number) => (
                   <div key={i} className={styles.thumbCard}>
                     <NextImage src={url} alt={`Photo ${i + 1}`} width={200} height={266}
-                      style={{ objectFit: 'cover', width: '100%', height: 'auto', display: 'block', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
+                      style={{ objectFit: 'cover', width: '100%', display: 'block', border: isV2 ? '3px solid var(--np-border)' : '1px solid #eee', boxShadow: isV2 ? 'var(--np-shadow-sm)' : 'none' }} />
                     <a href={url} download className={styles.downloadBtn}>
                       <Download size={12} /> Photo {i + 1}
                     </a>
@@ -120,7 +119,6 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
                 ))}
               </div>
             </div>
-          </div>
 
           <div className={styles.resultSidebar}>
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, textAlign: 'center', flexShrink: 0 }}>
