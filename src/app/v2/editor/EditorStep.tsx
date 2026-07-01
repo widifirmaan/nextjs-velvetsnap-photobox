@@ -77,7 +77,6 @@ export default function EditorStep({
       <div className={styles.newspaperFooter}>
         <div className={styles.mastheadMeta}>
           <span>VelvetSnap Photobooth</span>
-          <a href="/admin/login" className={styles.mastheadLink}>Admin</a>
         </div>
       </div>
     </div>

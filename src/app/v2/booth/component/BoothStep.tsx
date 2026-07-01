@@ -138,7 +138,6 @@ export default function BoothStep({
       <div className={styles.newspaperFooter} style={{ width: '100%' }}>
         <div className={styles.mastheadMeta}>
           <span>VelvetSnap Photobooth</span>
-          <a href="/admin/login" className={styles.mastheadLink}>Admin</a>
         </div>
       </div>
     </div>

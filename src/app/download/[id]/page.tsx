@@ -149,7 +149,6 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
         <div className={styles.newspaperFooter}>
           <div className={styles.mastheadMeta}>
             <span>VelvetSnap Photobooth</span>
-            <a href="/admin/login" className={styles.mastheadLink}>Admin</a>
           </div>
         </div>
       </div>
