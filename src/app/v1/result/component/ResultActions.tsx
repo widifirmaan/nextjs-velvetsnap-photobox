@@ -24,11 +24,7 @@ export default function ResultActions({
   }, [downloadUrl]);
 
   const handleDownload = () => {
-    if (!compositedImage) return;
-    const link = document.createElement('a');
-    link.download = `photobooth-${Date.now()}.jpg`;
-    link.href = compositedImage;
-    link.click();
+    if (downloadUrl) window.location.href = downloadUrl;
   };
 
   const handlePrint = () => {
