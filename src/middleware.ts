@@ -4,6 +4,14 @@ import type { NextRequest } from 'next/server';
 export async function middleware(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
+  // Rewrite /v{n}/download/* to /download/* for any theme version
+  const match = pathname.match(/^\/(v\d+)\/download\/(.+)/);
+  if (match) {
+    const url = new URL(`/download/${match[2]}${search}`, request.url);
+    url.searchParams.set('theme', match[1]);
+    return NextResponse.rewrite(url);
+  }
+
   if (pathname !== '/' || search) {
     return NextResponse.next();
   }
@@ -21,5 +29,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/',
+  matcher: ['/', '/:theme(v\\d+)/download/:path*'],
 };

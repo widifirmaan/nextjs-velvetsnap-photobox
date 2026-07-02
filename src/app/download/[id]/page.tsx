@@ -46,8 +46,9 @@ const V2_VARS: Record<string, string> = {
   '--font-body': 'var(--font-ebgaramond, EB Garamond, Georgia, serif)',
 };
 
-export default async function DownloadPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function DownloadPage({ params, searchParams }: { params: Promise<{ id: string }>, searchParams: Promise<Record<string, string>> }) {
   const { id } = await params;
+  const { theme: themeParam } = await searchParams;
   const [tx, themeRes, headersList] = await Promise.all([
     getTransaction(id),
     fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/api/settings`, { cache: 'no-store' })
@@ -57,8 +58,9 @@ export default async function DownloadPage({ params }: { params: Promise<{ id: s
     headers(),
   ]);
 
-  const isV2 = themeRes.uiTheme === 'v2';
-  const appName = (themeRes.appName as string) || 'VelvetSnap';
+  const uiTheme = themeParam || (themeRes as Record<string, unknown>)?.uiTheme as string || 'v1';
+  const isV2 = uiTheme === 'v2';
+  const appName = (themeRes as Record<string, unknown>)?.appName as string || 'VelvetSnap';
   const host = headersList.get('host') || 'localhost:3000';
   const downloadUrl = tx && id ? `${process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : 'http://localhost:3000'}/download/${id}` : null;
 
