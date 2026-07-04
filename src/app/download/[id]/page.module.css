@@ -206,6 +206,8 @@
   .newspaperHeader { padding: 6px 16px 0; }
   .resultLayout { padding: 16px; gap: 16px; }
   .resultSidebar { display: none; }
+  .mastheadMeta { font-size: 11px; }
+  .mastheadTagline { font-size: 11px; }
 }
 
 @media (max-width: 400px) {
