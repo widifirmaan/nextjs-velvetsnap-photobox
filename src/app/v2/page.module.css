@@ -261,9 +261,9 @@
   min-height: 0;
   -webkit-overflow-scrolling: touch;
   display: flex;
-  flex-direction: column;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  will-change: scroll-position;
 }
 
 .carouselViewport::-webkit-scrollbar { display: none; }

@@ -25,22 +25,22 @@ export default function HomePage({
   loaded: boolean;
 }) {
   const carouselRef = useRef<HTMLDivElement>(null);
-  const autoScrollRef = useRef(0);
   const pausedRef = useRef(false);
 
   /* ── Auto-scroll carousel ── */
   useEffect(() => {
     const el = carouselRef.current;
     if (!el || !strips.length) return;
+    let raf: number;
     const step = () => {
       if (!pausedRef.current) {
         el.scrollLeft += 0.8;
         if (el.scrollLeft >= el.scrollWidth / 2) el.scrollLeft = 0;
       }
-      autoScrollRef.current = requestAnimationFrame(step);
+      raf = requestAnimationFrame(step);
     };
-    autoScrollRef.current = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(autoScrollRef.current);
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
   }, [strips.length]);
 
   return (
@@ -83,6 +83,8 @@ export default function HomePage({
               className={styles.carouselViewport}
               onPointerEnter={() => { pausedRef.current = true; }}
               onPointerLeave={() => { pausedRef.current = false; }}
+              onTouchStart={() => { pausedRef.current = true; }}
+              onTouchEnd={() => { pausedRef.current = false; }}
             >
               <div className={styles.carouselTrack}>
                 {strips.length > 0 ? (
