@@ -1658,4 +1658,7 @@
   .resultLayout {
     padding: 12px;
   }
+
+  .mastheadMeta { font-size: 11px; }
+  .mastheadTagline { font-size: 11px; }
 }
