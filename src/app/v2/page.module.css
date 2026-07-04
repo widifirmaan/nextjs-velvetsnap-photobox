@@ -1623,6 +1623,16 @@
     gap: 8px;
     align-items: flex-start;
   }
+
+  .resultLayout {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .resultSidebar {
+    width: 100%;
+    max-width: 400px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1661,4 +1671,5 @@
 
   .mastheadMeta { font-size: 11px; }
   .mastheadTagline { font-size: 11px; }
+  .resultImage img { max-height: 50dvh; }
 }
