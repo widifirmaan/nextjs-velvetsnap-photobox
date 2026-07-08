@@ -1,3 +1,6 @@
+// File: src/app/admin/components/index.ts
+// Description: Auto-added top comment for easier file identification.
+
 export { default as AdminPageHeader } from './AdminPageHeader';
 export { default as AdminStatCard } from './AdminStatCard';
 export { AdminStatGrid } from './AdminStatGrid';

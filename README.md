@@ -1,3 +1,6 @@
+<!-- File: README.md -->
+<!-- Description: Auto-added top comment for easier file identification. -->
+
 # 📸 VelvetSnap Co. — Aesthetic Photobooth Web App
 
 **VelvetSnap Co.** is a full-stack photobooth web application built with **Next.js 16** and **MongoDB**. It features a complete photobooth workflow — from webcam/DSLR capture and template-based frame compositing to digital payment and print-ready result download.
@@ -86,7 +89,13 @@ Explore the comprehensive features of **VelvetSnap Co.** through our gallery.
 
 ---
 
-## 📦 Getting Started
+## � Beginner Node Guide
+
+If you are new to Node.js and Next.js, start with `NODE_BEGINNER_GUIDE.md`.
+
+---
+
+## �📦 Getting Started
 
 ### Prerequisites
 - **Node.js 20+**

@@ -1,3 +1,6 @@
+// File: src/app/admin/loading.tsx
+// Description: Auto-added top comment for easier file identification.
+
 import styles from './page.module.css';
 
 export default function AdminLoading() {

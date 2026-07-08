@@ -1,10 +1,13 @@
+// File: src/app/admin/templates/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Trash2, Loader2, ExternalLink } from 'lucide-react';
 import { AdminPageHeader, AdminTableCard, AdminConfirmModal } from '@/app/admin/components';
-import { adminFetch } from '@/lib/admin-fetch';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 import type { IStripElement } from '@/models/Template';
 import styles from './page.module.css';
 

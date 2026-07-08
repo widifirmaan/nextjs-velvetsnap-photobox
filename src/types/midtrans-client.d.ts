@@ -1,3 +1,6 @@
+// File: src/types/midtrans-client.d.ts
+// Description: Auto-added top comment for easier file identification.
+
 declare module 'midtrans-client' {
   interface SnapConfig {
     isProduction: boolean;

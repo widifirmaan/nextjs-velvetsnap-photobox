@@ -1,7 +1,10 @@
+// File: src/app/api/devices/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Device from '@/models/Device';
-import { apiError } from '@/lib/api-utils';
+import { apiError } from '@/lib/utils/api-utils';
 export async function GET(_req: Request) {
   try {
     await connectDB();

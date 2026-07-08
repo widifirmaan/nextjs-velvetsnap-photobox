@@ -1,9 +1,12 @@
+// File: src/app/api/templates/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Template from '@/models/Template';
-import { getSession, buildAccountFilter } from '@/lib/require-admin';
-import { normalizeTemplate } from '@/lib/normalize-template';
-import { apiError } from '@/lib/api-utils';
+import { getSession, buildAccountFilter } from '@/lib/utils/require-admin';
+import { normalizeTemplate } from '@/lib/utils/normalize-template';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function GET(req: Request) {
   try {

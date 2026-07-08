@@ -1,3 +1,6 @@
+// File: src/app/admin/template-studio/data/stickers.ts
+// Description: Auto-added top comment for easier file identification.
+
 export interface StickerCategory {
   name: string;
   emojis: string[];

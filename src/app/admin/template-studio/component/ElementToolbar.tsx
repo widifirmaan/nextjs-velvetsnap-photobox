@@ -1,3 +1,6 @@
+// File: src/app/admin/template-studio/component/ElementToolbar.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { Type, Image } from 'lucide-react';

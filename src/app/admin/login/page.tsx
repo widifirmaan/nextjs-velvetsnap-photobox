@@ -1,11 +1,14 @@
+// File: src/app/admin/login/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import styles from './page.module.css';
-import { STORAGE_KEYS } from '@/lib/constants';
-import { adminFetch, syncAdminSession } from '@/lib/admin-fetch';
+import { STORAGE_KEYS } from '@/lib/utils/constants';
+import { adminFetch, syncAdminSession } from '@/lib/utils/admin-fetch';
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');

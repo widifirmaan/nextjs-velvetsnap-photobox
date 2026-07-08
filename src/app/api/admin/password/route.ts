@@ -1,10 +1,13 @@
+// File: src/app/api/admin/password/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Settings from '@/models/Settings';
 import Account from '@/models/Account';
-import { hashPassword } from '@/lib/auth';
-import { getSession } from '@/lib/require-admin';
-import { apiError } from '@/lib/api-utils';
+import { hashPassword } from '@/lib/utils/auth';
+import { getSession } from '@/lib/utils/require-admin';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function PUT(req: Request) {
   try {

@@ -1,8 +1,11 @@
+// File: src/app/layout.tsx
+// Description: Auto-added top comment for easier file identification.
+
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
-import { ModelProvider } from '@/lib/ModelContext';
+import { ModelProvider } from '@/lib/context/ModelContext';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 

@@ -1,9 +1,12 @@
+// File: src/app/api/transactions/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Transaction from '@/models/Transaction';
-import { buildAccountFilter, getSession } from '@/lib/require-admin';
+import { buildAccountFilter, getSession } from '@/lib/utils/require-admin';
 import { v4 as uuidv4 } from 'uuid';
-import { apiError } from '@/lib/api-utils';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function POST(req: Request) {
   try {

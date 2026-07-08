@@ -1,10 +1,13 @@
+// File: src/app/admin/template-studio/component/AssetSearch.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Image from 'next/image';
 import { Search, FolderUp, Palette, X } from 'lucide-react';
-import { useModel } from '@/lib/ModelContext';
-import { adminFetch } from '@/lib/admin-fetch';
+import { useModel } from '@/lib/context/ModelContext';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 import styles from './AssetSearch.module.css';
 
 interface AssetSearchProps {

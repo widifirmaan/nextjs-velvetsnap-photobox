@@ -1,3 +1,6 @@
+<!-- File: OPTIMASI_PLAN.md -->
+<!-- Description: Auto-added top comment for easier file identification. -->
+
 # VelvetSnap Photobox — Optimization Plan
 
 ## 🔴 PHASE 1: Security (Revenue-Affecting)

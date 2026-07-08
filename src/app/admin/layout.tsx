@@ -1,3 +1,6 @@
+// File: src/app/admin/layout.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import Link from 'next/link';
@@ -5,8 +8,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Layers, Server, Clock, Film, Loader2, LogOut, Settings2, User, Users, type LucideIcon } from 'lucide-react';
 import styles from './layout.module.css';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { STORAGE_KEYS, CURTAIN_ANIM_DELAY, CURTAIN_FALLBACK_TIMEOUT } from '@/lib/constants';
-import { adminFetch, clearAdminSession, syncAdminSession } from '@/lib/admin-fetch';
+import { STORAGE_KEYS, CURTAIN_ANIM_DELAY, CURTAIN_FALLBACK_TIMEOUT } from '@/lib/utils/constants';
+import { adminFetch, clearAdminSession, syncAdminSession } from '@/lib/utils/admin-fetch';
 
 interface NavLink {
   href: string;

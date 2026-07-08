@@ -1,3 +1,6 @@
+// File: src/app/admin/components/AdminEmptyState.tsx
+// Description: Auto-added top comment for easier file identification.
+
 import styles from './admin-empty-state.module.css';
 
 interface Props {

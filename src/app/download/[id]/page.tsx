@@ -1,4 +1,7 @@
-import connectDB from '@/lib/db';
+// File: src/app/download/[id]/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
+import connectDB from '@/lib/utils/db';
 import Transaction from '@/models/Transaction';
 import { isValidObjectId } from 'mongoose';
 import NextImage from 'next/image';

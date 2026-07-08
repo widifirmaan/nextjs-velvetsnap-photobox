@@ -1,11 +1,14 @@
+// File: src/app/admin/devices/DevicesPage.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Camera, Save, Monitor, Printer, RefreshCw, CheckCircle, Usb } from 'lucide-react';
 import AdminPageHeader from '@/app/admin/components/AdminPageHeader';
 import styles from './page.module.css';
-import { STORAGE_KEYS, SAVED_MSG_TIMEOUT } from '@/lib/constants';
-import { adminFetch } from '@/lib/admin-fetch';
+import { STORAGE_KEYS, SAVED_MSG_TIMEOUT } from '@/lib/utils/constants';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 
 interface DeviceSettings {
   cameraType: 'webcam' | 'dslr';

@@ -1,10 +1,13 @@
+// File: src/app/admin/settings/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, Loader2, Image, Timer, Lock, Check, MapPin, Plus, Trash2, CheckCircle, FileText, Upload, Layout } from 'lucide-react';
-import { adminFetch } from '@/lib/admin-fetch';
-import { STORAGE_KEYS, LOGOUT_REDIRECT_DELAY, SAVED_MSG_TIMEOUT } from '@/lib/constants';
+import { adminFetch } from '@/lib/utils/admin-fetch';
+import { STORAGE_KEYS, LOGOUT_REDIRECT_DELAY, SAVED_MSG_TIMEOUT } from '@/lib/utils/constants';
 import { AdminConfirmModal, AdminModal, AdminPageHeader } from '@/app/admin/components';
 import styles from './page.module.css';
 

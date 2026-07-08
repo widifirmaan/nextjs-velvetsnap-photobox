@@ -1,3 +1,6 @@
+// File: src/app/download/[id]/DownloadQr.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 import { useEffect, useRef } from 'react';
 

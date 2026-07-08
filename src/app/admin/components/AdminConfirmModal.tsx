@@ -1,3 +1,6 @@
+// File: src/app/admin/components/AdminConfirmModal.tsx
+// Description: Auto-added top comment for easier file identification.
+
 import AdminModal from './AdminModal';
 import styles from './admin-modal.module.css';
 

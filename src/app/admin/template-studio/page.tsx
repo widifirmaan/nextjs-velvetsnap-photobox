@@ -1,3 +1,6 @@
+// File: src/app/admin/template-studio/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useCallback, useRef, useEffect, Suspense } from 'react';
@@ -19,8 +22,8 @@ import ElementToolbar from './component/ElementToolbar';
 import LayerPanel from './component/LayerPanel';
 import PropertiesPanel from './component/PropertiesPanel';
 import AssetSearch from './component/AssetSearch';
-import { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT, CHROMA_KEY_TARGET, CHROMA_KEY_THRESHOLD } from '@/lib/constants';
-import { adminFetch } from '@/lib/admin-fetch';
+import { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT, CHROMA_KEY_TARGET, CHROMA_KEY_THRESHOLD } from '@/lib/utils/constants';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 import styles from './page.module.css';
 
 const DEFAULT_CANVAS_W = DEFAULT_CANVAS_WIDTH;

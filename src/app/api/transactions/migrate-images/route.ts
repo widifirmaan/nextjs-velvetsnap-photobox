@@ -1,9 +1,12 @@
+// File: src/app/api/transactions/migrate-images/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Transaction from '@/models/Transaction';
-import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/cloudinary';
-import { apiError } from '@/lib/api-utils';
-import { buildAccountFilter } from '@/lib/require-admin';
+import { uploadBase64, uploadBase64Array, isBase64 } from '@/lib/utils/cloudinary';
+import { apiError } from '@/lib/utils/api-utils';
+import { buildAccountFilter } from '@/lib/utils/require-admin';
 
 async function runMigration(accountFilter: Record<string, unknown>) {
   await connectDB();

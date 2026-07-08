@@ -1,9 +1,12 @@
+// File: src/app/api/templates/reupload/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Template from '@/models/Template';
-import { uploadBase64 } from '@/lib/cloudinary';
-import { apiError } from '@/lib/api-utils';
-import { buildAccountFilter } from '@/lib/require-admin';
+import { uploadBase64 } from '@/lib/utils/cloudinary';
+import { apiError } from '@/lib/utils/api-utils';
+import { buildAccountFilter } from '@/lib/utils/require-admin';
 import type { IStripElement } from '@/models/Template';
 
 async function urlToBase64(url: string): Promise<string | null> {

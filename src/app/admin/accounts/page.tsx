@@ -1,9 +1,12 @@
+// File: src/app/admin/accounts/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Loader2, Key, User as UserIcon } from 'lucide-react';
 import { AdminPageHeader, AdminTableCard, AdminConfirmModal, AdminModal } from '@/app/admin/components';
-import { adminFetch } from '@/lib/admin-fetch';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 import styles from './page.module.css';
 
 interface AccountItem {

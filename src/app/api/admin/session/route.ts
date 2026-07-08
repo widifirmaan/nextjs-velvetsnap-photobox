@@ -1,6 +1,9 @@
+// File: src/app/api/admin/session/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import { getSession } from '@/lib/require-admin';
-import { apiError } from '@/lib/api-utils';
+import { getSession } from '@/lib/utils/require-admin';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function GET(req: Request) {
   try {

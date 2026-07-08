@@ -1,3 +1,6 @@
+// File: src/middleware.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 

@@ -1,3 +1,6 @@
+// File: src/app/admin/components/AdminBadge.tsx
+// Description: Auto-added top comment for easier file identification.
+
 import styles from './admin-badge.module.css';
 
 const statusMap: Record<string, string> = {

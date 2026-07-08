@@ -1,9 +1,12 @@
+// File: src/app/admin/MobileActions.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { LogOut, ExternalLink } from 'lucide-react';
-import { adminFetch, clearAdminSession } from '@/lib/admin-fetch';
+import { adminFetch, clearAdminSession } from '@/lib/utils/admin-fetch';
 import styles from './page.module.css';
 
 export default function MobileActions() {

@@ -1,3 +1,6 @@
+<!-- File: AGENTS.md -->
+<!-- Description: Auto-added top comment for easier file identification. -->
+
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 

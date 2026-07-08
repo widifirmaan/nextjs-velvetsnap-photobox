@@ -1,8 +1,11 @@
+// File: src/app/api/finance/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Transaction from '@/models/Transaction';
-import { apiError } from '@/lib/api-utils';
-import { buildAccountFilter } from '@/lib/require-admin';
+import { apiError } from '@/lib/utils/api-utils';
+import { buildAccountFilter } from '@/lib/utils/require-admin';
 
 export async function GET(req: Request) {
   try {

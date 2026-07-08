@@ -1,9 +1,12 @@
-import connectDB from '@/lib/db';
+// File: src/app/api/templates/list/route.ts
+// Description: Auto-added top comment for easier file identification.
+
+import connectDB from '@/lib/utils/db';
 import Template from '@/models/Template';
 import { NextResponse } from 'next/server';
-import { buildAccountFilter } from '@/lib/require-admin';
-import { normalizeTemplate } from '@/lib/normalize-template';
-import { apiError } from '@/lib/api-utils';
+import { buildAccountFilter } from '@/lib/utils/require-admin';
+import { normalizeTemplate } from '@/lib/utils/normalize-template';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function GET(req: Request) {
   try {

@@ -1,11 +1,14 @@
+// File: src/app/api/admin/login/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Settings from '@/models/Settings';
 import Account from '@/models/Account';
-import { hashPassword, verifyPassword, generateSessionToken } from '@/lib/auth';
-import { getAdminToken } from '@/lib/require-admin';
-import { apiError } from '@/lib/api-utils';
-import { COOKIE_NAME, COOKIE_BASE } from '@/lib/constants';
+import { hashPassword, verifyPassword, generateSessionToken } from '@/lib/utils/auth';
+import { getAdminToken } from '@/lib/utils/require-admin';
+import { apiError } from '@/lib/utils/api-utils';
+import { COOKIE_NAME, COOKIE_BASE } from '@/lib/utils/constants';
 
 export async function POST(req: Request) {
   try {

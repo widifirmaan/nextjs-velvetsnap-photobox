@@ -1,5 +1,8 @@
+// File: src/app/api/upload/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import { uploadBase64, isBase64 } from '@/lib/cloudinary';
+import { uploadBase64, isBase64 } from '@/lib/utils/cloudinary';
 export const runtime = 'nodejs';
 
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;

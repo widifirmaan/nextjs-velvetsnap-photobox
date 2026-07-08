@@ -1,3 +1,6 @@
+// File: src/app/api/log/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {

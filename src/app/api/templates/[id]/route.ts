@@ -1,10 +1,13 @@
+// File: src/app/api/templates/[id]/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Template from '@/models/Template';
-import { uploadBase64, isBase64, deleteImages } from '@/lib/cloudinary';
-import { normalizeTemplate } from '@/lib/normalize-template';
-import { getSession } from '@/lib/require-admin';
-import { apiError } from '@/lib/api-utils';
+import { uploadBase64, isBase64, deleteImages } from '@/lib/utils/cloudinary';
+import { normalizeTemplate } from '@/lib/utils/normalize-template';
+import { getSession } from '@/lib/utils/require-admin';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

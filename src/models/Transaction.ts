@@ -1,3 +1,6 @@
+// File: src/models/Transaction.ts
+// Description: Auto-added top comment for easier file identification.
+
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ITransaction extends Document {

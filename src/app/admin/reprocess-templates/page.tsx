@@ -1,10 +1,13 @@
+// File: src/app/admin/reprocess-templates/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { Loader2, CheckCircle2, XCircle, Play } from 'lucide-react';
-import { renderStripFrame, removeGreenScreen } from '@/lib/canvas-utils';
+import { renderStripFrame, removeGreenScreen } from '@/lib/utils/canvas-utils';
 import type { IStripElement } from '@/models/Template';
-import { adminFetch } from '@/lib/admin-fetch';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 import styles from './page.module.css';
 
 const HI_RES_MULTIPLIER = 3;

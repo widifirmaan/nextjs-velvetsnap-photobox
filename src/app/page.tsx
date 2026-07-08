@@ -1,3 +1,6 @@
+// File: src/app/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 import { redirect } from 'next/navigation';
 
 export default async function Page() {

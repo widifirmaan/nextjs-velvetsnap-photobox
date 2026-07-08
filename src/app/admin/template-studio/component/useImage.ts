@@ -1,3 +1,6 @@
+// File: src/app/admin/template-studio/component/useImage.ts
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useEffect, useState } from 'react';

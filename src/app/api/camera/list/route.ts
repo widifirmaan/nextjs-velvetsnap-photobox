@@ -1,7 +1,10 @@
+// File: src/app/api/camera/list/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import { apiError } from '@/lib/api-utils';
+import { apiError } from '@/lib/utils/api-utils';
 
 const execAsync = promisify(exec);
 

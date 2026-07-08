@@ -1,8 +1,11 @@
+// File: src/app/api/midtrans/notification/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Transaction from '@/models/Transaction';
-import { apiError } from '@/lib/api-utils';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function POST(req: Request) {
   try {

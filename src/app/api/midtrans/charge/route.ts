@@ -1,9 +1,12 @@
+// File: src/app/api/midtrans/charge/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
 import { Snap } from 'midtrans-client';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Transaction from '@/models/Transaction';
-import { MIDTRANS_PAYMENT_EXPIRY_DURATION, MIDTRANS_PAYMENT_EXPIRY_UNIT } from '@/lib/constants';
-import { apiError } from '@/lib/api-utils';
+import { MIDTRANS_PAYMENT_EXPIRY_DURATION, MIDTRANS_PAYMENT_EXPIRY_UNIT } from '@/lib/utils/constants';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function POST(req: Request) {
   try {

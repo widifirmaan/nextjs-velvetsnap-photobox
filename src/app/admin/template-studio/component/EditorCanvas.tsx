@@ -1,3 +1,6 @@
+// File: src/app/admin/template-studio/component/EditorCanvas.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useRef, useLayoutEffect, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
@@ -5,7 +8,7 @@ import { Stage, Layer, Transformer, Rect, Circle, Text, Group, Image as KonvaIma
 import Konva from 'konva';
 import type { IStripElement } from '@/models/Template';
 import { useImage } from './useImage';
-import { createSlotShapeNodes, type SlotShape } from '@/lib/shapes';
+import { createSlotShapeNodes, type SlotShape } from '@/lib/utils/shapes';
 
 const SNAP_THRESHOLD = 6;
 const GUIDE_WIDTH = 1;

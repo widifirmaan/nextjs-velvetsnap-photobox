@@ -1,3 +1,6 @@
+// File: src/lib/hooks/useCountdown.ts
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 import { useState, useRef, useCallback } from 'react';
 import { COUNTDOWN_SEC } from '../constants';

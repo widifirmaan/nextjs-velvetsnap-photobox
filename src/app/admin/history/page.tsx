@@ -1,10 +1,13 @@
+// File: src/app/admin/history/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { Camera, Loader2, Search, X, Trash2, Printer, ImageIcon, Eye, EyeOff } from 'lucide-react';
 import { AdminPageHeader, AdminBadge, AdminEmptyState, AdminModal, AdminConfirmModal } from '@/app/admin/components';
-import { adminFetch } from '@/lib/admin-fetch';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 import styles from './page.module.css';
 
 interface Transaction {

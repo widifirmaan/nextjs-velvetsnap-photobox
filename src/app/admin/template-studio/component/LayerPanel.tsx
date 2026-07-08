@@ -1,3 +1,6 @@
+// File: src/app/admin/template-studio/component/LayerPanel.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { Camera, Type, Sparkles, Diamond, Palette, Eye, EyeOff, ChevronUp, ChevronDown, X } from 'lucide-react';

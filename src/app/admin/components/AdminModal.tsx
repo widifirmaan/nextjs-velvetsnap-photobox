@@ -1,3 +1,6 @@
+// File: src/app/admin/components/AdminModal.tsx
+// Description: Auto-added top comment for easier file identification.
+
 'use client';
 
 import { useEffect } from 'react';

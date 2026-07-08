@@ -1,9 +1,12 @@
+// File: src/app/api/admin/accounts/[id]/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import connectDB from '@/lib/utils/db';
 import Account from '@/models/Account';
-import { requireRoot } from '@/lib/require-admin';
-import { hashPassword } from '@/lib/auth';
-import { apiError } from '@/lib/api-utils';
+import { requireRoot } from '@/lib/utils/require-admin';
+import { hashPassword } from '@/lib/utils/auth';
+import { apiError } from '@/lib/utils/api-utils';
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {

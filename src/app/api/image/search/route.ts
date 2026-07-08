@@ -1,3 +1,6 @@
+// File: src/app/api/image/search/route.ts
+// Description: Auto-added top comment for easier file identification.
+
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {

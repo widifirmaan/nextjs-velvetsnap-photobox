@@ -1,4 +1,7 @@
-import connectDB from '@/lib/db';
+// File: src/app/admin/page.tsx
+// Description: Auto-added top comment for easier file identification.
+
+import connectDB from '@/lib/utils/db';
 import Template from '@/models/Template';
 import Transaction from '@/models/Transaction';
 import Settings from '@/models/Settings';
@@ -9,7 +12,7 @@ import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'luc
 import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
 import MobileActions from './MobileActions';
 import styles from './page.module.css';
-import { COOKIE_NAME } from '@/lib/constants';
+import { COOKIE_NAME } from '@/lib/utils/constants';
 
 export const revalidate = 60;
 
