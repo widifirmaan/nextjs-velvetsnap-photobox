@@ -26,7 +26,6 @@ interface SharedEditorControlsProps {
   headingClassName?: string;
   buttonClassName?: string;
   primaryButtonClassName?: string;
-  secondaryButtonClassName?: string;
   retakeButtonClassName?: string;
   sectionClassName?: string;
 }
@@ -44,7 +43,6 @@ export default function SharedEditorControls({
   headingClassName,
   buttonClassName,
   primaryButtonClassName,
-  secondaryButtonClassName,
   retakeButtonClassName,
   sectionClassName,
 }: SharedEditorControlsProps) {

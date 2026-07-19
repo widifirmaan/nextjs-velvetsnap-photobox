@@ -3,7 +3,7 @@
 
 'use client';
 import { useState, useEffect, useMemo, useCallback, useRef, type Dispatch, type SetStateAction } from 'react';
-import { STORAGE_KEYS } from '../constants';
+import { STORAGE_KEYS } from '../utils/constants';
 
 export interface UseCameraDevicesReturn {
   deviceId: string | undefined;

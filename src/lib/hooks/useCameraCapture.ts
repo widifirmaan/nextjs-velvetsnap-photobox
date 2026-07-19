@@ -3,7 +3,7 @@
 
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { COUNTDOWN_SEC } from './constants';
+import { COUNTDOWN_SEC } from '../utils/constants';
 
 export interface CameraCaptureOptions {
   totalSlots: number;

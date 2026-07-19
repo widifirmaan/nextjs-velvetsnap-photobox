@@ -56,7 +56,6 @@ export default function EditorStep({
             SliderControl={AdjustSlider}
             buttonClassName={styles.boothBtn}
             primaryButtonClassName={`${styles.boothBtn} ${styles.boothBtnPrimary}`}
-            secondaryButtonClassName={styles.boothBtn}
             retakeButtonClassName={`${styles.boothBtn} ${styles.editorRetakeBtn}`}
             sectionClassName={styles.editorAdjustSection}
           />

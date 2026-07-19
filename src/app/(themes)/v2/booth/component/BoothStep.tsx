@@ -137,6 +137,7 @@ export default function BoothStep({
         mirrored={mirrored}
         setMirrored={setMirrored}
         camMenuRef={camMenuRef}
+        styles={styles}
       />
       <div className={styles.newspaperFooter} style={{ width: '100%' }}>
         <div className={styles.mastheadMeta}>

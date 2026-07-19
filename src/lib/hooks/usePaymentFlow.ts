@@ -3,7 +3,7 @@
 
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { STORAGE_KEYS, MIDTRANS_SNAP_URL, UPLOAD_COMPRESS_THRESHOLD, UPLOAD_PAYMENT_MAX_DIM, SNAP_LOAD_TIMEOUT, SNAP_PAY_TIMEOUT, PAYMENT_SUCCESS_DELAY, PAYMENT_POLL_INTERVAL } from './constants';
+import { STORAGE_KEYS, MIDTRANS_SNAP_URL, UPLOAD_COMPRESS_THRESHOLD, UPLOAD_PAYMENT_MAX_DIM, SNAP_LOAD_TIMEOUT, SNAP_PAY_TIMEOUT, PAYMENT_SUCCESS_DELAY, PAYMENT_POLL_INTERVAL } from '../utils/constants';
 
 export interface PaymentFlowOptions {
   price: number;

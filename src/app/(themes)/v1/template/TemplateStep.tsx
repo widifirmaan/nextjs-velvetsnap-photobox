@@ -3,7 +3,6 @@
 
 'use client';
 
-import { useCallback } from 'react';
 import SharedTemplateStep from '@/components/flow/SharedTemplateStep';
 import styles from '@/app/(themes)/v1/page.module.css';
 import type { TemplateData } from '../types';
@@ -15,27 +14,16 @@ interface TemplateStepProps {
   onBack: () => void;
 }
 
-export default function TemplateStep({ templates, loading, onSelect, onBack }: TemplateStepProps) {
-  const handleCardClick = useCallback((t: TemplateData) => {
-    onSelect(t.templateId, t);
-  }, [onSelect]);
-
+export default function TemplateStep({ templates, loading, onSelect }: TemplateStepProps) {
   return (
-    <div className={`${styles.stepPage} ${styles.stepPageTemplates}`}>
-      <StepperBar current={0} total={5} />
-      <div className={styles.stepHeader}>
-        <button className={styles.backBtn} onClick={onBack}><ArrowLeft size={18} /></button>
-        <h1 className={styles.stepHeading}>Pilih Frame</h1>
-      </div>
-      <TemplateList
-        templates={templates}
-        loading={loading}
-        emptyMessage="No templates available"
-        listClassName={styles.templateGrid}
-        renderTemplate={(t) => (
-          <TemplateCard key={t._id || t.templateId} template={t} onSelect={handleCardClick} />
-        )}
-      />
-    </div>
+    <SharedTemplateStep
+      templates={templates}
+      loading={loading}
+      onSelect={onSelect}
+      title="Pilih Frame"
+      wrapperClassName={styles.stepPage}
+      headingClassName={styles.stepHeading}
+      listClassName={styles.templateGrid}
+    />
   );
 }

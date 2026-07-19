@@ -3,9 +3,9 @@
 
 'use client';
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from './canvas-utils';
-import { getHighResUrl, getFullQualityUrl } from './cloudinary-url';
-import { STORAGE_KEYS, FRAME_RENDER_MAX_W } from './constants';
+import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '../utils/canvas-utils';
+import { getHighResUrl, getFullQualityUrl } from '../utils/cloudinary-url';
+import { STORAGE_KEYS, FRAME_RENDER_MAX_W } from '../utils/constants';
 import { TEMPLATE_CONFIGS, DEFAULT_ADJUST, type IStripElement, type TemplateData, type PhotoAdjust } from '@/lib/types';
 
 export interface PhotoboothFlowOptions {

@@ -4,7 +4,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { MODEL_RETRY_DELAY, MODEL_CLEAR_CACHE_DELAY } from './constants';
+import { MODEL_RETRY_DELAY, MODEL_CLEAR_CACHE_DELAY } from '../utils/constants';
 
 type ModelStatus = 'checking' | 'ready' | 'downloading' | 'error';
 
@@ -24,7 +24,7 @@ const ModelContext = createContext<ModelContextValue>({
   errorMessage: '',
 });
 
-import { STORAGE_KEYS } from './constants';
+import { STORAGE_KEYS } from '../utils/constants';
 const STORAGE_KEY = STORAGE_KEYS.IMGLY_MODEL_READY;
 const RETRY_KEY = STORAGE_KEYS.IMGLY_MODEL_RETRY;
 

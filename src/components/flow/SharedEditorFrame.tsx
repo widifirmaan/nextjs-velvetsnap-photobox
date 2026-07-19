@@ -38,6 +38,8 @@ function DraggablePhoto({
   adjust,
   cssFilter,
   selectedFilter,
+  selectedGrayClassName,
+  selectedSepiaClassName,
   onSelect,
   onAdjust,
 }: {
@@ -47,6 +49,8 @@ function DraggablePhoto({
   adjust: PhotoAdjust;
   cssFilter: string;
   selectedFilter: string;
+  selectedGrayClassName?: string;
+  selectedSepiaClassName?: string;
   onSelect: () => void;
   onAdjust: (idx: number, patch: Partial<PhotoAdjust>) => void;
 }) {
@@ -145,7 +149,6 @@ export default function SharedEditorFrame({
   captures,
   templateData,
   keyedFrameImage,
-  frameRatio,
   photoAdjust,
   selectedSlotIdx,
   setSelectedSlotIdx,
@@ -191,16 +194,18 @@ export default function SharedEditorFrame({
                   borderRadius: '2px',
                 }}
               >
-                <DraggablePhoto
-                  src={src}
-                  slotIdx={idx}
-                  selected={selectedSlotIdx === idx}
-                  adjust={photoAdjust[idx] || DEFAULT_ADJUST}
-                  cssFilter={slotCssFilter(idx)}
-                  selectedFilter={selectedFilter}
-                  onSelect={() => setSelectedSlotIdx(idx)}
-                  onAdjust={onAdjustSlot}
-                />
+                  <DraggablePhoto
+                    src={src}
+                    slotIdx={idx}
+                    selected={selectedSlotIdx === idx}
+                    adjust={photoAdjust[idx] || DEFAULT_ADJUST}
+                    cssFilter={slotCssFilter(idx)}
+                    selectedFilter={selectedFilter}
+                    selectedGrayClassName={selectedGrayClassName}
+                    selectedSepiaClassName={selectedSepiaClassName}
+                    onSelect={() => setSelectedSlotIdx(idx)}
+                    onAdjust={onAdjustSlot}
+                  />
               </div>
             );
           })}

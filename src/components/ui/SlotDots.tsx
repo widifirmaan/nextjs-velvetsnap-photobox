@@ -3,7 +3,7 @@
 
 'use client';
 
-import type { CSSProperties, MouseEventHandler } from 'react';
+import type { CSSProperties } from 'react';
 
 export default function SlotDots({
   count,

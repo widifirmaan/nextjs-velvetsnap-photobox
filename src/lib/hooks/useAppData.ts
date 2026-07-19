@@ -3,7 +3,7 @@
 
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { STORAGE_KEYS } from './constants';
+import { STORAGE_KEYS } from '../utils/constants';
 import type { StripResult } from '@/lib/types';
 
 export interface AppData {
