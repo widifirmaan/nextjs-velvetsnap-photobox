@@ -398,30 +398,36 @@
 }
 
 .templateGrid {
-  display: flex;
-  gap: 12px;
-  padding: 8px 0;
-  min-height: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
   flex: 1;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--np-border);
+  border-bottom: 1px solid var(--np-border);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.templateGrid > * {
+  border-right: 1px solid var(--np-border);
+  padding: 12px;
+  overflow: hidden;
+}
+
+.templateGrid > *:last-child {
+  border-right: none;
 }
 
 .templateCard {
   background: var(--np-card);
   border: 3px solid var(--np-border);
   box-shadow: var(--np-shadow-sm);
-  padding: 0;
   cursor: pointer;
   transition: all 0.1s;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  flex: 0 0 180px;
-  scroll-snap-align: start;
+  text-align: left;
+  width: 100%;
 }
 
 .templateCard:hover {
@@ -453,10 +459,11 @@
   width: 100%;
   flex: 1;
   min-height: 0;
-  object-fit: contain;
   background: var(--np-bg);
   border-bottom: 2px solid var(--np-border);
-  display: block;
+  position: relative;
+  overflow: hidden;
+  object-fit: contain;
 }
 
 .templateCardBody {
@@ -1590,15 +1597,11 @@
   }
 
   .templateGrid {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    padding: 8px 0;
-    overflow: visible;
   }
 
-  .templateCard {
-    flex: none;
+  .templateGrid > * {
+    padding: 8px;
   }
 
   .boothNewsColLeft,
@@ -1632,6 +1635,22 @@
   .resultSidebar {
     width: 100%;
     max-width: 400px;
+  }
+}
+
+@media (max-width: 600px) {
+  .templateGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .templateGrid > * {
+    border-right: none;
+    border-bottom: 1px solid var(--np-border);
+    padding: 8px;
+  }
+
+  .templateGrid > *:last-child {
+    border-bottom: none;
   }
 }
 
