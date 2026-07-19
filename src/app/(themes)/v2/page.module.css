@@ -449,12 +449,14 @@
 
 .templateCardImg {
   width: 100%;
-  flex: 1;
-  min-height: 0;
+  aspect-ratio: 3 / 4;
   background: var(--np-bg);
   border-bottom: 2px solid var(--np-border);
   position: relative;
   overflow: hidden;
+}
+
+.templateCardImg img {
   object-fit: contain;
 }
 
