@@ -3,10 +3,10 @@
 
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, type ComponentType } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import TemplateList from '@/components/template/TemplateList';
-import TemplateCard from '@/components/template/TemplateCard';
+import GenericTemplateCard from '@/components/template/TemplateCard';
 import type { TemplateData } from '@/lib/types';
 
 interface SharedTemplateStepProps {
@@ -20,9 +20,12 @@ interface SharedTemplateStepProps {
   backButtonClassName?: string;
   headingClassName?: string;
   listClassName?: string;
+  cardComponent?: ComponentType<{
+    template: TemplateData;
+    onSelect: (template: TemplateData) => void;
+  }>;
 }
 
-// Shared template step renders a header and list of selectable template cards.
 export default function SharedTemplateStep({
   templates,
   loading,
@@ -34,11 +37,13 @@ export default function SharedTemplateStep({
   backButtonClassName,
   headingClassName,
   listClassName,
+  cardComponent: CardComponent,
 }: SharedTemplateStepProps) {
-  // When the user clicks a template card, forward the selection to the parent flow.
   const handleCardClick = useCallback((template: TemplateData) => {
     onSelect(template.templateId, template);
   }, [onSelect]);
+
+  const TemplateCard = CardComponent || GenericTemplateCard;
 
   return (
     <div className={wrapperClassName}>

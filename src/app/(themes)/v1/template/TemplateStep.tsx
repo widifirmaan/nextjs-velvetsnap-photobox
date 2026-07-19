@@ -1,9 +1,7 @@
-// File: src/app/(themes)/v1/template/TemplateStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import SharedTemplateStep from '@/components/flow/SharedTemplateStep';
+import TemplateCard from './TemplateCard';
 import styles from '@/app/(themes)/v1/page.module.css';
 import type { TemplateData } from '../types';
 
@@ -24,6 +22,7 @@ export default function TemplateStep({ templates, loading, onSelect }: TemplateS
       wrapperClassName={styles.stepPage}
       headingClassName={styles.stepHeading}
       listClassName={styles.templateGrid}
+      cardComponent={TemplateCard}
     />
   );
 }
