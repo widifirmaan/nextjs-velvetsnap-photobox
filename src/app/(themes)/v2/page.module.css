@@ -449,7 +449,7 @@
 
 .templateCardImg {
   width: 100%;
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 1 / 3;
   background: var(--np-bg);
   border-bottom: 2px solid var(--np-border);
   position: relative;
