@@ -57,7 +57,7 @@ export default function SharedTemplateCard({
       style={{ background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', padding: 0, ...buttonStyle }}
       onClick={() => onSelect(template)}
     >
-      <div className={imageWrapperClassName} style={imageWrapperClassName ? undefined : { position: 'relative', width: '100%', minHeight: 200, background: '#f3f3f3' }}>
+      <div className={imageWrapperClassName} style={imageWrapperClassName ? undefined : { position: 'relative', width: '100%', height: 200, background: '#f3f3f3' }}>
         <LoadableImage
           src={imageSrc}
           alt={template.templateName}
