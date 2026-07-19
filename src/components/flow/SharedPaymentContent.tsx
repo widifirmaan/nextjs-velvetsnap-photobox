@@ -83,7 +83,7 @@ export default function SharedPaymentContent({
               {!isSnapLoaded ? 'Loading payment gateway...' : 'Preparing QRIS...'}
             </p>
           )}
-          <div style={{ textAlign: 'center', marginTop: 24, opacity: isBypassing ? 1 : 0.5 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24, opacity: isBypassing ? 1 : 0.5 }}>
             <button
               className={secondaryButtonClassName}
               onClick={onBypass}
