@@ -3,28 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node node_modules/.bin/next dev --webpack",
-    "build": "node node_modules/.bin/next build",
-    "start": "node node_modules/.bin/next start",
-    "dev-win": "next dev --webpack",
-    "build-win": "next build",
-    "start-win": "next start",
+    "dev": "next dev --webpack",
+    "build": "next build && node -e \"require('fs').copyFileSync('worker.js','out/_worker.js')\"",
+    "deploy": "npx wrangler pages deploy out --project-name photobox",
+    "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
-    "cloudinary": "^2.10.0",
     "konva": "^10.3.0",
     "lucide-react": "^1.17.0",
-    "midtrans-client": "^1.4.3",
-    "mongoose": "^9.6.3",
     "next": "16.2.6",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-konva": "^19.2.4",
-    "react-webcam": "^7.2.0",
-    "uuid": "^14.0.0"
+    "react-webcam": "^7.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -34,9 +28,5 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "typescript": "^5"
-  },
-  "allowScripts": {
-    "sharp@0.34.5": true,
-    "unrs-resolver@1.12.2": true
   }
 }

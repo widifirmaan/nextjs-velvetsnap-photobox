@@ -1,0 +1,16 @@
+{
+  "name": "photobox",
+  "pages_build_output_dir": "out",
+  "compatibility_date": "2025-02-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "PHOTOBOX_DB",
+      "database_name": "photobox-db",
+      "database_id": "24baf404-a8fb-4481-ab78-31e930973787"
+    }
+  ],
+  "vars": {
+    "MIDTRANS_IS_PRODUCTION": "false"
+  }
+}

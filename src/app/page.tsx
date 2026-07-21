@@ -1,19 +1,21 @@
-// File: src/app/page.tsx
-// Description: Auto-added top comment for easier file identification.
+'use client';
 
-import { redirect } from 'next/navigation';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default async function Page() {
-  const base = process.env.NEXT_PUBLIC_VERCEL_URL
-    ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-    : 'http://localhost:3000';
-  try {
-    const res = await fetch(`${base}/api/settings`, { cache: 'no-store' });
-    const data = await res.json();
-    const uiTheme: string = data.data?.uiTheme || 'v1';
-    const theme = /^v\d+$/.test(uiTheme) ? uiTheme : 'v1';
-    redirect(`/${theme}`);
-  } catch {
-    redirect('/v1');
-  }
+export default function HomePage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then(r => r.json())
+      .then(data => {
+        const uiTheme = data.data?.uiTheme || 'v1';
+        const theme = /^v\d+$/.test(uiTheme) ? uiTheme : 'v1';
+        router.replace(`/${theme}`);
+      })
+      .catch(() => router.replace('/v1'));
+  }, [router]);
+
+  return null;
 }

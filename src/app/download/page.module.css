@@ -62,12 +62,6 @@
   line-height: 1;
 }
 
-.mastheadLink {
-  color: var(--np-text, #1a1a1a);
-  text-decoration: none;
-  border-bottom: 1px solid var(--np-border, #1a1a1a);
-}
-
 .resultLayout {
   flex: 1;
   display: flex;
@@ -137,15 +131,6 @@
   overflow: hidden;
 }
 
-.thumbLabel {
-  font-family: var(--font-body);
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--np-text-muted, #888);
-  text-align: center;
-}
-
 .downloadBtn {
   display: block;
   margin: 0 -3px;
@@ -195,7 +180,6 @@
     flex-direction: column;
     align-items: center;
   }
-
   .resultSidebar {
     width: 100%;
     max-width: 400px;

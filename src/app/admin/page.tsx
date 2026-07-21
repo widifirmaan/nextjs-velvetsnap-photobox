@@ -1,125 +1,55 @@
-// File: src/app/admin/page.tsx
-// Description: Auto-added top comment for easier file identification.
+'use client';
 
-import connectDB from '@/lib/utils/db';
-import Template from '@/models/Template';
-import Transaction from '@/models/Transaction';
-import Settings from '@/models/Settings';
-import Account from '@/models/Account';
-import { cookies } from 'next/headers';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'lucide-react';
 import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
 import MobileActions from './MobileActions';
 import styles from './page.module.css';
-import { COOKIE_NAME } from '@/lib/utils/constants';
 
-export const revalidate = 60;
+export default function AdminDashboard() {
+  const [data, setData] = useState(null);
 
-async function getAdminSession() {
-  const cookieStore = await cookies();
-  const adminSession = cookieStore.get(COOKIE_NAME);
-  if (!adminSession?.value) return { isRoot: false, accountId: null, username: null };
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/finance').then(r => r.json()),
+      fetch('/api/transactions/count').then(r => r.json()),
+      fetch('/api/templates/thumbnails').then(r => r.json()),
+    ]).then(([finance, txCount, templates]) => {
+      const isRoot = sessionStorage.getItem('admin_is_root') === '1';
+      const username = sessionStorage.getItem('admin_username') || '';
+      const activeCount = (templates.data || []).filter(t => t.isActive).length;
+      const templateCount = (templates.data || []).length;
+      const totalSessions = txCount.total || 0;
 
-  await connectDB();
+      const fd = finance.data || {};
+      const dailyData = (fd.dailyRevenue || []).map(d => ({
+        date: d.date,
+        dayLabel: new Date(d.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short' }),
+        dateLabel: new Date(d.date + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        total: d.total,
+        count: d.count,
+      }));
+      const maxRevenue = Math.max(...dailyData.map(d => d.total), 1);
 
-  const settings = await Settings.findOne({}).lean();
-  const rootToken = settings?.security?.session || settings?.adminSession;
-  if (rootToken === adminSession.value) {
-    return { isRoot: true, accountId: null, username: 'root' };
-  }
+      setData({ isRoot, username, totalSessions, revenue: fd.allTime?.total || 0, todayRevenue: fd.today?.total || 0, activeCount, templateCount, dailyData, maxRevenue });
+    }).catch(() => {});
+  }, []);
 
-  const account = await Account.findOne({ session: adminSession.value }).lean();
-  if (account) {
-    return { isRoot: false, accountId: account._id.toString(), username: account.username };
-  }
-
-  return { isRoot: false, accountId: null, username: null };
-}
-
-export default async function AdminDashboard() {
-  await connectDB();
-  const session = await getAdminSession();
-
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const weekStart = new Date(todayStart);
-  weekStart.setDate(weekStart.getDate() - 6);
-
-  const txFilter: Record<string, unknown> = {};
-  const tmplFilter: Record<string, unknown> = {};
-
-  if (session.isRoot) {
-    // Root sees all
-  } else if (session.accountId) {
-    txFilter.accountId = session.accountId;
-    tmplFilter.accountId = session.accountId;
-  } else {
-    txFilter.accountId = { $in: [null, undefined] };
-    tmplFilter.accountId = { $in: [null, undefined] };
-  }
-
-  const [templateCount, activeCount, totalSessions, aggResult] = await Promise.all([
-    Template.countDocuments(tmplFilter),
-    Template.countDocuments({ ...tmplFilter, isActive: { $ne: false } }),
-    Transaction.countDocuments(txFilter),
-    Transaction.aggregate([
-      { $match: { ...txFilter, status: 'PAID' } },
-      {
-        $facet: {
-          allTime: [{ $group: { _id: null, total: { $sum: '$price' } } }],
-          last7Days: [
-            { $match: { createdAt: { $gte: weekStart } } },
-            {
-              $group: {
-                _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-                total: { $sum: '$price' },
-                count: { $sum: 1 },
-              },
-            },
-            { $sort: { _id: 1 } },
-          ],
-        },
-      },
-    ]),
-  ]);
-
-  const todayStr = todayStart.toISOString().split('T')[0];
-  const revenue = aggResult[0]?.allTime?.[0]?.total || 0;
-  const dailyRevenueAgg = aggResult[0]?.last7Days || [];
-  const todayAgg = dailyRevenueAgg.find((r: { _id: string; total: number }) => r._id === todayStr);
-  const todayRevenue = todayAgg?.total || 0;
-
-  const dailyData = [];
-  let maxRevenue = 0;
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(todayStart);
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    const found = dailyRevenueAgg.find((r: { _id?: string; k?: string; total: number }) => (r._id || r.k) === dateStr);
-    const total = found?.total || 0;
-    if (total > maxRevenue) maxRevenue = total;
-    dailyData.push({
-      date: dateStr,
-      dayLabel: d.toLocaleDateString('en-US', { weekday: 'short' }),
-      dateLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      total,
-      count: found?.count || 0,
-    });
-  }
+  if (!data) return <div className="page-stack"><AdminPageHeader title="Dashboard" subtitle="Loading..." /></div>;
 
   return (
     <div className="page-stack">
       <AdminPageHeader
         title="Dashboard"
-        subtitle={session.isRoot ? 'VelvetSnap Co. — Root Dashboard (all accounts)' : `VelvetSnap Co. — ${session.username || 'Account'} Dashboard`}
+        subtitle={data.isRoot ? 'VelvetSnap Co. — Root Dashboard (all accounts)' : `VelvetSnap Co. — ${data.username || 'Account'} Dashboard`}
       />
       <MobileActions />
       <AdminStatGrid>
-        <AdminStatCard icon={<Camera size={22} />} label="Total Sessions" value={totalSessions.toLocaleString('id-ID')} color="blue" delay={0.05} />
-        <AdminStatCard icon={<DollarSign size={22} />} label="Total Revenue" value={`Rp ${revenue.toLocaleString('id-ID')}`} color="green" delay={0.1} />
-        <AdminStatCard icon={<TrendingUp size={22} />} label="Today's Revenue" value={`Rp ${todayRevenue.toLocaleString('id-ID')}`} color="orange" delay={0.15} />
-        <AdminStatCard icon={<Layers size={22} />} label="Active Templates" value={`${activeCount}`} color="purple" delay={0.2} subtext={`${templateCount} total`} />
+        <AdminStatCard icon={<Camera size={22} />} label="Total Sessions" value={data.totalSessions.toLocaleString('id-ID')} color="blue" delay={0.05} />
+        <AdminStatCard icon={<DollarSign size={22} />} label="Total Revenue" value={`Rp ${data.revenue.toLocaleString('id-ID')}`} color="green" delay={0.1} />
+        <AdminStatCard icon={<TrendingUp size={22} />} label="Today's Revenue" value={`Rp ${data.todayRevenue.toLocaleString('id-ID')}`} color="orange" delay={0.15} />
+        <AdminStatCard icon={<Layers size={22} />} label="Active Templates" value={`${data.activeCount}`} color="purple" delay={0.2} subtext={`${data.templateCount} total`} />
       </AdminStatGrid>
       <div className={`card card-md ${styles.chartSection}`}>
         <div className={styles.chartHeader}>
@@ -129,8 +59,8 @@ export default async function AdminDashboard() {
           </div>
         </div>
         <div className={styles.barChart}>
-          {dailyData.map((day) => {
-            const heightPct = maxRevenue > 0 ? (day.total / maxRevenue) * 100 : 0;
+          {data.dailyData.map((day) => {
+            const heightPct = data.maxRevenue > 0 ? (day.total / data.maxRevenue) * 100 : 0;
             return (
               <div key={day.date} className={styles.barGroup}>
                 {day.total > 0 && <span className={styles.barAmount}>{(day.total / 1000).toFixed(0)}k</span>}
