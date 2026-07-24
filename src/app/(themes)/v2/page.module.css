@@ -350,6 +350,13 @@
   box-shadow: 4px 4px 0px var(--np-border);
 }
 
+@media (max-width: 640px) {
+  .leadStoryBtn {
+    font-size: 16px;
+    padding: 14px 28px;
+  }
+}
+
 .leadStoryBtn:active {
   transform: translate(4px, 4px);
   box-shadow: 2px 2px 0px var(--np-border);
