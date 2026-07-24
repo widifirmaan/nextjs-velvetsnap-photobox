@@ -352,8 +352,9 @@
 
 @media (max-width: 640px) {
   .leadStoryBtn {
-    font-size: 16px;
-    padding: 14px 28px;
+    font-size: 13px;
+    padding: 12px 24px;
+    justify-content: center;
   }
 }
 
