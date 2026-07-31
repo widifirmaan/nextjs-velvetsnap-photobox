@@ -13,8 +13,8 @@ export default function TemplateStep({ templates, loading, onSelect }: {
       templates={templates}
       loading={loading}
       onSelect={onSelect}
-      title="Pilih Frame"
-      wrapperClassName={styles.stepPage}
+      title=""
+      wrapperClassName={styles.templateStepPage}
       headingClassName={styles.stepHeading}
       listClassName={styles.templateGrid}
       cardComponent={TemplateCard}

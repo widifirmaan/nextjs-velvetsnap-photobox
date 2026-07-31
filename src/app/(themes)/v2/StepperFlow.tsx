@@ -35,6 +35,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
       onRefresh={onRefresh}
       sessionTimer={sessionTimer}
       wrapperClassName={styles.stepPage}
+      contentClassName={styles.stepperContent}
       renderTemplateStep={(flow) => wrapScene(
         <TemplateStep templates={flow.cachedTemplates || []} loading={flow.templatesLoading} onSelect={flow.handleSelectTemplate} />
       )}

@@ -47,14 +47,16 @@ export default function SharedTemplateStep({
 
   return (
     <div className={wrapperClassName}>
-      <div className={headerClassName}>
-        {onBack ? (
-          <button type="button" className={backButtonClassName} onClick={onBack}>
-            <ArrowLeft size={18} />
-          </button>
-        ) : null}
-        <h1 className={headingClassName}>{title}</h1>
-      </div>
+      {title ? (
+        <div className={headerClassName}>
+          {onBack ? (
+            <button type="button" className={backButtonClassName} onClick={onBack}>
+              <ArrowLeft size={18} />
+            </button>
+          ) : null}
+          <h1 className={headingClassName}>{title}</h1>
+        </div>
+      ) : null}
       <TemplateList
         templates={templates}
         loading={loading}
