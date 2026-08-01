@@ -3,7 +3,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import LoadingSpinner from './LoadingSpinner';
 import type { CSSProperties } from 'react';
@@ -35,9 +35,19 @@ export default function LoadableImage({
 }: LoadableImageProps) {
   const [hasLoaded, setHasLoaded] = useState(false);
 
+  useEffect(() => {
+    setHasLoaded(false);
+  }, [src]);
+
+  useEffect(() => {
+    if (!src) return;
+    const t = setTimeout(() => setHasLoaded(true), 12000);
+    return () => clearTimeout(t);
+  }, [src]);
+
   return (
     <div className={wrapperClassName} style={{ position: 'relative', width: '100%', height: '100%', ...wrapperStyle }}>
-      {!hasLoaded && <LoadingSpinner className="image-loader" label={`Loading ${alt}`} />}
+      {src && !hasLoaded && <LoadingSpinner className="image-loader" label={`Loading ${alt}`} />}
       {src ? (
         <Image
           src={src}
@@ -46,7 +56,7 @@ export default function LoadableImage({
           sizes={sizes}
           className={className}
           style={style}
-          onLoadingComplete={() => {
+          onLoad={() => {
             setHasLoaded(true);
             onLoad?.();
           }}
