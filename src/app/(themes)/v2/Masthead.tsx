@@ -41,6 +41,7 @@ export default function Masthead({ top, title, tagline, bottom, onBack, timer }:
       </div>
       <div className={styles.mastheadRule} />
       {bottom && <div className={styles.mastheadMeta}>{bottom}</div>}
+      {bottom && <div className={styles.mastheadRule} />}
     </div>
   );
 }
