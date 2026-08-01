@@ -428,7 +428,7 @@
   grid-auto-columns: 200px;
   grid-auto-flow: column;
   gap: 12px;
-  border-top: 1px solid var(--np-border);
+  border-top: none;
   border-bottom: none;
   min-height: 0;
   overflow-x: auto;
