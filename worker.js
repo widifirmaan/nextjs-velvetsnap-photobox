@@ -4,11 +4,16 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
 };
 
-function json(data, status = 200) {
+function json(data, status = 200, extraHeaders = {}) {
     return new Response(JSON.stringify(data), {
         status,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+        headers: { 'Content-Type': 'application/json', ...corsHeaders, ...extraHeaders },
     });
+}
+
+function getEnv(env, key) {
+    if (env && env[key] !== undefined && env[key] !== null) return env[key];
+    return process.env[key] || '';
 }
 
 async function createJWT(payload, secret) {
@@ -205,21 +210,21 @@ function generateId() {
     return crypto.randomUUID();
 }
 
-function getCloudinaryConfig() {
-    const url = process.env.CLOUDINARY_URL || '';
+function getCloudinaryConfig(env) {
+    const url = getEnv(env, 'CLOUDINARY_URL');
     const match = url.match(/cloudinary:\/\/(\w+):([\w-]+)@(\w+)/);
     if (match) {
         return { cloudName: match[3], apiKey: match[1], apiSecret: match[2] };
     }
     return {
-        cloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
-        apiKey: process.env.CLOUDINARY_API_KEY || '',
-        apiSecret: process.env.CLOUDINARY_API_SECRET || '',
+        cloudName: getEnv(env, 'CLOUDINARY_CLOUD_NAME'),
+        apiKey: getEnv(env, 'CLOUDINARY_API_KEY'),
+        apiSecret: getEnv(env, 'CLOUDINARY_API_SECRET'),
     };
 }
 
-async function uploadToCloudinary(dataUri, folder, publicId) {
-    const { cloudName, apiKey, apiSecret } = getCloudinaryConfig();
+async function uploadToCloudinary(env, dataUri, folder, publicId) {
+    const { cloudName, apiKey, apiSecret } = getCloudinaryConfig(env);
     if (!cloudName || !apiKey || !apiSecret) {
         throw new Error('Cloudinary not configured. Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET');
     }
@@ -316,21 +321,23 @@ export default {
         if (path === '/api/transactions' && request.method === 'DELETE') return handleDeleteTransaction(request, db, env);
         if (path === '/api/transactions/strips' && request.method === 'GET') return handleGetStrips(request, db, env);
         if (path === '/api/transactions/count' && request.method === 'GET') return handleGetTransactionCount(request, db, env);
-        if (path === '/api/transactions/migrate-images' && (request.method === 'GET' || request.method === 'POST')) return handleMigrateImages(request, db);
+        if (path === '/api/transactions/migrate-images' && (request.method === 'GET' || request.method === 'POST')) return handleMigrateImages(request, db, env);
 
         if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'GET') return handleGetTransaction(request, db, env);
         if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'PATCH') return handlePatchTransaction(request, db, env);
 
-        if (path === '/api/midtrans/charge' && request.method === 'POST') return handleMidtransCharge(request, db);
-        if (path === '/api/midtrans/notification' && request.method === 'POST') return handleMidtransNotification(request, db);
+        if (path === '/api/midtrans/charge' && request.method === 'POST') return handleMidtransCharge(request, db, env);
+        if (path === '/api/midtrans/notification' && request.method === 'POST') return handleMidtransNotification(request, db, env);
         if (path === '/api/midtrans/status' && request.method === 'GET') return handleMidtransStatus(request, db);
 
-        if (path === '/api/upload' && request.method === 'POST') return handleUpload(request);
+        if (path === '/api/upload' && request.method === 'POST') return handleUpload(request, env);
 
-        if (path === '/api/image/search' && request.method === 'POST') return handleImageSearch(request);
+        if (path === '/api/camera/capture' && request.method === 'POST') return handleCameraCapture(request);
 
-        if (path === '/api/devices' && request.method === 'GET') return handleListDevices(db);
-        if (path === '/api/devices' && request.method === 'POST') return handleCreateDevice(request, db);
+        if (path === '/api/image/search' && request.method === 'POST') return handleImageSearch(request, env);
+
+        if (path === '/api/devices' && request.method === 'GET') return handleListDevices(request, db, env);
+        if (path === '/api/devices' && request.method === 'POST') return handleCreateDevice(request, db, env);
 
         if (path === '/api/log' && request.method === 'POST') return handleLog(request);
 
@@ -547,6 +554,8 @@ async function handleUpdateSettings(request, db, env) {
             return json({ success: true, data: mapAccountSettings(updatedRow) });
         }
 
+        if (!session.isRoot) return json({ success: false, error: 'Forbidden' }, 403);
+
         const body = await request.json();
         const sets = [];
         const vals = [];
@@ -598,7 +607,9 @@ async function handleGetTemplatesList(request, db, env) {
         query += ' ORDER BY createdAt DESC';
         const templates = await db.prepare(query).bind(...params).all();
         const data = (templates.results || []).map(normalizeTemplate);
-        return json({ success: true, data }, 200, { 'Cache-Control': 'public, max-age=300' });
+        // Only cache anonymous/public responses; account-scoped data must not be shared via CDN cache.
+        const cacheControl = accountFilter?.publicOnly ? 'public, max-age=300' : 'no-store';
+        return json({ success: true, data }, 200, { 'Cache-Control': cacheControl });
     } catch (e) {
         return json({ success: false, error: e.message }, 500);
     }
@@ -693,7 +704,7 @@ async function handleUpdateTemplate(request, db, env) {
         }
 
         for (const u of toUpload) {
-            const url = await uploadToCloudinary(u.b64, folder, u.key);
+            const url = await uploadToCloudinary(env, u.b64, folder, u.key);
             if (u.key === 'templateFull') templateFullUrl = url;
             else if (u.key === 'templateThumb') templateThumbUrl = url;
             else {
@@ -748,6 +759,8 @@ async function handleDeleteTemplate(request, db, env) {
 
 async function handleReuploadTemplates(request, db, env) {
     try {
+        const session = await getSession(env, request);
+        if (!session.token) return json({ success: false, error: 'Unauthorized' }, 401);
         const accountFilter = await buildAccountFilter(env, request);
         let query = 'SELECT * FROM templates';
         const params = [];
@@ -773,12 +786,12 @@ async function handleReuploadTemplates(request, db, env) {
 
                 if (doc.templateFull && doc.templateFull.includes('res.cloudinary.com')) {
                     const b64 = await urlToBase64(doc.templateFull);
-                    if (b64) { updates.templateFull = await uploadToCloudinary(b64, folder, 'templateFull'); }
+                    if (b64) { updates.templateFull = await uploadToCloudinary(env, b64, folder, 'templateFull'); }
                     else { errors.push('templateFull download failed'); }
                 }
                 if (doc.templateThumb && doc.templateThumb.includes('res.cloudinary.com')) {
                     const b64 = await urlToBase64(doc.templateThumb);
-                    if (b64) { updates.templateThumb = await uploadToCloudinary(b64, folder, 'templateThumb'); }
+                    if (b64) { updates.templateThumb = await uploadToCloudinary(env, b64, folder, 'templateThumb'); }
                     else { errors.push('templateThumb download failed'); }
                 }
                 for (const el of updatedElements) {
@@ -786,7 +799,7 @@ async function handleReuploadTemplates(request, db, env) {
                     if (stickerUrl && stickerUrl.includes('res.cloudinary.com')) {
                         const b64 = await urlToBase64(stickerUrl);
                         if (b64) {
-                            const url = await uploadToCloudinary(b64, folder, `el_${el.id}`);
+                            const url = await uploadToCloudinary(env, b64, folder, `el_${el.id}`);
                             el.props.stickerUrl = url;
                         } else { errors.push(`element ${el.id} download failed`); }
                     }
@@ -820,10 +833,16 @@ async function handleCreateTransaction(request, db) {
         if (!sessionId) return json({ success: false, error: 'sessionId is required' }, 400);
 
         const existing = await db.prepare('SELECT id FROM transactions WHERE sessionId = ?').bind(sessionId).first();
+        // Payment completion is only trusted from the Midtrans notification (server-verified).
+        // The client may only self-declare PAID for explicit bypass orders, and must never
+        // downgrade a transaction that the server has already marked as PAID.
+        const isBypass = typeof orderId === 'string' && orderId.startsWith('BYPASS_');
+        const clientStatus = status === 'PAID' && isBypass ? 'PAID' : 'PENDING';
+        const effectiveStatus = existing?.status === 'PAID' ? 'PAID' : clientStatus;
         const data = {
             templateId: templateId || 't1',
             price: price || 35000,
-            status: status || 'PENDING',
+            status: effectiveStatus,
             captures: JSON.stringify(captures || []),
             finalImage: finalImage || '',
             orderId: orderId || null,
@@ -904,7 +923,9 @@ async function handleGetTransaction(request, db, env) {
         if (!tx) return json({ success: false, error: 'Transaction not found' }, 404);
 
         const session = await getSession(env, request);
-        if (session.accountId && tx.accountId && tx.accountId !== session.accountId) return json({ success: false, error: 'Forbidden' }, 403);
+        // Private tenant transactions may only be read by the owning account or root.
+        // Public (kiosk) transactions remain readable anonymously for download pages.
+        if (tx.accountId && !(session.isRoot || session.accountId === tx.accountId)) return json({ success: false, error: 'Forbidden' }, 403);
 
         return json({ success: true, data: normalizeTransaction(tx) });
     } catch (e) {
@@ -918,6 +939,7 @@ async function handlePatchTransaction(request, db, env) {
         const body = await request.json();
 
         const session = await getSession(env, request);
+        if (!session.token) return json({ success: false, error: 'Unauthorized' }, 401);
         const existing = await db.prepare('SELECT * FROM transactions WHERE id = ?').bind(id).first();
         if (!existing) return json({ success: false, error: 'Transaction not found' }, 404);
         if (session.accountId && existing.accountId && existing.accountId !== session.accountId) return json({ success: false, error: 'Forbidden' }, 403);
@@ -945,7 +967,9 @@ async function handleGetStrips(request, db, env) {
             else if (accountFilter.accountId) { where += ' AND accountId = ?'; params.push(accountFilter.accountId); }
         }
         const transactions = await db.prepare(`SELECT id, sessionId, finalImage FROM transactions ${where} ORDER BY createdAt DESC LIMIT 7`).bind(...params).all();
-        return json({ success: true, data: transactions.results || [] }, 200, { 'Cache-Control': 'public, max-age=60' });
+        // Only cache anonymous/public responses; account-scoped data must not be shared via CDN cache.
+        const cacheControl = accountFilter?.publicOnly ? 'public, max-age=60' : 'no-store';
+        return json({ success: true, data: transactions.results || [] }, 200, { 'Cache-Control': cacheControl });
     } catch (e) {
         return json({ success: false, error: e.message }, 500);
     }
@@ -961,14 +985,17 @@ async function handleGetTransactionCount(request, db, env) {
             else if (accountFilter.accountId) { where = 'WHERE accountId = ?'; params.push(accountFilter.accountId); }
         }
         const result = await db.prepare(`SELECT COUNT(*) as total FROM transactions ${where}`).bind(...params).first();
-        return json({ success: true, total: result?.total || 0 }, 200, { 'Cache-Control': 'public, max-age=300' });
+        const cacheControl = accountFilter?.publicOnly ? 'public, max-age=300' : 'no-store';
+        return json({ success: true, total: result?.total || 0 }, 200, { 'Cache-Control': cacheControl });
     } catch (e) {
         return json({ success: false, error: e.message }, 500);
     }
 }
 
-async function handleMigrateImages(request, db) {
+async function handleMigrateImages(request, db, env) {
     try {
+        const session = await getSession(env, request);
+        if (!session.token) return json({ success: false, error: 'Unauthorized' }, 401);
         const allTxs = await db.prepare('SELECT * FROM transactions').all();
         let migrated = 0, failed = 0;
 
@@ -978,7 +1005,7 @@ async function handleMigrateImages(request, db) {
 
             if (tx.finalImage && await isBase64(tx.finalImage)) {
                 try {
-                    updates.finalImage = await uploadToCloudinary(tx.finalImage, 'velvetsnap/final');
+                    updates.finalImage = await uploadToCloudinary(env, tx.finalImage, 'velvetsnap/final');
                     dirty = true;
                 } catch { failed++; }
             }
@@ -990,7 +1017,7 @@ async function handleMigrateImages(request, db) {
                 const b64Indices = captures.map((c, i) => isBase64(c) ? i : -1).filter(i => i >= 0);
                 if (b64Indices.length) {
                     try {
-                        const results = await Promise.all(b64Indices.map(i => uploadToCloudinary(captures[i], 'velvetsnap/captures')));
+                        const results = await Promise.all(b64Indices.map(i => uploadToCloudinary(env, captures[i], 'velvetsnap/captures')));
                         const newCaptures = [...captures];
                         b64Indices.forEach((i, idx) => { newCaptures[i] = results[idx]; });
                         updates.captures = JSON.stringify(newCaptures);
@@ -1014,7 +1041,7 @@ async function handleMigrateImages(request, db) {
     }
 }
 
-async function handleMidtransCharge(request, db) {
+async function handleMidtransCharge(request, db, env) {
     try {
         const body = await request.json();
         const { sessionId, templateId, price, captures, finalImage } = body;
@@ -1027,7 +1054,7 @@ async function handleMidtransCharge(request, db) {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
-                'Authorization': 'Basic ' + btoa((process.env.MIDTRANS_SERVER_KEY || 'SB-Mid-server-xxx') + ':'),
+                'Authorization': 'Basic ' + btoa((getEnv(env, 'MIDTRANS_SERVER_KEY') || 'SB-Mid-server-xxx') + ':'),
             },
             body: JSON.stringify({
                 transaction_details: { order_id: orderId, gross_amount: price },
@@ -1039,11 +1066,13 @@ async function handleMidtransCharge(request, db) {
         });
         const midtransData = await midtransRes.json();
 
-        const existing = await db.prepare('SELECT id FROM transactions WHERE sessionId = ?').bind(sessionId).first();
+        const existing = await db.prepare('SELECT id, status FROM transactions WHERE sessionId = ?').bind(sessionId).first();
 
         if (existing) {
+            // Never downgrade a transaction the server has already confirmed as PAID.
+            const keepPaid = existing.status === 'PAID';
             await db.prepare('UPDATE transactions SET orderId = ?, price = ?, status = ?, midtransStatus = ?, qrCodeUrl = ?, updatedAt = datetime("now") WHERE sessionId = ?').bind(
-                orderId, price, 'PENDING', 'pending', midtransData.redirect_url, sessionId
+                orderId, price, keepPaid ? 'PAID' : 'PENDING', keepPaid ? 'settlement' : 'pending', midtransData.redirect_url, sessionId
             ).run();
         } else {
             const id = generateId();
@@ -1062,7 +1091,7 @@ async function handleMidtransCharge(request, db) {
     }
 }
 
-async function handleMidtransNotification(request, db) {
+async function handleMidtransNotification(request, db, env) {
     try {
         const body = await request.json();
         const orderId = body.order_id;
@@ -1076,10 +1105,15 @@ async function handleMidtransNotification(request, db) {
 
         if (!orderId) return json({ success: false, error: 'Missing order_id' }, 400);
 
-        const serverKey = process.env.MIDTRANS_SERVER_KEY || '';
+        const serverKey = getEnv(env, 'MIDTRANS_SERVER_KEY') || '';
         const encoder = new TextEncoder();
         const hashBytes = await crypto.subtle.digest('SHA-512', encoder.encode(orderId + statusCode + grossAmount + serverKey));
         const computed = Array.from(new Uint8Array(hashBytes)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+        if (!serverKey) {
+            console.error('Midtrans server key not configured');
+            return json({ success: false, error: 'Server key not configured' }, 500);
+        }
 
         if (computed !== signatureKey) {
             console.error('Midtrans signature mismatch:', { computed, received: signatureKey });
@@ -1097,7 +1131,16 @@ async function handleMidtransNotification(request, db) {
         const sets = Object.entries(updateData).map(([k]) => `${k} = ?`).join(', ');
         const vals = Object.values(updateData);
         vals.push(orderId);
-        await db.prepare(`UPDATE transactions SET ${sets} WHERE orderId = ?`).bind(...vals).run();
+        const result = await db.prepare(`UPDATE transactions SET ${sets} WHERE orderId = ?`).bind(...vals).run();
+        // Notification can arrive before the client finishes uploading (client POST
+        // happens after payment). If the row does not exist yet, create it so the
+        // payment status is never lost; the client POST fills the remaining fields.
+        if ((result.meta.changes ?? result.meta.changed ?? 0) === 0 && status === 'PAID') {
+            const sessionId = orderId.startsWith('VS-') ? orderId.slice(3).replace(/-\d+$/, '') : '';
+            await db.prepare('INSERT INTO transactions (id, sessionId, templateId, orderId, price, status, midtransTransactionId, midtransStatus, paymentMethod) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(
+                generateId(), sessionId, 't1', orderId, parseFloat(grossAmount) || 0, 'PAID', transactionId, transactionStatus, paymentType
+            ).run();
+        }
 
         return json({ success: true });
     } catch (e) {
@@ -1128,7 +1171,7 @@ async function handleMidtransStatus(request, db) {
     }
 }
 
-async function handleUpload(request) {
+async function handleUpload(request, env) {
     try {
         const { dataUri, folder, publicId } = await request.json();
         if (!dataUri || !(await isBase64(dataUri))) return json({ success: false, error: 'Invalid data URI' }, 400);
@@ -1142,7 +1185,7 @@ async function handleUpload(request) {
             return json({ success: false, error: 'Invalid image type. Supported: jpeg, png, webp, gif' }, 400);
         }
 
-        const url = await uploadToCloudinary(dataUri, folder || 'velvetsnap/templates', publicId);
+        const url = await uploadToCloudinary(env, dataUri, folder || 'velvetsnap/templates', publicId);
         return json({ success: true, url });
     } catch (e) {
         const msg = e.message || String(e);
@@ -1150,12 +1193,23 @@ async function handleUpload(request) {
     }
 }
 
-async function handleImageSearch(request) {
+// DSLR capture requires local desktop services (gphoto2 / DigiCamControl) that
+// cannot run inside the Cloudflare edge. The kiosk browser may call DigiCamControl
+// directly (http://127.0.0.1:5513) when it is running locally; this endpoint exists
+// so the UI receives a clear JSON error instead of a 404 page.
+async function handleCameraCapture(request) {
+    return json({
+        success: false,
+        error: 'DSLR capture unavailable from the cloud. Use the webcam, or enable DigiCamControl capture directly from the kiosk browser.',
+    }, 503);
+}
+
+async function handleImageSearch(request, env) {
     try {
         const { query, page = 1 } = await request.json();
         if (!query || !query.trim()) return json({ success: false, error: 'Query is required' }, 400);
 
-        const apiKey = process.env.PIXABAY_API_KEY;
+        const apiKey = getEnv(env, 'PIXABAY_API_KEY');
         if (!apiKey) return json({ success: false, error: 'Pixabay API key not configured' }, 500);
 
         const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(query)}&image_type=all&per_page=20&page=${page}&safesearch=true`;
@@ -1174,8 +1228,10 @@ async function handleImageSearch(request) {
     }
 }
 
-async function handleListDevices(db) {
+async function handleListDevices(request, db, env) {
     try {
+        const session = await getSession(env, request);
+        if (!session.token) return json({ success: false, error: 'Unauthorized' }, 401);
         const devices = await db.prepare('SELECT * FROM devices').all();
         return json({ success: true, data: devices.results || [] });
     } catch (e) {
@@ -1183,8 +1239,10 @@ async function handleListDevices(db) {
     }
 }
 
-async function handleCreateDevice(request, db) {
+async function handleCreateDevice(request, db, env) {
     try {
+        const session = await getSession(env, request);
+        if (!session.token) return json({ success: false, error: 'Unauthorized' }, 401);
         const body = await request.json();
         const id = generateId();
         await db.prepare('INSERT INTO devices (id, deviceId, name, location, status) VALUES (?, ?, ?, ?, ?)').bind(
@@ -1213,6 +1271,8 @@ async function handleLog(request) {
 
 async function handleFinance(request, db, env) {
     try {
+        const session = await getSession(env, request);
+        if (!session.token) return json({ success: false, error: 'Unauthorized' }, 401);
         const accountFilter = await buildAccountFilter(env, request);
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();

@@ -66,6 +66,8 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   const [timeLeft, setTimeLeft] = useState(sessionTimer);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const compositingId = useRef(0);
+  const chromaKeyId = useRef(0);
+  const templateIdRef = useRef<string | null>(null);
 
   // Convert a time value in seconds to a human-readable mm:ss format.
   const formatTime = (seconds: number) => {
@@ -77,6 +79,8 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   // Reset the entire photobooth flow and clear session state.
   const startOver = useCallback(() => {
     try { if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
+    chromaKeyId.current++;
+    compositingId.current++;
     onRefresh?.();
     setStep(0);
     setCaptures([]);
@@ -154,11 +158,13 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
 
   // Render the selected template frame and remove green screen background.
   const renderFrameFromElements = useCallback(async (elements: IStripElement[], canvasWidth: number, canvasHeight: number, backgroundColor: string) => {
+    const runId = ++chromaKeyId.current;
     try {
       const frameDataUrl = await renderStripFrame(elements, canvasWidth, canvasHeight, backgroundColor, 720);
       const keyedDataUrl = await removeGreenScreen(frameDataUrl, FRAME_RENDER_MAX_W);
+      if (chromaKeyId.current !== runId) return;
       const image = new window.Image();
-      image.onload = () => setFrameRatio(image.naturalWidth / image.naturalHeight);
+      image.onload = () => { if (chromaKeyId.current === runId) setFrameRatio(image.naturalWidth / image.naturalHeight); };
       image.src = keyedDataUrl;
       setKeyedFrameImage(keyedDataUrl);
     } catch (error) {
@@ -168,6 +174,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
 
   // Select a template and prepare the flow for booth capture.
   const handleSelectTemplate = useCallback((id: string, data?: TemplateData, keyedUrl?: string) => {
+    templateIdRef.current = id;
     setTemplateId(id);
     setStep(2);
     const canvasWidth = data?.templateData?.canvasWidth || 1000;
@@ -199,7 +206,9 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
 
   useEffect(() => {
     if (!templateId || templateData) return;
+    templateIdRef.current = templateId;
     const loadTemplate = async () => {
+      const requestedId = templateId;
       setStripLoading(true);
       let matchedTemplate: TemplateData | undefined;
       try {
@@ -209,6 +218,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       } catch (error) {
         console.error('usePhotoboothFlow: failed to load thumbnails', error);
       }
+      if (templateIdRef.current !== requestedId) return;
       if (matchedTemplate) {
         setTemplateData(matchedTemplate);
         setPrice(matchedTemplate.templatePrice ?? 35000);
@@ -291,23 +301,26 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
     const frameSource = keyedFrameImage || templateData.templateFull || '';
     const isPreComposedFrame = !!frameSource;
     const compositionId = ++compositingId.current;
-    if (!isPreComposedFrame && templateData.templateData?.type === 'strip' && templateData.templateData?.elements?.length) {
-      composeStripImage(
-        templateData.templateData.elements,
-        templateData.templateData.color || '#ffffff',
-        captures,
-        adjustments,
-        outputWidth,
-        templateData.templateData.canvasHeight || 3000,
-        outputWidth,
-      )
-        .then((result) => { if (compositingId.current === compositionId) setCompositedImage(result); })
-        .catch((error) => console.error('composeStripImage failed', error));
-    } else if (frameSource) {
-      composeFrameImage(frameSource, templateData.templateData?.slotsLayout, captures, adjustments, templateData.templateData?.color || '#ffffff', outputWidth)
-        .then((result) => { if (compositingId.current === compositionId) setCompositedImage(result); })
-        .catch((error) => console.error('composeFrameImage failed', error));
-    }
+    const timer = setTimeout(() => {
+      if (!isPreComposedFrame && templateData.templateData?.type === 'strip' && templateData.templateData?.elements?.length) {
+        composeStripImage(
+          templateData.templateData.elements,
+          templateData.templateData.color || '#ffffff',
+          captures,
+          adjustments,
+          outputWidth,
+          templateData.templateData.canvasHeight || 3000,
+          outputWidth,
+        )
+          .then((result) => { if (compositingId.current === compositionId) setCompositedImage(result); })
+          .catch((error) => console.error('composeStripImage failed', error));
+      } else if (frameSource) {
+        composeFrameImage(frameSource, templateData.templateData?.slotsLayout, captures, adjustments, templateData.templateData?.color || '#ffffff', outputWidth)
+          .then((result) => { if (compositingId.current === compositionId) setCompositedImage(result); })
+          .catch((error) => console.error('composeFrameImage failed', error));
+      }
+    }, 500);
+    return () => clearTimeout(timer);
   }, [captures, photoAdjust, templateData, keyedFrameImage]);
 
   // When payment succeeds, store the transaction ID and move to the result step.

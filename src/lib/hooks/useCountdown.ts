@@ -53,9 +53,14 @@ export function useCountdown(): UseCountdownReturn {
     await new Promise((r) => setTimeout(r, 180));
     setFlash(false);
     await new Promise((r) => setTimeout(r, 80));
-    await onFire();
-    await new Promise((r) => setTimeout(r, 400));
-    setBusy(false);
+    try {
+      await onFire();
+    } catch (e) {
+      console.error('useCountdown: capture failed', e);
+    } finally {
+      await new Promise((r) => setTimeout(r, 400));
+      setBusy(false);
+    }
   }, []);
 
   const runCountdown = useCallback(async (onFire: () => void | Promise<void>) => {

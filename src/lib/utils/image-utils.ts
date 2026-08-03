@@ -58,6 +58,32 @@ export function flipImageHorizontal(dataUrl: string): Promise<string> {
   });
 }
 
+// DSLR capture: try the local DigiCamControl web server directly from the kiosk
+// browser (only works when it runs on the same machine and allows CORS), then
+// fall back to the API endpoint (which reports a clear error from the cloud).
+export async function captureDslrPhoto(): Promise<string> {
+  const localBase = 'http://127.0.0.1:5513';
+  try {
+    const capRes = await fetch(`${localBase}/capture`, { method: 'POST', signal: AbortSignal.timeout(15000) });
+    if (capRes.ok) {
+      const imgRes = await fetch(`${localBase}/image/latest`, { signal: AbortSignal.timeout(10000) });
+      if (imgRes.ok) {
+        const blob = await imgRes.blob();
+        return await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = () => reject(new Error('Failed to read captured image'));
+          reader.readAsDataURL(blob);
+        });
+      }
+    }
+  } catch { /* local capture unavailable — fall back to the API */ }
+  const res = await fetch('/api/camera/capture', { method: 'POST' });
+  const data = await res.json().catch(() => ({ success: false, error: 'Camera service unavailable' }));
+  if (!data.success) throw new Error(data.error || 'Unknown error');
+  return data.dataUrl;
+}
+
 export function calcCoverFit(imgW: number, imgH: number, boxW: number, boxH: number): {dw:number;dh:number;dx:number;dy:number} {
   const ia = imgW / imgH;
   const sa = boxW / boxH;

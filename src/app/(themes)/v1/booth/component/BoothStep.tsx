@@ -5,6 +5,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { flipImage } from '@/lib/utils/canvas-utils';
+import { captureDslrPhoto } from '@/lib/utils/image-utils';
 import { useCameraDevices, useCountdown } from '@/lib/hooks';
 import type Webcam from 'react-webcam';
 import dynamic from 'next/dynamic';
@@ -48,16 +49,14 @@ export default function BoothStep({
     if (cameraType === 'dslr') {
       setDslrCapturing(true);
       try {
-        const res = await fetch('/api/camera/capture', { method: 'POST' });
-        const data = await res.json();
-        if (data.success) onAddCapture(data.dataUrl);
-        else alert('Gagal mengambil foto: ' + (data.error || 'Unknown error'));
-      } catch (err: unknown) { alert('Gagal terhubung ke kamera: ' + (err instanceof Error ? err.message : 'Unknown error')); }
+        const dataUrl = await captureDslrPhoto();
+        onAddCapture(dataUrl);
+      } catch (err: unknown) { alert('Gagal mengambil foto: ' + (err instanceof Error ? err.message : 'Unknown error')); }
       finally { setDslrCapturing(false); }
     } else {
       const imageSrc = webcamRef.current?.getScreenshot();
       if (imageSrc) {
-        if (mirrored) flipImage(imageSrc).then(onAddCapture);
+        if (mirrored) await flipImage(imageSrc).then(onAddCapture);
         else onAddCapture(imageSrc);
       }
     }

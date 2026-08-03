@@ -124,6 +124,7 @@ export function drawSlotShape(ctx: CanvasRenderingContext2D, opts: ShapeDrawOpti
       if (stroke) ctx.stroke();
       ctx.fillStyle = stroke || '#ffffff';
       ctx.fillRect(x + w * 0.2, y + h - 14, w * 0.6, 8);
+      ctx.restore();
       return;
     }
     default: {

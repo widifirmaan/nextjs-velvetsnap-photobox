@@ -6,18 +6,19 @@ import { DEFAULT_ADJUST, type PhotoAdjust } from '@/lib/types';
 export function clampPhotoAdjust(prev: PhotoAdjust[], idx: number, patch: Partial<PhotoAdjust>): PhotoAdjust[] {
   const next = prev.map((a) => ({ ...a }));
   if (!next[idx]) next[idx] = { ...DEFAULT_ADJUST };
-  if ('scale' in patch) {
-    const s = patch.scale || 1;
+  const clamped: Partial<PhotoAdjust> = { ...patch };
+  if ('scale' in clamped) {
+    const s = clamped.scale || 1;
     const maxT = Math.max(0, (1 - 1 / s) / 2 * 100);
     next[idx].x = Math.max(-maxT, Math.min(maxT, next[idx].x || 0));
     next[idx].y = Math.max(-maxT, Math.min(maxT, next[idx].y || 0));
   } else {
     const s = next[idx].scale || 1;
     const maxT = Math.max(0, (1 - 1 / s) / 2 * 100);
-    if ('x' in patch) patch.x = Math.max(-maxT, Math.min(maxT, patch.x!));
-    if ('y' in patch) patch.y = Math.max(-maxT, Math.min(maxT, patch.y!));
+    if ('x' in clamped) clamped.x = Math.max(-maxT, Math.min(maxT, clamped.x!));
+    if ('y' in clamped) clamped.y = Math.max(-maxT, Math.min(maxT, clamped.y!));
   }
-  Object.assign(next[idx], patch);
+  Object.assign(next[idx], clamped);
   return next;
 }
 

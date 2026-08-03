@@ -11,7 +11,7 @@ export default function ResultStep({ compositedImage, onHome, txId }: {
   compositedImage: string | null; onHome: () => void; txId?: string | null;
 }) {
   const qrRef = useRef<HTMLCanvasElement>(null);
-  const downloadUrl = txId ? `${window.location.origin}/download/${txId}` : null;
+  const downloadUrl = txId ? `${window.location.origin}/download?id=${encodeURIComponent(txId)}` : null;
 
   useEffect(() => {
     if (!qrRef.current || !downloadUrl) return;

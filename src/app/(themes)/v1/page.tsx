@@ -181,6 +181,23 @@ export default function Home() {
           .then((r) => r.json()).then((res) => { if (res.success && res.data?.length) setStrips(res.data); }).catch((e) => { console.error('retry strips failed', e); });
         fetch(`/api/transactions/count${qp2}`)
           .then((r) => r.json()).then((res) => { if (res.success) setTxCount(res.total); }).catch((e) => { console.error('retry count failed', e); });
+        // Refetch the template list with the resolved account so tenant templates
+        // are not replaced by the anonymous (root) list cached earlier.
+        const tmpl2 = fetch(`/api/templates/list${qp2}`).then((r) => r.json());
+        // @ts-expect-error global shared promise for StepperFlow
+        if (typeof window !== 'undefined') window.__templatePromise = tmpl2;
+        tmpl2.then((res) => {
+          if (res.success) {
+            setTmplCount(res.data.length);
+            const list = (res.data as TemplateData[]).filter((t) => t.isActive !== false);
+            const raw = JSON.stringify(list);
+            if (raw.length < 4_000_000) sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, raw);
+            list.forEach((t) => {
+              const src = t.templateFull ? getOptimizedUrl(t.templateFull, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H) : t.templateThumb;
+              if (src) { const img = new window.Image(); img.src = src; }
+            });
+          }
+        }).catch((e) => { console.error('retry templates failed', e); });
       }
     }).catch((e) => { console.error('resolveAccountId failed', e); });
   }, [refreshKey]);
