@@ -23,6 +23,8 @@ interface SharedTemplateStepProps {
   cardComponent?: ComponentType<{
     template: TemplateData;
     onSelect: (template: TemplateData) => void;
+    loading?: 'lazy' | 'eager';
+    fetchPriority?: 'high' | 'low' | 'auto';
   }>;
 }
 
@@ -62,8 +64,14 @@ export default function SharedTemplateStep({
         loading={loading}
         emptyMessage="No templates available"
         listClassName={listClassName}
-        renderTemplate={(template) => (
-          <TemplateCard key={template._id || template.templateId} template={template} onSelect={handleCardClick} />
+        renderTemplate={(template, index) => (
+          <TemplateCard
+            key={template._id || template.templateId}
+            template={template}
+            onSelect={handleCardClick}
+            loading={index < 6 ? 'eager' : 'lazy'}
+            fetchPriority={index < 3 ? 'high' : 'auto'}
+          />
         )}
       />
     </div>

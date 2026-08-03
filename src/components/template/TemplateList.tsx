@@ -12,7 +12,7 @@ interface TemplateListProps {
   loading: boolean;
   emptyMessage?: string;
   listClassName?: string;
-  renderTemplate: (template: TemplateData) => ReactNode;
+  renderTemplate: (template: TemplateData, index: number) => ReactNode;
 }
 
 export default function TemplateList({
@@ -40,5 +40,5 @@ export default function TemplateList({
     );
   }
 
-  return <div className={listClassName}>{templates.map((template) => renderTemplate(template))}</div>;
+  return <div className={listClassName}>{templates.map((template, index) => renderTemplate(template, index))}</div>;
 }

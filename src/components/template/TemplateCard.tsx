@@ -6,12 +6,16 @@
 import type { CSSProperties } from 'react';
 import LoadableImage from '@/components/ui/LoadableImage';
 import SlotDots from '@/components/ui/SlotDots';
+import { getOptimizedUrl } from '@/lib/utils/cloudinary-url';
+import { TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H } from '@/lib/utils/constants';
 import type { TemplateData } from '@/lib/types';
 
 interface SharedTemplateCardProps {
   template: TemplateData;
   onSelect: (template: TemplateData) => void;
   keyedFrameUrl?: string;
+  loading?: 'lazy' | 'eager';
+  fetchPriority?: 'high' | 'low' | 'auto';
   sizes?: string;
   buttonClassName?: string;
   buttonStyle?: CSSProperties;
@@ -32,6 +36,8 @@ export default function SharedTemplateCard({
   template,
   onSelect,
   keyedFrameUrl,
+  loading = 'lazy',
+  fetchPriority = 'auto',
   sizes = '200px',
   buttonClassName,
   buttonStyle,
@@ -47,7 +53,7 @@ export default function SharedTemplateCard({
   slotDotClassName,
   fallback,
 }: SharedTemplateCardProps) {
-  const imageSrc = keyedFrameUrl || template.templateFull || template.templateThumb || '';
+  const imageSrc = keyedFrameUrl || (template.templateFull ? getOptimizedUrl(template.templateFull, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H) : template.templateThumb) || '';
   const slotCount = template.templateData?.slots || 1;
 
   return (
@@ -62,6 +68,8 @@ export default function SharedTemplateCard({
           src={imageSrc}
           alt={template.templateName}
           sizes={sizes}
+          loading={loading}
+          fetchPriority={fetchPriority}
           wrapperClassName={imageWrapperClassName}
           className={imageClassName}
           fallback={fallback}

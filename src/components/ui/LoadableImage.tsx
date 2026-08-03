@@ -12,6 +12,8 @@ interface LoadableImageProps {
   src: string;
   alt: string;
   sizes?: string;
+  loading?: 'lazy' | 'eager';
+  fetchPriority?: 'high' | 'low' | 'auto';
   className?: string;
   wrapperClassName?: string;
   style?: CSSProperties;
@@ -25,6 +27,8 @@ export default function LoadableImage({
   src,
   alt,
   sizes = '100vw',
+  loading = 'lazy',
+  fetchPriority = 'auto',
   className,
   wrapperClassName,
   style,
@@ -54,6 +58,8 @@ export default function LoadableImage({
           alt={alt}
           fill
           sizes={sizes}
+          loading={loading}
+          fetchPriority={fetchPriority}
           className={className}
           style={style}
           onLoad={() => {

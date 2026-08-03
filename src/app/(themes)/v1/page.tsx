@@ -136,6 +136,19 @@ export default function Home() {
 
     if (immediateId) fetchSettings(immediateId); else fetchSettings();
 
+    // Preload template thumbs from sessionStorage immediately (returning visitors),
+    // so the selection step renders instantly without waiting for the network fetch.
+    const storedTemplates = sessionStorage.getItem(STORAGE_KEYS.TEMPLATES);
+    if (storedTemplates) {
+      try {
+        const parsed = JSON.parse(storedTemplates) as TemplateData[];
+        parsed.filter((t) => t.isActive !== false).forEach((t) => {
+          const src = t.templateFull ? getOptimizedUrl(t.templateFull, TEMPLATE_PRELOAD_W, TEMPLATE_PRELOAD_H) : t.templateThumb;
+          if (src) { const img = new window.Image(); img.src = src; }
+        });
+      } catch (e) { console.error('sessionStorage template preload failed', e); }
+    }
+
     // Start all fetches in parallel immediately
     const stripsPromise = fetch(`/api/transactions/strips${qp}`).then((r) => r.json());
     const countPromise = fetch(`/api/transactions/count${qp}`).then((r) => r.json());

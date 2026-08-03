@@ -7,16 +7,20 @@ import SharedTemplateCard from '@/components/template/TemplateCard';
 import type { TemplateData } from '../types';
 import styles from '@/app/(themes)/v1/page.module.css';
 
-export default function TemplateCard({ template, onSelect, keyedFrameUrl }: {
+export default function TemplateCard({ template, onSelect, keyedFrameUrl, loading, fetchPriority }: {
   template: TemplateData;
   onSelect: (template: TemplateData) => void;
   keyedFrameUrl?: string;
+  loading?: 'lazy' | 'eager';
+  fetchPriority?: 'high' | 'low' | 'auto';
 }) {
   return (
     <SharedTemplateCard
       template={template}
       onSelect={onSelect}
       keyedFrameUrl={keyedFrameUrl}
+      loading={loading}
+      fetchPriority={fetchPriority}
       sizes="200px"
       buttonClassName={styles.templateCard}
       imageWrapperClassName={styles.templateCardThumb}
