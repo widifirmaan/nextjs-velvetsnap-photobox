@@ -62,9 +62,7 @@ export default function TemplatesAdmin() {
       const res = await adminFetch(`/api/templates/${deleteTarget}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(res.statusText);
       setDeleteTarget(null);
-      const removedId = deleteTarget;
-      setTemplates((prev) => prev.filter((t) => t._id !== removedId));
-      fetchTemplates();
+      await fetchTemplates();
     } catch (err) {
       console.error('Delete failed:', err);
     } finally {
@@ -73,15 +71,19 @@ export default function TemplatesAdmin() {
   };
 
   const handleToggleActive = async (t: TemplateData) => {
+    const prevActive = t.isActive;
     try {
       await adminFetch(`/api/templates/${t._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isActive: !t.isActive }),
+        body: JSON.stringify({ isActive: !prevActive }),
       });
       fetchTemplates();
     } catch (err) {
       console.error('Toggle failed:', err);
+      setTemplates((prev) =>
+        prev.map((tm) => (tm._id === t._id ? { ...tm, isActive: prevActive } : tm))
+      );
     }
   };
 

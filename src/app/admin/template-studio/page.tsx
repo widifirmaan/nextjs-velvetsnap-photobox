@@ -24,6 +24,7 @@ import PropertiesPanel from './component/PropertiesPanel';
 import AssetSearch from './component/AssetSearch';
 import { DEFAULT_CANVAS_WIDTH, DEFAULT_CANVAS_HEIGHT, CHROMA_KEY_TARGET, CHROMA_KEY_THRESHOLD } from '@/lib/utils/constants';
 import { adminFetch } from '@/lib/utils/admin-fetch';
+import { removeGreenScreen } from '@/lib/utils/canvas-utils';
 import styles from './page.module.css';
 
 const DEFAULT_CANVAS_W = DEFAULT_CANVAS_WIDTH;
@@ -39,35 +40,6 @@ function makeId(): string {
 
 interface ISlot {
   x: number; y: number; w: number; h: number;
-}
-
-function removeChromaKey(dataUrl: string, targetW = DEFAULT_CANVAS_W, targetH = DEFAULT_CANVAS_H): Promise<string> {
-  return new Promise((resolve) => {
-    const img = new window.Image();
-    img.onload = () => {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = targetW;
-        canvas.height = targetH;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) { resolve(dataUrl); return; }
-        ctx.drawImage(img, 0, 0, targetW, targetH);
-        const imgData = ctx.getImageData(0, 0, targetW, targetH);
-        const d = imgData.data;
-        const [targetR, targetG, targetB] = CHROMA_KEY_TARGET;
-        const threshold2 = CHROMA_KEY_THRESHOLD;
-        for (let i = 0; i < d.length; i += 4) {
-          const r = d[i], g = d[i + 1], b = d[i + 2];
-          const dr = r - targetR, dg = g - targetG, db = b - targetB;
-          if (dr * dr + dg * dg + db * db < threshold2) d[i + 3] = 0;
-        }
-        ctx.putImageData(imgData, 0, 0);
-        resolve(canvas.toDataURL('image/png'));
-      } catch { resolve(dataUrl); }
-    };
-    img.onerror = () => resolve(dataUrl);
-    img.src = dataUrl;
-  });
 }
 
 function detectTransparentSlots(imgEl: HTMLImageElement, cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H): ISlot[] {
@@ -322,17 +294,14 @@ function StripsStudioPage() {
   const blobToBase64 = async (url: string): Promise<string> => {
     if (url.startsWith('data:')) return url;
     try {
-      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-        const i = new window.Image();
-        i.onload = () => resolve(i);
-        i.onerror = reject;
-        i.src = url;
+      const res = await fetch(url);
+      const blob = await res.blob();
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
       });
-      const c = document.createElement('canvas');
-      c.width = img.width;
-      c.height = img.height;
-      c.getContext('2d')!.drawImage(img, 0, 0);
-      return c.toDataURL('image/png');
     } catch { return url; }
   };
 
@@ -640,7 +609,7 @@ function StripsStudioPage() {
             const reader = new FileReader();
             reader.onloadend = async () => {
               const dataUrl = reader.result as string;
-              const processed = await removeChromaKey(dataUrl, DEFAULT_CANVAS_W, DEFAULT_CANVAS_H);
+              const processed = await removeGreenScreen(dataUrl, DEFAULT_CANVAS_W);
               const img = new window.Image();
               img.onload = () => {
                 const cw = DEFAULT_CANVAS_W, ch = DEFAULT_CANVAS_H;
