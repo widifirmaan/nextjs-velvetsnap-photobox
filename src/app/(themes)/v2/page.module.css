@@ -945,7 +945,6 @@
   border: 4px solid var(--np-border);
   box-shadow: var(--np-shadow);
   background: var(--np-card);
-  flex: 1;
 }
 
 .boothStripPreview img {
