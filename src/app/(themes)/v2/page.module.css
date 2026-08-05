@@ -662,7 +662,6 @@
   gap: 16px;
   padding: 0 24px 12px;
   width: 100%;
-  max-width: 1200px;
   align-items: stretch;
   min-height: 0;
 }
@@ -1617,6 +1616,12 @@
   .resultSidebar {
     width: 100%;
     max-width: 400px;
+  }
+
+  .boothPreview {
+    width: 15%;
+    min-width: 0;
+    max-width: none;
   }
 }
 
