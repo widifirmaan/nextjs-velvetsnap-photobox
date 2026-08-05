@@ -71,9 +71,12 @@ export default function AssetSearch({ onSelect, onClose, isBackground }: AssetSe
       log('error', 'removeBackground failed', { message: msg, elapsed: Date.now() - startedAt });
       setImageError(msg);
       setActiveUrl(null);
-      const isCorrupt = /download|corrupt|onnx|wasm|network|fetch|abort/i.test(msg);
+      const isCorrupt = /download|corrupt|onnx|wasm|network|fetch|abort|clipboard/i.test(msg);
       if (isCorrupt && model.status === 'ready') {
         model.retry();
+      }
+      if (/clipboard/i.test(msg)) {
+        setImageError('Clipboard does not contain a supported image. Please upload a file instead.');
       }
     }
   };

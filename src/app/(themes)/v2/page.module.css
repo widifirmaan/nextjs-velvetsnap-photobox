@@ -930,8 +930,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   width: 140px;
+  height: 100%;
 }
 
 .boothStripPreview {
@@ -1201,28 +1203,6 @@
 
 .boothStripCol > * {
   margin: 0 auto;
-}
-
-.boothPreview {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  height: 100%;
-}
-
-.boothStripPreview {
-  position: relative;
-  width: auto;
-  height: 100%;
-  max-height: calc(100% - 64px);
-  border: 4px solid var(--np-border);
-  box-shadow: var(--np-shadow);
-  background: var(--np-card);
-  overflow: hidden;
-  flex-shrink: 0;
-  box-sizing: border-box;
 }
 
 .boothStripPlaceholder {
