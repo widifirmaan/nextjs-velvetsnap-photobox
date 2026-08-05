@@ -932,7 +932,9 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 280px;
+  width: 30%;
+  min-width: 200px;
+  max-width: 400px;
   height: 100%;
 }
 
