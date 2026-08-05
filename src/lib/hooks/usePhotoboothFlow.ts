@@ -166,7 +166,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       const image = new window.Image();
       image.onload = () => { if (chromaKeyId.current === runId) setFrameRatio(image.naturalWidth / image.naturalHeight); };
       image.src = keyedDataUrl;
-      setKeyedFrameImage(keyedDataUrl);
+      if (chromaKeyId.current === runId) setKeyedFrameImage(keyedDataUrl);
     } catch (error) {
       console.error('renderFrameFromElements failed', error);
     }
@@ -198,6 +198,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   // Background chroma-key render when template changes
   useEffect(() => {
     if (!templateData?.templateData?.elements?.length) return;
+    if (templateData.templateFull) return;
     const elements = templateData.templateData.elements;
     const canvasWidth = templateData.templateData.canvasWidth || 1000;
     const canvasHeight = templateData.templateData.canvasHeight || 3000;

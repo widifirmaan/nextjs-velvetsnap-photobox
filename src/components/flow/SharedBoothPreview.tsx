@@ -98,7 +98,6 @@ export default function SharedBoothPreview({
             })}
             {keyedFrameImage && (
               <img
-                key={keyedFrameImage}
                 src={getAutoFormatUrl(keyedFrameImage)}
                 alt=""
                 crossOrigin="anonymous"
