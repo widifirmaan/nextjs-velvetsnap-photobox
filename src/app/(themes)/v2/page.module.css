@@ -822,6 +822,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-height: 0;
   max-height: 100%;
   position: relative;
@@ -830,8 +831,9 @@
 .boothWebcamWrap {
   position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 4/3;
   max-height: 100%;
+  margin: auto;
   border: 3px solid var(--np-border);
   box-shadow: var(--np-shadow-sm);
   overflow: hidden;
