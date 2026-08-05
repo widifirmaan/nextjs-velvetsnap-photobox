@@ -101,17 +101,6 @@ export default function BoothStep({
             styles={styles}
           />
         </div>
-        <div className={styles.boothNewsColLeft}>
-          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, borderBottom: '1px solid var(--np-border)', paddingBottom: 4, color: 'var(--np-text)' }}>Booth</h1>
-          <div className={styles.boothNewsColTitle}>The Gazette</div>
-          <div className={styles.boothNewsColText}>VelvetSnap unveils new vintage-inspired frames for the holiday season. Early reviews praise the warm sepia tones.</div>
-          <div className={styles.boothNewsColText}>Photobooth attendance up 34% this quarter as visitors rediscover analog charm in a digital age.</div>
-        </div>
-        <div className={styles.boothNewsColRight}>
-          <div className={styles.boothNewsColTitle}>Editorial</div>
-          <div className={styles.boothNewsColText}>Why photobooths matter: In an age of disappearing digital media, the printed photo strip remains a tangible keepsake.</div>
-          <div className={styles.boothNewsColText}>Tips &mdash; Position yourself center-frame for best results. Natural light recommended.</div>
-        </div>
       </div>
       <SharedBoothControls
         taking={taking}
