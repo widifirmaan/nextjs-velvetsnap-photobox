@@ -49,6 +49,20 @@ export default function Home() {
   } | null>(null);
   const [clipStage, setClipStage] = useState<'init' | 'expand' | null>(null);
 
+  // Deep-link access to any step via ?step=N (0=home, 1=template, 2=photo, 3=edit, 4=pay, 5=cetak)
+  useEffect(() => {
+    const n = parseInt(new URLSearchParams(window.location.search).get('step') || '', 10);
+    if (Number.isInteger(n)) setStep(Math.max(0, Math.min(5, n)));
+  }, []);
+
+  // Keep the URL in sync with the current step
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (step === 0) url.searchParams.delete('step');
+    else url.searchParams.set('step', String(step));
+    window.history.replaceState(null, '', url.toString());
+  }, [step]);
+
   const handleRefresh = useCallback(() => {
     if (refreshTimer.current) clearTimeout(refreshTimer.current);
     refreshTimer.current = setTimeout(() => setRefreshKey((k) => k + 1), 300);

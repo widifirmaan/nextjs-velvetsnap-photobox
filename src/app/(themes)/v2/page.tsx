@@ -2,7 +2,7 @@
 // Description: Auto-added top comment for easier file identification.
 
 'use client';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './page.module.css';
 import StepperFlow from './StepperFlow';
 import HomePage from './homepage/HomePage';
@@ -13,6 +13,20 @@ export default function V2Page() {
   const [flipDir, setFlipDir] = useState<'none' | 'forward' | 'backward'>('none');
   const flipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const appData = useAppData();
+
+  // Deep-link access to any step via ?step=N (0=home, 1=template, 2=photo, 3=edit, 4=pay, 5=cetak)
+  useEffect(() => {
+    const n = parseInt(new URLSearchParams(window.location.search).get('step') || '', 10);
+    if (Number.isInteger(n)) setStep(Math.max(0, Math.min(5, n)));
+  }, []);
+
+  // Keep the URL in sync with the current step
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (step === 0) url.searchParams.delete('step');
+    else url.searchParams.set('step', String(step));
+    window.history.replaceState(null, '', url.toString());
+  }, [step]);
 
   const handleStart = useCallback(() => {
     setStep(1);
