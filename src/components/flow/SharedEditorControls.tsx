@@ -48,9 +48,6 @@ export default function SharedEditorControls({
 }: SharedEditorControlsProps) {
   return (
     <div className={containerClassName}>
-      <button className={buttonClassName} onClick={onBack}>
-        Back
-      </button>
       <div className={sectionClassName}>
         <h4 className={headingClassName}>Adjustments</h4>
         <SliderControl
