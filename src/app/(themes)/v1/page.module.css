@@ -1621,6 +1621,7 @@
 
 .stepPageResult {
   align-items: center;
+  max-width: none;
 }
 
 .resultLayout {
