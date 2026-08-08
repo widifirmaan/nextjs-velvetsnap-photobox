@@ -29,6 +29,7 @@ export default function ResultStep({
           primaryButtonClassName={styles.boothBtnPrimary}
           secondaryButtonClassName={styles.boothBtnSecondary}
           homeButtonClassName={`${styles.boothBtnSecondary} ${styles.resultHomeBtn}`}
+          downloadPath="/v1/download"
           qrSectionClassName={styles.qrSection}
           qrDividerClassName={styles.qrDivider}
           qrLabelClassName={styles.qrLabel}

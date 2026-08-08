@@ -1698,6 +1698,77 @@
   max-width: 100%;
 }
 
+/* ── Download Page ── */
+.downloadLayout {
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 900px;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.downloadPreview {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.stripCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 260px;
+}
+
+.stripImg {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+.thumbCard {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 180px;
+}
+
+.thumbImg {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+}
+
+.stripDownloadBtn,
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--mn-text);
+  color: #fff;
+  font-family: var(--brand-font-family, inherit);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.stripDownloadBtn:hover,
+.downloadBtn:hover {
+  opacity: 0.85;
+}
+
 /* ── Step Responsive ── */
 
 @media (max-width: 768px) {

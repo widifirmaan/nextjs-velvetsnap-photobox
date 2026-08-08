@@ -22,6 +22,7 @@ interface ResultActionsProps {
   qrCanvasClassName?: string;
   qrUrlClassName?: string;
   qrSize?: number;
+  downloadPath?: string;
   buttonStyle?: CSSProperties;
 }
 
@@ -39,10 +40,11 @@ export default function ResultActions({
   qrCanvasClassName,
   qrUrlClassName,
   qrSize = 140,
+  downloadPath = '/download',
   buttonStyle,
 }: ResultActionsProps) {
   const qrRef = useRef<HTMLCanvasElement>(null);
-  const downloadUrl = txId ? `${window.location.origin}/download?id=${encodeURIComponent(txId)}` : null;
+  const downloadUrl = txId ? `${window.location.origin}${downloadPath}?id=${encodeURIComponent(txId)}` : null;
 
   useEffect(() => {
     if (!qrRef.current || !downloadUrl) return;

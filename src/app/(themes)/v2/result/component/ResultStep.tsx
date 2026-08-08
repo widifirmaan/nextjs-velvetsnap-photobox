@@ -2,7 +2,6 @@
 // Description: Auto-added top comment for easier file identification.
 
 'use client';
-import { useEffect, useRef } from 'react';
 import { Loader2 } from 'lucide-react';
 import ResultActions from '@/components/result/ResultActions';
 import styles from '../../page.module.css';
@@ -10,19 +9,6 @@ import styles from '../../page.module.css';
 export default function ResultStep({ compositedImage, onHome, txId }: {
   compositedImage: string | null; onHome: () => void; txId?: string | null;
 }) {
-  const qrRef = useRef<HTMLCanvasElement>(null);
-  const downloadUrl = txId ? `${window.location.origin}/download?id=${encodeURIComponent(txId)}` : null;
-
-  useEffect(() => {
-    if (!qrRef.current || !downloadUrl) return;
-    import('qrcode').then((QRCode) => {
-      QRCode.toCanvas(qrRef.current!, downloadUrl, {
-        width: 140, margin: 2,
-        color: { dark: '#1d1d1f', light: '#ffffff' },
-      });
-    });
-  }, [downloadUrl]);
-
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div className={styles.resultLayout}>
@@ -41,6 +27,7 @@ export default function ResultStep({ compositedImage, onHome, txId }: {
             compositedImage={compositedImage}
             onHome={onHome}
             txId={txId}
+            downloadPath="/v2/download"
             qrSize={280}
             qrSectionClassName={styles.qrSection}
             qrDividerClassName={styles.qrDivider}
