@@ -233,10 +233,16 @@ async function uploadToCloudinary(env, dataUri, folder, publicId) {
     const timestamp = Math.floor(Date.now() / 1000);
     const folderParam = folder || 'velvetsnap/templates';
 
-    let params = `folder=${encodeURIComponent(folderParam)}&timestamp=${timestamp}`;
-    if (publicId) params += `&public_id=${encodeURIComponent(publicId)}&overwrite=true&invalidate=true`;
-
-    const toSign = params + apiSecret;
+    const signParams = { folder: folderParam, timestamp: timestamp.toString() };
+    if (publicId) {
+        signParams.public_id = publicId;
+        signParams.overwrite = 'true';
+        signParams.invalidate = 'true';
+    }
+    const toSign = Object.entries(signParams)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([k, v]) => `${k}=${v}`)
+        .join('&') + apiSecret;
     const encoder = new TextEncoder();
     const signatureBytes = await crypto.subtle.digest('SHA-1', encoder.encode(toSign));
     const signature = Array.from(new Uint8Array(signatureBytes)).map(b => b.toString(16).padStart(2, '0')).join('');
