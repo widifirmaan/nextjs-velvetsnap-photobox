@@ -1592,7 +1592,17 @@
 }
 
 .downloadLayout .previewInner {
-  grid-template-columns: auto minmax(0, 1.5fr) minmax(0, 1.5fr);
+  grid-template-columns: auto minmax(0, 1.8fr) minmax(0, 1.8fr);
+}
+
+.downloadLayout .thumbCard {
+  justify-content: center;
+}
+
+.downloadLayout .thumbCard > div {
+  flex: none;
+  aspect-ratio: 3 / 4;
+  max-height: 100%;
 }
 
 .downloadLayout .stripCol {
