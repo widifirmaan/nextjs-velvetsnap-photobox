@@ -118,6 +118,53 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
   const uploadImagesFn = useRef(uploadImages);
   uploadImagesFn.current = uploadImages;
 
+  const saveTx = useCallback(async (sessionId: string, orderId: string, status: 'PAID' | 'PENDING', photos?: { captures: string[]; finalImage: string }) => {
+    const body: Record<string, unknown> = {
+      sessionId,
+      templateId: templateId || 't1',
+      price,
+      status,
+      orderId,
+    };
+    if (photos) {
+      body.captures = photos.captures;
+      body.finalImage = photos.finalImage;
+    }
+    const res = await fetch('/api/transactions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Failed to save transaction');
+    return data;
+  }, [templateId, price]);
+
+  const uploadWithRetry = useCallback(async (): Promise<{ captures: string[]; finalImage: string }> => {
+    let lastError: unknown;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        return await uploadImagesFn.current();
+      } catch (e) {
+        lastError = e;
+        if (attempt < 3) await new Promise((r) => setTimeout(r, 1000 * attempt));
+      }
+    }
+    throw lastError;
+  }, []);
+
+  const reportError = useCallback((message: string, err: unknown) => {
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error(message, err);
+    try {
+      fetch('/api/log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level: 'error', message, data: { detail } }),
+      }).catch(() => {});
+    } catch {}
+  }, []);
+
   useEffect(() => {
     if (autoTriggered.current || paid) return;
     if (!snapLoaded || !templateId || !price) return;
@@ -162,17 +209,17 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
             setPaid(true);
             if (transactionId) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, transactionId);
             try {
-              const { captures: uploadedCaptures, finalImage: uploadedFinal } = await uploadImagesFn.current();
-              await fetch('/api/transactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  sessionId, templateId: templateId || 't1', price,
-                  captures: uploadedCaptures, finalImage: uploadedFinal,
-                  status: 'PAID', orderId,
-                }),
-              });
-            } catch (e) { console.error('Payment upload failed', e); }
+              await saveTx(sessionId, orderId, 'PENDING');
+            } catch (e) {
+              reportError('Save transaction (pre-upload) failed', e);
+            }
+            try {
+              const photos = await uploadWithRetry();
+              await saveTx(sessionId, orderId, 'PENDING', photos);
+            } catch (e) {
+              reportError('Payment photo upload failed', e);
+              setErrMsg('Pembayaran sukses, tetapi foto gagal diunggah. Hubungi admin.');
+            }
             setTimeout(() => onSuccess(transactionId || 'ok'), PAYMENT_SUCCESS_DELAY);
           },
           onPending: () => {
@@ -188,17 +235,17 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
                   pollRef.current = null;
                   if (data.data._id) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, data.data._id);
                   try {
-                    const { captures: uploadedCaptures, finalImage: uploadedFinal } = await uploadImagesFn.current();
-                    await fetch('/api/transactions', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        sessionId, templateId: templateId || 't1', price,
-                        captures: uploadedCaptures, finalImage: uploadedFinal,
-                        status: 'PAID', orderId,
-                      }),
-                    });
-                  } catch (e) { console.error('Payment upload failed', e); }
+                    await saveTx(sessionId, orderId, 'PENDING');
+                  } catch (e) {
+                    reportError('Save transaction (poll, pre-upload) failed', e);
+                  }
+                  try {
+                    const photos = await uploadWithRetry();
+                    await saveTx(sessionId, orderId, 'PENDING', photos);
+                  } catch (e) {
+                    reportError('Payment poll photo upload failed', e);
+                    setErrMsg('Pembayaran sukses, tetapi foto gagal diunggah. Hubungi admin.');
+                  }
                   onSuccess(data.data._id || 'ok');
                 }
               } catch (e) { console.error('Payment poll error', e); }
@@ -237,26 +284,16 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
       Math.random().toString(36).substring(2);
     sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, sessionId);
     const orderId = 'BYPASS_' + now + '_' + Math.random().toString(36).slice(2, 6);
-    let uploadedCaptures: string[] = [];
-    let uploadedFinal = '';
     try {
-      const result = await uploadImagesFn.current();
-      uploadedCaptures = result.captures;
-      uploadedFinal = result.finalImage;
-    } catch (e) { console.error('Bypass upload failed (ok to proceed)', e); }
+      await saveTx(sessionId, orderId, 'PAID');
+    } catch (e) {
+      reportError('Bypass save transaction (pre-upload) failed', e);
+    }
     try {
-      const res = await fetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId, templateId: templateId || 't1', price,
-          captures: uploadedCaptures, finalImage: uploadedFinal,
-          status: 'PAID', orderId,
-        }),
-      });
-      const data = await res.json();
-      if (data.success && data.data?._id) {
-        sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, data.data._id);
+      const photos = await uploadWithRetry();
+      const saved = await saveTx(sessionId, orderId, 'PAID', photos);
+      if (saved.data?._id) {
+        sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, saved.data._id);
       }
       setPaid(true);
       setTimeout(() => onSuccess('bypass_' + now), PAYMENT_SUCCESS_DELAY);
