@@ -41,6 +41,12 @@ export default function ResultStep({ compositedImage, onHome, txId }: {
             compositedImage={compositedImage}
             onHome={onHome}
             txId={txId}
+            qrSize={280}
+            qrSectionClassName={styles.qrSection}
+            qrDividerClassName={styles.qrDivider}
+            qrLabelClassName={styles.qrLabel}
+            qrCanvasClassName={styles.qrCanvas}
+            qrUrlClassName={styles.qrUrl}
             primaryButtonClassName={`${styles.boothBtn} ${styles.boothBtnPrimary}`}
             secondaryButtonClassName={styles.boothBtn}
             homeButtonClassName={styles.boothBtn}

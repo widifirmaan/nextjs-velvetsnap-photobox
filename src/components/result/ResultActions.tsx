@@ -21,6 +21,7 @@ interface ResultActionsProps {
   qrLabelClassName?: string;
   qrCanvasClassName?: string;
   qrUrlClassName?: string;
+  qrSize?: number;
   buttonStyle?: CSSProperties;
 }
 
@@ -37,6 +38,7 @@ export default function ResultActions({
   qrLabelClassName,
   qrCanvasClassName,
   qrUrlClassName,
+  qrSize = 140,
   buttonStyle,
 }: ResultActionsProps) {
   const qrRef = useRef<HTMLCanvasElement>(null);
@@ -46,7 +48,7 @@ export default function ResultActions({
     if (!qrRef.current || !downloadUrl) return;
     import('qrcode').then((QRCode) => {
       QRCode.toCanvas(qrRef.current!, downloadUrl, {
-        width: 140,
+        width: qrSize,
         margin: 2,
         color: { dark: '#1d1d1f', light: '#ffffff' },
       });
