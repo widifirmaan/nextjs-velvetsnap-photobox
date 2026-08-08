@@ -112,11 +112,6 @@ function DownloadContent() {
           </div>
         </div>
 
-        <div className={styles.newspaperFooter}>
-          <div className={styles.mastheadMeta}>
-            <span>VelvetSnap Photobooth</span>
-          </div>
-        </div>
       </div>
     </div>
   );

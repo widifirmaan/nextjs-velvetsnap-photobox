@@ -53,11 +53,6 @@ export default function ResultStep({ compositedImage, onHome, txId }: {
           />
         </div>
       </div>
-      <div className={styles.newspaperFooter}>
-        <div className={styles.mastheadMeta}>
-          <span>VelvetSnap Photobooth</span>
-        </div>
-      </div>
     </div>
   );
 }

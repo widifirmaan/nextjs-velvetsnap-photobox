@@ -127,11 +127,6 @@ export default function BoothStep({
         camMenuRef={camMenuRef}
         styles={styles}
       />
-      <div className={styles.newspaperFooter} style={{ width: '100%' }}>
-        <div className={styles.mastheadMeta}>
-          <span>VelvetSnap Photobooth</span>
-        </div>
-      </div>
     </div>
   );
 }
