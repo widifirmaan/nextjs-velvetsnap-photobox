@@ -292,11 +292,12 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
     try {
       const photos = await uploadWithRetry();
       const saved = await saveTx(sessionId, orderId, 'PAID', photos);
+      const txId = saved.data?._id || 'bypass_' + now;
       if (saved.data?._id) {
         sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, saved.data._id);
       }
       setPaid(true);
-      setTimeout(() => onSuccess('bypass_' + now), PAYMENT_SUCCESS_DELAY);
+      setTimeout(() => onSuccess(txId), PAYMENT_SUCCESS_DELAY);
     } catch (e) {
       console.error('Bypass failed', e);
       setErrMsg('Bypass failed: ' + (e instanceof Error ? e.message : String(e)));
