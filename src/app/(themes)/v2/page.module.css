@@ -1592,7 +1592,7 @@
 }
 
 .downloadLayout .previewInner {
-  grid-template-columns: auto minmax(0, 1.8fr) minmax(0, 1.8fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .downloadLayout .thumbCard {
