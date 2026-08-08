@@ -1592,7 +1592,7 @@
 }
 
 .downloadLayout .previewInner {
-  grid-template-columns: auto 1fr 1fr;
+  grid-template-columns: auto minmax(0, 1.5fr) minmax(0, 1.5fr);
 }
 
 .downloadLayout .stripCol {
