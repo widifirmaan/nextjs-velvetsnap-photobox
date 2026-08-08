@@ -61,26 +61,33 @@ function V1DownloadContent() {
       <div className={`${styles.stepPage} ${styles.stepPageResult}`}>
         <h2 className={styles.stepHeading} style={{ margin: '24px 0 8px' }}>Your Photos are Ready!</h2>
         <p style={{ color: '#888', marginBottom: '20px' }}>Download your photo strip and individual photos.</p>
-        <div className={styles.downloadLayout}>
-          <div className={styles.downloadPreview}>
-            {tx.finalImage && (
-              <div className={styles.stripCard}>
-                <img src={tx.finalImage} alt="Photo strip" className={styles.stripImg} />
-                <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
-                  <Download size={16} /> Download Strip
-                </a>
-              </div>
-            )}
-            {(tx.captures || []).map((url, i) => (
-              <div key={i} className={styles.thumbCard}>
-                <img src={url} alt={`Photo ${i + 1}`} className={styles.thumbImg} />
-                <a href={url} download className={styles.downloadBtn}>
-                  <Download size={12} /> Photo {i + 1}
-                </a>
-              </div>
-            ))}
+        <div className={`${styles.resultLayout} ${styles.downloadLayout}`}>
+          <div className={styles.resultPreview}>
+            <div className={styles.previewInner}>
+              {tx.finalImage && (
+                <div className={styles.stripCol}>
+                  <div className={styles.stripFrame}>
+                    <img src={tx.finalImage} alt="Photo strip" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  </div>
+                  <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
+                    <Download size={16} /> Download Strip
+                  </a>
+                </div>
+              )}
+              {(tx.captures || []).map((url, i) => (
+                <div key={i} className={styles.thumbCard}>
+                  <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--mn-border)', boxShadow: 'var(--mn-shadow-sm, 0 4px 12px rgba(0,0,0,0.10))' }}>
+                    <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <a href={url} download className={styles.downloadBtn}>
+                    <Download size={16} /> Photo {i + 1}
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className={styles.resultActions}>
+
+          <div className={`${styles.resultActions} ${styles.downloadSidebar}`}>
             {downloadUrl && (
               <div className={styles.qrSection}>
                 <div className={styles.qrDivider} />
