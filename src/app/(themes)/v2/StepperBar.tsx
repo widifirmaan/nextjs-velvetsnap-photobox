@@ -27,7 +27,7 @@ export default function StepperBar({ current, total, onBack }: {
       </>}
       title={<><span className={styles.mastheadAccent}>{roman[current]}</span> {labels[current]}</>}
       tagline={taglines[current]}
-      bottom={<div style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', width: '100%', marginBottom: 16 }}>
+      bottom={<div style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', width: '100%', margin: '12px 0' }}>
         {labels.slice(0, total).map((l, i) => (
           <span key={i} style={{
             color: i === current ? 'var(--np-accent)' : i < current ? 'var(--np-text)' : 'var(--np-text-muted)',
