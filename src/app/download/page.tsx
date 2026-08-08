@@ -6,6 +6,16 @@ import { Download, Smartphone } from 'lucide-react';
 import styles from './page.module.css';
 import DownloadQr from './DownloadQr';
 
+function splitTitle(appName: string): [string, string] {
+  let caps = 0;
+  for (let i = 0; i < appName.length; i++) {
+    if (appName[i] >= 'A' && appName[i] <= 'Z') caps++;
+    if (caps === 2) return [appName.slice(0, i), appName.slice(i)];
+  }
+  const mid = Math.ceil(appName.length / 2);
+  return [appName.slice(0, mid), appName.slice(mid)];
+}
+
 function DownloadContent() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
@@ -28,7 +38,11 @@ function DownloadContent() {
   const uiTheme = settings?.uiTheme || 'v1';
   const isV2 = uiTheme === 'v2';
   const appName = settings?.appName || 'VelvetSnap';
+  const location = settings?.header?.location || 'Jakarta';
+  let navItems: { label: string; url: string }[] = [];
+  try { navItems = JSON.parse(settings?.header?.navItems || '[]'); } catch {}
   const downloadUrl = tx && id ? `${window.location.origin}/download?id=${id}` : null;
+  const [accent, rest] = splitTitle(appName);
 
   const V2_VARS = {
     '--np-bg': '#f5f0e8', '--np-card': '#faf6ef', '--np-text': '#1a1a1a',
@@ -42,10 +56,26 @@ function DownloadContent() {
       <div className={`${styles.stepPage}${isV2 ? '' : ''}`} style={isV2 ? V2_VARS : undefined}>
         <div className={styles.stepContent}>
           <div className={styles.newspaperHeader}>
-            <div className={styles.mastheadMeta}><span>{host.toUpperCase()}</span><span>&nbsp;</span><span>Not Found</span></div>
+            <div className={styles.mastheadMeta}>
+              <span>{host.toUpperCase()}</span>
+              <span>&nbsp;</span>
+              <span>Not Found</span>
+            </div>
             <div className={styles.mastheadRule} />
-            <h1 className={styles.mastheadTitle}>{appName}<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
-            {isV2 && <p className={styles.mastheadTagline}>This download link may be invalid or expired.</p>}
+            <div style={{ position: 'relative' }}>
+              <h1 className={styles.mastheadTitle}><span className={styles.mastheadAccent}>{accent}</span>{rest}<span className={styles.mastheadAccent}> NOT FOUND</span></h1>
+              {isV2 && <p className={styles.mastheadTagline}>This download link may be invalid or expired.</p>}
+            </div>
+            <div className={styles.mastheadRule} />
+            <div className={styles.mastheadMeta}>
+              <span>Price Rp 35.000</span>
+              <span>Est. 2024</span>
+              <span>
+                {(navItems || []).map((item, i) => (
+                  <a key={i} href={item.url} className={styles.mastheadLink}>{item.label}</a>
+                ))}
+              </span>
+            </div>
             <div className={styles.mastheadRule} />
           </div>
           <div className={styles.notFound}>
@@ -63,10 +93,23 @@ function DownloadContent() {
           <div className={styles.mastheadMeta}>
             <span>{host.toUpperCase()}</span>
             <span>{tx.captures?.length || 0} PHOTOS</span>
+            <span>{location} — Edition</span>
           </div>
           <div className={styles.mastheadRule} />
-          <h1 className={styles.mastheadTitle}>{appName}</h1>
-          <p className={styles.mastheadTagline}>Download your photo strip and individual photos.</p>
+          <div style={{ position: 'relative' }}>
+            <h1 className={styles.mastheadTitle}><span className={styles.mastheadAccent}>{accent}</span>{rest}</h1>
+            <p className={styles.mastheadTagline}>Download your photo strip and individual photos.</p>
+          </div>
+          <div className={styles.mastheadRule} />
+          <div className={styles.mastheadMeta}>
+            <span>Price Rp {tx.price?.toLocaleString('id-ID') || '35.000'}</span>
+            <span>Est. 2024</span>
+            <span>
+              {(navItems || []).map((item, i) => (
+                <a key={i} href={item.url} className={styles.mastheadLink}>{item.label}</a>
+              ))}
+            </span>
+          </div>
           <div className={styles.mastheadRule} />
         </div>
 

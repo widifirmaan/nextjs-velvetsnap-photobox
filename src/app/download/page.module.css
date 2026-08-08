@@ -52,6 +52,23 @@
   color: var(--np-accent, #c73e3e);
 }
 
+.mastheadLink {
+  color: var(--np-text, #1a1a1a);
+  text-decoration: none;
+  border-bottom: 1px solid var(--np-border, #1a1a1a);
+}
+
+.mastheadLink:hover {
+  color: var(--np-accent, #c73e3e);
+  border-color: var(--np-accent, #c73e3e);
+}
+
+.navItems {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .mastheadTagline {
   font-family: var(--font-body);
   font-style: italic;
