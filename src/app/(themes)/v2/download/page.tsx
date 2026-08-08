@@ -77,12 +77,12 @@ function V2DownloadContent() {
         </>}
       />
 
-      <div className={styles.resultLayout}>
+      <div className={`${styles.resultLayout} ${styles.downloadLayout}`}>
         <div className={styles.resultPreview}>
           <div className={styles.previewInner}>
             {tx.finalImage && (
               <div className={styles.stripCol}>
-                <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '4px solid var(--np-border)', boxShadow: 'var(--np-shadow)' }}>
+                <div className={styles.stripFrame}>
                   <img src={tx.finalImage} alt="Photo strip" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                 </div>
                 <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
@@ -103,7 +103,7 @@ function V2DownloadContent() {
           </div>
         </div>
 
-        <div className={styles.resultSidebar}>
+        <div className={`${styles.resultSidebar} ${styles.downloadSidebar}`}>
           <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, textAlign: 'center', flexShrink: 0 }}>
             Your Photos are Ready!
           </h2>
