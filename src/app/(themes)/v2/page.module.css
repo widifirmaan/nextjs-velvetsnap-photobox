@@ -1568,23 +1568,24 @@
 }
 
 .downloadBtn {
-  display: block;
-  margin: 0 -3px;
-  width: calc(100% + 6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 24px;
   border: 3px solid var(--np-border);
   background: var(--np-accent);
   color: #fff;
   font-family: var(--font-body);
   font-weight: 700;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: none;
+  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  box-sizing: border-box;
+  text-decoration: none;
+  cursor: pointer;
   box-shadow: var(--np-shadow-sm);
-  padding: 8px 12px;
-  font-size: 11px;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .downloadLayout .resultPreview {

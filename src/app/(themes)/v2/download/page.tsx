@@ -96,7 +96,7 @@ function V2DownloadContent() {
                   <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <a href={url} download className={styles.downloadBtn}>
-                  <Download size={12} /> Photo {i + 1}
+                  <Download size={16} /> Photo {i + 1}
                 </a>
               </div>
             ))}
