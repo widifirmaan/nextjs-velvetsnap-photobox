@@ -1776,6 +1776,10 @@
   grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
 }
 
+.downloadLayout .stripDownloadBtn {
+  width: 100%;
+}
+
 .downloadLayout .thumbCard {
   justify-content: center;
 }

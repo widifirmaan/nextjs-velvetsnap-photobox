@@ -1615,6 +1615,10 @@
   justify-content: flex-start;
 }
 
+.downloadLayout .stripDownloadBtn {
+  width: 100%;
+}
+
 .downloadLayout .stripFrame {
   flex: 1;
   min-height: 0;
