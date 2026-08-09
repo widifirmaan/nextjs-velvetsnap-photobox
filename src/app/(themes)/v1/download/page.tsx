@@ -59,7 +59,7 @@ function V1DownloadContent() {
       </header>
 
       <div className={`${styles.stepPage} ${styles.stepPageResult}`}>
-        <h2 className={styles.stepHeading} style={{ margin: '24px 0 8px' }}>Your Photos are Ready!</h2>
+        <h2 className={styles.stepHeading} style={{ margin: '0 0 8px' }}>Your Photos are Ready!</h2>
         <p style={{ color: '#888', marginBottom: '20px' }}>Download your photo strip and individual photos.</p>
         <div className={`${styles.resultLayout} ${styles.downloadLayout}`}>
           <div className={styles.resultPreview}>
