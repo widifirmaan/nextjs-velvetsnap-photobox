@@ -1621,7 +1621,7 @@
 }
 
 .downloadLayout .stripDownloadBtn {
-  width: 100%;
+  width: fit-content;
 }
 
 .downloadLayout .stripFrame {
