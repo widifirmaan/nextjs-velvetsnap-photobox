@@ -1790,14 +1790,15 @@
 .downloadLayout .stripCol {
   max-width: none;
   width: auto;
+  height: 100%;
+  aspect-ratio: 1 / 3;
+  justify-content: flex-start;
 }
 
 .downloadLayout .stripFrame {
   flex: 1;
   min-height: 0;
-  aspect-ratio: 1 / 3;
-  width: auto;
-  max-width: 100%;
+  width: 100%;
   position: relative;
   border: 4px solid var(--mn-border);
   box-shadow: var(--mn-shadow-sm, 0 4px 12px rgba(0,0,0,0.10));
