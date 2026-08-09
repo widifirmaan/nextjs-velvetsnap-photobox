@@ -1784,6 +1784,11 @@
   justify-content: center;
 }
 
+.downloadLayout .thumbCard .downloadBtn {
+  width: fit-content;
+  align-self: center;
+}
+
 .downloadLayout .thumbCard > div {
   flex: 1;
   min-height: 0;
