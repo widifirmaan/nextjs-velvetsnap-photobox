@@ -1601,9 +1601,10 @@
 }
 
 .downloadLayout .thumbCard > div {
-  flex: none;
-  aspect-ratio: 3 / 4;
-  max-height: 100%;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  width: 100%;
 }
 
 .downloadLayout .stripCol {
