@@ -67,7 +67,7 @@ function V1DownloadContent() {
               {tx.finalImage && (
                 <div className={styles.stripCol}>
                   <div className={styles.stripFrame}>
-                    <img src={tx.finalImage} alt="Photo strip" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    <img src={tx.finalImage} alt="Photo strip" style={{ width: '100%', height: '100%' }} />
                   </div>
                   <a href={tx.finalImage} download className={styles.stripDownloadBtn}>
                     <Download size={16} /> Download Strip
