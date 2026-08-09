@@ -1774,6 +1774,7 @@
 
 .downloadLayout .previewInner {
   grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+  row-gap: 4px;
 }
 
 .downloadLayout .stripDownloadBtn {
@@ -1802,6 +1803,7 @@
   height: 100%;
   aspect-ratio: 1 / 3;
   justify-content: flex-start;
+  gap: 4px;
 }
 
 .downloadLayout .stripFrame {
