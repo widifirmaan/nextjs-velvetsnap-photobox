@@ -1618,7 +1618,7 @@
   max-width: 100%;
   position: relative;
   border: 4px solid var(--np-border);
-  box-shadow: var(--np-shadow);
+  box-shadow: var(--np-shadow-sm);
 }
 
 .downloadSidebar {
