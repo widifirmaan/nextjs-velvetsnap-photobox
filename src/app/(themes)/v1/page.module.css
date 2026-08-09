@@ -1773,7 +1773,7 @@
 }
 
 .downloadLayout .previewInner {
-  grid-template-columns: minmax(0, 180px) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
 }
 
 .downloadLayout .thumbCard {
@@ -1789,12 +1789,14 @@
 
 .downloadLayout .stripCol {
   max-width: none;
-  width: 100%;
+  width: auto;
 }
 
 .downloadLayout .stripFrame {
-  width: 100%;
+  flex: 1;
+  min-height: 0;
   aspect-ratio: 1 / 3;
+  width: auto;
   max-width: 100%;
   position: relative;
   border: 4px solid var(--mn-border);
