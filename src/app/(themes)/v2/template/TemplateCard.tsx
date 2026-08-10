@@ -23,7 +23,7 @@ export default function TemplateCard({ template, onSelect, keyedFrameUrl, loadin
       fetchPriority={fetchPriority}
       sizes="200px"
       buttonClassName={styles.templateCard}
-      buttonStyle={{ background: 'none', border: 'none', padding: 0 }}
+      buttonStyle={{ background: 'none', padding: 0 }}
       imageWrapperClassName={styles.templateCardImg}
       imageClassName={styles.templateCardImg}
       bodyClassName={styles.templateCardBody}
