@@ -1188,7 +1188,7 @@
 .editorLayout {
   display: flex;
   gap: 24px;
-  padding: 24px;
+  padding: 12px 24px 24px;
   flex: 1;
   min-height: 0;
 }
@@ -1347,7 +1347,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 12px 24px 24px;
   gap: 24px;
 }
 
@@ -1436,7 +1436,7 @@
   flex: 1;
   display: flex;
   gap: 24px;
-  padding: 24px;
+  padding: 12px 24px 24px;
   min-height: 0;
 }
 
