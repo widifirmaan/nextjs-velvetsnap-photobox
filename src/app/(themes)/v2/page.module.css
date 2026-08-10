@@ -660,7 +660,7 @@
 .boothContent {
   display: flex;
   gap: 16px;
-  padding: 0 24px 12px;
+  padding: 12px 24px 12px;
   width: 100%;
   align-items: stretch;
   min-height: 0;
