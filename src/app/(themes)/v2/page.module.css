@@ -1256,6 +1256,7 @@
   border: 3px solid var(--np-border);
   padding: 24px;
   box-shadow: var(--np-shadow-sm);
+  margin-bottom: 16px;
 }
 
 .editorRetakeBtn {
