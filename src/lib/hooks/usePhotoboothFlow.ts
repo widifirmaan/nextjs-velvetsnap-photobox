@@ -89,8 +89,15 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
         setFrameRatio(canvasWidth / canvasHeight);
         if (restored.data.templateFull) setKeyedFrameImage(restored.data.templateFull);
       }
+      let restoredCaptures: string[] | null = null;
+      try {
+        const rawCaptures = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.CAPTURES) : null;
+        if (rawCaptures) restoredCaptures = JSON.parse(rawCaptures);
+      } catch (e) { console.error('usePhotoboothFlow: failed to restore captures', e); }
+      if (Array.isArray(restoredCaptures) && restoredCaptures.length) setCaptures(restoredCaptures);
       return;
     }
+    try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.CAPTURES); } catch (e) { console.error('usePhotoboothFlow: failed to clear captures', e); }
     setStep(1);
   }, [step, templateId, templateData, setStep]);
 
@@ -104,6 +111,8 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   // Reset the entire photobooth flow and clear session state.
   const startOver = useCallback(() => {
     try { if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
+    try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.SELECTED_TEMPLATE); } catch {}
+    try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.CAPTURES); } catch {}
     chromaKeyId.current++;
     compositingId.current++;
     onRefresh?.();
@@ -324,6 +333,16 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   const handleDeleteCapture = useCallback((idx: number) => {
     setCaptures((prev) => { const n = [...prev]; n[idx] = ''; return n; });
   }, []);
+
+  // Persist captured photos so step 3 can survive a page reload.
+  useEffect(() => {
+    if (step < 3) return;
+    if (!captures.some((c) => c !== '')) return;
+    try {
+      const raw = JSON.stringify(captures);
+      if (raw.length < 4_000_000) localStorage.setItem(STORAGE_KEYS.CAPTURES, raw);
+    } catch (e) { console.error('usePhotoboothFlow: failed to persist captures', e); }
+  }, [captures, step]);
 
   useEffect(() => {
     if (!captures.length || !templateData?.templateData?.slotsLayout?.length) return;
