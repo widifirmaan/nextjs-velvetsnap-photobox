@@ -2,15 +2,16 @@
 // Description: Auto-added top comment for easier file identification.
 
 'use client';
+import type { ReactNode } from 'react';
 import styles from '@/app/(themes)/v1/page.module.css';
 
-export default function AdjustSlider({ label, value, min, max, onChange, display }: {
-  label: string; value: number; min: number; max: number;
+export default function AdjustSlider({ label, icon, value, min, max, onChange, display }: {
+  label: string; icon?: ReactNode; value: number; min: number; max: number;
   onChange: (v: number) => void; display?: string;
 }) {
   return (
     <div className={styles.editorAdjustRow}>
-      <span className={styles.editorAdjustLabel}>{label}</span>
+      <span className={styles.editorAdjustLabel} title={label}>{icon}</span>
       <input type="range" min={min} max={max} step={1}
         value={value} onChange={(e) => onChange(parseFloat(e.target.value))}
         className={styles.editorSlider} />

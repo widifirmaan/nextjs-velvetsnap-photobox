@@ -3,11 +3,13 @@
 
 'use client';
 
+import { ZoomIn, Sun, Contrast, Droplets, Thermometer } from 'lucide-react';
 import type { PhotoAdjust } from '@/lib/types';
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 
 export interface SliderControlProps {
   label: string;
+  icon?: ReactNode;
   value: number;
   min: number;
   max: number;
@@ -52,6 +54,7 @@ export default function SharedEditorControls({
         <h4 className={headingClassName}>Adjustments</h4>
         <SliderControl
           label="Zoom"
+          icon={<ZoomIn size={16} />}
           value={Math.round(currentAdjustment.scale * 100)}
           min={100}
           max={300}
@@ -60,6 +63,7 @@ export default function SharedEditorControls({
         />
         <SliderControl
           label="Brightness"
+          icon={<Sun size={16} />}
           value={currentAdjustment.brightness}
           min={50}
           max={150}
@@ -67,6 +71,7 @@ export default function SharedEditorControls({
         />
         <SliderControl
           label="Contrast"
+          icon={<Contrast size={16} />}
           value={currentAdjustment.contrast}
           min={50}
           max={150}
@@ -74,6 +79,7 @@ export default function SharedEditorControls({
         />
         <SliderControl
           label="Saturation"
+          icon={<Droplets size={16} />}
           value={currentAdjustment.saturation}
           min={0}
           max={200}
@@ -81,6 +87,7 @@ export default function SharedEditorControls({
         />
         <SliderControl
           label="Temperature"
+          icon={<Thermometer size={16} />}
           value={currentAdjustment.temperature}
           min={-100}
           max={100}
