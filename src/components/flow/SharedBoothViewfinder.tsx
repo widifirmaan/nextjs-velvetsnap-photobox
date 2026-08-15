@@ -43,7 +43,6 @@ export default function SharedBoothViewfinder({
 }: SharedBoothViewfinderProps) {
   return (
     <div className={styles.boothViewfinder}>
-      {infoLine ? <div style={infoStyle}>{infoLine}</div> : null}
       {stripLoading && (
         <div className={styles.boothCountdown}>
           <span style={{ fontSize: 18, fontWeight: 500 }}>Menyiapkan kamera...</span>
@@ -52,6 +51,7 @@ export default function SharedBoothViewfinder({
       {cameraType === 'dslr' ? (
         // DSLR mode displays an external camera placeholder and capture countdown state.
         <div className={styles.boothDslrPlaceholder}>
+          {infoLine ? <div style={infoStyle}>{infoLine}</div> : null}
           <CameraIcon size={64} style={{ opacity: 0.5 }} />
           <p>Kamera DSLR terhubung via USB</p>
           {countdown !== null && <div className={styles.boothCountdown}>{countdown}</div>}
@@ -60,6 +60,7 @@ export default function SharedBoothViewfinder({
         </div>
       ) : (
         <div className={styles.boothWebcamWrap}>
+          {infoLine ? <div style={infoStyle}>{infoLine}</div> : null}
           <Webcam audio={false} ref={webcamRef} screenshotFormat="image/jpeg"
             videoConstraints={{ facingMode: 'user', deviceId: deviceId ? { exact: deviceId } : undefined }}
             className={styles.boothWebcam} style={{ transform: mirrored ? 'scaleX(-1)' : 'none' }}
