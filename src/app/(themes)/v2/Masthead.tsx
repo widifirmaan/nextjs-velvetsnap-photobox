@@ -22,7 +22,7 @@ export default function Masthead({ top, title, tagline, bottom, onBack, timer }:
             position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
             background: 'var(--np-card)', textTransform: 'uppercase', letterSpacing: '0.06em',
           }}>
-            <ArrowLeft size={22} /> BACK
+            <ArrowLeft size={22} /> <span className={styles.mastheadBackLabel}>BACK</span>
           </button>
         )}
         {timer && (

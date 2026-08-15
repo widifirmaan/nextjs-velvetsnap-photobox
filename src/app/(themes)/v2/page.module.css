@@ -1838,6 +1838,10 @@
 }
 
 @media (max-width: 480px) {
+  .mastheadBackLabel {
+    display: none;
+  }
+
   .heroSection {
     padding: 32px 12px 24px;
   }
