@@ -1911,14 +1911,29 @@
     width: 100%;
   }
 
-  .boothBtnSecondary,
-  .boothBtnPrimary {
+  .boothBtnRow > .boothBtnSecondary,
+  .boothBtnRow > .boothBtnPrimary {
     width: 100%;
     justify-content: center;
   }
 
   .boothModeToggle {
     width: 100%;
+  }
+
+  .boothCamSwitcherGroup {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .boothCamSwitcherGroup .boothBtnSecondary {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    padding: 0;
+    justify-content: center;
   }
 }
 
