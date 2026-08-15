@@ -411,6 +411,7 @@
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
+  padding: 0 24px;
 }
 
 .stepperContent {
@@ -433,7 +434,7 @@
   min-height: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  padding: 12px 24px;
+  padding: 12px 0;
   scrollbar-width: thin;
   scrollbar-color: var(--np-border) transparent;
 }
@@ -1782,7 +1783,7 @@
   .templateGrid {
     grid-auto-columns: 170px;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 10px 0;
   }
 }
 
@@ -1832,7 +1833,7 @@
   .templateGrid {
     grid-auto-columns: 150px;
     gap: 8px;
-    padding: 8px 10px;
+    padding: 8px 0;
   }
 }
 
