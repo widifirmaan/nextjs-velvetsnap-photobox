@@ -14,6 +14,7 @@ interface SharedStepperFlowProps {
   onRefresh?: () => void;
   wrapperClassName?: string;
   contentClassName?: string;
+  hideTimerBadge?: boolean;
   renderTemplateStep: (flow: PhotoboothFlowResult) => ReactNode;
   renderBoothStep: (flow: PhotoboothFlowResult) => ReactNode;
   renderEditorStep: (flow: PhotoboothFlowResult) => ReactNode;
@@ -28,6 +29,7 @@ export default function SharedStepperFlow({
   onRefresh,
   wrapperClassName,
   contentClassName,
+  hideTimerBadge = false,
   renderTemplateStep,
   renderBoothStep,
   renderEditorStep,
@@ -36,7 +38,7 @@ export default function SharedStepperFlow({
 }: SharedStepperFlowProps) {
   const flow = usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer });
 
-  const timerBadge = (step >= 1 && step <= 5 && sessionTimer > 0 && flow.timeLeft > 0) ? (
+  const timerBadge = (!hideTimerBadge && step >= 1 && step <= 5 && sessionTimer > 0 && flow.timeLeft > 0) ? (
     <div
       role="timer"
       aria-label={`Session time remaining: ${flow.formatTime(flow.timeLeft)}`}

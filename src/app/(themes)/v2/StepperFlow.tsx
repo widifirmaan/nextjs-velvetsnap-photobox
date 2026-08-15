@@ -21,12 +21,15 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
     : step === 4 ? (() => setStep(3))
     : undefined;
 
-  const wrapScene = (inner: React.ReactNode) => (
+  const wrapScene = (inner: React.ReactNode, timer?: string) => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-      <StepperBar current={step - 1} total={5} onBack={stepBack} />
+      <StepperBar current={step - 1} total={5} onBack={stepBack} timer={timer} />
       {inner}
     </div>
   );
+
+  const sceneTimer = (flow: { timeLeft: number; formatTime: (s: number) => string }) =>
+    sessionTimer > 0 && flow.timeLeft > 0 ? flow.formatTime(flow.timeLeft) : undefined;
 
   return (
     <SharedStepperFlow
@@ -34,10 +37,12 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
       setStep={setStep}
       onRefresh={onRefresh}
       sessionTimer={sessionTimer}
+      hideTimerBadge
       wrapperClassName={styles.stepPage}
       contentClassName={styles.stepperContent}
       renderTemplateStep={(flow) => wrapScene(
-        <TemplateStep templates={flow.cachedTemplates || []} loading={flow.templatesLoading} onSelect={flow.handleSelectTemplate} />
+        <TemplateStep templates={flow.cachedTemplates || []} loading={flow.templatesLoading} onSelect={flow.handleSelectTemplate} />,
+        sceneTimer(flow)
       )}
       renderBoothStep={(flow) => wrapScene(
         <BoothStep
@@ -53,7 +58,8 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
           stripLoading={flow.stripLoading}
           onNext={() => setStep(3)}
           onBack={() => { setStep(1); flow.setCaptures([]); }}
-        />
+        />,
+        sceneTimer(flow)
       )}
       renderEditorStep={(flow) => wrapScene(
         <EditorStep
@@ -68,7 +74,8 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
           selectedFilter="none"
           onNext={() => setStep(4)}
           onBack={() => setStep(2)}
-        />
+        />,
+        sceneTimer(flow)
       )}
       renderPaymentStep={(flow) => wrapScene(
         <PaymentStep
@@ -82,14 +89,16 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
           compositedImage={flow.compositedImage}
           onSuccess={flow.handlePaymentSuccess}
           onBack={() => setStep(3)}
-        />
+        />,
+        sceneTimer(flow)
       )}
       renderResultStep={(flow) => wrapScene(
         <ResultStep
           compositedImage={flow.compositedImage}
           onHome={flow.startOver}
           txId={flow.txId}
-        />
+        />,
+        sceneTimer(flow)
       )}
     />
   );
