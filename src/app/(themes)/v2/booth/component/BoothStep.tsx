@@ -72,36 +72,32 @@ export default function BoothStep({
   }, [runBatchCountdown, capture]);
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
-      <div style={{ flex: 1, width: '100%', minHeight: 0, position: 'relative', display: 'flex', justifyContent: 'center' }}>
-        <div className={styles.boothContent}>
-          <Viewfinder
-            cameraType={cameraType}
-            countdown={countdown}
-            flash={flash}
-            dslrCapturing={dslrCapturing}
-            webcamRef={webcamRef}
-            mirrored={mirrored}
-            deviceId={deviceId}
-            stripLoading={stripLoading}
-            styles={styles}
-            infoLine={`${templateName} • ${filledCount}/${slotsCount} shots`}
-          />
-          <SharedBoothPreview
-            templateData={templateData}
-            captures={captures}
-            keyedFrameImage={keyedFrameImage}
-            frameRatio={frameRatio}
-            filledCount={filledCount}
-            slotsCount={slotsCount}
-            stripLoading={stripLoading}
-            onAddCapture={onAddCapture}
-            onDeleteCapture={onDeleteCapture}
-            onNext={onNext}
-            styles={styles}
-          />
-        </div>
-      </div>
+    <div className={styles.boothStage}>
+      <Viewfinder
+        cameraType={cameraType}
+        countdown={countdown}
+        flash={flash}
+        dslrCapturing={dslrCapturing}
+        webcamRef={webcamRef}
+        mirrored={mirrored}
+        deviceId={deviceId}
+        stripLoading={stripLoading}
+        styles={styles}
+        infoLine={`${templateName} • ${filledCount}/${slotsCount} shots`}
+      />
+      <SharedBoothPreview
+        templateData={templateData}
+        captures={captures}
+        keyedFrameImage={keyedFrameImage}
+        frameRatio={frameRatio}
+        filledCount={filledCount}
+        slotsCount={slotsCount}
+        stripLoading={stripLoading}
+        onAddCapture={onAddCapture}
+        onDeleteCapture={onDeleteCapture}
+        onNext={onNext}
+        styles={styles}
+      />
       <SharedBoothControls
         taking={taking}
         dslrCapturing={dslrCapturing}

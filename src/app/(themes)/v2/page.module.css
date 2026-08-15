@@ -700,6 +700,22 @@
   min-height: 0;
 }
 
+.boothStage {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "viewfinder preview"
+    "controls controls";
+  column-gap: 16px;
+  row-gap: 12px;
+  padding: 12px 24px 12px;
+  align-items: stretch;
+}
+
 .boothBtnRow {
   display: flex;
   align-items: center;
@@ -793,7 +809,8 @@
 }
 
 .boothControls {
-  margin: 12px 0;
+  grid-area: controls;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -820,7 +837,7 @@
 }
 
 .boothViewfinder {
-  flex: 1;
+  grid-area: viewfinder;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -930,6 +947,7 @@
 
 /* ── Booth Preview ── */
 .boothPreview {
+  grid-area: preview;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1855,10 +1873,30 @@
     max-width: 400px;
   }
 
+  .boothStage {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "viewfinder viewfinder"
+      "controls preview";
+    column-gap: 16px;
+    row-gap: 12px;
+    padding: 12px 16px 12px;
+  }
+
   .boothPreview {
-    width: 15%;
+    width: 120px;
     min-width: 0;
     max-width: none;
+  }
+
+  .boothControls {
+    justify-content: center;
+  }
+
+  .boothBtnRow {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 }
 
