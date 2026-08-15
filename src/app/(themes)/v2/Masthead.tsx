@@ -26,13 +26,7 @@ export default function Masthead({ top, title, tagline, bottom, onBack, timer }:
           </button>
         )}
         {timer && (
-          <div className={styles.mastheadBackBtn} style={{
-            border: '3px solid var(--np-border)', padding: '6px 12px',
-            display: 'flex', alignItems: 'center', gap: 6, color: 'var(--np-text)',
-            fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 13, lineHeight: 1,
-            position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
-            background: 'var(--np-card)', letterSpacing: '0.04em',
-          }}>
+          <div className={styles.mastheadTimer}>
             <Timer size={16} /> {timer}
           </div>
         )}

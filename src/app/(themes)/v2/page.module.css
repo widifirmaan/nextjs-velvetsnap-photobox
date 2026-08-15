@@ -95,6 +95,37 @@
   box-shadow: var(--np-shadow-sm);
 }
 
+.mastheadTimer {
+  border: 3px solid var(--np-border);
+  padding: 0 12px;
+  height: 40px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--np-text);
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--np-card);
+  letter-spacing: 0.04em;
+}
+
+.mastheadTimer:hover {
+  transform: translateY(-50%) translateX(-2px);
+  box-shadow: 5px 5px 0px var(--np-border);
+}
+
+.mastheadTimer:active {
+  transform: translateY(-50%) translateX(2px);
+  box-shadow: 1px 1px 0px var(--np-border);
+}
+
 .mastheadBackBtn:hover {
   transform: translateY(-50%) translateX(-2px);
   box-shadow: 5px 5px 0px var(--np-border);
@@ -1840,6 +1871,13 @@
 @media (max-width: 480px) {
   .mastheadBackLabel {
     display: none;
+  }
+
+  .mastheadTimer {
+    height: 20px;
+    padding: 0 8px;
+    font-size: 10px;
+    gap: 4px;
   }
 
   .heroSection {
