@@ -114,6 +114,8 @@
   transform: translateY(-50%);
   background: var(--np-card);
   letter-spacing: 0.04em;
+  transition: all 0.1s;
+  box-shadow: var(--np-shadow-sm);
 }
 
 .mastheadTimer:hover {
