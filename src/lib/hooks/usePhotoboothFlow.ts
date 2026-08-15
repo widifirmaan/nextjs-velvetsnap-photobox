@@ -69,6 +69,31 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   const chromaKeyId = useRef(0);
   const templateIdRef = useRef<string | null>(null);
 
+  // Restore the last selected template on reload when the user deep-links to a later step.
+  useEffect(() => {
+    if (step < 2) return;
+    if (templateId || templateData) return;
+    let restored: { id: string; data?: TemplateData } | null = null;
+    try {
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.SELECTED_TEMPLATE) : null;
+      if (raw) restored = JSON.parse(raw);
+    } catch (e) { console.error('usePhotoboothFlow: failed to restore selected template', e); }
+    if (restored?.id) {
+      templateIdRef.current = restored.id;
+      setTemplateId(restored.id);
+      if (restored.data) {
+        setTemplateData(restored.data);
+        setPrice(restored.data.templatePrice ?? 35000);
+        const canvasWidth = restored.data.templateData?.canvasWidth || 1000;
+        const canvasHeight = restored.data.templateData?.canvasHeight || 3000;
+        setFrameRatio(canvasWidth / canvasHeight);
+        if (restored.data.templateFull) setKeyedFrameImage(restored.data.templateFull);
+      }
+      return;
+    }
+    setStep(1);
+  }, [step, templateId, templateData, setStep]);
+
   // Convert a time value in seconds to a human-readable mm:ss format.
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -193,6 +218,11 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
         setPrice(found.templatePrice ?? 35000);
       }
     }
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(STORAGE_KEYS.SELECTED_TEMPLATE, JSON.stringify({ id, data }));
+      }
+    } catch (e) { console.error('usePhotoboothFlow: failed to persist selected template', e); }
   }, [setStep, cachedTemplates]);
 
   // Background chroma-key render when template changes

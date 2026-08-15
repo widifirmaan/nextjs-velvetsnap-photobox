@@ -72,5 +72,6 @@ export const STORAGE_KEYS = {
   IMGLY_MODEL_RETRY: 'imgly_model_retry',
   PHOTOBOOTH_SESSION: 'photobooth_session',
   PHOTOBOOTH_TX_ID: 'photobooth_txId',
+  SELECTED_TEMPLATE: 'velvetsnap_selected_template',
 } as const;
 
