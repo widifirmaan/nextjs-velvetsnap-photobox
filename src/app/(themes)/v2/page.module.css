@@ -1889,6 +1889,11 @@
     padding: 12px 16px 12px;
   }
 
+  .boothWebcamWrap {
+    aspect-ratio: auto;
+    height: 100%;
+  }
+
   .boothPreview {
     width: 120px;
     min-width: 0;
