@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '../utils/canvas-utils';
 import { getHighResUrl, getFullQualityUrl } from '../utils/cloudinary-url';
+import { compressImage } from '../utils/image-utils';
 import { STORAGE_KEYS, FRAME_RENDER_MAX_W } from '../utils/constants';
 import { TEMPLATE_CONFIGS, DEFAULT_ADJUST, type IStripElement, type TemplateData, type PhotoAdjust } from '@/lib/types';
 
@@ -334,14 +335,22 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
     setCaptures((prev) => { const n = [...prev]; n[idx] = ''; return n; });
   }, []);
 
-  // Persist captured photos so step 3 can survive a page reload.
+  // Persist captured photos (compressed) so the editor survives a page reload.
   useEffect(() => {
-    if (step < 3) return;
+    if (step < 2) return;
     if (!captures.some((c) => c !== '')) return;
-    try {
-      const raw = JSON.stringify(captures);
-      if (raw.length < 4_000_000) localStorage.setItem(STORAGE_KEYS.CAPTURES, raw);
-    } catch (e) { console.error('usePhotoboothFlow: failed to persist captures', e); }
+    let cancelled = false;
+    (async () => {
+      const compressed = await Promise.all(
+        captures.map((c) => (c ? compressImage(c, 720, 0.75) : Promise.resolve('')))
+      );
+      if (cancelled) return;
+      try {
+        const raw = JSON.stringify(compressed);
+        if (raw.length < 4_000_000) localStorage.setItem(STORAGE_KEYS.CAPTURES, raw);
+      } catch (e) { console.error('usePhotoboothFlow: failed to persist captures', e); }
+    })();
+    return () => { cancelled = true; };
   }, [captures, step]);
 
   useEffect(() => {
