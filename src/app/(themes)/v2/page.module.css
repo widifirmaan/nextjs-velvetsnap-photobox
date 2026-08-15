@@ -724,7 +724,9 @@
 }
 
 .boothBtnSecondary {
-  padding: 10px 16px;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 16px;
   border: 3px solid var(--np-border);
   box-shadow: var(--np-shadow-sm);
   background: var(--np-card);
@@ -754,8 +756,9 @@
   box-shadow: var(--np-shadow-sm);
   overflow: hidden;
   width: 72px;
-  height: 32px;
+  height: 42px;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .boothModeBtn {
@@ -1159,7 +1162,9 @@
 }
 
 .boothBtnPrimary {
-  padding: 12px 20px;
+  height: 42px;
+  box-sizing: border-box;
+  padding: 0 20px;
   border: 3px solid var(--np-border);
   box-shadow: var(--np-shadow-sm);
   background: var(--np-accent);
@@ -1895,8 +1900,20 @@
   }
 
   .boothBtnRow {
-    flex-wrap: wrap;
-    justify-content: flex-start;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .boothBtnSecondary,
+  .boothBtnPrimary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .boothModeToggle {
+    width: 100%;
   }
 }
 

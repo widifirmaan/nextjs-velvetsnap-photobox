@@ -122,6 +122,7 @@ export default function BoothStep({
         setMirrored={setMirrored}
         camMenuRef={camMenuRef}
         styles={styles}
+        hideBack
       />
     </div>
   );

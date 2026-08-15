@@ -29,6 +29,7 @@ interface SharedBoothControlsProps {
   setMirrored: React.Dispatch<React.SetStateAction<boolean>>;
   camMenuRef: React.RefObject<HTMLDivElement | null>;
   styles: Record<string, string>;
+  hideBack?: boolean;
 }
 
 // Booth controls show capture actions, mode toggles, and camera selection.
@@ -56,14 +57,17 @@ export default function SharedBoothControls({
   setMirrored,
   camMenuRef,
   styles,
+  hideBack = false,
 }: SharedBoothControlsProps) {
   return (
     <div className={styles.boothControls}>
       {!taking && !dslrCapturing && !busy && (
         <div className={styles.boothBtnRow}>
-          <button className={styles.boothBtnSecondary} onClick={onBack} disabled={stripLoading}>
-            <ArrowLeft size={16} /> Back
-          </button>
+          {!hideBack && (
+            <button className={styles.boothBtnSecondary} onClick={onBack} disabled={stripLoading}>
+              <ArrowLeft size={16} /> Back
+            </button>
+          )}
           {captureMode === 'manual' ? (
             <button
               className={styles.boothBtnPrimary}
