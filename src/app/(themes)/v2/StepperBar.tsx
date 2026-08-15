@@ -27,7 +27,7 @@ export default function StepperBar({ current, total, onBack, timer }: {
       </>}
       title={<><span className={styles.mastheadAccent}>{roman[current]}</span> {labels[current]}</>}
       tagline={taglines[current]}
-      bottom={<div style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+      bottom={<div className={styles.stepProgress} style={{ display: 'flex', gap: 16, justifyContent: 'center', alignItems: 'center', width: '100%' }}>
         {labels.slice(0, total).map((l, i) => (
           <span key={i} style={{
             color: i === current ? 'var(--np-accent)' : i < current ? 'var(--np-text)' : 'var(--np-text-muted)',

@@ -1875,6 +1875,12 @@
     display: none;
   }
 
+  .stepProgress {
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.02em;
+  }
+
   .mastheadTimer {
     height: 20px;
     padding: 0 8px;
