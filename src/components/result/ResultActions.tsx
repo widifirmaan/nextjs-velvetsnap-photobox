@@ -13,6 +13,8 @@ interface ResultActionsProps {
   onHome: () => void;
   txId?: string | null;
   wrapperClassName?: string;
+  buttonsGroupClassName?: string;
+  qrGroupClassName?: string;
   primaryButtonClassName?: string;
   secondaryButtonClassName?: string;
   homeButtonClassName?: string;
@@ -31,6 +33,8 @@ export default function ResultActions({
   onHome,
   txId,
   wrapperClassName,
+  buttonsGroupClassName,
+  qrGroupClassName,
   primaryButtonClassName,
   secondaryButtonClassName,
   homeButtonClassName,
@@ -82,8 +86,8 @@ export default function ResultActions({
     img.src = compositedImage;
   };
 
-  return (
-    <div className={wrapperClassName} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+  const buttons = (
+    <>
       <button className={primaryButtonClassName} style={buttonStyle} onClick={handleDownload}>
         <Download size={18} /> Download JPEG
       </button>
@@ -93,17 +97,33 @@ export default function ResultActions({
       <button className={homeButtonClassName} style={buttonStyle} onClick={onHome}>
         <HomeIcon size={18} /> Home
       </button>
+    </>
+  );
 
-      {downloadUrl && (
-        <div className={qrSectionClassName}>
-          <div className={qrDividerClassName} />
-          <p className={qrLabelClassName}>
-            <Smartphone size={14} /> Scan to download
-          </p>
-          <canvas ref={qrRef} className={qrCanvasClassName} />
-          <p className={qrUrlClassName}>{downloadUrl}</p>
-        </div>
-      )}
+  const qr = downloadUrl ? (
+    <div className={qrSectionClassName}>
+      <div className={qrDividerClassName} />
+      <p className={qrLabelClassName}>
+        <Smartphone size={14} /> Scan to download
+      </p>
+      <canvas ref={qrRef} className={qrCanvasClassName} />
+      <p className={qrUrlClassName}>{downloadUrl}</p>
+    </div>
+  ) : null;
+
+  if (buttonsGroupClassName) {
+    return (
+      <>
+        <div className={buttonsGroupClassName}>{buttons}</div>
+        {qr && <div className={qrGroupClassName}>{qr}</div>}
+      </>
+    );
+  }
+
+  return (
+    <div className={wrapperClassName} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      {buttons}
+      {qr}
     </div>
   );
 }

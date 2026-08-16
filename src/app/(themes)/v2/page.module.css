@@ -1537,6 +1537,17 @@
   min-width: 0;
 }
 
+.resultButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.resultQr {
+  display: flex;
+  justify-content: center;
+}
+
 .qrSection {
   display: flex;
   flex-direction: column;
@@ -1868,13 +1879,35 @@
   }
 
   .resultLayout {
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "preview actions"
+      "qr qr";
+    gap: 16px 16px;
+    align-items: start;
+  }
+
+  .resultPreview {
+    grid-area: preview;
   }
 
   .resultSidebar {
+    display: contents;
+  }
+
+  .resultButtons {
+    grid-area: actions;
+  }
+
+  .resultQr {
+    grid-area: qr;
     width: 100%;
-    max-width: 400px;
+  }
+
+  .resultHeading {
+    display: none;
   }
 
   .boothStage {

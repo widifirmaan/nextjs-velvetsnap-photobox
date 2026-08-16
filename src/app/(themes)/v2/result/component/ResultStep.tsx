@@ -22,13 +22,15 @@ export default function ResultStep({ compositedImage, onHome, txId }: {
           </div>
         </div>
         <div className={styles.resultSidebar}>
-          <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, textAlign: 'center', flexShrink: 0 }}>Your Photos are Ready!</h2>
+          <h2 className={styles.resultHeading} style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, textAlign: 'center', flexShrink: 0 }}>Your Photos are Ready!</h2>
           <ResultActions
             compositedImage={compositedImage}
             onHome={onHome}
             txId={txId}
             downloadPath="/v2/download"
             qrSize={280}
+            buttonsGroupClassName={styles.resultButtons}
+            qrGroupClassName={styles.resultQr}
             qrSectionClassName={styles.qrSection}
             qrDividerClassName={styles.qrDivider}
             qrLabelClassName={styles.qrLabel}
