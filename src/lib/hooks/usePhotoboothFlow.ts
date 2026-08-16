@@ -96,6 +96,10 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
         if (rawCaptures) restoredCaptures = JSON.parse(rawCaptures);
       } catch (e) { console.error('usePhotoboothFlow: failed to restore captures', e); }
       if (Array.isArray(restoredCaptures) && restoredCaptures.length) setCaptures(restoredCaptures);
+      try {
+        const rawTx = typeof window !== 'undefined' ? sessionStorage.getItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID) : null;
+        if (rawTx) setTxId(rawTx);
+      } catch (e) { console.error('usePhotoboothFlow: failed to restore tx id', e); }
       return;
     }
     try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.CAPTURES); } catch (e) { console.error('usePhotoboothFlow: failed to clear captures', e); }
@@ -114,6 +118,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
     try { if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
     try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.SELECTED_TEMPLATE); } catch {}
     try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.CAPTURES); } catch {}
+    try { if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID); } catch {}
     chromaKeyId.current++;
     compositingId.current++;
     onRefresh?.();
