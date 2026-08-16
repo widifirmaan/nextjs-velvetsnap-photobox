@@ -3,7 +3,7 @@
 
 'use client';
 import { Suspense } from 'react';
-import { Download, MapPin, Smartphone } from 'lucide-react';
+import { Download, Home, MapPin, Smartphone } from 'lucide-react';
 import { useDownloadData } from '@/lib/hooks/useDownloadData';
 import DownloadQr from '@/app/download/DownloadQr';
 import styles from '../page.module.css';
@@ -17,6 +17,10 @@ function V1DownloadContent() {
 
   const nav = (
     <nav className={styles.nav}>
+      <a href="/v1" className={styles.navLink}>
+        <Home size={16} /> Home
+      </a>
+      <span className={styles.navSep} />
       {(navItems || []).map((item, i) => (
         <span key={item.url}>
           {i > 0 && <span className={styles.navSep} />}

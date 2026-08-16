@@ -32,6 +32,8 @@ function V2DownloadContent() {
     return (
       <div className={styles.stepPage}>
         <Masthead
+          onBack={() => { window.location.href = '/v2'; }}
+          backLabel="HOME"
           top={<>
             <span>{host.toUpperCase()}</span>
             <span>&nbsp;</span>
@@ -59,6 +61,8 @@ function V2DownloadContent() {
   return (
     <div className={styles.stepPage}>
       <Masthead
+        onBack={() => { window.location.href = '/v2'; }}
+        backLabel="HOME"
         top={<>
           <span>{host.toUpperCase()}</span>
           <span>{tx.captures?.length || 0} PHOTOS</span>
