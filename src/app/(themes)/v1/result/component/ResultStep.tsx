@@ -21,22 +21,24 @@ export default function ResultStep({
         <div className={styles.resultImage}>
           {compositedImage ? <img src={compositedImage} alt="Final strip" /> : <Loader2 className="spin" size={40} />}
         </div>
-        <ResultActions
-          compositedImage={compositedImage}
-          onHome={onHome}
-          txId={txId}
-          buttonsGroupClassName={styles.resultActions}
-          qrGroupClassName={styles.resultQr}
-          primaryButtonClassName={styles.boothBtnPrimary}
-          secondaryButtonClassName={styles.boothBtnSecondary}
-          homeButtonClassName={`${styles.boothBtnSecondary} ${styles.resultHomeBtn}`}
-          downloadPath="/v1/download"
-          qrSectionClassName={styles.qrSection}
-          qrDividerClassName={styles.qrDivider}
-          qrLabelClassName={styles.qrLabel}
-          qrCanvasClassName={styles.qrCanvas}
-          qrUrlClassName={styles.qrUrl}
-        />
+        <div className={styles.resultCol}>
+          <ResultActions
+            compositedImage={compositedImage}
+            onHome={onHome}
+            txId={txId}
+            buttonsGroupClassName={styles.resultActions}
+            qrGroupClassName={styles.resultQr}
+            primaryButtonClassName={styles.boothBtnPrimary}
+            secondaryButtonClassName={styles.boothBtnSecondary}
+            homeButtonClassName={`${styles.boothBtnSecondary} ${styles.resultHomeBtn}`}
+            downloadPath="/v1/download"
+            qrSectionClassName={styles.qrSection}
+            qrDividerClassName={styles.qrDivider}
+            qrLabelClassName={styles.qrLabel}
+            qrCanvasClassName={styles.qrCanvas}
+            qrUrlClassName={styles.qrUrl}
+          />
+        </div>
       </div>
     </div>
   );
