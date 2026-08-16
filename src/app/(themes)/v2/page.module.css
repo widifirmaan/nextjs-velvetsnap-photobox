@@ -1574,7 +1574,7 @@
 
 .qrCanvas {
   width: 100%;
-  max-width: 280px;
+  max-width: 140px;
   height: auto;
   border: 2px solid var(--np-border);
 }
