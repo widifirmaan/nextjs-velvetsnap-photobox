@@ -21,9 +21,9 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
     : step === 4 ? (() => setStep(3))
     : undefined;
 
-  const wrapScene = (inner: React.ReactNode, timer?: string) => (
+  const wrapScene = (inner: React.ReactNode, timer?: string, onBack?: () => void, backLabel?: string) => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-      <StepperBar current={step - 1} total={5} onBack={stepBack} timer={timer} />
+      <StepperBar current={step - 1} total={5} onBack={onBack || stepBack} backLabel={backLabel} timer={timer} />
       {inner}
     </div>
   );
@@ -98,7 +98,9 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
           onHome={flow.startOver}
           txId={flow.txId}
         />,
-        sceneTimer(flow)
+        sceneTimer(flow),
+        flow.startOver,
+        'HOME'
       )}
     />
   );

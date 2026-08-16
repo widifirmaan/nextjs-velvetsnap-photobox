@@ -5,9 +5,9 @@
 import { ArrowLeft, Timer } from 'lucide-react';
 import styles from './page.module.css';
 
-export default function Masthead({ top, title, tagline, bottom, onBack, timer }: {
+export default function Masthead({ top, title, tagline, bottom, onBack, backLabel, timer }: {
   top?: React.ReactNode; title: React.ReactNode;
-  tagline?: string; bottom?: React.ReactNode; onBack?: () => void; timer?: string;
+  tagline?: string; bottom?: React.ReactNode; onBack?: () => void; backLabel?: string; timer?: string;
 }) {
   return (
     <div className={styles.newspaperHeader}>
@@ -22,7 +22,7 @@ export default function Masthead({ top, title, tagline, bottom, onBack, timer }:
             position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
             background: 'var(--np-card)', textTransform: 'uppercase', letterSpacing: '0.06em',
           }}>
-            <ArrowLeft size={22} /> <span className={styles.mastheadBackLabel}>BACK</span>
+            <ArrowLeft size={22} /> <span className={styles.mastheadBackLabel}>{backLabel || 'BACK'}</span>
           </button>
         )}
         {timer && (
