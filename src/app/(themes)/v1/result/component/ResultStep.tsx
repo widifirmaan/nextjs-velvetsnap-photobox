@@ -25,7 +25,8 @@ export default function ResultStep({
           compositedImage={compositedImage}
           onHome={onHome}
           txId={txId}
-          wrapperClassName={styles.resultActions}
+          buttonsGroupClassName={styles.resultActions}
+          qrGroupClassName={styles.resultQr}
           primaryButtonClassName={styles.boothBtnPrimary}
           secondaryButtonClassName={styles.boothBtnSecondary}
           homeButtonClassName={`${styles.boothBtnSecondary} ${styles.resultHomeBtn}`}
