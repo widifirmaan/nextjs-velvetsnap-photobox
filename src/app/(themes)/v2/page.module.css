@@ -1311,7 +1311,7 @@
 .editorAdjustSection {
   background: var(--np-card);
   border: 3px solid var(--np-border);
-  padding: 24px;
+  padding: 10px;
   box-shadow: var(--np-shadow-sm);
   margin-bottom: 16px;
 }
