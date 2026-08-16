@@ -1905,6 +1905,11 @@
     width: 100%;
   }
 
+  .resultQr .qrCanvas {
+    width: 140px !important;
+    height: 140px !important;
+  }
+
   .resultHeading {
     display: none;
   }
