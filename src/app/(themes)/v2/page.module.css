@@ -1255,7 +1255,7 @@
 .editorPreview {
   flex: 1 1 50%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   min-width: 0;
   overflow: hidden;
@@ -1293,7 +1293,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .editorSidebar h4 {
