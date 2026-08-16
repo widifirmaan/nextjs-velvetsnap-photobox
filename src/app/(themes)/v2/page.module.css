@@ -1885,7 +1885,7 @@
       "controls preview";
     column-gap: 16px;
     row-gap: 12px;
-    padding: 12px 16px 12px;
+    padding: 12px 24px 12px;
   }
 
   .boothWebcamWrap {
@@ -2002,7 +2002,7 @@
   }
 
   .editorLayout {
-    padding: 12px;
+    padding: 12px 24px;
   }
 
   .resultLayout {
