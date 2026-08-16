@@ -28,7 +28,7 @@ export default function ResultStep({ compositedImage, onHome, txId }: {
             onHome={onHome}
             txId={txId}
             downloadPath="/v2/download"
-            qrSize={280}
+            qrSize={140}
             buttonsGroupClassName={styles.resultButtons}
             qrGroupClassName={styles.resultQr}
             qrSectionClassName={styles.qrSection}
