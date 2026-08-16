@@ -1896,7 +1896,7 @@
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas:
       "preview actions"
-      "qr qr";
+      "preview qr";
     gap: 12px 16px;
     align-items: start;
   }

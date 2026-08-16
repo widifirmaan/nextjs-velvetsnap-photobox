@@ -1881,16 +1881,17 @@
   .resultLayout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    grid-template-rows: auto auto;
+    grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas:
       "preview actions"
-      "qr qr";
-    gap: 16px 16px;
+      "preview qr";
+    gap: 12px 16px;
     align-items: start;
   }
 
   .resultPreview {
     grid-area: preview;
+    min-height: 0;
   }
 
   .resultSidebar {
