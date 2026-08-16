@@ -1573,10 +1573,11 @@
 }
 
 .qrCanvas {
-  width: 100%;
-  max-width: 140px;
-  height: auto;
+  width: 140px;
+  height: 140px;
+  max-width: 100%;
   border: 2px solid var(--np-border);
+  flex-shrink: 0;
 }
 
 .qrUrl {
