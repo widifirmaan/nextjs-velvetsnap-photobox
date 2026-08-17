@@ -355,6 +355,8 @@
   }
   .main {
     max-width: none;
+    padding-left: 5%;
+    padding-right: 5%;
   }
 }
 
