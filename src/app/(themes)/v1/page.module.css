@@ -968,6 +968,7 @@
 .stepPageTemplates {
   align-items: center;
   min-height: 0;
+  padding-top: 0;
 }
 
 .stepPageTemplates .stepHeading {
@@ -1954,6 +1955,9 @@
   }
   .stepPage > .boothStepper {
     margin-top: 24px;
+  }
+  .stepPageTemplates {
+    padding-top: 0;
   }
   .boothStepLine {
     width: 16px;
