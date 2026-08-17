@@ -1851,6 +1851,10 @@
   justify-content: flex-start;
 }
 
+.downloadSidebar .qrSection {
+  justify-content: flex-start;
+}
+
 /* ── Step Responsive ── */
 
 @media (max-width: 768px) {
