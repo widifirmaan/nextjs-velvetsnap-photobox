@@ -12,14 +12,17 @@ interface TemplateStepProps {
   onBack: () => void;
 }
 
-export default function TemplateStep({ templates, loading, onSelect }: TemplateStepProps) {
+export default function TemplateStep({ templates, loading, onSelect, onBack }: TemplateStepProps) {
   return (
     <SharedTemplateStep
       templates={templates}
       loading={loading}
       onSelect={onSelect}
+      onBack={onBack}
       title="Pilih Frame"
       wrapperClassName={`${styles.stepPage} ${styles.stepPageTemplates}`}
+      headerClassName={styles.stepHeader}
+      backButtonClassName={styles.backBtn}
       headingClassName={styles.stepHeading}
       listClassName={styles.templateGrid}
       cardComponent={TemplateCard}

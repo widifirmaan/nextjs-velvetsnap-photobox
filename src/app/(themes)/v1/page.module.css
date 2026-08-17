@@ -192,23 +192,32 @@
   user-select: none;
 }
 
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
+.tooltip {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  opacity: 0;
+  translate: 0 6px;
+  transition: all 200ms ease;
+  pointer-events: none;
+  z-index: 20;
 }
 
-.brandLogo {
-  flex-shrink: 0;
+.tooltipVisible {
+  opacity: 1;
+  translate: 0 0;
 }
 
-.brandName {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: var(--mn-text);
+.tooltipContent {
+  padding: 12px 16px;
+  background: var(--mn-card);
+  border: 1px solid var(--mn-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+  font-size: 13px;
+  color: var(--mn-text-secondary);
   white-space: nowrap;
+  max-width: 280px;
 }
 
 .nav {
@@ -830,10 +839,20 @@
 }
 
 .stepHeader {
-  display: flex;
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.stepHeader > .backBtn {
+  grid-column: 1;
+}
+
+.stepHeader > .stepHeading {
+  grid-column: 2;
+  text-align: center;
 }
 
 .stepHeading {

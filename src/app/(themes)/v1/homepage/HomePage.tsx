@@ -28,6 +28,7 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
   onStart: (e: React.MouseEvent) => void; onCarouselReady?: () => void;
 }) {
   const [slideIdx, setSlideIdx] = useState(0);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
   const smallVpRef = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -52,7 +53,7 @@ export default function HomePage({ strips, txCount, tmplCount, branding, onStart
 
   return (
     <div className={styles.page}>
-      <HomeHeader branding={branding} />
+      <HomeHeader tooltipVisible={tooltipVisible} setTooltipVisible={setTooltipVisible} branding={branding} />
 
       <main className={styles.main}>
         <div className={styles.colLeft}>
