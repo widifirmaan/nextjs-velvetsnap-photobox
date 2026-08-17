@@ -745,7 +745,7 @@
   }
   .colRight {
     grid-column: 1;
-    grid-row: 3;
+    grid-row: 2;
     /* 
     min-height: 0;
     overflow: visible;
