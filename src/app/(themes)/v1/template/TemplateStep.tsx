@@ -2,6 +2,7 @@
 
 import SharedTemplateStep from '@/components/flow/SharedTemplateStep';
 import TemplateCard from './TemplateCard';
+import StepperBar from '../StepperBar';
 import styles from '@/app/(themes)/v1/page.module.css';
 import type { TemplateData } from '../types';
 
@@ -14,7 +15,9 @@ interface TemplateStepProps {
 
 export default function TemplateStep({ templates, loading, onSelect, onBack }: TemplateStepProps) {
   return (
-    <SharedTemplateStep
+    <>
+      <StepperBar current={0} total={5} />
+      <SharedTemplateStep
       templates={templates}
       loading={loading}
       onSelect={onSelect}
@@ -26,6 +29,7 @@ export default function TemplateStep({ templates, loading, onSelect, onBack }: T
       headingClassName={styles.stepHeading}
       listClassName={styles.templateGrid}
       cardComponent={TemplateCard}
-    />
+      />
+    </>
   );
 }
