@@ -13,7 +13,7 @@ import { getOptimizedUrl } from '@/lib/utils/cloudinary-url';
 
 export default function HomePage({
   onStart, strips, appName, appTagline, heroSubtitle, heroImage,
-  cardHtml, navItems, location, footerText, loaded,
+  cardHtml, minPrice, navItems, location, footerText, loaded,
 }: {
   onStart: () => void;
   strips: StripResult[];
@@ -22,6 +22,7 @@ export default function HomePage({
   heroSubtitle: string;
   heroImage: string;
   cardHtml: string;
+  minPrice: number;
   navItems: { label: string; url: string }[];
   location: string;
   footerText: string;
@@ -50,7 +51,7 @@ export default function HomePage({
     <div className={styles.homepage}>
       <V2Preloader ready={loaded} appName={appName} tagline={appTagline} />
 
-      <HomeHeader appName={appName} location={location} navItems={navItems} tagline={appTagline} />
+      <HomeHeader appName={appName} location={location} navItems={navItems} tagline={appTagline} minPrice={minPrice} />
 
       <NewspaperSection>
         <div className={styles.leadStoryGrid}>
@@ -60,9 +61,9 @@ export default function HomePage({
             <div className={styles.stepsList}>
               {[
                 { number: 'I', title: 'Pick Frame', desc: 'Choose from our collection of vintage-inspired frames.' },
-                { number: 'II', title: 'Snap & Post', desc: 'Step into the booth and capture your moment.' },
+                { number: 'II', title: 'Pose & Snap', desc: 'Step into the booth and capture your moment.' },
                 { number: 'III', title: 'Adjust', desc: 'Fine-tune brightness, contrast, and positioning.' },
-                { number: 'IV', title: 'Pay', desc: 'Secure checkout via QRIS.' },
+                { number: 'IV', title: 'Pay', desc: 'Secure checkout with multiple payment methods.' },
                 { number: 'V', title: 'Save & Print', desc: 'Download your strip and share with the world.' },
               ].map((s) => (
                 <div key={s.number} className={styles.stepItem}>

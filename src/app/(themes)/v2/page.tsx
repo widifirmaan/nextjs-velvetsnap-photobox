@@ -50,6 +50,7 @@ export default function V2Page() {
           heroSubtitle={appData.heroSubtitle}
           heroImage={appData.heroImage}
           cardHtml={appData.cardHtml}
+          minPrice={appData.minPrice}
           navItems={appData.navItems}
           location={appData.location}
           footerText={appData.footerText}

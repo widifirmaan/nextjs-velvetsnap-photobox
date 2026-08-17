@@ -13,6 +13,7 @@ export interface AppData {
   heroSubtitle: string;
   heroImage: string;
   cardHtml: string;
+  minPrice: number;
   navItems: { label: string; url: string }[];
   location: string;
   footerText: string;
@@ -27,6 +28,7 @@ export function useAppData(): AppData {
   const [heroSubtitle, setHeroSubtitle] = useState('');
   const [heroImage, setHeroImage] = useState('');
   const [cardHtml, setCardHtml] = useState('');
+  const [minPrice, setMinPrice] = useState(0);
   const [navItems, setNavItems] = useState<{ label: string; url: string }[]>([]);
   const [location, setLocation] = useState('');
   const [footerText, setFooterText] = useState('');
@@ -78,12 +80,14 @@ export function useAppData(): AppData {
       if (res.success && res.data?.length) {
         const list = res.data;
         try { sessionStorage.setItem(STORAGE_KEYS.TEMPLATES, JSON.stringify(list)); } catch {}
+        const prices = list.map((t: any) => Number(t.templatePrice) || 0).filter((p: number) => p > 0);
+        if (prices.length) setMinPrice(Math.min(...prices));
       }
     }).catch((e) => { console.error('preload templates failed', e); });
   }, []);
 
   return {
     sessionTimer, appName, appTagline, heroSubtitle, heroImage,
-    cardHtml, navItems, location, footerText, strips, loaded,
+    cardHtml, minPrice, navItems, location, footerText, strips, loaded,
   };
 }

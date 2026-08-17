@@ -16,8 +16,8 @@ function splitTitle(appName: string): [string, string] {
   return [appName.slice(0, mid), appName.slice(mid)];
 }
 
-export default function HomeHeader({ appName, location, navItems, tagline }: {
-  appName?: string; location?: string; navItems?: { label: string; url: string }[]; tagline?: string;
+export default function HomeHeader({ appName, location, navItems, tagline, minPrice }: {
+  appName?: string; location?: string; navItems?: { label: string; url: string }[]; tagline?: string; minPrice?: number;
 }) {
   const [time, setTime] = useState('');
   const [today, setToday] = useState('');
@@ -25,13 +25,13 @@ export default function HomeHeader({ appName, location, navItems, tagline }: {
 
   useEffect(() => {
     const now = new Date();
-    setTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    setTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, hourCycle: 'h23' }));
     setToday(now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }));
     setMounted(true);
 
     const id = setInterval(() => {
       const n = new Date();
-      setTime(n.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+      setTime(n.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, hourCycle: 'h23' }));
     }, 1000);
     return () => clearInterval(id);
   }, []);
@@ -48,7 +48,7 @@ export default function HomeHeader({ appName, location, navItems, tagline }: {
       title={<><span className={styles.mastheadAccent}>{accent}</span>{rest}</>}
       tagline={tagline || 'The photobooth that freezes time'}
       bottom={<>
-        <span>Price Rp 35.000</span>
+        <span>Start Rp {(minPrice || 0).toLocaleString('id-ID')}</span>
         <span>Est. 2024</span>
         <span className={styles.navItems}>
           {(navItems || []).map((item, i) => (
