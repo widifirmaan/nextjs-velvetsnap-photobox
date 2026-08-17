@@ -16,7 +16,7 @@ interface TemplateStepProps {
 export default function TemplateStep({ templates, loading, onSelect, onBack }: TemplateStepProps) {
   return (
     <>
-      <StepperBar current={0} total={5} />
+      <div className={styles.templateStepper}><StepperBar current={0} total={5} /></div>
       <SharedTemplateStep
       templates={templates}
       loading={loading}
