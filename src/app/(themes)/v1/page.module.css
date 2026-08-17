@@ -391,11 +391,6 @@
     padding: 14px 24px;
     min-height: 54px;
   }
-  .stepPageTemplates {
-    max-width: none;
-    padding-left: 5%;
-    padding-right: 5%;
-  }
 }
 
 .introDesc {
@@ -955,6 +950,14 @@
 .stepPageTemplates .stepHeading {
   text-align: center;
   text-transform: uppercase;
+}
+
+@media (min-width: 1101px) {
+  .stepPageTemplates {
+    max-width: none;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
 }
 
 .templateGrid {
