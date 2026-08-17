@@ -49,7 +49,6 @@ export default function HomeHeader({ appName, location, navItems, tagline, minPr
       tagline={tagline || 'The photobooth that freezes time'}
       bottom={<>
         <span>Start Rp {(minPrice || 0).toLocaleString('id-ID')}</span>
-        <span>Est. 2024</span>
         <span className={styles.navItems}>
           {(navItems || []).map((item, i) => (
             <a key={i} href={item.url} className={styles.mastheadLink}>{item.label}</a>

@@ -60,11 +60,11 @@ export default function HomePage({
           <div>
             <div className={styles.stepsList}>
               {[
-                { number: 'I', title: 'Pick Frame', desc: 'Choose from our collection of vintage-inspired frames.' },
-                { number: 'II', title: 'Pose & Snap', desc: 'Step into the booth and capture your moment.' },
-                { number: 'III', title: 'Adjust', desc: 'Fine-tune brightness, contrast, and positioning.' },
-                { number: 'IV', title: 'Pay', desc: 'Secure checkout with multiple payment methods.' },
-                { number: 'V', title: 'Save & Print', desc: 'Download your strip and share with the world.' },
+                { number: 'I', title: 'Pick Frame', desc: 'Browse our vintage-inspired collection and pick the perfect frame — from classic monochrome to bold modern prints that set the mood for your session.' },
+                { number: 'II', title: 'Pose & Snap', desc: 'Step into the booth, strike a pose, and capture your moment. A lively countdown keeps the energy high while each shot freezes the fun in time.' },
+                { number: 'III', title: 'Adjust', desc: 'Take full control before you print — fine-tune brightness, contrast, and positioning so every frame looks exactly the way you imagined.' },
+                { number: 'IV', title: 'Pay', desc: 'Check out securely in seconds with a wide range of payment methods, so you can pick whatever works best for you without the hassle.' },
+                { number: 'V', title: 'Save & Print', desc: 'Download your finished photo strip and print it on the spot — then share the memories with family and friends, in print and online.' },
               ].map((s) => (
                 <div key={s.number} className={styles.stepItem}>
                   <div className={styles.stepNumber}>{s.number}</div>

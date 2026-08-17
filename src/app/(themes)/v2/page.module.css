@@ -257,12 +257,12 @@
 
 .stepNumber {
   font-family: var(--font-body);
-  font-size: 36px;
+  font-size: 45px;
   font-weight: 900;
   color: var(--np-accent);
   line-height: 1;
   flex-shrink: 0;
-  width: 40px;
+  width: 50px;
 }
 
 .stepContent {
@@ -273,7 +273,7 @@
 
 .stepTitle {
   font-family: var(--font-body);
-  font-size: 20px;
+  font-size: 25px;
   font-weight: 700;
   color: var(--np-text);
   line-height: 1.1;
@@ -282,7 +282,7 @@
 
 .stepDesc {
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 18.75px;
   line-height: 1.2;
   color: var(--np-text-secondary);
 }

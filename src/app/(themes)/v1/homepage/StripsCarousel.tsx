@@ -167,7 +167,9 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
   return (
     <div className={styles.colRight}>
       {strips.length > 0 ? (
-        <div className={styles.fanViewport}>
+        <>
+          <div className={styles.fanTitle}>Our Friends</div>
+          <div className={styles.fanViewport}>
           <div
             ref={trackRef}
             className={styles.fanTrack}
@@ -220,6 +222,7 @@ export default function StripsCarousel({ strips, smallVpRef, onReady }: {
             ))}
           </div>
         </div>
+        </>
       ) : (
         <div className={styles.rightEmpty}>
           <CameraIcon size={32} />

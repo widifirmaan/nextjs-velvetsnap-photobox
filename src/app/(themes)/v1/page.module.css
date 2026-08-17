@@ -349,6 +349,13 @@
   .logoSubMobile {
     display: none !important;
   }
+  .page {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .main {
+    max-width: none;
+  }
 }
 
 .introDesc {
@@ -584,6 +591,16 @@
 }
 
 /* ── Fan Strips Layout ── */
+.fanTitle {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--mn-text);
+  letter-spacing: -0.01em;
+  padding: 14px 0 0;
+  flex-shrink: 0;
+}
+
 .fanViewport {
   flex: 1;
   display: flex;
@@ -652,6 +669,9 @@
 /* ── Responsive ── */
 @media (max-width: 768px) {
 
+  .fanTitle {
+    display: none;
+  }
   .stepTransition {
     height: auto;
     min-height: 100dvh;
