@@ -358,6 +358,48 @@
     padding-left: 5%;
     padding-right: 5%;
   }
+  .logoWrap {
+    gap: 18px;
+  }
+  .logo {
+    width: 84px !important;
+    height: 84px !important;
+  }
+  .logoText {
+    gap: 4px;
+  }
+  .logoTitle {
+    font-size: 36px;
+  }
+  .logoSub {
+    font-size: 16px;
+  }
+  .introContent {
+    gap: 16px;
+    padding: 32px 28px 28px;
+  }
+  .introDesc {
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .introStats {
+    gap: 14px;
+    padding: 14px 0;
+  }
+  .statNum {
+    font-size: 22px;
+  }
+  .statLabel {
+    font-size: 12px;
+  }
+  .statDivider {
+    height: 36px;
+  }
+  .introCta {
+    font-size: 17px;
+    padding: 14px 24px;
+    min-height: 54px;
+  }
 }
 
 .introDesc {
@@ -595,7 +637,7 @@
 /* ── Fan Strips Layout ── */
 .fanTitle {
   text-align: center;
-  font-size: 16px;
+  font-size: 32px;
   font-weight: 600;
   color: var(--mn-text);
   letter-spacing: -0.01em;
