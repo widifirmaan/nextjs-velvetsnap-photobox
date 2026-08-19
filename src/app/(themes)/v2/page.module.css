@@ -1725,6 +1725,20 @@
   flex: 0 0 280px;
 }
 
+.photoStrip {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  width: 100%;
+  padding: 12px 0 4px;
+  scrollbar-width: thin;
+}
+
+.photoStrip .thumbCard {
+  flex: 0 0 auto;
+  width: 140px;
+}
+
 .notFound {
   flex: 1;
   display: flex;

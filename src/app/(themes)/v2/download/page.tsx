@@ -94,16 +94,6 @@ function V2DownloadContent() {
                 </a>
               </div>
             )}
-            {(tx.captures || []).map((url, i) => (
-              <div key={i} className={styles.thumbCard}>
-                <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--np-border)', boxShadow: 'var(--np-shadow-sm)' }}>
-                  <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-                <a href={url} download className={styles.downloadBtn}>
-                  <Download size={16} /> Photo {i + 1}
-                </a>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -122,6 +112,21 @@ function V2DownloadContent() {
           )}
         </div>
       </div>
+
+      {(tx.captures || []).length > 0 && (
+        <div className={styles.photoStrip}>
+          {(tx.captures || []).map((url, i) => (
+            <div key={i} className={styles.thumbCard}>
+              <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--np-border)', boxShadow: 'var(--np-shadow-sm)' }}>
+                <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+              <a href={url} download className={styles.downloadBtn}>
+                <Download size={16} /> Photo {i + 1}
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
