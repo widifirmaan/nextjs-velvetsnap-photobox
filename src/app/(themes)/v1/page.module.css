@@ -2175,6 +2175,48 @@
   .resultQr .qrDivider {
     margin: 4px 0 2px;
   }
+  .downloadLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .downloadLayout .resultPreview {
+    overflow: visible;
+    width: 100%;
+  }
+  .downloadLayout .previewInner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    height: auto;
+  }
+  .downloadLayout .stripCol {
+    aspect-ratio: auto;
+    height: auto;
+    width: 220px;
+    max-width: 60%;
+    gap: 8px;
+    grid-row: auto;
+  }
+  .downloadLayout .stripFrame {
+    aspect-ratio: 1 / 3;
+    flex: none;
+    width: 100%;
+    height: auto;
+  }
+  .downloadLayout .thumbCard {
+    width: 100%;
+  }
+  .downloadLayout .thumbCard > div {
+    aspect-ratio: 1 / 1;
+    flex: none;
+    height: auto;
+  }
+  .downloadSidebar {
+    flex: none;
+    width: 100%;
+  }
   .templateGrid {
     grid-auto-columns: 130px;
     gap: 10px;
