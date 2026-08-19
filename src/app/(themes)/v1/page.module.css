@@ -1517,6 +1517,21 @@
 
 .stepPageEditor {
   align-items: center;
+  min-height: 0;
+  padding-top: 0;
+}
+
+.stepPageEditor .stepHeading {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1101px) {
+  .stepPageEditor {
+    max-width: none;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
 }
 
 .editorLayout {
@@ -1688,6 +1703,21 @@
 .stepPagePayment {
   align-items: center;
   justify-content: center;
+  min-height: 0;
+  padding-top: 0;
+}
+
+.stepPagePayment .stepHeading {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1101px) {
+  .stepPagePayment {
+    max-width: none;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
 }
 
 .paymentCard {
@@ -1742,6 +1772,23 @@
   align-items: center;
   max-width: none;
   padding-top: 0;
+}
+
+.stepPageResult .stepHeading {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1101px) {
+  .stepPageResult {
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+}
+
+.resultSub {
+  color: #888;
+  margin: 0 0 20px;
 }
 
 .resultLayout {
@@ -1983,7 +2030,11 @@
   .stepPage > .boothStepper {
     margin-top: 32px;
   }
-  .stepPageTemplates {
+  .stepPageTemplates,
+  .stepPageBooth,
+  .stepPageEditor,
+  .stepPagePayment,
+  .stepPageResult {
     padding-top: 0;
   }
   .boothStepLine {

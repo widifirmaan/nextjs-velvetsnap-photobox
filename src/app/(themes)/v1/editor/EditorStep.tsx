@@ -2,6 +2,7 @@
 // Description: Auto-added top comment for easier file identification.
 
 'use client';
+import { ArrowLeft } from 'lucide-react';
 import StepperBar from '../StepperBar';
 import EditorFrame from './EditorFrame';
 import AdjustSlider from './AdjustSlider';
@@ -33,9 +34,16 @@ export default function EditorStep({
   };
 
   return (
-    <div className={`${styles.stepPage} ${styles.stepPageEditor}`}>
-      <StepperBar current={2} total={5} />
-      <div className={styles.editorLayout}>
+    <>
+      <div className={styles.templateStepper}><StepperBar current={2} total={5} /></div>
+      <div className={`${styles.stepPage} ${styles.stepPageEditor}`}>
+        <div className={styles.stepHeader}>
+          <button type="button" className={styles.backBtn} onClick={handleBack}>
+            <ArrowLeft size={18} />
+          </button>
+          <h1 className={styles.stepHeading}>Edit Foto</h1>
+        </div>
+        <div className={styles.editorLayout}>
         <EditorFrame
           captures={captures}
           templateData={templateData}
@@ -64,5 +72,6 @@ export default function EditorStep({
         </div>
       </div>
     </div>
+    </>
   );
 }
