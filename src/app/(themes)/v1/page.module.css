@@ -842,7 +842,7 @@
   display: grid;
   grid-template-columns: 36px 1fr 36px;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 16px;
 }
 

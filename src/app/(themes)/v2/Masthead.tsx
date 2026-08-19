@@ -18,7 +18,7 @@ export default function Masthead({ top, title, tagline, bottom, onBack, backLabe
         {onBack && (
           <button onClick={onBack} className={styles.mastheadBackBtn} style={{
             border: '3px solid var(--np-border)', cursor: 'pointer',
-            padding: '6px 12px', display: 'flex', alignItems: 'center', color: 'var(--np-text)',
+            padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 8, color: 'var(--np-text)',
             fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: 13, lineHeight: 1,
             position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
             background: 'var(--np-card)', textTransform: 'uppercase', letterSpacing: '0.06em',
