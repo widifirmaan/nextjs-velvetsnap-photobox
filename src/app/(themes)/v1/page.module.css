@@ -1234,12 +1234,12 @@
   justify-content: center;
   flex-shrink: 0;
   height: 100%;
+  position: relative;
 }
 
 .boothStripPreview {
   width: auto;
   height: 100%;
-  max-height: calc(100% - 60px);
   position: relative;
   overflow: hidden;
   border-radius: 12px;
@@ -1301,10 +1301,15 @@
 }
 
 .boothProceedBtn {
-  margin-top: 8px;
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  width: calc(100% - 16px);
+  margin: 0;
   padding: 10px 24px;
   font-size: 14px;
-  width: 100%;
   border: none;
   border-radius: 12px;
   background: #262626;
