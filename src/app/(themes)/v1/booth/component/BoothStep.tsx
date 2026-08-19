@@ -77,7 +77,7 @@ export default function BoothStep({
     <div className={`${styles.stepPage} ${styles.stepPageBooth}`}>
       <StepperBar current={1} total={5} />
       <p className={styles.boothInfo}>{templateName} • {filledCount} / {slotsCount} shots</p>
-      <div className={styles.boothContent}>
+      <div className={styles.boothStage}>
         <Viewfinder
           cameraType={cameraType}
           countdown={countdown}
@@ -102,32 +102,32 @@ export default function BoothStep({
           onNext={onNext}
           styles={styles}
         />
+        <SharedBoothControls
+          taking={taking}
+          dslrCapturing={dslrCapturing}
+          busy={busy}
+          stripLoading={stripLoading}
+          captureMode={captureMode}
+          filledCount={filledCount}
+          slotsCount={slotsCount}
+          onBack={onBack}
+          handleManualCapture={handleManualCapture}
+          takePhoto={takePhoto}
+          setCaptureMode={setCaptureMode}
+          setTaking={setTaking}
+          cameraType={cameraType}
+          setShowCamMenu={setShowCamMenu}
+          showCamMenu={showCamMenu}
+          availableCams={availableCams}
+          deviceId={deviceId}
+          handleSwitchCamera={handleSwitchCamera}
+          isFrontCamera={isFrontCamera}
+          mirrored={mirrored}
+          setMirrored={setMirrored}
+          camMenuRef={camMenuRef}
+          styles={styles}
+        />
       </div>
-      <SharedBoothControls
-        taking={taking}
-        dslrCapturing={dslrCapturing}
-        busy={busy}
-        stripLoading={stripLoading}
-        captureMode={captureMode}
-        filledCount={filledCount}
-        slotsCount={slotsCount}
-        onBack={onBack}
-        handleManualCapture={handleManualCapture}
-        takePhoto={takePhoto}
-        setCaptureMode={setCaptureMode}
-        setTaking={setTaking}
-        cameraType={cameraType}
-        setShowCamMenu={setShowCamMenu}
-        showCamMenu={showCamMenu}
-        availableCams={availableCams}
-        deviceId={deviceId}
-        handleSwitchCamera={handleSwitchCamera}
-        isFrontCamera={isFrontCamera}
-        mirrored={mirrored}
-        setMirrored={setMirrored}
-        camMenuRef={camMenuRef}
-        styles={styles}
-      />
     </div>
   );
 }

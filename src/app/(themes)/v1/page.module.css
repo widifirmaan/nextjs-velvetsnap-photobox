@@ -1093,18 +1093,23 @@
   color: #888;
 }
 
-.boothContent {
-  display: flex;
-  gap: 16px;
-  width: 100%;
-  max-width: 900px;
-  align-items: stretch;
+.boothStage {
   flex: 1;
   min-height: 0;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "viewfinder preview"
+    "controls controls";
+  column-gap: 16px;
+  row-gap: 12px;
+  align-items: stretch;
 }
 
 .boothViewfinder {
-  flex: 1;
+  grid-area: viewfinder;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -1228,6 +1233,7 @@
 }
 
 .boothPreview {
+  grid-area: preview;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1328,7 +1334,8 @@
 }
 
 .boothControls {
-  margin-top: 12px;
+  grid-area: controls;
+  margin: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1971,14 +1978,28 @@
   .boothStepLabel {
     display: none;
   }
-  .boothContent {
-    gap: 8px;
+  .boothStage {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "viewfinder viewfinder"
+      "controls preview";
+    column-gap: 16px;
+    row-gap: 12px;
   }
   .boothPreview {
-    height: 100%;
+    width: 120px;
+    min-width: 0;
+    max-width: none;
+    height: auto;
+  }
+  .boothStripPreview {
+    height: auto;
+    width: 100%;
+    max-height: none;
   }
   .boothControls {
-    margin-top: 12px;
+    justify-content: center;
   }
   .editorLayout {
     flex-direction: row;
