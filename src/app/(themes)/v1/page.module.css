@@ -1085,6 +1085,21 @@
 
 .stepPageBooth {
   align-items: center;
+  min-height: 0;
+  padding-top: 0;
+}
+
+.stepPageBooth .stepHeading {
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (min-width: 1101px) {
+  .stepPageBooth {
+    max-width: none;
+    padding-left: 5%;
+    padding-right: 5%;
+  }
 }
 
 .boothInfo {

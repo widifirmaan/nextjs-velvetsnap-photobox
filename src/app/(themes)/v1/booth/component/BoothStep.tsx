@@ -4,6 +4,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { flipImage } from '@/lib/utils/canvas-utils';
 import { captureDslrPhoto } from '@/lib/utils/image-utils';
 import { useCameraDevices, useCountdown } from '@/lib/hooks';
@@ -74,10 +75,17 @@ export default function BoothStep({
   }, [runBatchCountdown, capture]);
 
   return (
-    <div className={`${styles.stepPage} ${styles.stepPageBooth}`}>
-      <StepperBar current={1} total={5} />
-      <p className={styles.boothInfo}>{templateName} • {filledCount} / {slotsCount} shots</p>
-      <div className={styles.boothStage}>
+    <>
+      <div className={styles.templateStepper}><StepperBar current={1} total={5} /></div>
+      <div className={`${styles.stepPage} ${styles.stepPageBooth}`}>
+        <div className={styles.stepHeader}>
+          <button type="button" className={styles.backBtn} onClick={onBack}>
+            <ArrowLeft size={18} />
+          </button>
+          <h1 className={styles.stepHeading}>Ambil Foto</h1>
+        </div>
+        <p className={styles.boothInfo}>{templateName} • {filledCount} / {slotsCount} shots</p>
+        <div className={styles.boothStage}>
         <Viewfinder
           cameraType={cameraType}
           countdown={countdown}
@@ -129,5 +137,6 @@ export default function BoothStep({
         />
       </div>
     </div>
+    </>
   );
 }
