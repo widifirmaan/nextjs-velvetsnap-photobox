@@ -1674,6 +1674,10 @@
   flex-shrink: 0;
 }
 
+.downloadLayout {
+  flex: none;
+}
+
 .downloadLayout .resultPreview {
   flex: 1;
 }
