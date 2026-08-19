@@ -1538,18 +1538,18 @@
   display: flex;
   gap: 24px;
   width: 100%;
-  max-width: 1000px;
   flex: 1;
   min-height: 0;
-  align-items: flex-start;
+  align-items: stretch;
 }
 
 .editorPreview {
-  flex: 1;
+  flex: 1 1 50%;
   display: flex;
-  justify-content: center;
   align-items: flex-start;
-  padding-top: 20px;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .editorFrame {
@@ -1557,32 +1557,34 @@
   border-radius: 8px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.15);
   overflow: hidden;
+  height: 100%;
+  max-height: calc(100dvh - 200px);
+  max-width: 100%;
 }
 
 .editorSimplePreview {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  width: 100%;
+  max-width: 500px;
 }
 
 .editorSimplePreview img {
   width: 100%;
-  max-width: 400px;
+  aspect-ratio: 3/4;
+  object-fit: cover;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .editorSidebar {
-  width: 260px;
-  padding: 24px;
+  flex: 1 1 50%;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  border-radius: 20px;
-  background: #fff;
-  border: 1.5px solid #eee;
-  min-height: 400px;
+  gap: 16px;
+  justify-content: flex-start;
 }
 
 
@@ -1650,17 +1652,22 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px 0;
-  border-top: 1px solid #f0f0f0;
+  padding: 12px;
+  border: 1.5px solid #eee;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
 }
 
 .editorAdjustSection h4 {
   font-size: 11px;
   font-weight: 700;
   color: #999;
-  margin: 0;
+  margin: 0 0 4px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .editorAdjustRow {
@@ -2069,14 +2076,20 @@
   }
   .editorLayout {
     flex-direction: row;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 12px;
   }
+  .editorPreview {
+    flex: 1 1 55%;
+    min-width: 0;
+  }
   .editorSidebar {
-    width: 200px;
-    padding: 14px;
-    min-height: auto;
+    flex: 1 1 45%;
+    min-width: 0;
+    max-width: none;
+    padding: 0;
     gap: 12px;
+    justify-content: flex-start;
     overflow-y: auto;
   }
   .editorSidebar .editorAdjustSection {
