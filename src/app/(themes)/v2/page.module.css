@@ -1939,13 +1939,17 @@
     width: 100%;
   }
   .downloadLayout .previewInner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 12px;
+    justify-items: center;
+    align-items: center;
+    width: 100%;
     height: auto;
   }
   .downloadLayout .stripCol {
+    grid-column: 1 / -1;
+    justify-self: center;
     aspect-ratio: auto;
     height: auto;
     width: 220px;
@@ -1960,7 +1964,7 @@
     height: auto;
   }
   .downloadLayout .thumbCard {
-    width: 100%;
+    width: 140px;
   }
   .downloadLayout .thumbCard > div {
     aspect-ratio: 1 / 1;
