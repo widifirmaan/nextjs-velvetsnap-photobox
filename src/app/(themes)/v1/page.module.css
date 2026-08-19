@@ -1638,7 +1638,7 @@
   height: 20px;
   background: #e8e8e8;
   outline: none;
-  border-radius: 0;
+  border-radius: 10px;
   cursor: pointer;
   touch-action: pan-y;
 }
@@ -1646,35 +1646,36 @@
 .sliderInput::-webkit-slider-runnable-track {
   height: 20px;
   background: #e8e8e8;
+  border-radius: 10px;
 }
 
 .sliderInput::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 40px;
-  height: 40px;
-  margin-top: -10px;
-  background: #fff;
-  border: 3px solid #262626;
-  box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+  width: 24px;
+  height: 24px;
+  margin-top: -2px;
+  background: #262626;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   cursor: grab;
-  border-radius: 0;
+  border-radius: 50%;
 }
 
 .sliderInput::-moz-range-track {
   height: 20px;
   background: #e8e8e8;
-  border-radius: 0;
+  border-radius: 10px;
 }
 
 .sliderInput::-moz-range-thumb {
-  width: 40px;
-  height: 40px;
-  background: #fff;
-  border: 3px solid #262626;
-  box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+  width: 24px;
+  height: 24px;
+  background: #262626;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
   cursor: grab;
-  border-radius: 0;
+  border-radius: 50%;
 }
 
 .editorAdjustSection {
@@ -2115,15 +2116,16 @@
   }
   .editorSidebar .sliderInput {
     height: 16px;
+    border-radius: 8px;
   }
   .editorSidebar .sliderInput::-webkit-slider-thumb {
-    width: 28px;
-    height: 28px;
-    margin-top: -6px;
+    width: 20px;
+    height: 20px;
+    margin-top: -2px;
   }
   .editorSidebar .sliderInput::-moz-range-thumb {
-    width: 28px;
-    height: 28px;
+    width: 20px;
+    height: 20px;
   }
   .resultLayout {
     display: grid;
