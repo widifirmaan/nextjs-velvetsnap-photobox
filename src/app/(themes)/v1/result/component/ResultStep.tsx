@@ -2,7 +2,7 @@
 // Description: Auto-added top comment for easier file identification.
 
 'use client';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { Home, Loader2 } from 'lucide-react';
 import StepperBar from '../../StepperBar';
 import ResultActions from '@/components/result/ResultActions';
 import styles from '@/app/(themes)/v1/page.module.css';
@@ -18,7 +18,7 @@ export default function ResultStep({
       <div className={`${styles.stepPage} ${styles.stepPageResult}`}>
         <div className={styles.stepHeader}>
           <button type="button" className={styles.backBtn} onClick={onHome}>
-            <ArrowLeft size={18} />
+            <Home size={18} />
           </button>
           <h1 className={styles.stepHeading}>Cetak</h1>
         </div>

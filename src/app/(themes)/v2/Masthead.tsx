@@ -2,13 +2,14 @@
 // Description: Auto-added top comment for easier file identification.
 
 'use client';
-import { ArrowLeft, Timer } from 'lucide-react';
+import { ArrowLeft, Home, Timer } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function Masthead({ top, title, tagline, bottom, onBack, backLabel, timer }: {
   top?: React.ReactNode; title: React.ReactNode;
   tagline?: string; bottom?: React.ReactNode; onBack?: () => void; backLabel?: string; timer?: string;
 }) {
+  const BackIcon = backLabel === 'HOME' ? Home : ArrowLeft;
   return (
     <div className={styles.newspaperHeader}>
       {top && <div className={styles.mastheadMeta}>{top}</div>}
@@ -22,7 +23,7 @@ export default function Masthead({ top, title, tagline, bottom, onBack, backLabe
             position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
             background: 'var(--np-card)', textTransform: 'uppercase', letterSpacing: '0.06em',
           }}>
-            <ArrowLeft size={22} /> <span className={styles.mastheadBackLabel}>{backLabel || 'BACK'}</span>
+            <BackIcon size={22} /> <span className={styles.mastheadBackLabel}>{backLabel || 'BACK'}</span>
           </button>
         )}
         {timer && (
