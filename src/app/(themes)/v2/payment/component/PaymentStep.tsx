@@ -9,14 +9,14 @@ import styles from '../../page.module.css';
 
 export default function PaymentStep({
   price, paid: _paid, setPaid: _setPaid, errMsg: _errMsg, setErrMsg: _setErrMsg,
-  captures, templateId, compositedImage, onSuccess, onBack: _onBack,
+  captures, videos, templateId, compositedImage, onSuccess, onBack: _onBack,
 }: {
   price: number; paid: boolean; setPaid: (v: boolean) => void;
   errMsg: string | null; setErrMsg: (v: string | null) => void;
-  captures: string[]; templateId: string; compositedImage: string | null;
+  captures: string[]; videos: string[]; templateId: string; compositedImage: string | null;
   onSuccess: (id: string) => void; onBack: () => void;
 }) {
-  const paymentFlow = usePaymentFlow({ price, templateId, captures, compositedImage, onSuccess });
+  const paymentFlow = usePaymentFlow({ price, templateId, captures, videos, compositedImage, onSuccess });
   const [bypassing, setBypassing] = useState(false);
 
   const handleBypass = async () => {

@@ -85,6 +85,7 @@ export default function StepperFlow({ step, setStep, onRefresh, sessionTimer, on
           errMsg={flow.errMsg}
           setErrMsg={flow.setErrMsg}
           captures={flow.captures}
+          videos={flow.videos}
           templateId={flow.templateId || 't1'}
           compositedImage={flow.compositedImage}
           onSuccess={flow.handlePaymentSuccess}

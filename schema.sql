@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     price REAL NOT NULL DEFAULT 35000,
     status TEXT NOT NULL DEFAULT 'PENDING',
     captures TEXT NOT NULL DEFAULT '[]',
+    videos TEXT NOT NULL DEFAULT '[]',
     finalImage TEXT NOT NULL DEFAULT '',
     showInCarousel INTEGER NOT NULL DEFAULT 0,
     accountId TEXT,

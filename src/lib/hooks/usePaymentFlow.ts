@@ -9,6 +9,7 @@ export interface PaymentFlowOptions {
   price: number;
   templateId: string;
   captures: string[];
+  videos: string[];
   compositedImage: string | null;
   onSuccess: (id: string) => void;
 }
@@ -35,7 +36,7 @@ declare global {
   }
 }
 
-export function usePaymentFlow({ price, templateId, captures, compositedImage, onSuccess }: PaymentFlowOptions): PaymentFlowResult {
+export function usePaymentFlow({ price, templateId, captures, videos, compositedImage, onSuccess }: PaymentFlowOptions): PaymentFlowResult {
   const [loading, setLoading] = useState(true);
   const [snapLoaded, setSnapLoaded] = useState(false);
   const [snapError, setSnapError] = useState(false);
@@ -77,7 +78,7 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
     };
   }, []);
 
-  const uploadImages = useCallback(async (): Promise<{ captures: string[]; finalImage: string }> => {
+  const uploadImages = useCallback(async (): Promise<{ captures: string[]; videos: string[]; finalImage: string }> => {
     const uploadOne = async (dataUri: string, folder: string): Promise<string> => {
       let payload = dataUri;
       if (payload.length > UPLOAD_COMPRESS_THRESHOLD) {
@@ -104,6 +105,16 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
       return data.url;
     };
 
+    const blobToDataUri = async (blobUrl: string): Promise<string> => {
+      const blob = await fetch(blobUrl).then((r) => r.blob());
+      return await new Promise<string>((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result as string);
+        reader.onerror = () => rej(new Error('Failed to read video blob'));
+        reader.readAsDataURL(blob);
+      });
+    };
+
     const finalImage = compositedImage
       ? await uploadOne(compositedImage, 'velvetsnap/final')
       : '';
@@ -112,13 +123,21 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
         c.startsWith('data:') ? await uploadOne(c, 'velvetsnap/captures') : c
       )
     );
-    return { captures: uploadedCaptures, finalImage };
-  }, [captures, compositedImage]);
+    const uploadedVideos = await Promise.all(
+      (videos || []).map(async (v) => {
+        if (!v) return '';
+        if (v.startsWith('data:')) return await uploadOne(v, 'velvetsnap/videos');
+        const dataUri = await blobToDataUri(v);
+        return await uploadOne(dataUri, 'velvetsnap/videos');
+      })
+    );
+    return { captures: uploadedCaptures, videos: uploadedVideos, finalImage };
+  }, [captures, videos, compositedImage]);
 
   const uploadImagesFn = useRef(uploadImages);
   uploadImagesFn.current = uploadImages;
 
-  const saveTx = useCallback(async (sessionId: string, orderId: string, status: 'PAID' | 'PENDING', photos?: { captures: string[]; finalImage: string }) => {
+  const saveTx = useCallback(async (sessionId: string, orderId: string, status: 'PAID' | 'PENDING', photos?: { captures: string[]; videos: string[]; finalImage: string }) => {
     const body: Record<string, unknown> = {
       sessionId,
       templateId: templateId || 't1',
@@ -128,6 +147,7 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
     };
     if (photos) {
       body.captures = photos.captures;
+      body.videos = photos.videos;
       body.finalImage = photos.finalImage;
     }
     const res = await fetch('/api/transactions', {
@@ -140,7 +160,7 @@ export function usePaymentFlow({ price, templateId, captures, compositedImage, o
     return data;
   }, [templateId, price]);
 
-  const uploadWithRetry = useCallback(async (): Promise<{ captures: string[]; finalImage: string }> => {
+  const uploadWithRetry = useCallback(async (): Promise<{ captures: string[]; videos: string[]; finalImage: string }> => {
     let lastError: unknown;
     for (let attempt = 1; attempt <= 3; attempt++) {
       try {

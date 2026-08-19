@@ -6,6 +6,7 @@ interface DownloadTx {
   _id?: string;
   finalImage?: string;
   captures?: string[];
+  videos?: string[];
   price?: number;
 }
 

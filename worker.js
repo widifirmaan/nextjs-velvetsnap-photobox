@@ -199,11 +199,27 @@ function normalizeTransaction(tx) {
     if (!tx) return tx;
     let captures = [];
     try { captures = JSON.parse(tx.captures || '[]'); } catch {}
+    let videos = [];
+    try { videos = JSON.parse(tx.videos || '[]'); } catch {}
     return {
         _id: tx.id,
         ...tx,
         captures,
+        videos,
     };
+}
+
+let schemaReady = null;
+async function ensureSchema(db) {
+    if (schemaReady) return schemaReady;
+    schemaReady = (async () => {
+        const cols = await db.prepare(`SELECT name FROM pragma_table_info('transactions')`).all();
+        const hasVideos = (cols.results || []).some((c) => c.name === 'videos');
+        if (!hasVideos) {
+            await db.prepare(`ALTER TABLE transactions ADD COLUMN videos TEXT NOT NULL DEFAULT '[]'`).run();
+        }
+    })().catch((e) => { console.error('ensureSchema failed', e); schemaReady = null; });
+    return schemaReady;
 }
 
 function generateId() {
@@ -223,17 +239,20 @@ function getCloudinaryConfig(env) {
     };
 }
 
-async function uploadToCloudinary(env, dataUri, folder, publicId) {
+async function uploadToCloudinary(env, dataUri, folder, publicId, resourceType = 'image') {
     const { cloudName, apiKey, apiSecret } = getCloudinaryConfig(env);
     if (!cloudName || !apiKey || !apiSecret) {
         throw new Error('Cloudinary not configured. Set CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET');
     }
 
+    const mimeMatch = dataUri.match(/^data:([\w\/-]+);base64,/);
+    const mimeType = mimeMatch ? mimeMatch[1] : (resourceType === 'video' ? 'video/mp4' : 'image/png');
     const base64Data = dataUri.replace(/^data:[\w\/-]+;base64,/, '');
     const timestamp = Math.floor(Date.now() / 1000);
     const folderParam = folder || 'velvetsnap/templates';
 
     const signParams = { folder: folderParam, timestamp: timestamp.toString() };
+    if (resourceType === 'video') signParams.resource_type = 'video';
     if (publicId) {
         signParams.public_id = publicId;
         signParams.overwrite = 'true';
@@ -248,10 +267,11 @@ async function uploadToCloudinary(env, dataUri, folder, publicId) {
     const signature = Array.from(new Uint8Array(signatureBytes)).map(b => b.toString(16).padStart(2, '0')).join('');
 
     const formData = new FormData();
-    formData.append('file', `data:image/png;base64,${base64Data}`);
+    formData.append('file', `data:${mimeType};base64,${base64Data}`);
     formData.append('api_key', apiKey);
     formData.append('timestamp', timestamp.toString());
     formData.append('folder', folderParam);
+    if (resourceType === 'video') formData.append('resource_type', 'video');
     formData.append('signature', signature);
     if (publicId) {
         formData.append('public_id', publicId);
@@ -259,7 +279,10 @@ async function uploadToCloudinary(env, dataUri, folder, publicId) {
         formData.append('invalidate', 'true');
     }
 
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+    const endpoint = resourceType === 'video'
+        ? `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`
+        : `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+    const res = await fetch(endpoint, {
         method: 'POST',
         body: formData,
     });
@@ -292,6 +315,8 @@ export default {
         const url = new URL(request.url);
         const path = url.pathname;
         const db = env.PHOTOBOX_DB;
+
+        try { await ensureSchema(db); } catch (e) { console.error('ensureSchema error', e); }
 
         if (path === '/api/ping') {
             return json({ pong: true, path });
@@ -835,7 +860,7 @@ async function handleReuploadTemplates(request, db, env) {
 async function handleCreateTransaction(request, db) {
     try {
         const body = await request.json();
-        const { sessionId, templateId, price, status, captures, finalImage, orderId, qrCodeUrl } = body;
+        const { sessionId, templateId, price, status, captures, videos, finalImage, orderId, qrCodeUrl } = body;
         if (!sessionId) return json({ success: false, error: 'sessionId is required' }, 400);
 
         const existing = await db.prepare('SELECT id FROM transactions WHERE sessionId = ?').bind(sessionId).first();
@@ -850,6 +875,7 @@ async function handleCreateTransaction(request, db) {
             price: price || 35000,
             status: effectiveStatus,
             captures: JSON.stringify(captures || []),
+            videos: JSON.stringify(videos || []),
             finalImage: finalImage || '',
             orderId: orderId || null,
             qrCodeUrl: qrCodeUrl || null,
@@ -865,8 +891,8 @@ async function handleCreateTransaction(request, db) {
         }
 
         const id = generateId();
-        await db.prepare('INSERT INTO transactions (id, sessionId, templateId, price, status, captures, finalImage, orderId, qrCodeUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(
-            id, sessionId, data.templateId, data.price, data.status, data.captures, data.finalImage, data.orderId, data.qrCodeUrl
+        await db.prepare('INSERT INTO transactions (id, sessionId, templateId, price, status, captures, videos, finalImage, orderId, qrCodeUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(
+            id, sessionId, data.templateId, data.price, data.status, data.captures, data.videos, data.finalImage, data.orderId, data.qrCodeUrl
         ).run();
         const tx = await db.prepare('SELECT * FROM transactions WHERE id = ?').bind(id).first();
         return json({ success: true, data: normalizeTransaction(tx) }, 201);
@@ -1050,7 +1076,7 @@ async function handleMigrateImages(request, db, env) {
 async function handleMidtransCharge(request, db, env) {
     try {
         const body = await request.json();
-        const { sessionId, templateId, price, captures, finalImage } = body;
+        const { sessionId, templateId, price, captures, videos, finalImage } = body;
         if (!sessionId || !templateId || !price) return json({ success: false, error: 'Missing required fields' }, 400);
 
         const orderId = `VS-${sessionId}-${Date.now()}`;
@@ -1082,8 +1108,8 @@ async function handleMidtransCharge(request, db, env) {
             ).run();
         } else {
             const id = generateId();
-            await db.prepare('INSERT INTO transactions (id, sessionId, templateId, orderId, price, status, captures, finalImage, midtransStatus, qrCodeUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(
-                id, sessionId, templateId, orderId, price, 'PENDING', JSON.stringify(captures || []), finalImage || '', 'pending', midtransData.redirect_url
+            await db.prepare('INSERT INTO transactions (id, sessionId, templateId, orderId, price, status, captures, videos, finalImage, midtransStatus, qrCodeUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(
+                id, sessionId, templateId, orderId, price, 'PENDING', JSON.stringify(captures || []), JSON.stringify(videos || []), finalImage || '', 'pending', midtransData.redirect_url
             ).run();
         }
 
@@ -1179,19 +1205,28 @@ async function handleMidtransStatus(request, db) {
 
 async function handleUpload(request, env) {
     try {
-        const { dataUri, folder, publicId } = await request.json();
+        const { dataUri, folder, publicId, resourceType } = await request.json();
         if (!dataUri || !(await isBase64(dataUri))) return json({ success: false, error: 'Invalid data URI' }, 400);
 
         const base64Data = dataUri.split(',')[1] || dataUri;
         const fileBytes = Math.round((base64Data.length * 3) / 4);
-        if (fileBytes > 10 * 1024 * 1024) return json({ success: false, error: 'File too large (max 10MB)' }, 400);
+        const maxBytes = resourceType === 'video' ? 30 * 1024 * 1024 : 10 * 1024 * 1024;
+        if (fileBytes > maxBytes) return json({ success: false, error: `File too large (max ${Math.round(maxBytes / 1024 / 1024)}MB)` }, 400);
 
-        const mimeMatch = dataUri.match(/^data:image\/(\w+);base64,/);
-        if (!mimeMatch || !['jpeg', 'png', 'webp', 'gif'].includes(mimeMatch[1])) {
+        const mimeMatch = dataUri.match(/^data:(image|video)\/(\w+);base64,/);
+        const allowedImage = ['jpeg', 'png', 'webp', 'gif'];
+        const allowedVideo = ['mp4', 'webm', 'quicktime'];
+        if (!mimeMatch) return json({ success: false, error: 'Invalid data URI type' }, 400);
+        const kind = mimeMatch[1];
+        const ext = mimeMatch[2];
+        if (kind === 'image' && !allowedImage.includes(ext)) {
             return json({ success: false, error: 'Invalid image type. Supported: jpeg, png, webp, gif' }, 400);
         }
+        if (kind === 'video' && !allowedVideo.includes(ext)) {
+            return json({ success: false, error: 'Invalid video type. Supported: mp4, webm' }, 400);
+        }
 
-        const url = await uploadToCloudinary(env, dataUri, folder || 'velvetsnap/templates', publicId);
+        const url = await uploadToCloudinary(env, dataUri, folder || (kind === 'video' ? 'velvetsnap/videos' : 'velvetsnap/templates'), publicId, kind);
         return json({ success: true, url });
     } catch (e) {
         const msg = e.message || String(e);
