@@ -40,7 +40,7 @@ export default function SharedPaymentContent({
 }: SharedPaymentContentProps) {
   return (
     <div style={containerStyle}>
-      <h2 style={{ margin: '0 0 12px' }}>Payment</h2>
+      <h2 style={{ margin: '0 0 12px', textAlign: 'center' }}>Payment</h2>
       <p style={{ color: '#888', marginBottom: 24 }}>Scan the QRIS code to pay</p>
 
       {isPaid ? (
