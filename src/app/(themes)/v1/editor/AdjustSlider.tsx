@@ -10,12 +10,14 @@ export default function AdjustSlider({ label, icon, value, min, max, onChange, d
   onChange: (v: number) => void; display?: string;
 }) {
   return (
-    <div className={styles.editorAdjustRow}>
-      <span className={styles.editorAdjustLabel} title={label}>{icon}</span>
-      <input type="range" min={min} max={max} step={1}
-        value={value} onChange={(e) => onChange(parseFloat(e.target.value))}
-        className={styles.editorSlider} />
-      <span className={styles.editorAdjustValue}>{display ?? value}</span>
+    <div className={styles.sliderRow}>
+      <div className={styles.sliderHeader}>
+        <span className={styles.sliderLabel} title={label}>{icon}</span>
+        <span className={styles.sliderValue}>{display || value}</span>
+      </div>
+      <input type="range" min={min} max={max} value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className={styles.sliderInput} />
     </div>
   );
 }

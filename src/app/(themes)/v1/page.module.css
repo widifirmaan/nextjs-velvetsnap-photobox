@@ -1600,101 +1600,109 @@
 
 
 
-.editorSlider {
-  flex: 1;
-  height: 24px;
+.sliderRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.sliderRow:last-child {
+  margin-bottom: 0;
+}
+
+.sliderHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sliderLabel {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #262626;
+}
+
+.sliderValue {
+  font-size: 14px;
+  font-weight: 400;
+  color: #888;
+}
+
+.sliderInput {
   -webkit-appearance: none;
   appearance: none;
-  background: transparent;
+  width: 100%;
+  height: 20px;
+  background: #e8e8e8;
   outline: none;
+  border-radius: 0;
   cursor: pointer;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
+  touch-action: pan-y;
 }
 
-.editorSlider::-webkit-slider-runnable-track {
-  height: 8px;
-  border-radius: 4px;
+.sliderInput::-webkit-slider-runnable-track {
+  height: 20px;
   background: #e8e8e8;
 }
 
-.editorSlider::-webkit-slider-thumb {
+.sliderInput::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #262626;
-  cursor: pointer;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  margin-top: -8px;
+  width: 40px;
+  height: 40px;
+  margin-top: -10px;
+  background: #fff;
+  border: 3px solid #262626;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+  cursor: grab;
+  border-radius: 0;
 }
 
-.editorSlider::-moz-range-track {
-  height: 8px;
-  border-radius: 4px;
+.sliderInput::-moz-range-track {
+  height: 20px;
   background: #e8e8e8;
+  border-radius: 0;
 }
 
-.editorSlider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: #262626;
-  cursor: pointer;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+.sliderInput::-moz-range-thumb {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: 3px solid #262626;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+  cursor: grab;
+  border-radius: 0;
 }
 
 .editorAdjustSection {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px;
+  padding: 10px 10px 15px;
   border: 1.5px solid #eee;
   border-radius: 12px;
   background: #fff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 16px;
 }
 
 .editorAdjustSection h4 {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   color: #999;
-  margin: 0 0 4px;
+  margin: 0 0 12px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.editorAdjustRow {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 40px;
-}
-
-.editorAdjustLabel {
-  font-size: 13px;
-  font-weight: 500;
-  color: #262626;
-  min-width: 52px;
-  text-align: left;
-}
-
-.editorAdjustValue {
-  font-size: 13px;
-  font-weight: 600;
-  color: #262626;
-  min-width: 44px;
-  text-align: center;
+  letter-spacing: 0.1em;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f0f0f0;
 }
 
 .editorRetakeBtn {
   justify-content: center;
+  width: 100%;
 }
 
 .filterGray {
@@ -2093,31 +2101,29 @@
     overflow-y: auto;
   }
   .editorSidebar .editorAdjustSection {
-    padding: 8px 0;
+    padding: 8px 8px 12px;
     gap: 6px;
   }
-  .editorSidebar .editorAdjustRow {
-    min-height: 32px;
-    gap: 8px;
+  .editorSidebar .sliderRow {
+    margin-bottom: 16px;
   }
-  .editorSidebar .editorAdjustLabel {
+  .editorSidebar .sliderLabel {
     font-size: 11px;
-    min-width: 40px;
   }
-  .editorSidebar .editorAdjustValue {
+  .editorSidebar .sliderValue {
     font-size: 11px;
-    min-width: 32px;
   }
-  .editorSidebar .editorSlider {
-    height: 20px;
+  .editorSidebar .sliderInput {
+    height: 16px;
   }
-  .editorSidebar .editorSlider::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
+  .editorSidebar .sliderInput::-webkit-slider-thumb {
+    width: 28px;
+    height: 28px;
+    margin-top: -6px;
   }
-  .editorSidebar .editorSlider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+  .editorSidebar .sliderInput::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
   }
   .resultLayout {
     display: grid;
