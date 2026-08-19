@@ -252,7 +252,6 @@ async function uploadToCloudinary(env, dataUri, folder, publicId, resourceType =
     const folderParam = folder || 'velvetsnap/templates';
 
     const signParams = { folder: folderParam, timestamp: timestamp.toString() };
-    if (resourceType === 'video') signParams.resource_type = 'video';
     if (publicId) {
         signParams.public_id = publicId;
         signParams.overwrite = 'true';
@@ -271,7 +270,6 @@ async function uploadToCloudinary(env, dataUri, folder, publicId, resourceType =
     formData.append('api_key', apiKey);
     formData.append('timestamp', timestamp.toString());
     formData.append('folder', folderParam);
-    if (resourceType === 'video') formData.append('resource_type', 'video');
     formData.append('signature', signature);
     if (publicId) {
         formData.append('public_id', publicId);
