@@ -4,7 +4,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Download, Printer, Home as HomeIcon, Smartphone } from 'lucide-react';
+import { Download, Printer, Smartphone } from 'lucide-react';
 import { PRINT_WINDOW_DELAY } from '@/lib/utils/constants';
 import type { CSSProperties } from 'react';
 
@@ -30,14 +30,14 @@ interface ResultActionsProps {
 
 export default function ResultActions({
   compositedImage,
-  onHome,
+  onHome: _onHome,
   txId,
   wrapperClassName,
   buttonsGroupClassName,
   qrGroupClassName,
   primaryButtonClassName,
   secondaryButtonClassName,
-  homeButtonClassName,
+  homeButtonClassName: _homeButtonClassName,
   qrSectionClassName,
   qrDividerClassName,
   qrLabelClassName,
@@ -93,9 +93,6 @@ export default function ResultActions({
       </button>
       <button className={secondaryButtonClassName} style={buttonStyle} onClick={handlePrint}>
         <Printer size={18} /> Print
-      </button>
-      <button className={homeButtonClassName} style={buttonStyle} onClick={onHome}>
-        <HomeIcon size={18} /> Home
       </button>
     </>
   );
