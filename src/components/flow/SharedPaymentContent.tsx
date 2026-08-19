@@ -13,6 +13,7 @@ interface SharedPaymentContentProps {
   isSnapLoaded: boolean;
   hasSnapError: boolean;
   errorMessage: string | null;
+  qrDataUrl?: string | null;
   onRetry: () => void;
   onBypass: () => Promise<void>;
   isBypassing?: boolean;
@@ -27,9 +28,10 @@ export default function SharedPaymentContent({
   price,
   isPaid,
   isLoading,
-  isSnapLoaded,
+  isSnapLoaded: _isSnapLoaded,
   hasSnapError,
   errorMessage,
+  qrDataUrl,
   onRetry,
   onBypass,
   isBypassing = false,
@@ -51,9 +53,18 @@ export default function SharedPaymentContent({
         </div>
       ) : (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 180, marginBottom: 18 }}>
-            <Loader2 size={48} className="spin" />
-          </div>
+           {qrDataUrl ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, marginBottom: 18 }}>
+              <img src={qrDataUrl} alt="QRIS payment code" style={{ width: 220, height: 220, background: '#fff', padding: 8, borderRadius: 8 }} />
+              <p style={{ color: '#888', fontSize: 12, margin: 0, textAlign: 'center', maxWidth: 220 }}>
+                Scan QRIS di bawah ini dengan aplikasi e-wallet atau mobile banking Anda
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 180, marginBottom: 18 }}>
+              <Loader2 size={48} className="spin" />
+            </div>
+          )}
           <div style={{ fontSize: 18, fontWeight: 700, textAlign: 'center' }}>Rp {price.toLocaleString('id-ID')}</div>
           {errorMessage && (
             <div style={{ textAlign: 'center', marginTop: 16 }}>
@@ -67,9 +78,9 @@ export default function SharedPaymentContent({
               <button className={primaryButtonClassName} onClick={onRetry} style={{ marginTop: 12 }}>Retry</button>
             </div>
           )}
-          {!errorMessage && !hasSnapError && isLoading && (
+          {!errorMessage && !hasSnapError && isLoading && !qrDataUrl && (
             <p style={{ color: '#888', fontSize: 13, marginTop: 12, textAlign: 'center' }}>
-              {!isSnapLoaded ? 'Loading payment gateway...' : 'Preparing QRIS...'}
+              Generating QRIS...
             </p>
           )}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24, opacity: isBypassing ? 1 : 0.5 }}>

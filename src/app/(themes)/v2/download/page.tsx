@@ -30,7 +30,7 @@ function V2DownloadContent() {
 
   if (!tx) {
     return (
-      <div className={styles.stepPage}>
+      <div className={`${styles.stepPage} ${styles.downloadPage}`}>
         <Masthead
           onBack={() => { window.location.href = '/v2'; }}
           backLabel="HOME"
@@ -58,8 +58,10 @@ function V2DownloadContent() {
     );
   }
 
+  const videos = (tx.videos || []).filter((v) => v);
+
   return (
-    <div className={styles.stepPage}>
+    <div className={`${styles.stepPage} ${styles.downloadPage}`}>
       <Masthead
         onBack={() => { window.location.href = '/v2'; }}
         backLabel="HOME"
@@ -97,12 +99,48 @@ function V2DownloadContent() {
           </div>
         </div>
 
+        {(tx.captures || []).length > 0 && (
+          <div className={styles.downloadPhotos}>
+            <h3 className={styles.stripSectionLabel}>Individual Photos</h3>
+            <div className={styles.photoStrip}>
+              {(tx.captures || []).map((url, i) => (
+                <div key={i} className={styles.thumbCard}>
+                  <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--np-border)', boxShadow: 'var(--np-shadow-sm)' }}>
+                    <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <a href={url} download className={styles.downloadBtn}>
+                    <Download size={16} /> Photo {i + 1}
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {videos.length > 0 && (
+          <div className={styles.downloadVideos}>
+            <h3 className={styles.stripSectionLabel}>Videos</h3>
+            <div className={`${styles.photoStrip} ${styles.videoStrip}`}>
+              {videos.map((url, i) => (
+                <div key={i} className={styles.thumbCard}>
+                  <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--np-border)', boxShadow: 'var(--np-shadow-sm)', background: '#111' }}>
+                    <video src={url} autoPlay loop muted playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  </div>
+                  <a href={url} download className={styles.downloadBtn}>
+                    <Download size={16} /> Video {i + 1}
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className={`${styles.resultSidebar} ${styles.downloadSidebar}`}>
           <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 22, margin: 0, textAlign: 'center', flexShrink: 0 }}>
             Your Photos are Ready!
           </h2>
           {downloadUrl && (
-            <div style={{ marginTop: 16, textAlign: 'center' }}>
+            <div style={{ marginTop: 0, textAlign: 'center' }}>
               <div style={{ borderTop: '2px solid var(--np-border)', marginBottom: 12 }} />
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 10, color: 'var(--np-text-muted)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                 <Smartphone size={14} /> Scan to download
@@ -112,21 +150,6 @@ function V2DownloadContent() {
           )}
         </div>
       </div>
-
-      {(tx.captures || []).length > 0 && (
-        <div className={styles.photoStrip}>
-          {(tx.captures || []).map((url, i) => (
-            <div key={i} className={styles.thumbCard}>
-              <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--np-border)', boxShadow: 'var(--np-shadow-sm)' }}>
-                <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </div>
-              <a href={url} download className={styles.downloadBtn}>
-                <Download size={16} /> Photo {i + 1}
-              </a>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

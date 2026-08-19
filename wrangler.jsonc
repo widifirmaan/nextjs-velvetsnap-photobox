@@ -11,6 +11,13 @@
     }
   ],
   "vars": {
-    "MIDTRANS_IS_PRODUCTION": "false"
+    "MIDTRANS_IS_PRODUCTION": "false",
+    "DOKU_IS_PRODUCTION": "false",
+    "DOKU_CLIENT_ID": "",
+    "DOKU_SECRET_KEY": "",
+    "DOKU_B2B_SECRET_KEY": "",
+    "DOKU_MERCHANT_ID": "",
+    "DOKU_TERMINAL_ID": "",
+    "DOKU_POSTAL_CODE": ""
   }
 }

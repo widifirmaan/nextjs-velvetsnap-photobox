@@ -20,6 +20,7 @@ export interface PhotoboothFlowResult {
   templateId: string | null;
   templateData: TemplateData | null;
   captures: string[];
+  videos: string[];
   photoAdjust: PhotoAdjust[];
   selectedSlotIdx: number;
   keyedFrameImage: string;
@@ -36,7 +37,7 @@ export interface PhotoboothFlowResult {
   filledCount: number;
   slotsCount: number;
   handleSelectTemplate: (id: string, data?: TemplateData, keyedUrl?: string) => void;
-  handleAddCapture: (url: string, slotIdx?: number) => void;
+  handleAddCapture: (url: string, slotIdx?: number, videoUrl?: string) => void;
   handleDeleteCapture: (idx: number) => void;
   handlePaymentSuccess: (id: string) => void;
   startOver: () => void;
@@ -52,6 +53,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [templateData, setTemplateData] = useState<TemplateData | null>(null);
   const [captures, setCaptures] = useState<string[]>([]);
+  const [videos, setVideos] = useState<string[]>([]);
   const [photoAdjust, setPhotoAdjust] = useState<PhotoAdjust[]>([]);
   const [selectedSlotIdx, setSelectedSlotIdx] = useState(0);
   const [keyedFrameImage, setKeyedFrameImage] = useState('');
@@ -124,6 +126,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
     onRefresh?.();
     setStep(0);
     setCaptures([]);
+    setVideos([]);
     setTemplateId(null);
     setTemplateData(null);
     setCompositedImage(null);
@@ -321,7 +324,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   }, [templateId]);
 
   // Add a captured photo to the current capture list, either into a specific slot or the next empty slot.
-  const handleAddCapture = useCallback((url: string, slotIdx?: number) => {
+  const handleAddCapture = useCallback((url: string, slotIdx?: number, videoUrl?: string) => {
     setCaptures((prev) => {
       if (slotIdx !== undefined && slotIdx >= 0) {
         const n = [...prev];
@@ -333,11 +336,25 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       if (idx !== -1) { const n = [...prev]; n[idx] = url; return n; }
       return [...prev, url];
     });
+    if (videoUrl) {
+      setVideos((prev) => {
+        if (slotIdx !== undefined && slotIdx >= 0) {
+          const n = [...prev];
+          while (n.length <= slotIdx) n.push('');
+          n[slotIdx] = videoUrl;
+          return n;
+        }
+        const idx = prev.findIndex((c) => c === '');
+        if (idx !== -1) { const n = [...prev]; n[idx] = videoUrl; return n; }
+        return [...prev, videoUrl];
+      });
+    }
   }, []);
 
   // Remove a capture from a specific slot, leaving an empty placeholder.
   const handleDeleteCapture = useCallback((idx: number) => {
     setCaptures((prev) => { const n = [...prev]; n[idx] = ''; return n; });
+    setVideos((prev) => { if (idx >= prev.length) return prev; const n = [...prev]; n[idx] = ''; return n; });
   }, []);
 
   // Persist captured photos (compressed) so the editor survives a page reload.
@@ -397,7 +414,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   const filledCount = useMemo(() => captures.filter((c) => c !== '').length, [captures]);
 
   return {
-    templateId, templateData, captures, photoAdjust, selectedSlotIdx,
+    templateId, templateData, captures, videos, photoAdjust, selectedSlotIdx,
     keyedFrameImage, frameRatio, stripLoading, compositedImage,
     price, paid, errMsg, txId, cachedTemplates, templatesLoading, timeLeft,
     filledCount, slotsCount,

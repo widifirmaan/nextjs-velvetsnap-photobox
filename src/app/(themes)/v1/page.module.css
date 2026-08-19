@@ -1913,14 +1913,31 @@
 
 /* ── Download Page ── */
 .downloadLayout {
-  display: flex;
-  gap: 24px;
+  display: grid;
+  gap: 16px 24px;
   width: 100%;
   max-width: none;
   flex: none;
-  align-items: stretch;
-  min-height: 0;
+  align-items: start;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "preview actions"
+    "photos photos"
+    "videos videos";
 }
+
+.downloadPhotos,
+.downloadVideos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.downloadPhotos { grid-area: photos; }
+.downloadVideos { grid-area: videos; }
+.downloadLayout .resultPreview { grid-area: preview; }
+.downloadLayout .downloadSidebar { grid-area: actions; }
 
 .resultLayout .resultPreview {
   flex: 1;
@@ -2053,6 +2070,102 @@
   width: 140px;
 }
 
+.stripSectionLabel {
+  font-family: var(--brand-font-family, inherit);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #888;
+  margin: 24px 0 4px;
+}
+
+@media (min-width: 769px) {
+  .photoStrip {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    overflow: visible;
+    padding: 8px 0 4px;
+  }
+  .photoStrip .thumbCard {
+    width: auto;
+    aspect-ratio: 1 / 1;
+  }
+  .photoStrip.videoStrip {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  .photoStrip.videoStrip .thumbCard {
+    aspect-ratio: 1 / 1;
+  }
+  .downloadLayout .previewInner {
+    display: flex;
+    justify-content: center;
+    height: auto;
+  }
+  .downloadLayout .stripCol {
+    flex: none;
+    height: 520px;
+    max-height: 62dvh;
+    width: auto;
+    aspect-ratio: 1 / 3;
+  }
+}
+
+@media (min-width: 1101px) {
+  .downloadPage {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .downloadPage .stepPage {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .downloadLayout {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) 260px;
+    grid-template-areas: "preview photos videos actions";
+    align-items: stretch;
+  }
+  .downloadLayout .resultPreview {
+    align-self: stretch;
+  }
+  .downloadLayout .previewInner {
+    height: 100%;
+  }
+  .downloadLayout .stripCol {
+    height: 100%;
+    max-height: none;
+  }
+  .downloadPhotos,
+  .downloadVideos {
+    overflow: hidden;
+  }
+  .downloadPhotos .photoStrip,
+  .downloadVideos .photoStrip {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 10px;
+    overflow-y: auto;
+    padding: 4px 0 0;
+  }
+  .downloadPhotos .thumbCard,
+  .downloadVideos .thumbCard {
+    width: auto;
+    aspect-ratio: 1 / 1;
+  }
+  .downloadPhotos .stripSectionLabel,
+  .downloadVideos .stripSectionLabel {
+    margin: 0 0 8px;
+  }
+}
+
 /* ── Step Responsive ── */
 
 @media (max-width: 768px) {
@@ -2151,6 +2264,14 @@
       "preview actions";
     gap: 0 16px;
     align-items: start;
+  }
+  .downloadLayout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "preview actions"
+      "photos photos"
+      "videos videos";
+    gap: 16px 16px;
   }
   .resultImage {
     grid-area: preview;

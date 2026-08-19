@@ -9,8 +9,8 @@ export interface UseCountdownReturn {
   countdown: number | null;
   flash: boolean;
   busy: boolean;
-  runCountdown: (onFire: () => void | Promise<void>) => Promise<void>;
-  runBatchCountdown: (count: number, onFire: () => void | Promise<void>) => Promise<void>;
+  runCountdown: (onFire: () => void | Promise<void>, onStart?: () => void) => Promise<void>;
+  runBatchCountdown: (count: number, onFire: () => void | Promise<void>, onStart?: () => void) => Promise<void>;
   cancel: () => void;
 }
 
@@ -26,9 +26,10 @@ export function useCountdown(): UseCountdownReturn {
     setBusy(false);
   }, []);
 
-  const runSingle = useCallback(async (onFire: () => void | Promise<void>): Promise<void> => {
+  const runSingle = useCallback(async (onFire: () => void | Promise<void>, onStart?: () => void): Promise<void> => {
     setBusy(true);
     cancelledRef.current = false;
+    onStart?.();
     let timer = COUNTDOWN_SEC;
     setCountdown(timer);
     await new Promise<void>((resolve) => {
@@ -63,14 +64,14 @@ export function useCountdown(): UseCountdownReturn {
     }
   }, []);
 
-  const runCountdown = useCallback(async (onFire: () => void | Promise<void>) => {
-    await runSingle(onFire);
+  const runCountdown = useCallback(async (onFire: () => void | Promise<void>, onStart?: () => void) => {
+    await runSingle(onFire, onStart);
   }, [runSingle]);
 
-  const runBatchCountdown = useCallback(async (count: number, onFire: () => void | Promise<void>) => {
+  const runBatchCountdown = useCallback(async (count: number, onFire: () => void | Promise<void>, onStart?: () => void) => {
     for (let i = 0; i < count; i++) {
       if (cancelledRef.current) break;
-      await runSingle(onFire);
+      await runSingle(onFire, onStart);
     }
   }, [runSingle]);
 

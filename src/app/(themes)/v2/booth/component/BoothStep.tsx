@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { flipImage } from '@/lib/utils/canvas-utils';
 import { captureDslrPhoto } from '@/lib/utils/image-utils';
-import { useCameraDevices, useCountdown } from '@/lib/hooks';
+import { useCameraDevices, useCountdown, useClipRecorder } from '@/lib/hooks';
 import styles from '../../page.module.css';
 import { TemplateData } from '../../types';
 import SharedBoothPreview from '@/components/flow/SharedBoothPreview';
@@ -21,7 +21,7 @@ export default function BoothStep({
   stripLoading, onNext, onBack,
 }: {
   templateName: string; slotsCount: number; filledCount: number; captures: string[];
-  onAddCapture: (url: string, slotIdx?: number) => void; onDeleteCapture: (idx: number) => void;
+  onAddCapture: (url: string, slotIdx?: number, videoUrl?: string) => void; onDeleteCapture: (idx: number) => void;
   templateData: TemplateData | null; keyedFrameImage: string; frameRatio: number;
   stripLoading: boolean; onNext: () => void; onBack: () => void;
 }) {
@@ -37,6 +37,7 @@ export default function BoothStep({
   } = useCameraDevices();
 
   const { countdown, flash, busy, runCountdown, runBatchCountdown } = useCountdown();
+  const { startClip, stopClip } = useClipRecorder();
   const [mirrored, setMirrored] = useState(true);
 
   useEffect(() => {
@@ -53,23 +54,28 @@ export default function BoothStep({
       finally { setDslrCapturing(false); }
     } else {
       const imageSrc = webcamRef.current?.getScreenshot();
+      const clipUrl = await stopClip();
       if (imageSrc) {
-        if (mirrored) await flipImage(imageSrc).then((url) => onAddCapture(url));
-        else onAddCapture(imageSrc);
+        if (mirrored) await flipImage(imageSrc).then((url) => onAddCapture(url, undefined, clipUrl || undefined));
+        else onAddCapture(imageSrc, undefined, clipUrl || undefined);
       }
     }
-  }, [webcamRef, cameraType, mirrored, onAddCapture]);
+  }, [webcamRef, cameraType, mirrored, onAddCapture, stopClip]);
+
+  const beginClip = useCallback(() => {
+    if (cameraType === 'webcam') startClip(webcamRef.current?.video ?? null, mirrored);
+  }, [cameraType, startClip, mirrored]);
 
   const handleManualCapture = useCallback(async () => {
     if (filledCount >= slotsCount || busy) return;
-    await runCountdown(capture);
-  }, [filledCount, slotsCount, busy, runCountdown, capture]);
+    await runCountdown(capture, beginClip);
+  }, [filledCount, slotsCount, busy, runCountdown, capture, beginClip]);
 
   const takePhoto = useCallback((remaining: number) => {
     if (remaining === 0) { setTaking(false); return; }
     setTaking(true);
-    runBatchCountdown(remaining, capture).finally(() => setTaking(false));
-  }, [runBatchCountdown, capture]);
+    runBatchCountdown(remaining, capture, beginClip).finally(() => setTaking(false));
+  }, [runBatchCountdown, capture, beginClip]);
 
   return (
     <div className={styles.boothStage}>

@@ -14,7 +14,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Standalone pages deleted**: all traffic through StepperFlow only
 - **Admin** at `/admin/login`, template-studio at `/strips-studio`
 - **DB**: MongoDB via Mongoose, cached on `globalThis`
-- **Payments**: Midtrans Snap (client-side `window.snap.pay`)
+- **Payments**: Doku SNAP QRIS Direct API (server-side `/snap-adapter/b2b/v1.0/qr/qr-mpm-generate`)
 
 ## Key Decisions
 - Chroma key runs in background after template selection
@@ -25,6 +25,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - `qrcode` lazy-loaded via dynamic `import()`
 - `@imgly/background-removal` dynamically imported (WASM ~30MB)
 - **No standalone routes** (`/booth`, `/result`, `/payment`, `/template` deleted)
+- **Payment Gateway**: Doku SNAP QRIS Direct API (returns `qrContent` directly, not hosted page URL)
+- **Doku API**: Uses OAuth B2B token + HMAC-SHA512 signature for SNAP QRIS (`/snap-adapter/b2b/v1.0/qr/qr-mpm-generate`)
+- **Doku env vars**: `DOKU_CLIENT_ID`, `DOKU_SECRET_KEY`, `DOKU_B2B_SECRET_KEY`, `DOKU_MERCHANT_ID`, `DOKU_TERMINAL_ID`, `DOKU_POSTAL_CODE`, `DOKU_IS_PRODUCTION`
 
 ## Types
 - `ISlot`, `IStripElement`, `ElementProps` defined in `src/app/main/types.ts`

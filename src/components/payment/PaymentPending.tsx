@@ -31,7 +31,7 @@ export default function PaymentPending({
       <Loader2 size={48} className={iconClassName} />
       <p className={titleClassName} style={{ margin: 0, fontWeight: 700 }}>Waiting for Payment...</p>
       <p className={descriptionClassName} style={{ margin: 0, fontSize: 12, color: '#888' }}>
-        Scan the QRIS code with your e-wallet app to complete payment
+        Scan QRIS code with your e-wallet or mobile banking app to complete payment
       </p>
       {errMsg && (
         <p className={errorClassName} style={{ margin: 0, color: '#d64545', display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
