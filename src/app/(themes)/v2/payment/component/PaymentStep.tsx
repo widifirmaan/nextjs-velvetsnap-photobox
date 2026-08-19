@@ -9,7 +9,7 @@ import styles from '../../page.module.css';
 
 export default function PaymentStep({
   price, paid: _paid, setPaid: _setPaid, errMsg: _errMsg, setErrMsg: _setErrMsg,
-  captures, templateId, compositedImage, onSuccess, onBack,
+  captures, templateId, compositedImage, onSuccess, onBack: _onBack,
 }: {
   price: number; paid: boolean; setPaid: (v: boolean) => void;
   errMsg: string | null; setErrMsg: (v: string | null) => void;
@@ -34,11 +34,9 @@ export default function PaymentStep({
           isSnapLoaded={paymentFlow.snapLoaded}
           hasSnapError={paymentFlow.snapError}
           errorMessage={paymentFlow.errMsg}
-          onBack={onBack}
           onRetry={() => window.location.reload()}
           onBypass={handleBypass}
           isBypassing={bypassing}
-          buttonClassName={styles.boothBtn}
           primaryButtonClassName={`${styles.boothBtn} ${styles.boothBtnPrimary}`}
           secondaryButtonClassName={styles.boothBtn}
           errorClassName={styles.errorMessage}

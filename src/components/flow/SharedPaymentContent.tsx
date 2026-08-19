@@ -13,11 +13,9 @@ interface SharedPaymentContentProps {
   isSnapLoaded: boolean;
   hasSnapError: boolean;
   errorMessage: string | null;
-  onBack: () => void;
   onRetry: () => void;
   onBypass: () => Promise<void>;
   isBypassing?: boolean;
-  buttonClassName?: string;
   primaryButtonClassName?: string;
   secondaryButtonClassName?: string;
   errorClassName?: string;
@@ -32,11 +30,9 @@ export default function SharedPaymentContent({
   isSnapLoaded,
   hasSnapError,
   errorMessage,
-  onBack,
   onRetry,
   onBypass,
   isBypassing = false,
-  buttonClassName,
   primaryButtonClassName,
   secondaryButtonClassName,
   errorClassName,
@@ -44,13 +40,6 @@ export default function SharedPaymentContent({
 }: SharedPaymentContentProps) {
   return (
     <div style={containerStyle}>
-      {/* Show back button only when we are not yet paid and the payment UI is idle. */}
-      {!isPaid && !isLoading && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-          <button className={buttonClassName} onClick={onBack}>Back</button>
-        </div>
-      )}
-
       <h2 style={{ margin: '0 0 12px' }}>Payment</h2>
       <p style={{ color: '#888', marginBottom: 24 }}>Scan the QRIS code to pay</p>
 
