@@ -1929,53 +1929,6 @@
     display: none;
   }
 
-  .downloadLayout {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-  .downloadLayout .resultPreview {
-    overflow: visible;
-    width: 100%;
-  }
-  .downloadLayout .previewInner {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 12px;
-    justify-items: center;
-    align-items: center;
-    width: 100%;
-    height: auto;
-  }
-  .downloadLayout .stripCol {
-    grid-column: 1 / -1;
-    justify-self: center;
-    aspect-ratio: auto;
-    height: auto;
-    width: 220px;
-    max-width: 60%;
-    gap: 8px;
-    grid-row: auto;
-  }
-  .downloadLayout .stripFrame {
-    aspect-ratio: 1 / 3;
-    flex: none;
-    width: 100%;
-    height: auto;
-  }
-  .downloadLayout .thumbCard {
-    width: 140px;
-  }
-  .downloadLayout .thumbCard > div {
-    aspect-ratio: 1 / 1;
-    flex: none;
-    height: auto;
-  }
-  .downloadLayout .downloadSidebar {
-    flex: none;
-    width: 100%;
-  }
-
   .boothStage {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: minmax(0, 1fr) auto;
