@@ -1675,8 +1675,28 @@
 }
 
 .downloadLayout {
-  flex: none;
+  display: grid;
+  gap: 16px 24px;
+  align-items: start;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "preview actions"
+    "photos photos"
+    "videos videos";
 }
+
+.downloadPhotos,
+.downloadVideos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.downloadPhotos { grid-area: photos; }
+.downloadVideos { grid-area: videos; }
+.downloadLayout .resultPreview { grid-area: preview; }
+.downloadLayout .downloadSidebar { grid-area: actions; }
 
 .downloadLayout .resultPreview {
   flex: 1;
@@ -1789,6 +1809,39 @@
     max-height: 62dvh;
     width: auto;
     aspect-ratio: 1 / 3;
+  }
+}
+
+@media (min-width: 1101px) {
+  .downloadLayout {
+    grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr) 260px;
+    grid-template-areas: "preview photos videos actions";
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: stretch;
+  }
+  .downloadLayout .resultPreview {
+    align-self: center;
+  }
+  .downloadPhotos .photoStrip,
+  .downloadVideos .photoStrip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    overflow: visible;
+    padding: 4px 0 0;
+  }
+  .downloadPhotos .thumbCard {
+    width: auto;
+    aspect-ratio: 3 / 4;
+  }
+  .downloadVideos .thumbCard {
+    width: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .downloadPhotos .stripSectionLabel,
+  .downloadVideos .stripSectionLabel {
+    margin: 0 0 8px;
   }
 }
 
@@ -1968,6 +2021,14 @@
       "preview actions";
     gap: 0 16px;
     align-items: start;
+  }
+  .downloadLayout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "preview actions"
+      "photos photos"
+      "videos videos";
+    gap: 16px 16px;
   }
 
   .resultPreview {

@@ -36,7 +36,7 @@ function V1DownloadContent() {
 
   if (!tx) {
     return (
-      <div className={styles.page}>
+      <div className={`${styles.page} ${styles.downloadPage}`}>
         <header className={styles.header}>
           <div className={styles.location}>
             <MapPin size={16} />
@@ -52,8 +52,10 @@ function V1DownloadContent() {
     );
   }
 
+  const videos = (tx.videos || []).filter((v) => v);
+
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${styles.downloadPage}`}>
       <header className={styles.header}>
         <div className={styles.location}>
           <MapPin size={16} />
@@ -81,6 +83,42 @@ function V1DownloadContent() {
             </div>
           </div>
 
+          {(tx.captures || []).length > 0 && (
+            <div className={styles.downloadPhotos}>
+              <h3 className={styles.stripSectionLabel}>Individual Photos</h3>
+              <div className={styles.photoStrip}>
+                {(tx.captures || []).map((url, i) => (
+                  <div key={i} className={styles.thumbCard}>
+                    <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--mn-border)', boxShadow: 'var(--mn-shadow-sm, 0 4px 12px rgba(0,0,0,0.10))' }}>
+                      <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <a href={url} download className={styles.downloadBtn}>
+                      <Download size={16} /> Photo {i + 1}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {videos.length > 0 && (
+            <div className={styles.downloadVideos}>
+              <h3 className={styles.stripSectionLabel}>Videos</h3>
+              <div className={`${styles.photoStrip} ${styles.videoStrip}`}>
+                {videos.map((url, i) => (
+                  <div key={i} className={styles.thumbCard}>
+                    <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--mn-border)', boxShadow: 'var(--mn-shadow-sm, 0 4px 12px rgba(0,0,0,0.10))', background: '#111' }}>
+                      <video src={url} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                    <a href={url} download className={styles.downloadBtn}>
+                      <Download size={16} /> Video {i + 1}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className={`${styles.resultActions} ${styles.downloadSidebar}`}>
             {downloadUrl && (
               <div className={styles.qrSection}>
@@ -94,42 +132,6 @@ function V1DownloadContent() {
             )}
           </div>
         </div>
-
-        {(tx.captures || []).length > 0 && (
-          <>
-            <h3 className={styles.stripSectionLabel}>Individual Photos</h3>
-            <div className={styles.photoStrip}>
-              {(tx.captures || []).map((url, i) => (
-                <div key={i} className={styles.thumbCard}>
-                  <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--mn-border)', boxShadow: 'var(--mn-shadow-sm, 0 4px 12px rgba(0,0,0,0.10))' }}>
-                    <img src={url} alt={`Photo ${i + 1}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                  <a href={url} download className={styles.downloadBtn}>
-                    <Download size={16} /> Photo {i + 1}
-                  </a>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-
-        {(tx.videos || []).filter((v) => v).length > 0 && (
-          <>
-            <h3 className={styles.stripSectionLabel}>Videos</h3>
-            <div className={`${styles.photoStrip} ${styles.videoStrip}`}>
-              {(tx.videos || []).filter((v) => v).map((url, i) => (
-                <div key={i} className={styles.thumbCard}>
-                  <div style={{ flex: 1, minHeight: 0, position: 'relative', width: '100%', border: '3px solid var(--mn-border)', boxShadow: 'var(--mn-shadow-sm, 0 4px 12px rgba(0,0,0,0.10))', background: '#111' }}>
-                    <video src={url} muted playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </div>
-                  <a href={url} download className={styles.downloadBtn}>
-                    <Download size={16} /> Video {i + 1}
-                  </a>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
       </div>
     </div>
   );
