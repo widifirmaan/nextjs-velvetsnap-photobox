@@ -1743,6 +1743,43 @@
   width: 140px;
 }
 
+.stripSectionLabel {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--np-text-muted);
+  border-top: 2px solid var(--np-border);
+  padding-top: 8px;
+  margin: 16px 24px 0;
+}
+
+.downloadPage {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+@media (min-width: 769px) {
+  .photoStrip {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    overflow: visible;
+    padding: 8px 24px 4px;
+  }
+  .photoStrip .thumbCard {
+    width: auto;
+    aspect-ratio: 3 / 4;
+  }
+  .photoStrip.videoStrip {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  .photoStrip.videoStrip .thumbCard {
+    aspect-ratio: 16 / 9;
+  }
+}
+
 .notFound {
   flex: 1;
   display: flex;
