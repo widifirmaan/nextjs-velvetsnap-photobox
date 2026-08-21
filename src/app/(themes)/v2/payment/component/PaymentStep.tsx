@@ -34,6 +34,7 @@ export default function PaymentStep({
           isSnapLoaded={paymentFlow.snapLoaded}
           hasSnapError={paymentFlow.snapError}
           errorMessage={paymentFlow.errMsg}
+          qrDataUrl={paymentFlow.qrDataUrl}
           onRetry={() => window.location.reload()}
           onBypass={handleBypass}
           isBypassing={bypassing}

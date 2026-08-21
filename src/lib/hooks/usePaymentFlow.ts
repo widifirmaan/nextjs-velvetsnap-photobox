@@ -3,7 +3,7 @@
 
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { STORAGE_KEYS, MIDTRANS_SNAP_URL, UPLOAD_COMPRESS_THRESHOLD, UPLOAD_PAYMENT_MAX_DIM, SNAP_LOAD_TIMEOUT, SNAP_PAY_TIMEOUT, PAYMENT_SUCCESS_DELAY, PAYMENT_POLL_INTERVAL } from '../utils/constants';
+import { STORAGE_KEYS, UPLOAD_COMPRESS_THRESHOLD, UPLOAD_PAYMENT_MAX_DIM, PAYMENT_SUCCESS_DELAY, PAYMENT_POLL_INTERVAL } from '../utils/constants';
 
 export interface PaymentFlowOptions {
   price: number;
@@ -20,61 +20,23 @@ export interface PaymentFlowResult {
   snapError: boolean;
   paid: boolean;
   errMsg: string | null;
+  qrDataUrl: string | null;
   handleBypass: () => Promise<void>;
-}
-
-declare global {
-  interface Window {
-    snap?: {
-      pay: (token: string, options?: {
-        onSuccess?: (result: unknown) => void;
-        onPending?: (result: unknown) => void;
-        onError?: (result: unknown) => void;
-        onClose?: () => void;
-      }) => void;
-    };
-  }
 }
 
 export function usePaymentFlow({ price, templateId, captures, videos, compositedImage, onSuccess }: PaymentFlowOptions): PaymentFlowResult {
   const [loading, setLoading] = useState(true);
-  const [snapLoaded, setSnapLoaded] = useState(false);
-  const [snapError, setSnapError] = useState(false);
+  const [snapLoaded] = useState(true);
+  const [snapError] = useState(false);
   const [paid, setPaid] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const autoTriggered = useRef(false);
-  const snapInitRef = useRef(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const payTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (snapInitRef.current) return;
-    snapInitRef.current = true;
-    const script = document.createElement('script');
-    script.src = MIDTRANS_SNAP_URL;
-    script.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || '');
-    script.async = true;
-    let timeoutId: ReturnType<typeof setTimeout> | null = setTimeout(() => {
-      setSnapError(true);
-    }, SNAP_LOAD_TIMEOUT);
-
-    script.onload = () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = null;
-      setSnapLoaded(true);
-    };
-    script.onerror = (_e) => {
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = null;
-      setSnapError(true);
-    };
-    document.body.appendChild(script);
-
     return () => {
-      if (timeoutId) clearTimeout(timeoutId);
       if (pollRef.current) clearInterval(pollRef.current);
-      if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
-      snapInitRef.current = false;
     };
   }, []);
 
@@ -226,7 +188,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
       void finalizeOrder('FREE');
       return;
     }
-    if (!snapLoaded || !price) return;
+    if (!price) return;
     autoTriggered.current = true;
     setLoading(true);
     setErrMsg(null);
@@ -238,90 +200,50 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
 
     (async () => {
       try {
-        const chargeRes = await fetch('/api/midtrans/charge', {
+        const chargeRes = await fetch('/api/doku/charge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sessionId, templateId: templateId || 't1', price }),
         });
         const chargeData = await chargeRes.json();
         if (!chargeRes.ok || !chargeData.success) {
-          throw new Error(chargeData.error || 'Failed to create payment');
+          throw new Error(chargeData.error || 'Failed to create QRIS payment');
         }
 
-        const { token, transactionId, orderId } = chargeData.data;
+        const { qrString, transactionId, orderId } = chargeData.data;
+        if (transactionId) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, transactionId);
 
-        if (!window.snap) {
-          throw new Error('Payment gateway not loaded');
-        }
+        // Render the DOKU qr_string as a scannable QR image.
+        const QRCode = await import('qrcode');
+        const url = await QRCode.toDataURL(qrString, { width: 512, margin: 2 });
+        setQrDataUrl(url);
+        setLoading(false);
 
-        payTimeoutRef.current = setTimeout(() => {
-          setErrMsg('Payment popup may be blocked or timed out. Please try again.');
-          setLoading(false);
-          autoTriggered.current = false;
-          payTimeoutRef.current = null;
-        }, SNAP_PAY_TIMEOUT);
-
-        window.snap.pay(token, {
-          onSuccess: async () => {
-            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
-            payTimeoutRef.current = null;
-            setPaid(true);
-            if (transactionId) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, transactionId);
-            try {
-              await saveTx(sessionId, orderId, 'PENDING');
-            } catch (e) {
-              reportError('Save transaction (pre-upload) failed', e);
-            }
-            try {
-              const photos = await uploadWithRetry();
-              await saveTx(sessionId, orderId, 'PENDING', photos);
-            } catch (e) {
-              reportError('Payment photo upload failed', e);
-              setErrMsg('Pembayaran sukses, tetapi foto gagal diunggah. Hubungi admin.');
-            }
-            setTimeout(() => onSuccess(transactionId || 'ok'), PAYMENT_SUCCESS_DELAY);
-          },
-          onPending: () => {
-            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
-            payTimeoutRef.current = null;
-            setPaid(true);
-            pollRef.current = setInterval(async () => {
+        pollRef.current = setInterval(async () => {
+          try {
+            const res = await fetch('/api/doku/status?sessionId=' + encodeURIComponent(sessionId));
+            const data = await res.json();
+            if (data.success && data.data.status === 'PAID') {
+              if (pollRef.current) clearInterval(pollRef.current);
+              pollRef.current = null;
+              setPaid(true);
+              if (data.data._id) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, data.data._id);
               try {
-                const res = await fetch('/api/midtrans/status?sessionId=' + encodeURIComponent(sessionId));
-                const data = await res.json();
-                if (data.success && data.data.status === 'PAID') {
-                  if (pollRef.current) clearInterval(pollRef.current);
-                  pollRef.current = null;
-                  if (data.data._id) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, data.data._id);
-                  try {
-                    await saveTx(sessionId, orderId, 'PENDING');
-                  } catch (e) {
-                    reportError('Save transaction (poll, pre-upload) failed', e);
-                  }
-                  try {
-                    const photos = await uploadWithRetry();
-                    await saveTx(sessionId, orderId, 'PENDING', photos);
-                  } catch (e) {
-                    reportError('Payment poll photo upload failed', e);
-                    setErrMsg('Pembayaran sukses, tetapi foto gagal diunggah. Hubungi admin.');
-                  }
-                  onSuccess(data.data._id || 'ok');
-                }
-              } catch (e) { console.error('Payment poll error', e); }
-            }, PAYMENT_POLL_INTERVAL);
-          },
-          onError: () => {
-            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
-            payTimeoutRef.current = null;
-            setErrMsg('Payment failed. Please try again.');
-            setLoading(false);
-          },
-          onClose: () => {
-            if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
-            payTimeoutRef.current = null;
-            setLoading(false);
-          },
-        });
+                await saveTx(sessionId, orderId, 'PENDING');
+              } catch (e) {
+                reportError('Save transaction (poll, pre-upload) failed', e);
+              }
+              try {
+                const photos = await uploadWithRetry();
+                await saveTx(sessionId, orderId, 'PENDING', photos);
+              } catch (e) {
+                reportError('Payment poll photo upload failed', e);
+                setErrMsg('Pembayaran sukses, tetapi foto gagal diunggah. Hubungi admin.');
+              }
+              setTimeout(() => onSuccess(data.data._id || transactionId || 'ok'), PAYMENT_SUCCESS_DELAY);
+            }
+          } catch (e) { console.error('QRIS poll error', e); }
+        }, PAYMENT_POLL_INTERVAL);
       } catch (err: unknown) {
         setErrMsg(err instanceof Error ? err.message : String(err));
         setLoading(false);
@@ -329,10 +251,10 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
       }
     })();
     return () => {
-      if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
-      payTimeoutRef.current = null;
+      if (pollRef.current) clearInterval(pollRef.current);
+      pollRef.current = null;
     };
-  }, [snapLoaded, templateId, price, paid, onSuccess, finalizeOrder]);
+  }, [templateId, price, paid, onSuccess, finalizeOrder]);
 
   const handleBypass = useCallback(async () => {
     if (paid) return;
@@ -340,5 +262,5 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
     await finalizeOrder('BYPASS');
   }, [paid, finalizeOrder]);
 
-  return { loading, snapLoaded, snapError, paid, errMsg, handleBypass };
+  return { loading, snapLoaded, snapError, paid, errMsg, qrDataUrl, handleBypass };
 }

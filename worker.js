@@ -359,6 +359,10 @@ export default {
         if (path === '/api/midtrans/notification' && request.method === 'POST') return handleMidtransNotification(request, db, env);
         if (path === '/api/midtrans/status' && request.method === 'GET') return handleMidtransStatus(request, db);
 
+        if (path === '/api/doku/charge' && request.method === 'POST') return handleDokuCharge(request, db, env);
+        if (path === '/api/doku/notification' && request.method === 'POST') return handleDokuNotification(request, db, env);
+        if (path === '/api/doku/status' && request.method === 'GET') return handleMidtransStatus(request, db);
+
         if (path === '/api/upload' && request.method === 'POST') return handleUpload(request, env);
 
         if (path === '/api/camera/capture' && request.method === 'POST') return handleCameraCapture(request);
@@ -1197,6 +1201,138 @@ async function handleMidtransStatus(request, db) {
             data: { _id: tx.id, status: tx.status, midtransStatus: tx.midtransStatus, orderId: tx.orderId, qrCodeUrl: tx.qrCodeUrl, transactionId: tx.midtransTransactionId, paymentMethod: tx.paymentMethod },
         });
     } catch (e) {
+        return json({ success: false, error: e.message }, 500);
+    }
+}
+
+// ── DOKU QRIS ──
+function getDokuConfig(env) {
+    const clientId = getEnv(env, 'DOKU_CLIENT_ID') || '';
+    const secretKey = getEnv(env, 'DOKU_SECRET_KEY') || '';
+    const isProduction = (getEnv(env, 'DOKU_IS_PRODUCTION') || 'false') === 'true';
+    const baseUrl = isProduction ? 'https://api.doku.com' : 'https://api-sandbox.doku.com';
+    return { clientId, secretKey, baseUrl };
+}
+
+async function sha256Hex(str) {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hmacSha256Base64(secret, str) {
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(str));
+    let bin = '';
+    const bytes = new Uint8Array(sig);
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+}
+
+function dokuTimestamp() {
+    // DOKU expects Asia/Jakarta time (UTC+7) in ISO8601, e.g. 2026-01-01T12:00:00+07:00
+    return new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 19) + '+07:00';
+}
+
+async function handleDokuCharge(request, db, env) {
+    try {
+        const body = await request.json();
+        const { sessionId, templateId, price, captures, videos, finalImage } = body;
+        if (!sessionId || !templateId || !price) return json({ success: false, error: 'Missing required fields' }, 400);
+
+        const { clientId, secretKey, baseUrl } = getDokuConfig(env);
+        if (!clientId || !secretKey) return json({ success: false, error: 'DOKU not configured. Set DOKU_CLIENT_ID and DOKU_SECRET_KEY.' }, 500);
+
+        const invoiceNumber = `VS-${sessionId}-${Date.now()}`.slice(0, 64);
+        const requestId = crypto.randomUUID();
+        const timestamp = dokuTimestamp();
+        const payload = JSON.stringify({
+            order: { amount: price, invoice_number: invoiceNumber },
+            payment: { payment_due_date: 60 },
+        });
+        const digest = await sha256Hex(payload);
+        const signature = await hmacSha256Base64(secretKey, clientId + requestId + timestamp + digest);
+
+        const res = await fetch(baseUrl + '/qrisswitch/v2/payment', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Client-Id': clientId,
+                'Request-Id': requestId,
+                'Request-Timestamp': timestamp,
+                'Signature': signature,
+            },
+            body: payload,
+        });
+        const data = await res.json();
+        const qrString = data?.response?.payment?.qr_string;
+        if (!res.ok || !qrString) {
+            console.error('DOKU charge failed:', JSON.stringify(data));
+            return json({ success: false, error: data?.error?.message || data?.response?.payment?.status || 'DOKU charge failed' }, 502);
+        }
+
+        const existing = await db.prepare('SELECT id, status FROM transactions WHERE sessionId = ?').bind(sessionId).first();
+        if (existing) {
+            // Never downgrade a transaction the server has already confirmed as PAID.
+            const keepPaid = existing.status === 'PAID';
+            await db.prepare('UPDATE transactions SET orderId = ?, price = ?, status = ?, midtransStatus = ?, qrCodeUrl = ?, updatedAt = datetime("now") WHERE sessionId = ?').bind(
+                invoiceNumber, price, keepPaid ? 'PAID' : 'PENDING', keepPaid ? 'SUCCESS' : 'STARTUP', qrString, sessionId
+            ).run();
+        } else {
+            const id = generateId();
+            await db.prepare('INSERT INTO transactions (id, sessionId, templateId, orderId, price, status, captures, videos, finalImage, midtransStatus, qrCodeUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(
+                id, sessionId, templateId, invoiceNumber, price, 'PENDING', JSON.stringify(captures || []), JSON.stringify(videos || []), finalImage || '', 'STARTUP', qrString
+            ).run();
+        }
+
+        const tx = await db.prepare('SELECT id FROM transactions WHERE sessionId = ?').bind(sessionId).first();
+        return json({
+            success: true,
+            data: { qrString, orderId: invoiceNumber, transactionId: tx?.id },
+        });
+    } catch (e) {
+        return json({ success: false, error: e.message }, 500);
+    }
+}
+
+async function handleDokuNotification(request, db, env) {
+    try {
+        const rawBody = await request.text();
+        const body = JSON.parse(rawBody);
+        const invoiceNumber = body?.order?.invoice_number;
+        const txStatus = body?.transaction?.status;
+        if (!invoiceNumber) return json({ success: false, error: 'Missing invoice_number' }, 400);
+
+        const { clientId, secretKey } = getDokuConfig(env);
+        if (!clientId || !secretKey) return json({ success: false, error: 'DOKU not configured' }, 500);
+        const requestId = request.headers.get('Request-Id') || '';
+        const timestamp = request.headers.get('Request-Timestamp') || '';
+        const receivedSig = request.headers.get('Signature') || '';
+        const digest = await sha256Hex(rawBody);
+        const computed = await hmacSha256Base64(secretKey, clientId + requestId + timestamp + digest);
+        if (computed !== receivedSig) {
+            console.error('DOKU notification signature mismatch');
+            return json({ success: false, error: 'Invalid signature' }, 403);
+        }
+
+        if (txStatus !== 'SUCCESS') return json({ success: true });
+
+        const updateData = { status: 'PAID', midtransStatus: 'SUCCESS', paymentMethod: 'qris_doku', updatedAt: new Date().toISOString() };
+        const sets = Object.entries(updateData).map(([k]) => `${k} = ?`).join(', ');
+        const vals = Object.values(updateData);
+        vals.push(invoiceNumber);
+        const result = await db.prepare(`UPDATE transactions SET ${sets} WHERE orderId = ?`).bind(...vals).run();
+        // Notification can arrive before the client finishes uploading; create the row
+        // so the payment status is never lost.
+        if ((result.meta.changes ?? result.meta.changed ?? 0) === 0) {
+            const sessionId = invoiceNumber.startsWith('VS-') ? invoiceNumber.slice(3).replace(/-\d+$/, '') : '';
+            await db.prepare('INSERT INTO transactions (id, sessionId, templateId, orderId, price, status, midtransStatus, paymentMethod) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(
+                generateId(), sessionId, 't1', invoiceNumber, parseFloat(body?.order?.amount) || 0, 'PAID', 'SUCCESS', 'qris_doku'
+            ).run();
+        }
+
+        return json({ success: true });
+    } catch (e) {
+        console.error('DOKU notification error:', e);
         return json({ success: false, error: e.message }, 500);
     }
 }
