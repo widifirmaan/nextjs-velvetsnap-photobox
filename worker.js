@@ -1228,9 +1228,30 @@ async function hmacSha256Base64(secret, str) {
     return btoa(bin);
 }
 
+// Digest component: base64-encoded SHA-256 of the raw JSON body.
+async function dokuDigest(rawBody) {
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(rawBody));
+    let bin = '';
+    const bytes = new Uint8Array(digest);
+    for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+    return btoa(bin);
+}
+
+// Signature per DOKU spec: newline-separated "Name:value" components,
+// HMAC-SHA256-base64 with the Secret Key, prefixed with "HMACSHA256=".
+async function dokuSignature(secretKey, clientId, requestId, timestamp, requestTarget, digestB64) {
+    const stringToSign =
+        `Client-Id:${clientId}\n` +
+        `Request-Id:${requestId}\n` +
+        `Request-Timestamp:${timestamp}\n` +
+        `Request-Target:${requestTarget}\n` +
+        `Digest:${digestB64}`;
+    return 'HMACSHA256=' + await hmacSha256Base64(secretKey, stringToSign);
+}
+
 function dokuTimestamp() {
-    // DOKU expects Asia/Jakarta time (UTC+7) in ISO8601, e.g. 2026-01-01T12:00:00+07:00
-    return new Date(Date.now() + 7 * 3600 * 1000).toISOString().slice(0, 19) + '+07:00';
+    // DOKU expects UTC time in ISO8601 Z format, e.g. 2024-07-12T02:45:31Z
+    return new Date().toISOString().slice(0, 19) + 'Z';
 }
 
 async function handleDokuCharge(request, db, env) {
@@ -1249,10 +1270,11 @@ async function handleDokuCharge(request, db, env) {
             order: { amount: price, invoice_number: invoiceNumber },
             payment: { payment_due_date: 60 },
         });
-        const digest = await sha256Hex(payload);
-        const signature = await hmacSha256Base64(secretKey, clientId + requestId + timestamp + digest);
+        const digest = await dokuDigest(payload);
+        const signature = await dokuSignature(secretKey, clientId, requestId, timestamp, '/checkout/v1/payment', digest);
 
-        const res = await fetch(baseUrl + '/qrisswitch/v2/payment', {
+        // DOKU Checkout v1: returns a hosted payment page (QRIS available inside).
+        const res = await fetch(baseUrl + '/checkout/v1/payment', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1264,8 +1286,8 @@ async function handleDokuCharge(request, db, env) {
             body: payload,
         });
         const data = await res.json();
-        const qrString = data?.response?.payment?.qr_string;
-        if (!res.ok || !qrString) {
+        const paymentUrl = data?.response?.payment?.url;
+        if (!res.ok || !paymentUrl) {
             console.error('DOKU charge failed:', JSON.stringify(data));
             return json({ success: false, error: data?.error?.message || data?.response?.payment?.status || 'DOKU charge failed' }, 502);
         }
@@ -1275,19 +1297,19 @@ async function handleDokuCharge(request, db, env) {
             // Never downgrade a transaction the server has already confirmed as PAID.
             const keepPaid = existing.status === 'PAID';
             await db.prepare('UPDATE transactions SET orderId = ?, price = ?, status = ?, midtransStatus = ?, qrCodeUrl = ?, updatedAt = datetime("now") WHERE sessionId = ?').bind(
-                invoiceNumber, price, keepPaid ? 'PAID' : 'PENDING', keepPaid ? 'SUCCESS' : 'STARTUP', qrString, sessionId
+                invoiceNumber, price, keepPaid ? 'PAID' : 'PENDING', keepPaid ? 'SUCCESS' : 'STARTUP', paymentUrl, sessionId
             ).run();
         } else {
             const id = generateId();
             await db.prepare('INSERT INTO transactions (id, sessionId, templateId, orderId, price, status, captures, videos, finalImage, midtransStatus, qrCodeUrl) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(
-                id, sessionId, templateId, invoiceNumber, price, 'PENDING', JSON.stringify(captures || []), JSON.stringify(videos || []), finalImage || '', 'STARTUP', qrString
+                id, sessionId, templateId, invoiceNumber, price, 'PENDING', JSON.stringify(captures || []), JSON.stringify(videos || []), finalImage || '', 'STARTUP', paymentUrl
             ).run();
         }
 
         const tx = await db.prepare('SELECT id FROM transactions WHERE sessionId = ?').bind(sessionId).first();
         return json({
             success: true,
-            data: { qrString, orderId: invoiceNumber, transactionId: tx?.id },
+            data: { paymentUrl, orderId: invoiceNumber, transactionId: tx?.id },
         });
     } catch (e) {
         return json({ success: false, error: e.message }, 500);
@@ -1307,8 +1329,8 @@ async function handleDokuNotification(request, db, env) {
         const requestId = request.headers.get('Request-Id') || '';
         const timestamp = request.headers.get('Request-Timestamp') || '';
         const receivedSig = request.headers.get('Signature') || '';
-        const digest = await sha256Hex(rawBody);
-        const computed = await hmacSha256Base64(secretKey, clientId + requestId + timestamp + digest);
+        const digest = await dokuDigest(rawBody);
+        const computed = await dokuSignature(secretKey, clientId, requestId, timestamp, '/api/doku/notification', digest);
         if (computed !== receivedSig) {
             console.error('DOKU notification signature mismatch');
             return json({ success: false, error: 'Invalid signature' }, 403);

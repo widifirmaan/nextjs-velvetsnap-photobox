@@ -20,7 +20,7 @@ export interface PaymentFlowResult {
   snapError: boolean;
   paid: boolean;
   errMsg: string | null;
-  qrDataUrl: string | null;
+  paymentUrl: string | null;
   handleBypass: () => Promise<void>;
 }
 
@@ -30,7 +30,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
   const [snapError] = useState(false);
   const [paid, setPaid] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+  const [paymentUrl, setPaymentUrl] = useState<string | null>(null);
   const autoTriggered = useRef(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -210,13 +210,11 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
           throw new Error(chargeData.error || 'Failed to create QRIS payment');
         }
 
-        const { qrString, transactionId, orderId } = chargeData.data;
+        const { paymentUrl: url, transactionId, orderId } = chargeData.data;
         if (transactionId) sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, transactionId);
 
-        // Render the DOKU qr_string as a scannable QR image.
-        const QRCode = await import('qrcode');
-        const url = await QRCode.toDataURL(qrString, { width: 512, margin: 2 });
-        setQrDataUrl(url);
+        // DOKU Checkout v3 returns a hosted payment page (QRIS inside).
+        setPaymentUrl(url);
         setLoading(false);
 
         pollRef.current = setInterval(async () => {
@@ -262,5 +260,5 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
     await finalizeOrder('BYPASS');
   }, [paid, finalizeOrder]);
 
-  return { loading, snapLoaded, snapError, paid, errMsg, qrDataUrl, handleBypass };
+  return { loading, snapLoaded, snapError, paid, errMsg, paymentUrl, handleBypass };
 }
