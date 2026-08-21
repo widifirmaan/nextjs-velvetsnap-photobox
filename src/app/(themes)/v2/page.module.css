@@ -1843,7 +1843,7 @@
     min-height: 0;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 4px 8px;
+    gap: 4px 10px;
     overflow-y: auto;
     padding: 4px 0 0;
   }
@@ -1851,7 +1851,6 @@
   .downloadVideos .thumbCard {
     width: auto;
     aspect-ratio: 1 / 1;
-    gap: 2px;
   }
   .downloadPhotos .stripSectionLabel,
   .downloadVideos .stripSectionLabel {
