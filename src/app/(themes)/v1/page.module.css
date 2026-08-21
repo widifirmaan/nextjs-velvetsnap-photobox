@@ -2113,15 +2113,9 @@
 }
 
 @media (min-width: 1101px) {
-  .downloadPage .stepPageResult {
-    padding-left: 24px;
-    padding-right: 24px;
-  }
   .downloadLayout {
     grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr) 260px;
     grid-template-areas: "preview photos videos actions";
-    max-width: 1200px;
-    margin: 0 auto;
     align-items: stretch;
   }
   .downloadLayout .resultPreview {

@@ -1816,8 +1816,8 @@
   .downloadLayout {
     grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr) 260px;
     grid-template-areas: "preview photos videos actions";
-    max-width: 1200px;
-    margin: 0 auto;
+    padding-left: 5%;
+    padding-right: 5%;
     align-items: stretch;
   }
   .downloadLayout .resultPreview {
