@@ -140,7 +140,7 @@ function V2DownloadContent() {
             Your Photos are Ready!
           </h2>
           {downloadUrl && (
-            <div style={{ marginTop: 8, textAlign: 'center' }}>
+            <div style={{ marginTop: 0, textAlign: 'center' }}>
               <div style={{ borderTop: '2px solid var(--np-border)', marginBottom: 12 }} />
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 10, color: 'var(--np-text-muted)', marginBottom: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
                 <Smartphone size={14} /> Scan to download
