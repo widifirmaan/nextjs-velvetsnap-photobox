@@ -1784,19 +1784,19 @@
   .photoStrip {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 16px;
+    gap: 10px;
     overflow: visible;
     padding: 8px 24px 4px;
   }
   .photoStrip .thumbCard {
     width: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
   }
   .photoStrip.videoStrip {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
   .photoStrip.videoStrip .thumbCard {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
   }
   .downloadLayout .previewInner {
     display: flex;
@@ -1841,23 +1841,19 @@
   .downloadVideos .photoStrip {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-  }
-  .downloadPhotos .photoStrip,
-  .downloadVideos .photoStrip {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    overflow: visible;
+    gap: 8px;
+    overflow-y: auto;
     padding: 4px 0 0;
   }
   .downloadPhotos .thumbCard {
     width: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
   }
   .downloadVideos .thumbCard {
     width: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
   }
   .downloadPhotos .stripSectionLabel,
   .downloadVideos .stripSectionLabel {
