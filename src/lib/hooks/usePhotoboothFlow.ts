@@ -16,6 +16,9 @@ export interface PhotoboothFlowOptions {
   sessionTimer: number;
 }
 
+// Random strip price: multiples of 5000 between Rp 0 and Rp 50000.
+const randomStripPrice = () => Math.floor(Math.random() * 11) * 5000;
+
 export interface PhotoboothFlowResult {
   templateId: string | null;
   templateData: TemplateData | null;
@@ -60,7 +63,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
   const [frameRatio, setFrameRatio] = useState(2 / 3);
   const [stripLoading, setStripLoading] = useState(false);
   const [compositedImage, setCompositedImage] = useState<string | null>(null);
-  const [price, setPrice] = useState(35000);
+  const [price, setPrice] = useState(randomStripPrice);
   const [paid, setPaid] = useState(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [txId, setTxId] = useState<string | null>(null);
@@ -86,7 +89,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       setTemplateId(restored.id);
       if (restored.data) {
         setTemplateData(restored.data);
-        setPrice(restored.data.templatePrice ?? 35000);
+        setPrice(randomStripPrice());
         const canvasWidth = restored.data.templateData?.canvasWidth || 1000;
         const canvasHeight = restored.data.templateData?.canvasHeight || 3000;
         setFrameRatio(canvasWidth / canvasHeight);
@@ -225,7 +228,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
     setFrameRatio(canvasWidth / canvasHeight);
     if (data) {
       setTemplateData(data);
-      setPrice(data.templatePrice ?? 35000);
+      setPrice(randomStripPrice());
       if (data.templateFull && !keyedUrl) {
         setKeyedFrameImage(data.templateFull);
       }
@@ -233,7 +236,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       const found = cachedTemplates.find((template) => template.templateId === id);
       if (found) {
         setTemplateData(found);
-        setPrice(found.templatePrice ?? 35000);
+        setPrice(randomStripPrice());
       }
     }
     try {
@@ -270,7 +273,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       if (templateIdRef.current !== requestedId) return;
       if (matchedTemplate) {
         setTemplateData(matchedTemplate);
-        setPrice(matchedTemplate.templatePrice ?? 35000);
+        setPrice(randomStripPrice());
         const canvasWidth = matchedTemplate.templateData.canvasWidth || 1000;
         const canvasHeight = matchedTemplate.templateData.canvasHeight || 3000;
 

@@ -185,9 +185,48 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
     } catch {}
   }, []);
 
+  // Save the transaction, upload photos/videos and continue to the result step
+  // without going through Midtrans (used for free strips and bypass).
+  const finalizeOrder = useCallback(async (prefix: string) => {
+    const now = Date.now();
+    const sessionId = sessionStorage.getItem(STORAGE_KEYS.PHOTOBOOTH_SESSION) ||
+      (typeof crypto !== 'undefined' && crypto.randomUUID?.()) ||
+      Math.random().toString(36).substring(2);
+    sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, sessionId);
+    const orderId = prefix + '_' + now + '_' + Math.random().toString(36).slice(2, 6);
+    try {
+      await saveTx(sessionId, orderId, 'PAID');
+    } catch (e) {
+      reportError('Save transaction (pre-upload) failed', e);
+    }
+    try {
+      const photos = await uploadWithRetry();
+      const saved = await saveTx(sessionId, orderId, 'PAID', photos);
+      const txId = saved.data?._id || prefix.toLowerCase() + '_' + now;
+      if (saved.data?._id) {
+        sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, saved.data._id);
+      }
+      setPaid(true);
+      setTimeout(() => onSuccess(txId), PAYMENT_SUCCESS_DELAY);
+    } catch (e) {
+      reportError(prefix === 'FREE' ? 'Free strip upload failed' : 'Bypass upload failed', e);
+      setErrMsg('Foto gagal diunggah. Hubungi admin.');
+      autoTriggered.current = false;
+    }
+  }, [saveTx, uploadWithRetry, reportError, onSuccess]);
+
   useEffect(() => {
     if (autoTriggered.current || paid) return;
-    if (!snapLoaded || !templateId || !price) return;
+    if (!templateId) return;
+    // Free strip (random price can be Rp 0): skip Midtrans entirely.
+    if (price === 0) {
+      autoTriggered.current = true;
+      setLoading(true);
+      setErrMsg(null);
+      void finalizeOrder('FREE');
+      return;
+    }
+    if (!snapLoaded || !price) return;
     autoTriggered.current = true;
     setLoading(true);
     setErrMsg(null);
@@ -293,36 +332,13 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
       if (payTimeoutRef.current) clearTimeout(payTimeoutRef.current);
       payTimeoutRef.current = null;
     };
-  }, [snapLoaded, templateId, price, paid, onSuccess]);
+  }, [snapLoaded, templateId, price, paid, onSuccess, finalizeOrder]);
 
   const handleBypass = useCallback(async () => {
     if (paid) return;
     setErrMsg(null);
-    const now = Date.now();
-    const sessionId = sessionStorage.getItem(STORAGE_KEYS.PHOTOBOOTH_SESSION) ||
-      (typeof crypto !== 'undefined' && crypto.randomUUID?.()) ||
-      Math.random().toString(36).substring(2);
-    sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_SESSION, sessionId);
-    const orderId = 'BYPASS_' + now + '_' + Math.random().toString(36).slice(2, 6);
-    try {
-      await saveTx(sessionId, orderId, 'PAID');
-    } catch (e) {
-      reportError('Bypass save transaction (pre-upload) failed', e);
-    }
-    try {
-      const photos = await uploadWithRetry();
-      const saved = await saveTx(sessionId, orderId, 'PAID', photos);
-      const txId = saved.data?._id || 'bypass_' + now;
-      if (saved.data?._id) {
-        sessionStorage.setItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID, saved.data._id);
-      }
-      setPaid(true);
-      setTimeout(() => onSuccess(txId), PAYMENT_SUCCESS_DELAY);
-    } catch (e) {
-      console.error('Bypass failed', e);
-      setErrMsg('Bypass failed: ' + (e instanceof Error ? e.message : String(e)));
-    }
-  }, [paid, templateId, price, onSuccess]);
+    await finalizeOrder('BYPASS');
+  }, [paid, finalizeOrder]);
 
   return { loading, snapLoaded, snapError, paid, errMsg, handleBypass };
 }
