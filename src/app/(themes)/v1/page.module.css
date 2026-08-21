@@ -2090,13 +2090,13 @@
   }
   .photoStrip .thumbCard {
     width: auto;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 4 / 3;
   }
   .photoStrip.videoStrip {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
   .photoStrip.videoStrip .thumbCard {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
   }
   .downloadLayout .previewInner {
     display: flex;
@@ -2113,7 +2113,20 @@
 }
 
 @media (min-width: 1101px) {
+  .downloadPage {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .downloadPage .stepPage {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
   .downloadLayout {
+    flex: 1;
+    min-height: 0;
     grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) 260px;
     grid-template-areas: "preview photos videos actions";
     align-items: stretch;
@@ -2121,9 +2134,22 @@
   .downloadLayout .resultPreview {
     align-self: stretch;
   }
+  .downloadLayout .previewInner {
+    height: 100%;
+  }
   .downloadLayout .stripCol {
-    height: 100dvh;
+    height: 100%;
     max-height: none;
+  }
+  .downloadPhotos,
+  .downloadVideos {
+    overflow: hidden;
+  }
+  .downloadPhotos .photoStrip,
+  .downloadVideos .photoStrip {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
   }
   .downloadPhotos .photoStrip,
   .downloadVideos .photoStrip {
@@ -2135,11 +2161,11 @@
   }
   .downloadPhotos .thumbCard {
     width: auto;
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 4 / 3;
   }
   .downloadVideos .thumbCard {
     width: auto;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
   }
   .downloadPhotos .stripSectionLabel,
   .downloadVideos .stripSectionLabel {
