@@ -1814,14 +1814,18 @@
 
 @media (min-width: 1101px) {
   .downloadLayout {
-    grid-template-columns: 180px minmax(0, 1fr) minmax(0, 1fr) 260px;
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) 260px;
     grid-template-areas: "preview photos videos actions";
     padding-left: 5%;
     padding-right: 5%;
     align-items: stretch;
   }
   .downloadLayout .resultPreview {
-    align-self: center;
+    align-self: stretch;
+  }
+  .downloadLayout .stripCol {
+    height: 100dvh;
+    max-height: none;
   }
   .downloadPhotos .photoStrip,
   .downloadVideos .photoStrip {
