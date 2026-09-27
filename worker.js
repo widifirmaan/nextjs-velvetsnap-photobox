@@ -1556,12 +1556,12 @@ async function handleUpload(request, env) {
         const maxBytes = resourceType === 'video' ? 30 * 1024 * 1024 : 10 * 1024 * 1024;
         if (fileBytes > maxBytes) return json({ success: false, error: `File too large (max ${Math.round(maxBytes / 1024 / 1024)}MB)` }, 400);
 
-        const mimeMatch = dataUri.match(/^data:(image|video)\/(\w+);[^;]+;base64,/);
-        const allowedImage = ['jpeg', 'png', 'webp', 'gif'];
-        const allowedVideo = ['mp4', 'webm', 'quicktime'];
-        if (!mimeMatch) return json({ success: false, error: 'Invalid data URI type' }, 400);
+        const mimeMatch = dataUri.match(/^data:(image|video)\/(\w+);/);
+        if (!mimeMatch || !dataUri.includes(';base64,')) return json({ success: false, error: 'Invalid data URI type' }, 400);
         const kind = mimeMatch[1];
         const ext = mimeMatch[2];
+        const allowedImage = ['jpeg', 'png', 'webp', 'gif'];
+        const allowedVideo = ['mp4', 'webm', 'quicktime'];
         if (kind === 'image' && !allowedImage.includes(ext)) {
             return json({ success: false, error: 'Invalid image type. Supported: jpeg, png, webp, gif' }, 400);
         }
