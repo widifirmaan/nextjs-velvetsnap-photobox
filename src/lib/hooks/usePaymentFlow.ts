@@ -97,8 +97,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
       (videos || []).map(async (v) => {
         if (!v) return '';
         if (v.startsWith('data:')) return await uploadOne(v, 'velvetsnap/videos');
-        const dataUri = await blobToDataUri(v);
-        return await uploadOne(dataUri, 'velvetsnap/videos');
+        return v;
       })
     );
     return { captures: uploadedCaptures, videos: uploadedVideos, finalImage };
@@ -215,7 +214,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
         const chargeRes = await fetch('/api/doku/charge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, templateId: templateId || 't1', price, captures, videos, finalImage: compositedImage }),
+          body: JSON.stringify({ sessionId, templateId: templateId || 't1', price }),
         });
         const chargeData = await chargeRes.json();
         if (!chargeRes.ok || !chargeData.success) {
