@@ -67,14 +67,12 @@ export default function SharedPaymentContent({
           )}
           <div style={{ fontSize: 18, fontWeight: 700, textAlign: 'center' }}>Rp {price.toLocaleString('id-ID')}</div>
           {errorMessage && (
-            <div style={{ textAlign: 'center', marginTop: 16 }}>
-              <p className={errorClassName}>{errorMessage}</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
               <button className={primaryButtonClassName} onClick={onRetry} style={{ marginTop: 12 }}>Retry Payment</button>
             </div>
           )}
           {!errorMessage && hasSnapError && (
-            <div style={{ textAlign: 'center', marginTop: 16 }}>
-              <p className={errorClassName}>Payment gateway failed to load. Check your connection.</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
               <button className={primaryButtonClassName} onClick={onRetry} style={{ marginTop: 12 }}>Retry</button>
             </div>
           )}

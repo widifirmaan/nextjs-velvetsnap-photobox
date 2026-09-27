@@ -33,12 +33,20 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const autoTriggered = useRef(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const bypassRequested = useRef(false);
 
   useEffect(() => {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, []);
+
+  const handleBypass = useCallback(async () => {
+    if (paid) return;
+    bypassRequested.current = true;
+    setErrMsg(null);
+    await finalizeOrder('BYPASS');
+  }, [paid, finalizeOrder]);
 
   const uploadImages = useCallback(async (): Promise<{ captures: string[]; videos: string[]; finalImage: string }> => {
     const uploadOne = async (dataUri: string, folder: string): Promise<string> => {
@@ -178,7 +186,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
   }, [saveTx, uploadWithRetry, reportError, onSuccess]);
 
   useEffect(() => {
-    if (autoTriggered.current || paid) return;
+    if (autoTriggered.current || paid || bypassRequested.current) return;
     if (!templateId) return;
     // Free strip (price Rp 0): skip Midtrans entirely.
     if (price === 0) {
