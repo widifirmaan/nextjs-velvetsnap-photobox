@@ -34,19 +34,13 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
   const autoTriggered = useRef(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const bypassRequested = useRef(false);
+  const finalizeOrderRef = useRef<((prefix: string) => Promise<void>) | null>(null);
 
   useEffect(() => {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
   }, []);
-
-  const handleBypass = useCallback(async () => {
-    if (paid) return;
-    bypassRequested.current = true;
-    setErrMsg(null);
-    await finalizeOrder('BYPASS');
-  }, [paid, finalizeOrder]);
 
   const uploadImages = useCallback(async (): Promise<{ captures: string[]; videos: string[]; finalImage: string }> => {
     const uploadOne = async (dataUri: string, folder: string): Promise<string> => {
@@ -148,8 +142,6 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
     } catch {}
   }, []);
 
-  // Save the transaction, upload photos/videos and continue to the result step
-  // without going through Midtrans (used for free strips and bypass).
   const finalizeOrder = useCallback(async (prefix: string) => {
     const now = Date.now();
     const sessionId = sessionStorage.getItem(STORAGE_KEYS.PHOTOBOOTH_SESSION) ||
@@ -178,10 +170,18 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
     }
   }, [saveTx, uploadWithRetry, reportError, onSuccess]);
 
+  finalizeOrderRef.current = finalizeOrder;
+
+  const handleBypass = useCallback(async () => {
+    if (paid) return;
+    bypassRequested.current = true;
+    setErrMsg(null);
+    await (finalizeOrderRef.current || finalizeOrder)('BYPASS');
+  }, [paid]);
+
   useEffect(() => {
     if (autoTriggered.current || paid || bypassRequested.current) return;
     if (!templateId) return;
-    // Free strip (price Rp 0): skip Midtrans entirely.
     if (price === 0) {
       autoTriggered.current = true;
       setLoading(true);
