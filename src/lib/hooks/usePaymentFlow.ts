@@ -75,16 +75,6 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
       return data.url;
     };
 
-    const blobToDataUri = async (blobUrl: string): Promise<string> => {
-      const blob = await fetch(blobUrl).then((r) => r.blob());
-      return await new Promise<string>((res, rej) => {
-        const reader = new FileReader();
-        reader.onload = () => res(reader.result as string);
-        reader.onerror = () => rej(new Error('Failed to read video blob'));
-        reader.readAsDataURL(blob);
-      });
-    };
-
     const finalImage = compositedImage && compositedImage.startsWith('data:')
       ? await uploadOne(compositedImage, 'velvetsnap/final')
       : compositedImage || '';
