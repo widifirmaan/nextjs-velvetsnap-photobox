@@ -290,7 +290,7 @@ async function uploadToCloudinary(env, dataUri, folder, publicId, resourceType =
 }
 
 async function isBase64(str) {
-    return typeof str === 'string' && /^data:[\w\/-]+;[^;]+;base64,/.test(str);
+    return typeof str === 'string' && /^data:[\w\/-]+;/.test(str) && /;base64,/.test(str);
 }
 
 async function urlToBase64(url) {
