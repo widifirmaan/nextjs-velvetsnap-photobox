@@ -45,7 +45,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
   const uploadImages = useCallback(async (): Promise<{ captures: string[]; videos: string[]; finalImage: string }> => {
     const uploadOne = async (dataUri: string, folder: string): Promise<string> => {
       let payload = dataUri;
-      if (payload.length > UPLOAD_COMPRESS_THRESHOLD) {
+      if (payload.length > UPLOAD_COMPRESS_THRESHOLD && !payload.startsWith('data:video/')) {
         const img = await new Promise<HTMLImageElement>((res, rej) => {
           const i = new window.Image();
           i.onload = () => res(i);
