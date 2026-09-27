@@ -91,28 +91,31 @@ export function useClipRecorder(): ClipRecorderState {
     return true;
   }, [stopMedia]);
 
-  const stopClip = useCallback((): Promise<string | null> => {
-    const recorder = recorderRef.current;
-    if (!recorder || recorder.state === 'inactive') {
-      recorderRef.current = null;
-      stopMedia();
-      setRecording(false);
-      return Promise.resolve(null);
-    }
-    return new Promise((resolve) => {
-      recorder.addEventListener('stop', () => {
-        recorderRef.current = null;
-        stopMedia();
-        setRecording(false);
-        if (!chunksRef.current.length) { resolve(null); return; }
-        const type = chunksRef.current[0].type || recorder.mimeType || 'video/webm';
-        const blob = new Blob(chunksRef.current, { type });
-        chunksRef.current = [];
-        resolve(URL.createObjectURL(blob));
-      });
-      recorder.stop();
-    });
-  }, [stopMedia]);
+const stopClip = useCallback((): Promise<string | null> => {
+     const recorder = recorderRef.current;
+     if (!recorder || recorder.state === 'inactive') {
+       recorderRef.current = null;
+       stopMedia();
+       setRecording(false);
+       return Promise.resolve(null);
+     }
+     return new Promise((resolve) => {
+       recorder.addEventListener('stop', () => {
+         recorderRef.current = null;
+         stopMedia();
+         setRecording(false);
+         if (!chunksRef.current.length) { resolve(null); return; }
+         const type = chunksRef.current[0].type || recorder.mimeType || 'video/webm';
+         const blob = new Blob(chunksRef.current, { type });
+         chunksRef.current = [];
+         const reader = new FileReader();
+         reader.onload = () => resolve(reader.result as string);
+         reader.onerror = () => resolve(URL.createObjectURL(blob));
+         reader.readAsDataURL(blob);
+       });
+       recorder.stop();
+     });
+   }, [stopMedia]);
 
   useEffect(() => stopMedia, [stopMedia]);
 
