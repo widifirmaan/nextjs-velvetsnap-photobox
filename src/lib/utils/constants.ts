@@ -74,6 +74,5 @@ export const STORAGE_KEYS = {
   PHOTOBOOTH_TX_ID: 'photobooth_txId',
   SELECTED_TEMPLATE: 'velvetsnap_selected_template',
   CAPTURES: 'velvetsnap_captures',
-  VIDEOS: 'velvetsnap_videos',
 } as const;
 

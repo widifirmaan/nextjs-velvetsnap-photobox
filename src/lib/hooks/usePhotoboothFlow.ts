@@ -99,7 +99,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       } catch (e) { console.error('usePhotoboothFlow: failed to restore captures', e); }
       if (Array.isArray(restoredCaptures) && restoredCaptures.length) setCaptures(restoredCaptures);
       try {
-        const rawVideos = typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.VIDEOS) : null;
+        const rawVideos = typeof window !== 'undefined' ? localStorage.getItem('velvetsnap_videos') : null;
         if (rawVideos) {
           const restoredVideos = JSON.parse(rawVideos);
           if (Array.isArray(restoredVideos) && restoredVideos.length) setVideos(restoredVideos);
@@ -112,7 +112,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
       return;
     }
     try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.CAPTURES); } catch (e) { console.error('usePhotoboothFlow: failed to clear captures', e); }
-    try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.VIDEOS); } catch (e) { console.error('usePhotoboothFlow: failed to clear videos', e); }
+    try { if (typeof window !== 'undefined') localStorage.removeItem('velvetsnap_videos'); } catch (e) { console.error('usePhotoboothFlow: failed to clear videos', e); }
     setStep(1);
   }, [step, templateId, templateData, setStep]);
 
@@ -128,7 +128,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
     try { if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_SESSION); } catch {}
     try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.SELECTED_TEMPLATE); } catch {}
     try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.CAPTURES); } catch {}
-    try { if (typeof window !== 'undefined') localStorage.removeItem(STORAGE_KEYS.VIDEOS); } catch {}
+    try { if (typeof window !== 'undefined') localStorage.removeItem('velvetsnap_videos'); } catch {}
     try { if (typeof window !== 'undefined') sessionStorage.removeItem(STORAGE_KEYS.PHOTOBOOTH_TX_ID); } catch {}
     chromaKeyId.current++;
     compositingId.current++;
@@ -380,7 +380,7 @@ export function usePhotoboothFlow({ step, setStep, onRefresh, sessionTimer }: Ph
         const raw = JSON.stringify(compressed);
         if (raw.length < 4_000_000) localStorage.setItem(STORAGE_KEYS.CAPTURES, raw);
         const rawVideos = JSON.stringify(videos);
-        if (rawVideos.length < 4_000_000) localStorage.setItem(STORAGE_KEYS.VIDEOS, rawVideos);
+        if (rawVideos.length < 4_000_000) localStorage.setItem('velvetsnap_videos', rawVideos);
       } catch (e) { console.error('usePhotoboothFlow: failed to persist captures', e); }
     })();
     return () => { cancelled = true; };
