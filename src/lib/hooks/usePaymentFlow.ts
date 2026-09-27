@@ -85,9 +85,9 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
       });
     };
 
-    const finalImage = compositedImage
+    const finalImage = compositedImage && compositedImage.startsWith('data:')
       ? await uploadOne(compositedImage, 'velvetsnap/final')
-      : '';
+      : compositedImage || '';
     const uploadedCaptures = await Promise.all(
       (captures || []).map(async (c) =>
         c.startsWith('data:') ? await uploadOne(c, 'velvetsnap/captures') : c
