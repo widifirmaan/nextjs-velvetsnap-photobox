@@ -259,11 +259,5 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
     };
   }, [templateId, price, paid, onSuccess, finalizeOrder]);
 
-  const handleBypass = useCallback(async () => {
-    if (paid) return;
-    setErrMsg(null);
-    await finalizeOrder('BYPASS');
-  }, [paid, finalizeOrder]);
-
   return { loading, snapLoaded, snapError, paid, errMsg, qrDataUrl, handleBypass };
 }
