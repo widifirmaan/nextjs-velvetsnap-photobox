@@ -290,7 +290,7 @@ async function uploadToCloudinary(env, dataUri, folder, publicId, resourceType =
 }
 
 async function isBase64(str) {
-    return typeof str === 'string' && /^data:[\w\/-]+;base64,/.test(str);
+    return typeof str === 'string' && /^data:[\w\/-]+;[^;]+;base64,/.test(str);
 }
 
 async function urlToBase64(url) {
@@ -1556,7 +1556,7 @@ async function handleUpload(request, env) {
         const maxBytes = resourceType === 'video' ? 30 * 1024 * 1024 : 10 * 1024 * 1024;
         if (fileBytes > maxBytes) return json({ success: false, error: `File too large (max ${Math.round(maxBytes / 1024 / 1024)}MB)` }, 400);
 
-        const mimeMatch = dataUri.match(/^data:(image|video)\/(\w+);base64,/);
+        const mimeMatch = dataUri.match(/^data:(image|video)\/(\w+);[^;]+;base64,/);
         const allowedImage = ['jpeg', 'png', 'webp', 'gif'];
         const allowedVideo = ['mp4', 'webm', 'quicktime'];
         if (!mimeMatch) return json({ success: false, error: 'Invalid data URI type' }, 400);
