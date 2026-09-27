@@ -119,6 +119,10 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
       body.captures = photos.captures;
       body.videos = photos.videos;
       body.finalImage = photos.finalImage;
+    } else {
+      body.captures = captures || [];
+      body.videos = videos || [];
+      body.finalImage = compositedImage || '';
     }
     const res = await fetch('/api/transactions', {
       method: 'POST',
@@ -128,7 +132,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
     const data = await res.json();
     if (!data.success) throw new Error(data.error || 'Failed to save transaction');
     return data;
-  }, [templateId, price]);
+  }, [templateId, price, captures, videos, compositedImage]);
 
   const uploadWithRetry = useCallback(async (): Promise<{ captures: string[]; videos: string[]; finalImage: string }> => {
     let lastError: unknown;
@@ -211,7 +215,7 @@ export function usePaymentFlow({ price, templateId, captures, videos, composited
         const chargeRes = await fetch('/api/doku/charge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId, templateId: templateId || 't1', price }),
+          body: JSON.stringify({ sessionId, templateId: templateId || 't1', price, captures, videos, finalImage: compositedImage }),
         });
         const chargeData = await chargeRes.json();
         if (!chargeRes.ok || !chargeData.success) {
