@@ -1852,6 +1852,12 @@
   .downloadPhotos .thumbCard,
   .downloadVideos .thumbCard {
     width: auto;
+    aspect-ratio: auto;
+  }
+  .downloadPhotos .thumbCard > div,
+  .downloadVideos .thumbCard > div {
+    flex: none;
+    width: 100%;
     aspect-ratio: 1 / 1;
   }
   .downloadPhotos .stripSectionLabel,
