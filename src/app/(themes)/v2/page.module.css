@@ -1832,7 +1832,7 @@
     height: 100%;
   }
   .downloadLayout .stripCol {
-    height: min(calc(100dvh - 360px), 620px);
+    height: min(calc(100dvh - 360px), 1000px);
     width: auto;
   }
   .downloadPhotos,
