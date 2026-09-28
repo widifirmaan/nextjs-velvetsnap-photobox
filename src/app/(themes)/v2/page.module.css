@@ -2120,6 +2120,11 @@
     min-height: 44px;
     padding: 12px 16px;
     font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .downloadLayout .photoStrip {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 
   .resultPreview {
@@ -2290,7 +2295,25 @@
     padding: 12px 16px 32px;
   }
 
-  .mastheadMeta { font-size: 11px; }
-  .mastheadTagline { font-size: 11px; }
+  .mastheadMeta {
+    font-size: 10px;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    justify-content: center;
+    text-align: center;
+  }
+  .mastheadTitle { font-size: 30px; }
+  .mastheadTagline {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 0 52px;
+  }
+  .mastheadBackBtn {
+    padding: 4px 8px !important;
+  }
+  .mastheadBackBtn svg {
+    width: 18px;
+    height: 18px;
+  }
   .resultImage img { max-height: 50dvh; }
 }
