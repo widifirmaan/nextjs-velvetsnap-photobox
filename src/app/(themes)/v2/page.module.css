@@ -1832,8 +1832,8 @@
     height: 100%;
   }
   .downloadLayout .stripCol {
-    height: 100%;
-    max-height: none;
+    height: min(calc(100dvh - 360px), 620px);
+    width: auto;
   }
   .downloadPhotos,
   .downloadVideos {
