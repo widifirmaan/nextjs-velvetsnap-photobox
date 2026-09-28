@@ -2050,6 +2050,7 @@
   .downloadLayout .resultPreview {
     overflow: visible;
     justify-content: center;
+    min-height: auto;
   }
 
   .downloadLayout .previewInner {
