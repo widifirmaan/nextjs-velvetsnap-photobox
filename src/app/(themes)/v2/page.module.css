@@ -1643,6 +1643,7 @@
   box-shadow: var(--np-shadow-sm);
   line-height: 1;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .thumbCard {
