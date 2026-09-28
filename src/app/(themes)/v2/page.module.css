@@ -1700,6 +1700,7 @@
 
 .downloadLayout .resultPreview {
   flex: 1;
+  overflow: visible;
 }
 
 .downloadLayout .previewInner {
