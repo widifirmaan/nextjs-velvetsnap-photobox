@@ -1745,6 +1745,14 @@
   position: relative;
   border: 3px solid var(--np-border);
   box-shadow: var(--np-shadow-sm);
+  background: #fff;
+  overflow: hidden;
+}
+
+.downloadLayout .stripFrame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .downloadSidebar {
@@ -1832,7 +1840,8 @@
     height: 100%;
   }
   .downloadLayout .stripCol {
-    height: min(calc(100dvh - 360px), 620px);
+    height: calc(100dvh - 195px);
+    max-height: 100%;
     width: auto;
   }
   .downloadPhotos,
