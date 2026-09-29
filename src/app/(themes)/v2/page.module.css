@@ -1793,7 +1793,7 @@
 @media (min-width: 769px) {
   .photoStrip {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 10px;
     overflow: visible;
     padding: 8px 24px 4px;
@@ -1803,7 +1803,7 @@
     aspect-ratio: 1 / 1;
   }
   .photoStrip.videoStrip {
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   }
   .photoStrip.videoStrip .thumbCard {
     aspect-ratio: 1 / 1;
@@ -2107,7 +2107,7 @@
 
   .downloadLayout .photoStrip {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 10px;
     overflow: visible;
     width: 100%;
@@ -2125,7 +2125,7 @@
   }
 
   .downloadLayout .photoStrip.videoStrip {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 
   .downloadLayout .photoStrip.videoStrip .thumbCard > div:first-child {
@@ -2139,10 +2139,6 @@
     padding: 12px 16px;
     font-size: 12px;
     white-space: nowrap;
-  }
-
-  .downloadLayout .photoStrip {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 
   .resultPreview {
