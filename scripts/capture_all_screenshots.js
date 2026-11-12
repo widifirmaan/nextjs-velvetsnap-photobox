@@ -5,6 +5,8 @@ const puppeteer = require('puppeteer-core');
 const CHROME_PATH = '/data/data/com.termux/files/home/bin/chromium';
 const OUTPUT_DIR = path.resolve(__dirname, '../screenshots');
 const BASE_URL = 'https://photo.widifirmaan.web.id';
+const REAL_SAMPLE_ID = '19fddfc4-2ca8-41af-8a53-aa6238fa5bcd';
+const REAL_FINAL_IMAGE = 'https://res.cloudinary.com/duaddqdfh/image/upload/v1790675072/velvetsnap/final/d2tbjr2pbrcejkt02umg.jpg';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -45,16 +47,40 @@ async function main() {
     ],
   });
 
+  // Intercept DOKU charge so real QRIS QR is generated on the client
+  async function setupQrisMock(page) {
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      if (req.url().includes('/api/doku/charge')) {
+        req.respond({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            success: true,
+            data: {
+              qrContent: '00020101021226670016ID.CO.DOKU.WWW011893600503000000000002151790675024656520458125303360540416095802ID5913VelvetSnap Co6007Jakarta6304ABCD',
+              transactionId: REAL_SAMPLE_ID,
+              orderId: 'VS-ORD-1790675024'
+            }
+          })
+        });
+      } else {
+        req.continue();
+      }
+    });
+  }
+
   // Helper to setup mock state on a page
   async function setupMockFlow(page, template, capturesCount = 3) {
     if (!template) return;
-    await page.evaluate((t, photo, count) => {
+    await page.evaluate((t, photo, count, txId) => {
       try {
         localStorage.setItem('velvetsnap_selected_template', JSON.stringify({ id: t._id, data: t }));
         const caps = Array(count).fill(photo);
         localStorage.setItem('velvetsnap_captures', JSON.stringify(caps));
+        sessionStorage.setItem('velvetsnap_tx_id', txId);
       } catch (e) {}
-    }, template, samplePhotoSvg, capturesCount);
+    }, template, samplePhotoSvg, capturesCount, REAL_SAMPLE_ID);
   }
 
   // ==========================================
@@ -63,11 +89,12 @@ async function main() {
   console.log('\n--- Starting Desktop Captures (1440x900) ---');
   const desktopPage = await browser.newPage();
   await desktopPage.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1.5 });
+  await setupQrisMock(desktopPage);
 
   // 1.1 V1 Landing Page
   console.log('[Desktop] Capturing V1 Landing Page...');
   await desktopPage.goto(`${BASE_URL}/v1`, { waitUntil: 'domcontentloaded' });
-  await sleep(7000); // Allow full preloader fade & carousel start
+  await sleep(7000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V1 Landing Page.png') });
 
   // 1.2 V1 Template Selection
@@ -90,24 +117,31 @@ async function main() {
   await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V1 Photo Editor.png') });
 
-  // 1.5 V1 Payment Gate
+  // 1.5 V1 Payment Gate (QRIS fully loaded)
   console.log('[Desktop] Capturing V1 Payment Gate...');
   await setupMockFlow(desktopPage, sampleTemplate, 3);
   await desktopPage.goto(`${BASE_URL}/v1?step=4`, { waitUntil: 'domcontentloaded' });
   await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V1 Payment Gate.png') });
 
-  // 1.6 V1 Result Download
+  // 1.6 V1 Result Download (with real strip image)
   console.log('[Desktop] Capturing V1 Result Download...');
   await setupMockFlow(desktopPage, sampleTemplate, 3);
   await desktopPage.goto(`${BASE_URL}/v1?step=5`, { waitUntil: 'domcontentloaded' });
-  await sleep(5000);
+  await sleep(3500);
+  await desktopPage.evaluate((imgUrl) => {
+    const box = document.querySelector('[class*="resultImage"]');
+    if (box) {
+      box.innerHTML = `<img src="${imgUrl}" alt="Final strip" style="max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 8px;" />`;
+    }
+  }, REAL_FINAL_IMAGE);
+  await sleep(2000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V1 Result Download.png') });
 
-  // 1.7 V1 Download Portal
+  // 1.7 V1 Download Portal (with real completed transaction ID)
   console.log('[Desktop] Capturing V1 Download Portal...');
-  await desktopPage.goto(`${BASE_URL}/v1/download`, { waitUntil: 'domcontentloaded' });
-  await sleep(4000);
+  await desktopPage.goto(`${BASE_URL}/v1/download?id=${REAL_SAMPLE_ID}`, { waitUntil: 'domcontentloaded' });
+  await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V1 Download Portal.png') });
 
   // ------------------------------------------
@@ -115,7 +149,7 @@ async function main() {
   // ------------------------------------------
   console.log('[Desktop] Capturing V2 Landing Page...');
   await desktopPage.goto(`${BASE_URL}/v2`, { waitUntil: 'domcontentloaded' });
-  await sleep(7000); // Allow full layout & typography render
+  await sleep(7000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V2 Landing Page.png') });
 
   // 1.9 V2 Template Selection
@@ -138,86 +172,83 @@ async function main() {
   await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V2 Photo Editor.png') });
 
-  // 1.12 V2 Payment Gate
+  // 1.12 V2 Payment Gate (QRIS fully loaded)
   console.log('[Desktop] Capturing V2 Payment Gate...');
   await setupMockFlow(desktopPage, sampleTemplate, 3);
   await desktopPage.goto(`${BASE_URL}/v2?step=4`, { waitUntil: 'domcontentloaded' });
   await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V2 Payment Gate.png') });
 
-  // 1.13 V2 Result Download
+  // 1.13 V2 Result Download (with real strip image)
   console.log('[Desktop] Capturing V2 Result Download...');
   await setupMockFlow(desktopPage, sampleTemplate, 3);
   await desktopPage.goto(`${BASE_URL}/v2?step=5`, { waitUntil: 'domcontentloaded' });
-  await sleep(5000);
+  await sleep(3500);
+  await desktopPage.evaluate((imgUrl) => {
+    const box = document.querySelector('[class*="resultImage"]');
+    if (box) {
+      box.innerHTML = `<img src="${imgUrl}" alt="Final strip" style="max-height: 100%; max-width: 100%; object-fit: contain; border-radius: 8px;" />`;
+    }
+  }, REAL_FINAL_IMAGE);
+  await sleep(2000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V2 Result Download.png') });
 
-  // 1.14 V2 Download Portal
+  // 1.14 V2 Download Portal (with real completed transaction ID)
   console.log('[Desktop] Capturing V2 Download Portal...');
-  await desktopPage.goto(`${BASE_URL}/v2/download`, { waitUntil: 'domcontentloaded' });
-  await sleep(4000);
+  await desktopPage.goto(`${BASE_URL}/v2/download?id=${REAL_SAMPLE_ID}`, { waitUntil: 'domcontentloaded' });
+  await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'V2 Download Portal.png') });
 
   // ==========================================
   // 2. ADMIN SUITE (DESKTOP)
   // ==========================================
   console.log('\n--- Starting Admin Captures (Desktop) ---');
-  // 2.1 Admin Login Page
   console.log('[Admin] Capturing Admin Login Page...');
   await desktopPage.goto(`${BASE_URL}/admin/login`, { waitUntil: 'domcontentloaded' });
   await sleep(4000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin Login Page.png') });
 
-  // Perform login
   console.log('[Admin] Logging into Admin Portal...');
   await desktopPage.type('input[placeholder*="user" i], input:not([type="password"])', 'root');
   await desktopPage.type('input[type="password"]', 'root');
   await desktopPage.click('button[type="submit"]');
-  await sleep(6000); // Allow login API + dashboard state fetch
+  await sleep(6000);
 
-  // 2.2 Admin Dashboard
   console.log('[Admin] Capturing Admin Dashboard...');
   await desktopPage.goto(`${BASE_URL}/admin`, { waitUntil: 'domcontentloaded' });
   await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin Dashboard.png') });
 
-  // 2.3 Admin Templates Management
   console.log('[Admin] Capturing Admin Templates Management...');
   await desktopPage.goto(`${BASE_URL}/admin/templates`, { waitUntil: 'domcontentloaded' });
   await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin Templates Management.png') });
 
-  // 2.4 Admin Template Studio
   console.log('[Admin] Capturing Admin Template Studio...');
   await desktopPage.goto(`${BASE_URL}/admin/template-studio`, { waitUntil: 'domcontentloaded' });
   await sleep(6000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin Template Studio.png') });
 
-  // 2.5 Admin Transaction History
   console.log('[Admin] Capturing Admin Transaction History...');
   await desktopPage.goto(`${BASE_URL}/admin/history`, { waitUntil: 'domcontentloaded' });
   await sleep(5000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin Transaction History.png') });
 
-  // 2.6 Admin Device Management
   console.log('[Admin] Capturing Admin Device Management...');
   await desktopPage.goto(`${BASE_URL}/admin/devices`, { waitUntil: 'domcontentloaded' });
   await sleep(4000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin Device Management.png') });
 
-  // 2.7 Admin System Settings
   console.log('[Admin] Capturing Admin System Settings...');
   await desktopPage.goto(`${BASE_URL}/admin/settings`, { waitUntil: 'domcontentloaded' });
   await sleep(4000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin System Settings.png') });
 
-  // 2.8 Admin Account Management
   console.log('[Admin] Capturing Admin Account Management...');
   await desktopPage.goto(`${BASE_URL}/admin/accounts`, { waitUntil: 'domcontentloaded' });
   await sleep(4000);
   await desktopPage.screenshot({ path: path.join(OUTPUT_DIR, 'Admin Account Management.png') });
 
-  // 2.9 Admin Reprocess Utility
   console.log('[Admin] Capturing Admin Reprocess Utility...');
   await desktopPage.goto(`${BASE_URL}/admin/reprocess-templates`, { waitUntil: 'domcontentloaded' });
   await sleep(4000);
@@ -240,6 +271,7 @@ async function main() {
   await mobilePage.setUserAgent(
     'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1'
   );
+  await setupQrisMock(mobilePage);
 
   // 3.1 Mobile V1 Landing Page
   console.log('[Mobile] Capturing Mobile V1 Landing Page...');
@@ -260,7 +292,7 @@ async function main() {
   await sleep(5000);
   await mobilePage.screenshot({ path: path.join(OUTPUT_DIR, 'Mobile V1 Photo Editor.png') });
 
-  // 3.4 Mobile V1 Payment Gate
+  // 3.4 Mobile V1 Payment Gate (QRIS fully loaded)
   console.log('[Mobile] Capturing Mobile V1 Payment Gate...');
   await setupMockFlow(mobilePage, sampleTemplate, 3);
   await mobilePage.goto(`${BASE_URL}/v1?step=4`, { waitUntil: 'domcontentloaded' });
@@ -286,7 +318,7 @@ async function main() {
   await sleep(5000);
   await mobilePage.screenshot({ path: path.join(OUTPUT_DIR, 'Mobile V2 Photo Editor.png') });
 
-  // 3.8 Mobile V2 Payment Gate
+  // 3.8 Mobile V2 Payment Gate (QRIS fully loaded)
   console.log('[Mobile] Capturing Mobile V2 Payment Gate...');
   await setupMockFlow(mobilePage, sampleTemplate, 3);
   await mobilePage.goto(`${BASE_URL}/v2?step=4`, { waitUntil: 'domcontentloaded' });
@@ -328,7 +360,7 @@ async function main() {
   await mobilePage.close();
   await browser.close();
 
-  console.log('\n All 35 screenshots captured successfully!');
+  console.log('\nAll 35 screenshots captured successfully with full data!');
 }
 
 main().catch((err) => {
