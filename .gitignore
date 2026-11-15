@@ -43,3 +43,5 @@ next-env.d.ts
 
 # cloudflare
 .wrangler/
+
+raw_screenshots/
