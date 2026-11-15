@@ -11,7 +11,6 @@ VelvetSnap is a modern digital photobooth web application and automated photo st
 [![Deployment](https://img.shields.io/badge/Deployment-Cloudflare_Pages-F38020?style=flat-square&logo=cloudflare)](https://pages.cloudflare.com/)
 [![WebAssembly AI](https://img.shields.io/badge/AI-Wasm_Background_Removal-654FF0?style=flat-square&logo=webassembly&logoColor=white)](https://img.ly/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 ---
 
@@ -37,12 +36,14 @@ VelvetSnap is a modern digital photobooth web application and automated photo st
 ## Features
 
 - **Automated Kiosk Stepper Lifecycle (`/v2`)**: Five-stage orchestrated client state machine guiding users through Template Selection, Simulated QRIS Payment, Viewfinder Capture, Photo Adjustment, and Print/Download.
+- **Dual Kiosk Theme Engine**: Modern tactile photobox layout (`/v1`) and vintage editorial newspaper theme (`/v2`) powered by `V2ThemeProvider`, custom mastheads, paper grain textures, and typography.
 - **Hardware Camera Bridge & Viewfinder**: Low-latency video streaming powered by `react-webcam` with configurable shutter countdown timers (3s, 5s), automated burst capture sequences, and flash effect transitions.
+- **Live Moment Clip Recorder (`useClipRecorder`)**: Automated in-browser video capture recording short behind-the-scenes video clips during photo capture sessions.
 - **High-Fidelity Konva Compositor (`react-konva`)**: Multi-layer 2D canvas engine handling frame bounding masks, dynamic aspect-ratio slotting, drag-and-drop sticker overlays, and composite image rendering.
 - **Client-Side Neural Background Removal**: In-browser machine learning inference executed via `@imgly/background-removal` WebAssembly runtime, isolating portraits without transmitting raw imagery to remote servers.
-- **Tactile Editorial Newspaper Aesthetic**: Custom typography, paper grain textures, authentic mastheads, and editorial design tokens reflecting vintage print publishing.
 - **Visual Template Studio (`/admin/template-studio`)**: Interactive layout designer for kiosk administrators to create and fine-tune frame slot coordinates, aspect ratios, overlays, and color palettes.
-- **Operations Dashboard & Hardware Diagnostics (`/admin`)**: Administrative dashboard tracking total session volume, transaction ledgers, active template toggles, and kiosk camera hardware diagnostics.
+- **Batch Template Reprocessor (`/admin/reprocess-templates`)**: Automated template analysis utility detecting chroma-key placeholders and frame slot coordinates across graphic assets.
+- **Operations Dashboard & Hardware Diagnostics (`/admin`, `/admin/devices`)**: Administrative dashboard tracking total session volume, transaction ledgers, active template toggles, and kiosk camera hardware diagnostics.
 - **Mobile QR Code Photo Strip Delivery**: Dynamic client-side QR generation using `qrcode` enabling guests to instantly scan on-screen tickets and download processed photo strips to mobile devices.
 
 ---
@@ -131,9 +132,3 @@ npm run deploy
 ## Author
 
 Developed by **[Widi Firmansyah](https://widifirmaan.web.id)**.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
