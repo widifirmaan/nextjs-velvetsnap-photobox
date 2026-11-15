@@ -2,12 +2,12 @@
 
 **VelvetSnap Co.** is a next-generation, enterprise-grade digital photobooth web application and automated photo strip compositing engine. Built with **Next.js 16 (App Router)** and **React 19**, deployed as a high-performance **Cloudflare Workers** edge application with **Cloudflare D1** (Serverless SQLite) and **Cloudinary CDN**, VelvetSnap delivers an end-to-end photobooth kiosk experience — from hardware camera control and real-time canvas compositing to QRIS digital payments, instant print receipts, and an operational administration suite.
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live_Production-4F46E5?style=for-the-badge&logo=cloudflare&logoColor=white)](https://photo.widifirmaan.web.id)
-[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers_&_D1-F38020?style=for-the-badge&logo=cloudflare)](https://photo.widifirmaan.web.id)
-[![Next.js 16](https://img.shields.io/badge/Next.js-16.2.6-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
-[![React 19](https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Cloudinary](https://img.shields.io/badge/Cloudinary-CDN_Media-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white)](https://cloudinary.com)
+[![Live Demo](https://img.shields.io/badge/Demo-photo.widifirmaan.web.id-10B981?style=flat-square&logo=cloudflare&logoColor=white)](https://photo.widifirmaan.web.id)
+[![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers_&_D1-F38020?style=flat-square&logo=cloudflare)](https://photo.widifirmaan.web.id)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
+[![React 19](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-CDN_Media-3448C5?style=flat-square&logo=cloudinary&logoColor=white)](https://cloudinary.com)
 
 ---
 
@@ -22,6 +22,10 @@
 ---
 
 ## 📸 Application Showcase
+
+| Desktop (MacBook Pro) | Mobile (iPhone 16 Pro) |
+| :---: | :---: |
+| **VelvetSnap Photobooth Desktop**<br>![VelvetSnap Desktop](screenshots/VelvetSnap%20Desktop.png) | **VelvetSnap Photobooth Mobile**<br>![VelvetSnap Mobile](screenshots/VelvetSnap%20Mobile.png) |
 
 ### 1. Public Photobooth V1 Experience (Claymorphism UI)
 
