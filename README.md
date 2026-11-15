@@ -58,7 +58,6 @@ VelvetSnap is a photobooth web application and photo strip generator built with 
 | **Camera & Video** | React-Webcam `7.2.0` | Browser MediaDevices API abstraction for webcam and camera hardware tethering |
 | **AI / Machine Learning** | `@imgly/background-removal` `1.7.0` | Client-side neural network running via WebAssembly to remove image backgrounds |
 | **Utilities & QR** | QRCode `1.5.4`, UUID `9.0.0`, Lucide React `1.17.0` | QR ticket generation, transaction session identification, and SVG iconography |
-| **Edge Deployment** | Cloudflare Pages, Cloudflare D1, Worker | Global static edge delivery with serverless SQLite persistence |
 
 ---
 
