@@ -36,13 +36,14 @@ VelvetSnap is a modern digital photobooth web application and automated photo st
 
 ## Features
 
-- **End-to-End Photobooth Kiosk Flow (`/v2`)**: Automated multi-step capture experience—template selection, simulated payment gate, live webcam viewfinder countdown, photo review, and print-ready strip generation.
-- **HTML5 Canvas & Konva Compositor**: Real-time layer blending, image positioning, border styling, sticker overlays, and dynamic aspect-ratio slotting powered by `react-konva`.
-- **Client-Side Background Removal**: Edge AI background subtraction executed locally in the browser via `@imgly/background-removal` WebAssembly runtime.
-- **Editorial Newspaper UI Design**: High-contrast brutalist and vintage editorial aesthetic with typographic hierarchy, textured paper backgrounds, and smooth responsive transitions.
-- **Interactive Template Studio (`/admin/template-studio`)**: In-browser visual layout creator for administrators to define photo strip slot coordinates, aspect ratios, overlays, and color palettes.
-- **Admin Management Portal (`/admin`)**: Operations suite for kiosk device status monitoring, transaction ledger tracking, template activation toggles, and kiosk system settings.
-- **QR Code Retrieval Portal**: Dynamic QR code generation powered by `qrcode` enabling customers to instantly scan and download their processed digital photo strips directly to their mobile devices.
+- **Automated Kiosk Stepper Lifecycle (`/v2`)**: Five-stage orchestrated client state machine guiding users through Template Selection, Simulated QRIS Payment, Viewfinder Capture, Photo Adjustment, and Print/Download.
+- **Hardware Camera Bridge & Viewfinder**: Low-latency video streaming powered by `react-webcam` with configurable shutter countdown timers (3s, 5s), automated burst capture sequences, and flash effect transitions.
+- **High-Fidelity Konva Compositor (`react-konva`)**: Multi-layer 2D canvas engine handling frame bounding masks, dynamic aspect-ratio slotting, drag-and-drop sticker overlays, and composite image rendering.
+- **Client-Side Neural Background Removal**: In-browser machine learning inference executed via `@imgly/background-removal` WebAssembly runtime, isolating portraits without transmitting raw imagery to remote servers.
+- **Tactile Editorial Newspaper Aesthetic**: Custom typography, paper grain textures, authentic mastheads, and editorial design tokens reflecting vintage print publishing.
+- **Visual Template Studio (`/admin/template-studio`)**: Interactive layout designer for kiosk administrators to create and fine-tune frame slot coordinates, aspect ratios, overlays, and color palettes.
+- **Operations Dashboard & Hardware Diagnostics (`/admin`)**: Administrative dashboard tracking total session volume, transaction ledgers, active template toggles, and kiosk camera hardware diagnostics.
+- **Mobile QR Code Photo Strip Delivery**: Dynamic client-side QR generation using `qrcode` enabling guests to instantly scan on-screen tickets and download processed photo strips to mobile devices.
 
 ---
 
@@ -50,7 +51,7 @@ VelvetSnap is a modern digital photobooth web application and automated photo st
 
 | Category | Technologies | Purpose |
 | :--- | :--- | :--- |
-| **Core Framework** | Next.js `16.2.6`, React `19.2.4` | Modern App Router architecture, server components, and concurrent UI rendering |
+| **Core Framework** | Next.js `16.2.6`, React `19.2.4` | App Router architecture, server components, and concurrent UI rendering |
 | **Canvas & Compositing** | Konva `10.3.0`, React-Konva `19.2.4` | 2D canvas drawing engine for photo strip layout composition and layer manipulation |
 | **Camera & Video** | React-Webcam `7.2.0` | Browser MediaDevices API abstraction for webcam and camera hardware tethering |
 | **AI / Machine Learning** | `@imgly/background-removal` `1.7.0` | Client-side neural network running via WebAssembly to remove image backgrounds |
@@ -61,8 +62,8 @@ VelvetSnap is a modern digital photobooth web application and automated photo st
 
 ## Project Structure
 
-```text
-nextjs-velvetsnap-photobox/
+```bash
+/
 ├── src/
 │   ├── app/
 │   │   ├── (themes)/
@@ -97,31 +98,39 @@ nextjs-velvetsnap-photobox/
 - **Node.js**: Version 18.18.0 or higher
 - **npm** or **pnpm**
 
-### Installation
+### Installation & Setup
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/widifirmaan/nextjs-velvetsnap-photobox.git
-   cd nextjs-velvetsnap-photobox
-   ```
+> **Environment Variables:** No external API keys or cloud accounts are mandatory for local development. Core photobooth camera capture, canvas compositing, and template editing function 100% locally in the browser.
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+# 1. Clone the repository
+git clone https://github.com/widifirmaan/nextjs-velvetsnap-photobox.git
+cd nextjs-velvetsnap-photobox
 
-3. **Start local development server**:
-   ```bash
-   npm run dev
-   ```
+# 2. Install project dependencies
+npm install
 
-4. **Open in browser**:
-   Navigate to [http://localhost:3000](http://localhost:3000).
+# 3. Start local Next.js development server
+npm run dev
+```
 
-5. **Build for production**:
-   ```bash
-   npm run build
-   ```
+Open [http://localhost:3000](http://localhost:3000) in your web browser.
+
+### Production Build & Deployment
+
+```bash
+# Build production bundle and copy Cloudflare worker bridge
+npm run build
+
+# Deploy static export to Cloudflare Pages via Wrangler CLI
+npm run deploy
+```
+
+---
+
+## Author
+
+Developed by **[Widi Firmansyah](https://widifirmaan.web.id)**.
 
 ---
 
