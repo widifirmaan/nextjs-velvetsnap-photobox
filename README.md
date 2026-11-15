@@ -2,7 +2,7 @@
 
 > Editorial photobooth kiosk platform and automated photo strip compositing engine.
 
-VelvetSnap is a modern digital photobooth web application and automated photo strip compositor built with Next.js 16 (App Router), React 19, and HTML5 Canvas / Konva. Deployed on Cloudflare Pages with edge worker storage and Cloudinary media optimization, VelvetSnap provides an end-to-end photobooth kiosk workflow—from real-time webcam/DSLR capture and countdowns to interactive canvas adjustments, vintage film filters, QRIS payment simulations, strip downloads, and an administrative management portal.
+VelvetSnap is a photobooth web application and photo strip generator built with Next.js 16 (App Router), React 19, and Konva canvas. Deployed on Cloudflare Pages with a custom Edge Worker bridge (`worker.js`) and Cloudflare D1 database, it provides dual photobooth kiosk themes (`v1` modern and `v2` newspaper editorial), camera capture with live countdowns, photo adjustments, client-side background removal via WebAssembly, QR-based mobile strip downloads, and an admin management portal.
 
 [![Live Demo](https://img.shields.io/badge/Demo-photo.widifirmaan.web.id-10B981?style=flat-square&logo=cloudflare&logoColor=white)](https://photo.widifirmaan.web.id)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
@@ -35,16 +35,17 @@ VelvetSnap is a modern digital photobooth web application and automated photo st
 
 ## Features
 
-- **Automated Kiosk Stepper Lifecycle (`/v2`)**: Five-stage orchestrated client state machine guiding users through Template Selection, Simulated QRIS Payment, Viewfinder Capture, Photo Adjustment, and Print/Download.
-- **Dual Kiosk Theme Engine**: Modern tactile photobox layout (`/v1`) and vintage editorial newspaper theme (`/v2`) powered by `V2ThemeProvider`, custom mastheads, paper grain textures, and typography.
-- **Hardware Camera Bridge & Viewfinder**: Low-latency video streaming powered by `react-webcam` with configurable shutter countdown timers (3s, 5s), automated burst capture sequences, and flash effect transitions.
-- **Live Moment Clip Recorder (`useClipRecorder`)**: Automated in-browser video capture recording short behind-the-scenes video clips during photo capture sessions.
-- **High-Fidelity Konva Compositor (`react-konva`)**: Multi-layer 2D canvas engine handling frame bounding masks, dynamic aspect-ratio slotting, drag-and-drop sticker overlays, and composite image rendering.
-- **Client-Side Neural Background Removal**: In-browser machine learning inference executed via `@imgly/background-removal` WebAssembly runtime, isolating portraits without transmitting raw imagery to remote servers.
-- **Visual Template Studio (`/admin/template-studio`)**: Interactive layout designer for kiosk administrators to create and fine-tune frame slot coordinates, aspect ratios, overlays, and color palettes.
+- **Dual Kiosk Themes**: Modern clean layout (`/v1`) and vintage editorial newspaper aesthetic (`/v2`) powered by `V2ThemeProvider`, custom mastheads, paper textures, and responsive layout scaling.
+- **Guided Customer Kiosk Workflow**: Step-by-step state flow guiding guests through Template Selection, Simulated QRIS Payment, Viewfinder Capture, Photo Adjustment, and Print/Download.
+- **Webcam Hardware Bridge**: Camera stream integration via `react-webcam` with configurable countdown timers (3s, 5s), automated burst sequences, flash effect transitions, and slot indicators.
+- **Live Video Clip Recorder (`useClipRecorder`)**: Automated in-browser video capture recording short behind-the-scenes video clips during photo capture sessions.
+- **Multi-Layer Canvas Compositor (`react-konva`)**: 2D canvas engine handling photo frame bounding masks, aspect-ratio scaling, drag-and-drop sticker overlays, and high-resolution composite rendering.
+- **Client-Side Background Removal**: In-browser neural background removal powered by `@imgly/background-removal` WebAssembly runtime without transmitting images to external servers.
+- **Visual Template Studio (`/admin/template-studio`)**: Interactive layout designer for kiosk administrators with draggable canvas layers, sticker asset catalog, and coordinate geometry inspector.
 - **Batch Template Reprocessor (`/admin/reprocess-templates`)**: Automated template analysis utility detecting chroma-key placeholders and frame slot coordinates across graphic assets.
-- **Operations Dashboard & Hardware Diagnostics (`/admin`, `/admin/devices`)**: Administrative dashboard tracking total session volume, transaction ledgers, active template toggles, and kiosk camera hardware diagnostics.
-- **Mobile QR Code Photo Strip Delivery**: Dynamic client-side QR generation using `qrcode` enabling guests to instantly scan on-screen tickets and download processed photo strips to mobile devices.
+- **Kiosk Device Health Monitor (`/admin/devices`)**: Hardware diagnostic panel verifying camera feed availability, resolution profiles, and peripheral status.
+- **Admin Operations & Analytics (`/admin`)**: Dashboard tracking revenue metrics (daily, weekly, monthly), transaction history, account roles, and kiosk settings backed by Cloudflare D1.
+- **Mobile QR Photo Strip Delivery**: Dynamic QR code generation via `qrcode` allowing guests to scan on-screen tickets and download photo strips to mobile devices.
 
 ---
 
