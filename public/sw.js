@@ -1,6 +1,3 @@
-// File: public/sw.js
-// Description: Auto-added top comment for easier file identification.
-
 const CACHE = 'velvetsnap-v3';
 const CACHE_BUST = '20260610';
 

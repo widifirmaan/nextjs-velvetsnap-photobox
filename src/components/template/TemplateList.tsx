@@ -1,6 +1,3 @@
-// File: src/components/template/TemplateList.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { type ReactNode } from 'react';

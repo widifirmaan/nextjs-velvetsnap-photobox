@@ -1,6 +1,3 @@
-// File: src/lib/hooks/usePhotoboothFlow.ts
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { removeGreenScreen, composeFrameImage, composeStripImage, renderStripFrame, stripElementsToSlotsLayout } from '../utils/canvas-utils';

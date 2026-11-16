@@ -1,6 +1,3 @@
-// File: scripts/batch-resave.user.js
-// Description: Auto-added top comment for easier file identification.
-
 // ==UserScript==
 // @name         VelvetSnap Batch Re-save Templates
 // @namespace    http://localhost:3000

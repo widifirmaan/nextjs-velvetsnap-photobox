@@ -1,6 +1,3 @@
-// File: src/app/admin/components/AdminPageHeader.tsx
-// Description: Auto-added top comment for easier file identification.
-
 import styles from './admin-page-header.module.css';
 
 interface Props {

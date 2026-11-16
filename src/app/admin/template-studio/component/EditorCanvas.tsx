@@ -1,6 +1,3 @@
-// File: src/app/admin/template-studio/component/EditorCanvas.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { useRef, useLayoutEffect, useEffect, useState, useCallback, forwardRef, useImperativeHandle } from 'react';

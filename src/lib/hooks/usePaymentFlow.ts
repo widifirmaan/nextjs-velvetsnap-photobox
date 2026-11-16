@@ -1,6 +1,3 @@
-// File: src/lib/hooks/usePaymentFlow.ts
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { STORAGE_KEYS, UPLOAD_COMPRESS_THRESHOLD, UPLOAD_PAYMENT_MAX_DIM, PAYMENT_SUCCESS_DELAY, PAYMENT_POLL_INTERVAL } from '../utils/constants';

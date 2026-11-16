@@ -1,6 +1,3 @@
-// File: src/lib/utils/vintage-theme.ts
-// Description: Auto-added top comment for easier file identification.
-
 function hexToHsl(hex: string): [number, number, number] {
   let r = 0, g = 0, b = 0;
   const h = hex.replace('#', '');

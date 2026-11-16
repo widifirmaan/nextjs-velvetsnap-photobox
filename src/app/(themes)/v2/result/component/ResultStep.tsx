@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/result/component/ResultStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { Loader2 } from 'lucide-react';
 import ResultActions from '@/components/result/ResultActions';

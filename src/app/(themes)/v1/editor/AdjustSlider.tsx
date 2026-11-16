@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/editor/AdjustSlider.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import type { ReactNode } from 'react';
 import styles from '@/app/(themes)/v1/page.module.css';

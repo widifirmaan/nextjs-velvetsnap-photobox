@@ -1,6 +1,3 @@
-// File: scripts/migrate-cloudinary.ts
-// Description: Auto-added top comment for easier file identification.
-
 /**
  * Migration script: upload existing base64 images from MongoDB to Cloudinary.
  *

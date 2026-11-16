@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/error.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import styles from './page.module.css';
 

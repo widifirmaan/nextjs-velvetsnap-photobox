@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/result/component/ResultStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { Home, Loader2 } from 'lucide-react';
 import StepperBar from '../../StepperBar';

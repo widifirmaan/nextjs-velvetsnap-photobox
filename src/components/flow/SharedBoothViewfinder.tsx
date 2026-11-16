@@ -1,6 +1,3 @@
-// File: src/components/flow/SharedBoothViewfinder.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { CameraIcon, Loader2 } from 'lucide-react';

@@ -1,6 +1,3 @@
-// File: src/lib/hooks/useThemeAccent.ts
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useEffect, useState } from 'react';
 import { vintageAccent } from '@/lib/utils/vintage-theme';

@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/template/TemplateCard.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import SharedTemplateCard from '@/components/template/TemplateCard';

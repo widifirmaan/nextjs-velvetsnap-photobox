@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/homepage/HomePage.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useEffect, useRef } from 'react';
 import styles from '../page.module.css';

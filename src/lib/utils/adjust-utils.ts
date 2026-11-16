@@ -1,6 +1,3 @@
-// File: src/lib/utils/adjust-utils.ts
-// Description: Auto-added top comment for easier file identification.
-
 import { DEFAULT_ADJUST, type PhotoAdjust } from '@/lib/types';
 
 export function clampPhotoAdjust(prev: PhotoAdjust[], idx: number, patch: Partial<PhotoAdjust>): PhotoAdjust[] {

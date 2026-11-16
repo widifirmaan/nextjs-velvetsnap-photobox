@@ -1,6 +1,3 @@
-// File: src/lib/utils/constants.ts
-// Description: Auto-added top comment for easier file identification.
-
 export const CHROMA_KEY_GREEN = '#00bf63';
 export const CHROMA_KEY_THRESHOLD = 5000;
 export const CHROMA_KEY_TARGET: [number, number, number] = [0, 191, 99];

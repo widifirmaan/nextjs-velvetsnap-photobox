@@ -1,6 +1,3 @@
-// File: src/lib/utils/image-utils.ts
-// Description: Auto-added top comment for easier file identification.
-
 export function loadImage(url: string, crossOrigin: string | null = 'anonymous'): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new window.Image();

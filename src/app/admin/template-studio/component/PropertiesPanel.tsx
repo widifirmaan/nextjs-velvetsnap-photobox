@@ -1,6 +1,3 @@
-// File: src/app/admin/template-studio/component/PropertiesPanel.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { Palette, Trash2, ChevronUp, ChevronDown } from 'lucide-react';

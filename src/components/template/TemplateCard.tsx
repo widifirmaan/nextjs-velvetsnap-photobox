@@ -1,6 +1,3 @@
-// File: src/components/template/TemplateCard.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import type { CSSProperties } from 'react';

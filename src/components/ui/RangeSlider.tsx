@@ -1,6 +1,3 @@
-// File: src/components/ui/RangeSlider.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 interface RangeSliderProps {

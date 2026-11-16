@@ -1,6 +1,3 @@
-// File: src/app/admin/settings/page.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';

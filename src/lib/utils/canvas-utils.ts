@@ -1,6 +1,3 @@
-// File: src/lib/utils/canvas-utils.ts
-// Description: Auto-added top comment for easier file identification.
-
 import type { ISlot, IStripElement } from '@/lib/types';
 import { loadImage, loadImages, flipImageHorizontal, applyPhotoAdjustment } from './image-utils';
 import { drawSlotShape, clipSlotShape } from './shapes';

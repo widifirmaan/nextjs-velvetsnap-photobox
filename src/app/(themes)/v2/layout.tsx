@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/layout.tsx
-// Description: Auto-added top comment for easier file identification.
-
 import type { Metadata } from 'next';
 import { UnifrakturMaguntia, EB_Garamond } from 'next/font/google';
 import V2ThemeProvider from './V2ThemeProvider';

@@ -1,6 +1,3 @@
-// File: src/lib/utils/admin-fetch.ts
-// Description: Auto-added top comment for easier file identification.
-
 import { STORAGE_KEYS } from './constants';
 
 export function adminFetch(url: string, opts: RequestInit = {}): Promise<Response> {

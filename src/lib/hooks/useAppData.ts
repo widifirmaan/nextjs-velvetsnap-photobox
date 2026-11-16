@@ -1,6 +1,3 @@
-// File: src/lib/hooks/useAppData.ts
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { STORAGE_KEYS } from '../utils/constants';

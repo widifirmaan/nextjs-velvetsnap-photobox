@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/homepage/HomeFooter.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { Camera as CameraIcon, MessageCircle, Sparkles } from 'lucide-react';
 import styles from '@/app/(themes)/v1/page.module.css';

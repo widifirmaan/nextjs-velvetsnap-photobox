@@ -1,6 +1,3 @@
-// File: src/lib/hooks/useCameraDevices.ts
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useState, useEffect, useMemo, useCallback, useRef, type Dispatch, type SetStateAction } from 'react';
 import { STORAGE_KEYS } from '../utils/constants';

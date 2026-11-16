@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/Masthead.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { ArrowLeft, Home, Timer } from 'lucide-react';
 import styles from './page.module.css';

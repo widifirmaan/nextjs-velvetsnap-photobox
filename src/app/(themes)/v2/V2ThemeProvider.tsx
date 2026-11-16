@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/V2ThemeProvider.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useThemeAccent } from '@/lib/hooks/useThemeAccent';
 

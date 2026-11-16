@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/booth/component/BoothStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';

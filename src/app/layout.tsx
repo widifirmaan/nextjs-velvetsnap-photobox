@@ -1,6 +1,3 @@
-// File: src/app/layout.tsx
-// Description: Auto-added top comment for easier file identification.
-
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';

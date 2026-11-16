@@ -1,6 +1,3 @@
-// File: src/lib/utils/shapes.tsx
-// Description: Auto-added top comment for easier file identification.
-
 import React from 'react';
 
 export type SlotShape = 'rectangle' | 'circle' | 'heart' | 'star' | 'diamond' | 'hexagon' | 'polaroid' | 'rounded';

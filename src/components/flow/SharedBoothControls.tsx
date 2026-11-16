@@ -1,6 +1,3 @@
-// File: src/components/flow/SharedBoothControls.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { ArrowLeft, CameraIcon, RefreshCcw, FlipHorizontal, Loader2 } from 'lucide-react';

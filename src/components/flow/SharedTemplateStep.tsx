@@ -1,6 +1,3 @@
-// File: src/components/flow/SharedTemplateStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { useCallback, type ComponentType } from 'react';

@@ -1,6 +1,3 @@
-// File: src/lib/utils/normalize-template.ts
-// Description: Auto-added top comment for easier file identification.
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeTemplate(doc: any) {
   if (!doc) return doc;

@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/error.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 export default function MainError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {

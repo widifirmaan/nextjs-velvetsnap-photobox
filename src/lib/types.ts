@@ -1,6 +1,3 @@
-// File: src/lib/types.ts
-// Description: Auto-added top comment for easier file identification.
-
 export interface ISlot {
   x: number;
   y: number;

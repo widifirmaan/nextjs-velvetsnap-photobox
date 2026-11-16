@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/StepperBar.tsx
-// Description: Auto-added top comment for easier file identification.
-
 import { Check } from 'lucide-react';
 import styles from '@/app/(themes)/v1/page.module.css';
 import { STEP_LABELS } from './types';

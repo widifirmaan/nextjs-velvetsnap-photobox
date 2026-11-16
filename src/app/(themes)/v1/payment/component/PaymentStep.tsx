@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/payment/component/PaymentStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useState } from 'react';
 import StepperBar from '../../StepperBar';

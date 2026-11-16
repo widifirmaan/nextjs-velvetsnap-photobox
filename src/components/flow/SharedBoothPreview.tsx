@@ -1,6 +1,3 @@
-// File: src/components/flow/SharedBoothPreview.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { X, Check, Upload, Loader2 } from 'lucide-react';

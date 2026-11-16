@@ -1,6 +1,3 @@
-// File: src/lib/context/ModelContext.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';

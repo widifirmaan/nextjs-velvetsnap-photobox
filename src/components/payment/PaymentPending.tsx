@@ -1,6 +1,3 @@
-// File: src/components/payment/PaymentPending.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { Loader2, AlertCircle } from 'lucide-react';

@@ -1,6 +1,3 @@
-// File: src/app/admin/components/AdminTableCard.tsx
-// Description: Auto-added top comment for easier file identification.
-
 import styles from './admin-table-card.module.css';
 
 interface Props {

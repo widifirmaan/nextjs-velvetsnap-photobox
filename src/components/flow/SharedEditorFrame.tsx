@@ -1,6 +1,3 @@
-// File: src/components/flow/SharedEditorFrame.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { useCallback, useRef } from 'react';

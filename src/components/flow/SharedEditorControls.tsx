@@ -1,6 +1,3 @@
-// File: src/components/flow/SharedEditorControls.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { ZoomIn, Sun, Contrast, Droplets, Thermometer } from 'lucide-react';

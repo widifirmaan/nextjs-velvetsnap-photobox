@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/editor/EditorStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { ArrowLeft } from 'lucide-react';
 import StepperBar from '../StepperBar';

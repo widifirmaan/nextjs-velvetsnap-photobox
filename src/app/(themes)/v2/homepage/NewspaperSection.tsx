@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/homepage/NewspaperSection.tsx
-// Description: Auto-added top comment for easier file identification.
-
 import styles from '../page.module.css';
 
 export default function NewspaperSection({ label, children, labelClass }: {

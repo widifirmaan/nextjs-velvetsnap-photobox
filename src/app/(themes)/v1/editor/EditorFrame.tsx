@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/editor/EditorFrame.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useRef, useCallback } from 'react';
 import { Pencil } from 'lucide-react';

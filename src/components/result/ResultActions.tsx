@@ -1,6 +1,3 @@
-// File: src/components/result/ResultActions.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { useEffect, useRef } from 'react';

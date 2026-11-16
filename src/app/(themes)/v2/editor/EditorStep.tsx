@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/editor/EditorStep.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import SharedEditorControls from '@/components/flow/SharedEditorControls';
 import styles from '../page.module.css';

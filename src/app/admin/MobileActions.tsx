@@ -1,6 +1,3 @@
-// File: src/app/admin/MobileActions.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 
 import { useRouter } from 'next/navigation';

@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v1/StepperFlow.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import SharedStepperFlow from '@/components/flow/SharedStepperFlow';
 import { TEMPLATE_CONFIGS } from './types';

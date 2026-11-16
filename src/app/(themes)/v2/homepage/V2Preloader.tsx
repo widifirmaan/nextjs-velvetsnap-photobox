@@ -1,6 +1,3 @@
-// File: src/app/(themes)/v2/homepage/V2Preloader.tsx
-// Description: Auto-added top comment for easier file identification.
-
 'use client';
 import { useEffect, useState } from 'react';
 import styles from '../page.module.css';
