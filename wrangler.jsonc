@@ -1,8 +1,16 @@
 {
-  "name": "photobox",
-  "pages_build_output_dir": "out",
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "nextjs-velvetsnap-photobox",
+  "main": "worker.js",
   "compatibility_date": "2025-02-01",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "directory": "out",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application"
+  },
   "d1_databases": [
     {
       "binding": "PHOTOBOX_DB",
@@ -19,5 +27,12 @@
     "DOKU_MERCHANT_ID": "",
     "DOKU_TERMINAL_ID": "",
     "DOKU_POSTAL_CODE": ""
-  }
+  },
+  "routes": [
+    {
+      "pattern": "photo.widifirmaan.web.id",
+      "zone_name": "widifirmaan.web.id",
+      "custom_domain": true
+    }
+  ]
 }

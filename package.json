@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build && node -e \"require('fs').copyFileSync('worker.js','out/_worker.js')\"",
-    "deploy": "npx wrangler pages deploy out --project-name photobox",
+    "build": "next build && node -e \"try{require('fs').unlinkSync('out/_worker.js')}catch(e){}\"",
+    "deploy": "npx wrangler deploy",
     "start": "next start",
     "lint": "eslint"
   },
