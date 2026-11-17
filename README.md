@@ -1,106 +1,90 @@
 # VelvetSnap
 
-> Editorial photobooth kiosk platform and automated photo strip compositing engine.
-
-VelvetSnap is a photobooth web application and photo strip generator built with Next.js 16 (App Router), React 19, and Konva canvas. It provides dual kiosk themes (`v1` modern card UI and `v2` newspaper editorial), live camera countdowns, photo adjustments, client-side background removal via WebAssembly, QR-based mobile strip downloads, and an administrative management portal backed by a local SQLite database.
+> Platform photobox mandiri dan generator cetak photo strip dengan tema ganda, editor canvas Konva, dan portal manajemen admin.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.2.4-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Konva](https://img.shields.io/badge/Canvas-Konva_10.3-0D9488?style=flat-square)](https://konvajs.org/)
 [![SQLite](https://img.shields.io/badge/Database-SQLite_3-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Live Demo](https://img.shields.io/badge/Demo-photo.widifirmaan.web.id-10B981?style=flat-square)](https://photo.widifirmaan.web.id)
 
 ---
 
-## Showcase
+## Live URL
 
-### 1. Dual Kiosk Landing & Modern Customer Workflow (`/v1`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Kiosk Hero Landing Stage**<br>![VelvetSnap Hero Landing Stage Desktop](screenshots/VelvetSnap%20Hero%20Landing%20Stage%20Desktop.png) | **Kiosk Hero Landing Stage**<br>![VelvetSnap Hero Landing Stage Mobile](screenshots/VelvetSnap%20Hero%20Landing%20Stage%20Mobile.png) |
-| **Step 1: Photo Strip Template Catalog**<br>![VelvetSnap Template Catalog Step 1 Desktop](screenshots/VelvetSnap%20Template%20Catalog%20Step%201%20Desktop.png) | **Step 1: Photo Strip Template Catalog**<br>![VelvetSnap Template Catalog Step 1 Mobile](screenshots/VelvetSnap%20Template%20Catalog%20Step%201%20Mobile.png) |
-| **Step 2: Simulated QRIS Payment Gate**<br>![VelvetSnap Simulated QRIS Payment Desktop](screenshots/VelvetSnap%20Simulated%20QRIS%20Payment%20Step%202%20Desktop.png) | **Step 2: Simulated QRIS Payment Gate**<br>![VelvetSnap Simulated QRIS Payment Mobile](screenshots/VelvetSnap%20Simulated%20QRIS%20Payment%20Step%202%20Mobile.png) |
-
-### 2. Camera Viewfinder, Canvas Compositing & Delivery (`/v1`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Step 3: Camera Viewfinder & Burst Capture**<br>![VelvetSnap Camera Viewfinder Capture Desktop](screenshots/VelvetSnap%20Camera%20Viewfinder%20Capture%20Step%203%20Desktop.png) | **Step 3: Camera Viewfinder & Burst Capture**<br>![VelvetSnap Camera Viewfinder Capture Mobile](screenshots/VelvetSnap%20Camera%20Viewfinder%20Capture%20Step%203%20Mobile.png) |
-| **Step 4: Multi-Layer Canvas Customization**<br>![VelvetSnap Canvas Customization Desktop](screenshots/VelvetSnap%20Canvas%20Customization%20Step%204%20Desktop.png) | **Step 4: Multi-Layer Canvas Customization**<br>![VelvetSnap Canvas Customization Mobile](screenshots/VelvetSnap%20Canvas%20Customization%20Step%204%20Mobile.png) |
-| **Step 5: Dynamic QR Code Mobile Delivery**<br>![VelvetSnap Mobile QR Delivery Desktop](screenshots/VelvetSnap%20Mobile%20QR%20Delivery%20Step%205%20Desktop.png) | **Step 5: Dynamic QR Code Mobile Delivery**<br>![VelvetSnap Mobile QR Delivery Mobile](screenshots/VelvetSnap%20Mobile%20QR%20Delivery%20Step%205%20Mobile.png) |
-
-### 3. Editorial Newspaper Vintage Kiosk Showcase (`/v2`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Editorial Newspaper Theme Showcase**<br>![VelvetSnap Newspaper Editorial Showcase Desktop](screenshots/VelvetSnap%20Newspaper%20Editorial%20Showcase%20Desktop.png) | **Editorial Newspaper Theme Showcase**<br>![VelvetSnap Newspaper Editorial Showcase Mobile](screenshots/VelvetSnap%20Newspaper%20Editorial%20Showcase%20Mobile.png) |
-| **Vintage Newspaper Template Catalog**<br>![VelvetSnap Newspaper Template Catalog Desktop](screenshots/VelvetSnap%20Newspaper%20Template%20Catalog%20Desktop.png) | **Vintage Newspaper Template Catalog**<br>![VelvetSnap Newspaper Template Catalog Mobile](screenshots/VelvetSnap%20Newspaper%20Template%20Catalog%20Mobile.png) |
-
-### 4. Admin Management Portal & Studio Operations (`/admin`)
-
-| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
-| :---: | :---: |
-| **Admin Operations Login Gateway**<br>![VelvetSnap Admin Login Gateway Desktop](screenshots/VelvetSnap%20Admin%20Login%20Gateway%20Desktop.png) | **Admin Operations Login Gateway**<br>![VelvetSnap Admin Login Gateway Mobile](screenshots/VelvetSnap%20Admin%20Login%20Gateway%20Mobile.png) |
-| **Executive Operations KPI Dashboard**<br>![VelvetSnap Admin Operations Dashboard Desktop](screenshots/VelvetSnap%20Admin%20Operations%20Dashboard%20Desktop.png) | **Executive Operations KPI Dashboard**<br>![VelvetSnap Admin Operations Dashboard Mobile](screenshots/VelvetSnap%20Admin%20Operations%20Dashboard%20Mobile.png) |
-| **Visual Strip Layout Template Studio**<br>![VelvetSnap Admin Visual Template Studio Desktop](screenshots/VelvetSnap%20Admin%20Visual%20Template%20Studio%20Desktop.png) | **Visual Strip Layout Template Studio**<br>![VelvetSnap Admin Visual Template Studio Mobile](screenshots/VelvetSnap%20Admin%20Visual%20Template%20Studio%20Mobile.png) |
-| **Frame Templates Catalog Management**<br>![VelvetSnap Admin Frame Templates Catalog Desktop](screenshots/VelvetSnap%20Admin%20Frame%20Templates%20Catalog%20Desktop.png) | **Frame Templates Catalog Management**<br>![VelvetSnap Admin Frame Templates Catalog Mobile](screenshots/VelvetSnap%20Admin%20Frame%20Templates%20Catalog%20Mobile.png) |
-| **Customer Photobooth Transaction Ledger**<br>![VelvetSnap Admin Transaction Ledger Desktop](screenshots/VelvetSnap%20Admin%20Transaction%20Ledger%20Desktop.png) | **Customer Photobooth Transaction Ledger**<br>![VelvetSnap Admin Transaction Ledger Mobile](screenshots/VelvetSnap%20Admin%20Transaction%20Ledger%20Mobile.png) |
-| **Kiosk Hardware Peripheral Devices Monitor**<br>![VelvetSnap Admin Hardware Devices Monitor Desktop](screenshots/VelvetSnap%20Admin%20Hardware%20Devices%20Monitor%20Desktop.png) | **Kiosk Hardware Peripheral Devices Monitor**<br>![VelvetSnap Admin Hardware Devices Monitor Mobile](screenshots/VelvetSnap%20Admin%20Hardware%20Devices%20Monitor%20Mobile.png) |
-| **System Branding & Price Rules Configuration**<br>![VelvetSnap Admin System Settings Desktop](screenshots/VelvetSnap%20Admin%20System%20Settings%20&%20Branding%20Desktop.png) | **System Branding & Price Rules Configuration**<br>![VelvetSnap Admin System Settings Mobile](screenshots/VelvetSnap%20Admin%20System%20Settings%20&%20Branding%20Mobile.png) |
+- **Production URL**: [https://photo.widifirmaan.web.id](https://photo.widifirmaan.web.id)
 
 ---
 
-## Features
+## Screenshot
 
-- **Dual Kiosk Themes**: Modern clean layout (`/v1`) and vintage editorial newspaper aesthetic (`/v2`) powered by `V2ThemeProvider`, custom mastheads, paper textures, and responsive layout scaling.
-- **Guided Customer Kiosk Workflow**: Step-by-step state flow guiding guests through Template Selection, Simulated QRIS Payment, Viewfinder Capture, Photo Adjustment, and Print/Download.
-- **Webcam Hardware Bridge**: Camera stream integration via `react-webcam` with configurable countdown timers (3s, 5s), automated burst sequences, flash effect transitions, and slot indicators.
-- **Live Video Clip Recorder (`useClipRecorder`)**: Automated in-browser video capture recording short behind-the-scenes video clips during photo capture sessions.
-- **Multi-Layer Canvas Compositor (`react-konva`)**: 2D canvas engine handling photo frame bounding masks, aspect-ratio scaling, drag-and-drop sticker overlays, and high-resolution composite rendering.
-- **Client-Side Background Removal**: In-browser neural background removal powered by `@imgly/background-removal` WebAssembly runtime without transmitting images to external servers.
-- **Visual Template Studio (`/admin/template-studio`)**: Interactive layout designer for kiosk administrators with draggable canvas layers, sticker asset catalog, and coordinate geometry inspector.
-- **Batch Template Reprocessor (`/admin/reprocess-templates`)**: Automated template analysis utility detecting chroma-key placeholders and frame slot coordinates across graphic assets.
-- **Kiosk Device Health Monitor (`/admin/devices`)**: Hardware diagnostic panel verifying camera feed availability, resolution profiles, and peripheral status.
-- **Admin Operations & Analytics (`/admin`)**: Dashboard tracking revenue metrics (daily, weekly, monthly), transaction history, account roles, and kiosk settings backed by SQLite.
-- **Mobile QR Photo Strip Delivery**: Dynamic QR code generation via `qrcode` allowing guests to scan on-screen tickets and download photo strips to mobile devices.
+| Desktop | Mobile |
+| :---: | :---: |
+| **Kiosk Home (Tema Modern v1)**<br>![Kiosk Home](screenshots/Kiosk%20Home%20Desktop.png) | **Kiosk Home (Tema Modern v1)**<br>![Kiosk Home](screenshots/Kiosk%20Home%20Mobile.png) |
+| **Katalog Template Frame Foto**<br>![Template Catalog](screenshots/Template%20Catalog%20Desktop.png) | **Katalog Template Frame Foto**<br>![Template Catalog](screenshots/Template%20Catalog%20Mobile.png) |
+| **Jendela Kamera & Hitung Mundur**<br>![Camera Viewfinder](screenshots/Camera%20Viewfinder%20Desktop.png) | **Jendela Kamera & Hitung Mundur**<br>![Camera Viewfinder](screenshots/Camera%20Viewfinder%20Mobile.png) |
+| **Editor Canvas Komposisi Strip (Konva)**<br>![Canvas Editor](screenshots/Canvas%20Editor%20Desktop.png) | **Editor Canvas Komposisi Strip (Konva)**<br>![Canvas Editor](screenshots/Canvas%20Editor%20Mobile.png) |
+| **Simulasi Gerbang Pembayaran QRIS**<br>![Payment QRIS](screenshots/Payment%20QRIS%20Desktop.png) | **Simulasi Gerbang Pembayaran QRIS**<br>![Payment QRIS](screenshots/Payment%20QRIS%20Mobile.png) |
+| **Tiket QR Download Mobile & Hasil Cetak**<br>![Result & QR](screenshots/Result%20&%20QR%20Desktop.png) | **Tiket QR Download Mobile & Hasil Cetak**<br>![Result & QR](screenshots/Result%20&%20QR%20Mobile.png) |
+| **Kiosk Tema Koran Vintage (v2)**<br>![Newspaper Theme](screenshots/Newspaper%20Theme%20Desktop.png) | **Kiosk Tema Koran Vintage (v2)**<br>![Newspaper Theme](screenshots/Newspaper%20Theme%20Mobile.png) |
+| **Autentikasi Login Admin Portal**<br>![Admin Login](screenshots/Admin%20Login%20Desktop.png) | **Autentikasi Login Admin Portal**<br>![Admin Login](screenshots/Admin%20Login%20Mobile.png) |
+| **Dashboard Operasional & Metrik Omset**<br>![Admin Dashboard](screenshots/Admin%20Dashboard%20Desktop.png) | **Dashboard Operasional & Metrik Omset**<br>![Admin Dashboard](screenshots/Admin%20Dashboard%20Mobile.png) |
+| **Studio Desain Layout Template Strip**<br>![Admin Studio](screenshots/Admin%20Studio%20Desktop.png) | **Studio Desain Layout Template Strip**<br>![Admin Studio](screenshots/Admin%20Studio%20Mobile.png) |
+| **Katalog Manajemen Template Frame**<br>![Admin Templates](screenshots/Admin%20Templates%20Desktop.png) | **Katalog Manajemen Template Frame**<br>![Admin Templates](screenshots/Admin%20Templates%20Mobile.png) |
+| **Buku Riwayat Sesi Pemotretan**<br>![Admin History](screenshots/Admin%20History%20Desktop.png) | **Buku Riwayat Sesi Pemotretan**<br>![Admin History](screenshots/Admin%20History%20Mobile.png) |
+| **Diagnostik Perangkat Keras Kamera Kiosk**<br>![Admin Devices](screenshots/Admin%20Devices%20Desktop.png) | **Diagnostik Perangkat Keras Kamera Kiosk**<br>![Admin Devices](screenshots/Admin%20Devices%20Mobile.png) |
+| **Konfigurasi Pengaturan & Branding Kiosk**<br>![Admin Settings](screenshots/Admin%20Settings%20Desktop.png) | **Konfigurasi Pengaturan & Branding Kiosk**<br>![Admin Settings](screenshots/Admin%20Settings%20Mobile.png) |
+
+---
+
+## Fitur
+
+- **Dua Tema Kiosk Lengkap**: Tampilan modern minimalis (`/v1`) dan estetika koran editorial klasik (`/v2`) dengan tekstur kertas, masthead koran, dan tata letak responsif.
+- **Alur Pelanggan Terpandu**: Alur tahapan otomatis mulai dari Pemilihan Template, Pembayaran Simulasi QRIS, Hitung Mundur Pengambilan Foto Kamera, Penyesuaian Canvas & Stiker, hingga Tiket QR Hasil Cetak.
+- **Integrasi Kamera Langsung (`react-webcam`)**: Penghubung aliran video webcam perangkat dengan timer hitung mundur (3 dan 5 detik), sequence burst foto otomatis, efek flash visual, dan slot indikator tangkapan.
+- **Perekaman Klip Singkat Otomatis (`useClipRecorder`)**: Perekam video latar belakang otomatis di browser saat pemotretan berlangsung untuk menghasilkan klip kenangan *behind-the-scenes*.
+- **Kompositor Canvas 2D Beresolusi Tinggi (`react-konva`)**: Engine canvas Konva untuk pemosisian foto dalam frame, masking aspek rasio, penambahan stiker dekorasi, dan render komposit akhir.
+- **Penghapusan Background Mandiri (WASM)**: Penghapus background foto berbasis machine learning `@imgly/background-removal` yang berjalan langsung via WebAssembly di browser tanpa server pihak ketiga.
+- **Studio Template Interaktif (`/admin/template-studio`)**: Desainer visual layout strip untuk admin kios dengan fitur drag-and-drop layer, pengaturan slot foto, dan koordinat geometri.
+- **Pemantau Kesehatan Perangkat Keras (`/admin/devices`)**: Panel diagnostik status koneksi webcam, profil resolusi kamera, dan status online kiosk.
+- **Dashboard Analisis Admin (`/admin`)**: Pelacak total sesi pemotretan, grafik omset transaksi harian/mingguan, buku besar pembayaran, dan pengaturan harga.
+- **Pengiriman Unduhan Mobile via Tiket QR**: Pembuatan kode QR instan pada layar hasil akhir sehingga pengguna dapat langsung memindai dari ponsel untuk mengunduh foto strip resolusi penuh.
 
 ---
 
 ## Tech Stack
 
-| Category | Technologies | Purpose |
+| Kategori | Teknologi | Deskripsi / Peran |
 | :--- | :--- | :--- |
-| **Core Framework** | Next.js `16.2.6`, React `19.2.4` | App Router architecture, server components, and concurrent UI rendering |
-| **Canvas & Compositing** | Konva `10.3.0`, React-Konva `19.2.4` | 2D canvas drawing engine for photo strip layout composition and layer manipulation |
-| **Camera & Video** | React-Webcam `7.2.0` | Browser MediaDevices API abstraction for webcam and camera hardware tethering |
-| **AI / Machine Learning** | `@imgly/background-removal` `1.7.0` | Client-side neural network running via WebAssembly to remove image backgrounds |
-| **Database & Persistence** | SQLite 3 | Relational database for settings, templates, device status, and transaction history |
-| **API & Edge Server** | Local Router (`worker.js`) | Local API router serving endpoints and handling `/api/*` data operations |
-| **Utilities & QR** | QRCode `1.5.4`, UUID `9.0.0`, Lucide React `1.17.0` | QR ticket generation, transaction session identification, and SVG iconography |
+| **Framework Utama** | Next.js `16.2.6` (App Router), React `19.2.4` | Arsitektur modern dengan rendering server dan UI cepat |
+| **Canvas & Komposisi** | Konva `10.3.0`, React-Konva `19.2.4` | Engine rendering canvas 2D untuk tata letak photo strip dan layer stiker |
+| **Kamera & Video** | React-Webcam `7.2.0` | Abstraksi MediaDevices API untuk streaming webcam dan jepretan kamera |
+| **AI / Machine Learning** | `@imgly/background-removal` `1.7.0` | Runtime WebAssembly penghapus background gambar langsung di browser |
+| **Basis Data** | SQLite 3 | Database relasional lokal untuk template, perangkat, akun admin, dan transaksi |
+| **API Server** | Local Router (`worker.js`) | Router endpoint lokal untuk melayani persistensi data `/api/*` |
+| **Utilitas & QR** | QRCode `1.5.4`, UUID `9.0.0`, Lucide React | Generator kode QR tiket unduhan dan ikon antarmuka |
 
 ---
 
 ## Database Architecture
 
-VelvetSnap organizes kiosk configuration, admin accounts, frame templates, and transaction audit trails in a relational SQLite database. The schema (`schema.sql`) organizes data across 5 normalized tables:
+VelvetSnap menyimpan pengaturan sistem, akun operator, katalog template strip, dan log transaksi dalam database SQLite relasional (`schema.sql`):
 
 ```sql
--- 1. Kiosk system configuration & branding
 CREATE TABLE settings (
     id TEXT PRIMARY KEY DEFAULT 'root',
     appName TEXT NOT NULL DEFAULT 'VelvetSnap',
     appTagline TEXT NOT NULL DEFAULT 'AI-Powered Photobooth Experience',
     heroSubtitle TEXT NOT NULL,
-    uiTheme TEXT NOT NULL DEFAULT 'v1',      -- 'v1' (modern) or 'v2' (newspaper)
-    system TEXT NOT NULL DEFAULT '{}',       -- JSON pricing & timer config
+    uiTheme TEXT NOT NULL DEFAULT 'v1',
+    system TEXT NOT NULL DEFAULT '{}',
     header TEXT NOT NULL DEFAULT '{}',
     footer TEXT NOT NULL DEFAULT '{}',
     password TEXT NOT NULL DEFAULT '',
     createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- 2. Admin & kiosk operator accounts
 CREATE TABLE accounts (
     id TEXT PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
@@ -109,9 +93,7 @@ CREATE TABLE accounts (
     session TEXT NOT NULL DEFAULT '',
     settings TEXT NOT NULL DEFAULT '{}'
 );
-CREATE INDEX idx_accounts_session ON accounts(session);
 
--- 3. Photo strip templates & dimensions
 CREATE TABLE templates (
     id TEXT PRIMARY KEY,
     templateId TEXT NOT NULL UNIQUE,
@@ -123,144 +105,92 @@ CREATE TABLE templates (
     isActive INTEGER NOT NULL DEFAULT 1
 );
 
--- 4. Customer photobooth transactions & captures
 CREATE TABLE transactions (
     id TEXT PRIMARY KEY,
     sessionId TEXT NOT NULL,
     templateId TEXT NOT NULL DEFAULT 't1',
     price REAL NOT NULL DEFAULT 35000,
-    status TEXT NOT NULL DEFAULT 'PENDING',  -- PENDING, PAID, COMPLETED
-    captures TEXT NOT NULL DEFAULT '[]',     -- JSON array of photo captures
-    videos TEXT NOT NULL DEFAULT '[]',       -- JSON array of video clips
-    finalImage TEXT NOT NULL DEFAULT '',     -- Rendered composite strip URL
+    status TEXT NOT NULL DEFAULT 'PENDING',
+    captures TEXT NOT NULL DEFAULT '[]',
+    videos TEXT NOT NULL DEFAULT '[]',
+    finalImage TEXT NOT NULL DEFAULT '',
     orderId TEXT UNIQUE,
     createdAt TEXT NOT NULL DEFAULT (datetime('now'))
 );
-CREATE INDEX idx_transactions_sessionId ON transactions(sessionId);
-CREATE INDEX idx_transactions_status ON transactions(status);
 
--- 5. Kiosk hardware peripheral status
 CREATE TABLE devices (
     id TEXT PRIMARY KEY,
     deviceId TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     location TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'OFFLINE',  -- ONLINE, OFFLINE
+    status TEXT NOT NULL DEFAULT 'OFFLINE',
     lastPing TEXT NOT NULL DEFAULT (datetime('now'))
 );
 ```
 
 ---
 
-## Project Structure
+## Panduan Setup & Menjalankan Lokal
 
-```bash
-/
-├── src/
-│   ├── app/
-│   │   ├── (themes)/
-│   │   │   ├── v1/                  # Modern card-based photobooth kiosk flow
-│   │   │   └── v2/                  # Vintage editorial newspaper kiosk flow
-│   │   ├── admin/
-│   │   │   ├── template-studio/     # Visual strip template editor
-│   │   │   ├── templates/           # Template catalog & status management
-│   │   │   ├── history/             # Transaction history & ledger
-│   │   │   ├── devices/             # Kiosk hardware diagnostics
-│   │   │   ├── settings/            # System & theme configuration
-│   │   │   ├── login/               # Admin authentication gate
-│   │   │   └── page.tsx             # Admin KPI dashboard
-│   │   ├── layout.tsx               # Root app layout
-│   │   └── page.tsx                 # Public landing page (theme router)
-│   ├── components/                  # Reusable UI primitives, modals, viewfinders
-│   └── lib/                         # Canvas math, image utilities, and custom hooks
-├── public/                          # Frame overlays, stickers, and static assets
-├── screenshots/                     # Desktop and mobile showcase mockups
-├── scripts/
-│   ├── capture-all.mjs              # Screenshot capture automation
-│   └── seed.sql                     # Turnkey database seeder with 26 templates
-├── schema.sql                       # SQLite database schema definition
-├── worker.js                        # Local API router and endpoint bridge
-├── wrangler.jsonc                   # Local SQLite database & asset bindings
-└── package.json
+### 1. Prasyarat Sistem
+
+- **Node.js**: Versi `20.x` atau `22.x`
+- **npm** atau **pnpm**
+- **SQLite 3**: Native CLI (`sqlite3`)
+
+### 2. Environment Variables
+
+Buat file `.env.local` pada direktori root:
+
+```env
+ADMIN_ROOT_PASSWORD=root
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
----
-
-## Local Setup & Deployment
-
-### 1. Prerequisites
-
-- **Node.js**: Version `18.18.0` or higher (`20.x` recommended)
-- **npm** or **pnpm**
-- **SQLite 3**: Native CLI (`sqlite3`) or local runner via `npx wrangler`
-
-### 2. Installation
+### 3. Instalasi Dependensi
 
 ```bash
-# Clone the repository
+# Clone repository
 git clone https://github.com/widifirmaan/nextjs-velvetsnap-photobox.git
 cd nextjs-velvetsnap-photobox
 
-# Install dependencies
+# Install dependensi
 npm install
 ```
 
-### 3. Setup Database & Seeder Lokal
+### 4. Setup Database & Seeder Lokal
 
-Inisialisasi skema tabel dan isi data awal (seeder) ke database SQLite lokal:
+Inisialisasi tabel SQLite lokal dan akun administrator default:
 
 ```bash
-# Opsi A: Menggunakan SQLite3 CLI langsung
+# Inisialisasi skema tabel lokal
 sqlite3 local.db < schema.sql
-sqlite3 local.db < scripts/seed.sql
-
-# Atau via npm script
-npm run db:setup
-
-# Opsi B: Menggunakan local runtime runner
-npx wrangler d1 execute photobox-db --local --file=schema.sql
-npm run seed
 ```
 
-#### Isi Data Seeder:
-* **Settings**: Konfigurasi kios default VelvetSnap (tema modern `v1`, pricing Rp 35.000).
-* **26 Templates Strip Foto**:
-  * 3 Frame Strip Klasik (White Minimalist, Dark Editorial, Pastel Romance)
-  * 4 Grid Collage & Retro 90s Frames
-  * Newspaper Vintage Mastheads (Times Edition, Gazette Style)
-  * Cute & Aesthetic Stickers & Overlays
-* **Devices Status**: Device booth `BOOTH-01` dengan status aktif.
+#### Kredensial Administrator Bawaan:
+- **Username**: `root`
+- **Password**: `root`
+- **Akses**: Masuk melalui `/admin/login` untuk mengakses dashboard, template studio, dan riwayat transaksi.
 
-### 4. Menjalankan Server Lokal
+### 5. Menjalankan Server Lokal
 
 ```bash
-# Jalankan frontend Next.js development server
+# Jalankan mode development
 npm run dev
 ```
 
-Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
+Buka [http://localhost:3000/v1](http://localhost:3000/v1) di browser Anda untuk alur pemotretan pelanggan, atau [http://localhost:3000/admin](http://localhost:3000/admin) untuk panel kontrol admin.
 
-Atau jalankan runtime API lokal terintegrasi:
+### 6. Panduan Uji Manual (Testing Checklist)
 
-```bash
-npm run build
-npx wrangler dev
-```
-
-Buka [http://localhost:8787](http://localhost:8787) di browser.
-
-### 5. Panduan Uji Manual (Testing Checklist)
-
-Lakukan verifikasi manual berikut di browser:
-
-| No | Fitur yang Diuji | Langkah Pengujian | Hasil yang Diharapkan |
+| No | Fitur | Langkah Pengujian | Hasil yang Diharapkan |
 | :---: | :--- | :--- | :--- |
-| 1 | **Theme Gateway** | Buka `/`, pilih tema `v1` atau `v2` | Halaman kiosk tampil sesuai tema (Modern Card UI atau Newspaper Vintage) |
-| 2 | **Katalog Template** | Buka `/v1/templates` atau `/v2/templates` | Menampilkan 26 template hasil seeder siap dipilih |
-| 3 | **Webcam & Capture** | Izinkan akses kamera, jalankan countdown sesi foto | Viewfinder aktif, countdown 3s/5s berjalan, foto tertangkap di frame slot |
-| 4 | **Canvas Editor** | Tambahkan sticker, adjust brightness/filter | Canvas Konva merender layer foto dan elemen grafis tanpa lag |
-| 5 | **Simulasi Checkout & QR** | Selesaikan sesi foto, klik Cetak/Download | Tampil QR code untuk download strip foto di mobile |
-| 6 | **Admin Portal** | Akses `/admin/login`, masuk ke dashboard `/admin` | Tampil ringkasan revenue, template management, dan device monitor |
+| 1 | **Kiosk Beranda** | Buka `/v1`, klik tombol *Mulai Sesi* | Masuk ke katalog pemilihan frame template |
+| 2 | **Pilih Template** | Pilih salah satu template frame | Masuk ke halaman simulasi pembayaran QRIS |
+| 3 | **Kamera Photobox** | Izinkan akses kamera browser pada jendela `/v1/booth` | Aliran video webcam muncul dengan timer hitung mundur |
+| 4 | **Canvas Editor** | Selesaikan pemotretan dan masuk ke editor `/v1/editor` | Hasil foto tertata otomatis pada slot frame strip Konva |
+| 5 | **Tiket Unduhan QR** | Masuk ke halaman `/v1/result` | Kode QR tiket unduhan tampil dan tombol simpan photo strip aktif |
+| 6 | **Portal Admin** | Buka `/admin/login`, masukkan password `root` | Berhasil login dan masuk ke Dashboard KPI Omset (`/admin`) |
 
 ---
 
