@@ -14,12 +14,40 @@ VelvetSnap is a photobooth web application and photo strip generator built with 
 
 ## Showcase
 
-| Desktop | Mobile |
+### 1. Dual Kiosk Landing & Modern Customer Workflow (`/v1`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
 | :---: | :---: |
-| **Hero Landing Stage Desktop**<br>![VelvetSnap Hero Landing Desktop](screenshots/VelvetSnap%20Hero%20Landing%20Desktop.png) | **Hero Landing Stage Mobile**<br>![VelvetSnap Hero Landing Mobile](screenshots/VelvetSnap%20Hero%20Landing%20Mobile.png) |
-| **Editorial Newspaper Showcase Desktop**<br>![VelvetSnap Newspaper Showcase Desktop](screenshots/VelvetSnap%20Newspaper%20Showcase%20Desktop.png) | **Editorial Newspaper Showcase Mobile**<br>![VelvetSnap Newspaper Showcase Mobile](screenshots/VelvetSnap%20Newspaper%20Showcase%20Mobile.png) |
-| **Interactive Template Catalog Desktop**<br>![VelvetSnap Template Catalog Desktop](screenshots/VelvetSnap%20Template%20Catalog%20Desktop.png) | **Interactive Template Catalog Mobile**<br>![VelvetSnap Template Catalog Mobile](screenshots/VelvetSnap%20Template%20Catalog%20Mobile.png) |
-| **Admin Operations Gate Desktop**<br>![VelvetSnap Admin Portal Desktop](screenshots/VelvetSnap%20Admin%20Portal%20Desktop.png) | **Admin Operations Gate Mobile**<br>![VelvetSnap Admin Portal Mobile](screenshots/VelvetSnap%20Admin%20Portal%20Mobile.png) |
+| **Kiosk Hero Landing Stage**<br>![VelvetSnap Hero Landing Stage Desktop](screenshots/VelvetSnap%20Hero%20Landing%20Stage%20Desktop.png) | **Kiosk Hero Landing Stage**<br>![VelvetSnap Hero Landing Stage Mobile](screenshots/VelvetSnap%20Hero%20Landing%20Stage%20Mobile.png) |
+| **Step 1: Photo Strip Template Catalog**<br>![VelvetSnap Template Catalog Step 1 Desktop](screenshots/VelvetSnap%20Template%20Catalog%20Step%201%20Desktop.png) | **Step 1: Photo Strip Template Catalog**<br>![VelvetSnap Template Catalog Step 1 Mobile](screenshots/VelvetSnap%20Template%20Catalog%20Step%201%20Mobile.png) |
+| **Step 2: Simulated QRIS Payment Gate**<br>![VelvetSnap Simulated QRIS Payment Desktop](screenshots/VelvetSnap%20Simulated%20QRIS%20Payment%20Step%202%20Desktop.png) | **Step 2: Simulated QRIS Payment Gate**<br>![VelvetSnap Simulated QRIS Payment Mobile](screenshots/VelvetSnap%20Simulated%20QRIS%20Payment%20Step%202%20Mobile.png) |
+
+### 2. Camera Viewfinder, Canvas Compositing & Delivery (`/v1`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **Step 3: Camera Viewfinder & Burst Capture**<br>![VelvetSnap Camera Viewfinder Capture Desktop](screenshots/VelvetSnap%20Camera%20Viewfinder%20Capture%20Step%203%20Desktop.png) | **Step 3: Camera Viewfinder & Burst Capture**<br>![VelvetSnap Camera Viewfinder Capture Mobile](screenshots/VelvetSnap%20Camera%20Viewfinder%20Capture%20Step%203%20Mobile.png) |
+| **Step 4: Multi-Layer Canvas Customization**<br>![VelvetSnap Canvas Customization Desktop](screenshots/VelvetSnap%20Canvas%20Customization%20Step%204%20Desktop.png) | **Step 4: Multi-Layer Canvas Customization**<br>![VelvetSnap Canvas Customization Mobile](screenshots/VelvetSnap%20Canvas%20Customization%20Step%204%20Mobile.png) |
+| **Step 5: Dynamic QR Code Mobile Delivery**<br>![VelvetSnap Mobile QR Delivery Desktop](screenshots/VelvetSnap%20Mobile%20QR%20Delivery%20Step%205%20Desktop.png) | **Step 5: Dynamic QR Code Mobile Delivery**<br>![VelvetSnap Mobile QR Delivery Mobile](screenshots/VelvetSnap%20Mobile%20QR%20Delivery%20Step%205%20Mobile.png) |
+
+### 3. Editorial Newspaper Vintage Kiosk Showcase (`/v2`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **Editorial Newspaper Theme Showcase**<br>![VelvetSnap Newspaper Editorial Showcase Desktop](screenshots/VelvetSnap%20Newspaper%20Editorial%20Showcase%20Desktop.png) | **Editorial Newspaper Theme Showcase**<br>![VelvetSnap Newspaper Editorial Showcase Mobile](screenshots/VelvetSnap%20Newspaper%20Editorial%20Showcase%20Mobile.png) |
+| **Vintage Newspaper Template Catalog**<br>![VelvetSnap Newspaper Template Catalog Desktop](screenshots/VelvetSnap%20Newspaper%20Template%20Catalog%20Desktop.png) | **Vintage Newspaper Template Catalog**<br>![VelvetSnap Newspaper Template Catalog Mobile](screenshots/VelvetSnap%20Newspaper%20Template%20Catalog%20Mobile.png) |
+
+### 4. Admin Management Portal & Studio Operations (`/admin`)
+
+| Desktop Interface (MacBook Pro M4) | Mobile Interface (iPhone 16 Pro) |
+| :---: | :---: |
+| **Admin Operations Login Gateway**<br>![VelvetSnap Admin Login Gateway Desktop](screenshots/VelvetSnap%20Admin%20Login%20Gateway%20Desktop.png) | **Admin Operations Login Gateway**<br>![VelvetSnap Admin Login Gateway Mobile](screenshots/VelvetSnap%20Admin%20Login%20Gateway%20Mobile.png) |
+| **Executive Operations KPI Dashboard**<br>![VelvetSnap Admin Operations Dashboard Desktop](screenshots/VelvetSnap%20Admin%20Operations%20Dashboard%20Desktop.png) | **Executive Operations KPI Dashboard**<br>![VelvetSnap Admin Operations Dashboard Mobile](screenshots/VelvetSnap%20Admin%20Operations%20Dashboard%20Mobile.png) |
+| **Visual Strip Layout Template Studio**<br>![VelvetSnap Admin Visual Template Studio Desktop](screenshots/VelvetSnap%20Admin%20Visual%20Template%20Studio%20Desktop.png) | **Visual Strip Layout Template Studio**<br>![VelvetSnap Admin Visual Template Studio Mobile](screenshots/VelvetSnap%20Admin%20Visual%20Template%20Studio%20Mobile.png) |
+| **Frame Templates Catalog Management**<br>![VelvetSnap Admin Frame Templates Catalog Desktop](screenshots/VelvetSnap%20Admin%20Frame%20Templates%20Catalog%20Desktop.png) | **Frame Templates Catalog Management**<br>![VelvetSnap Admin Frame Templates Catalog Mobile](screenshots/VelvetSnap%20Admin%20Frame%20Templates%20Catalog%20Mobile.png) |
+| **Customer Photobooth Transaction Ledger**<br>![VelvetSnap Admin Transaction Ledger Desktop](screenshots/VelvetSnap%20Admin%20Transaction%20Ledger%20Desktop.png) | **Customer Photobooth Transaction Ledger**<br>![VelvetSnap Admin Transaction Ledger Mobile](screenshots/VelvetSnap%20Admin%20Transaction%20Ledger%20Mobile.png) |
+| **Kiosk Hardware Peripheral Devices Monitor**<br>![VelvetSnap Admin Hardware Devices Monitor Desktop](screenshots/VelvetSnap%20Admin%20Hardware%20Devices%20Monitor%20Desktop.png) | **Kiosk Hardware Peripheral Devices Monitor**<br>![VelvetSnap Admin Hardware Devices Monitor Mobile](screenshots/VelvetSnap%20Admin%20Hardware%20Devices%20Monitor%20Mobile.png) |
+| **System Branding & Price Rules Configuration**<br>![VelvetSnap Admin System Settings Desktop](screenshots/VelvetSnap%20Admin%20System%20Settings%20&%20Branding%20Desktop.png) | **System Branding & Price Rules Configuration**<br>![VelvetSnap Admin System Settings Mobile](screenshots/VelvetSnap%20Admin%20System%20Settings%20&%20Branding%20Mobile.png) |
 
 ---
 
