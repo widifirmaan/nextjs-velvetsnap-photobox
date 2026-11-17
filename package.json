@@ -6,6 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build && node -e \"try{require('fs').unlinkSync('out/_worker.js')}catch(e){}\"",
     "deploy": "npx wrangler deploy",
+    "db:setup": "sqlite3 local.db < schema.sql && sqlite3 local.db < scripts/seed.sql",
+    "seed": "npx wrangler d1 execute photobox-db --local --file=scripts/seed.sql",
     "start": "next start",
     "lint": "eslint"
   },

@@ -2,23 +2,13 @@
 
 > Editorial photobooth kiosk platform and automated photo strip compositing engine.
 
-VelvetSnap is a photobooth web application and photo strip generator built with Next.js 16 (App Router), React 19, and Konva canvas. Deployed on Cloudflare Workers with static assets and a custom Edge Worker API (`worker.js`), it provides dual kiosk themes (`v1` modern card UI and `v2` newspaper editorial), live camera countdowns, photo adjustments, client-side background removal via WebAssembly, QR-based mobile strip downloads, and an administrative management portal backed by Cloudflare D1 (SQLite).
+VelvetSnap is a photobooth web application and photo strip generator built with Next.js 16 (App Router), React 19, and Konva canvas. It provides dual kiosk themes (`v1` modern card UI and `v2` newspaper editorial), live camera countdowns, photo adjustments, client-side background removal via WebAssembly, QR-based mobile strip downloads, and an administrative management portal backed by a local SQLite database.
 
-[![Live Demo](https://img.shields.io/badge/Demo-photo.widifirmaan.web.id-10B981?style=flat-square&logo=cloudflare&logoColor=white)](https://photo.widifirmaan.web.id)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.6-black?style=flat-square&logo=nextdotjs)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19.2.4-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
 [![Konva](https://img.shields.io/badge/Canvas-Konva_10.3-0D9488?style=flat-square)](https://konvajs.org/)
-[![Cloudflare Worker](https://img.shields.io/badge/Deployment-Cloudflare_Worker-F38020?style=flat-square&logo=cloudflareworkers&logoColor=white)](https://workers.cloudflare.com/)
-[![Cloudflare D1](https://img.shields.io/badge/Database-Cloudflare_D1-F38020?style=flat-square&logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/)
+[![SQLite](https://img.shields.io/badge/Database-SQLite_3-003B57?style=flat-square&logo=sqlite&logoColor=white)](https://sqlite.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-
----
-
-## Live Production
-
-- **URL:** [https://photo.widifirmaan.web.id](https://photo.widifirmaan.web.id)
-- **Deployment:** Cloudflare Worker with static assets (`wrangler.jsonc`)
-- **Database:** Cloudflare D1 Relational SQLite (`photobox-db`)
 
 ---
 
@@ -44,7 +34,7 @@ VelvetSnap is a photobooth web application and photo strip generator built with 
 - **Visual Template Studio (`/admin/template-studio`)**: Interactive layout designer for kiosk administrators with draggable canvas layers, sticker asset catalog, and coordinate geometry inspector.
 - **Batch Template Reprocessor (`/admin/reprocess-templates`)**: Automated template analysis utility detecting chroma-key placeholders and frame slot coordinates across graphic assets.
 - **Kiosk Device Health Monitor (`/admin/devices`)**: Hardware diagnostic panel verifying camera feed availability, resolution profiles, and peripheral status.
-- **Admin Operations & Analytics (`/admin`)**: Dashboard tracking revenue metrics (daily, weekly, monthly), transaction history, account roles, and kiosk settings backed by Cloudflare D1.
+- **Admin Operations & Analytics (`/admin`)**: Dashboard tracking revenue metrics (daily, weekly, monthly), transaction history, account roles, and kiosk settings backed by SQLite.
 - **Mobile QR Photo Strip Delivery**: Dynamic QR code generation via `qrcode` allowing guests to scan on-screen tickets and download photo strips to mobile devices.
 
 ---
@@ -57,14 +47,15 @@ VelvetSnap is a photobooth web application and photo strip generator built with 
 | **Canvas & Compositing** | Konva `10.3.0`, React-Konva `19.2.4` | 2D canvas drawing engine for photo strip layout composition and layer manipulation |
 | **Camera & Video** | React-Webcam `7.2.0` | Browser MediaDevices API abstraction for webcam and camera hardware tethering |
 | **AI / Machine Learning** | `@imgly/background-removal` `1.7.0` | Client-side neural network running via WebAssembly to remove image backgrounds |
-| **Database & Runtime** | Cloudflare D1 (SQLite), Cloudflare Worker | Relational edge persistence and custom Worker router (`worker.js`) |
+| **Database & Persistence** | SQLite 3 | Relational database for settings, templates, device status, and transaction history |
+| **API & Edge Server** | Local Router (`worker.js`) | Local API router serving endpoints and handling `/api/*` data operations |
 | **Utilities & QR** | QRCode `1.5.4`, UUID `9.0.0`, Lucide React `1.17.0` | QR ticket generation, transaction session identification, and SVG iconography |
 
 ---
 
 ## Database Architecture
 
-VelvetSnap utilizes Cloudflare D1 (serverless relational SQLite) for kiosk configuration, admin accounts, frame templates, and transaction audit trails. The schema (`schema.sql`) organizes data across 5 tables:
+VelvetSnap organizes kiosk configuration, admin accounts, frame templates, and transaction audit trails in a relational SQLite database. The schema (`schema.sql`) organizes data across 5 normalized tables:
 
 ```sql
 -- 1. Kiosk system configuration & branding
@@ -156,79 +147,92 @@ CREATE TABLE devices (
 │   └── lib/                         # Canvas math, image utilities, and custom hooks
 ├── public/                          # Frame overlays, stickers, and static assets
 ├── screenshots/                     # Desktop and mobile showcase mockups
-├── scripts/                         # Capture automation and batch migration scripts
-├── schema.sql                       # Cloudflare D1 SQLite database schema
-├── worker.js                        # Cloudflare Worker edge API and router
-├── wrangler.jsonc                   # Cloudflare Worker, D1 database, and route configuration
-└── README.md
+├── scripts/
+│   ├── capture-all.mjs              # Screenshot capture automation
+│   └── seed.sql                     # Turnkey database seeder with 26 templates
+├── schema.sql                       # SQLite database schema definition
+├── worker.js                        # Local API router and endpoint bridge
+├── wrangler.jsonc                   # Local SQLite database & asset bindings
+└── package.json
 ```
 
 ---
 
-## Getting Started & Local Development
+## Local Setup & Deployment
 
-### Prerequisites
+### 1. Prerequisites
 
-- **Node.js**: Version 18.18.0 or higher
-- **Cloudflare Wrangler CLI**: Installed locally or run via `npx wrangler`
+- **Node.js**: Version `18.18.0` or higher (`20.x` recommended)
+- **npm** or **pnpm**
+- **SQLite 3**: Native CLI (`sqlite3`) or local runner via `npx wrangler`
 
-### 1. Installation
+### 2. Installation
 
 ```bash
 # Clone the repository
 git clone https://github.com/widifirmaan/nextjs-velvetsnap-photobox.git
 cd nextjs-velvetsnap-photobox
 
-# Install project dependencies
+# Install dependencies
 npm install
 ```
 
-### 2. Database Setup (Cloudflare D1)
+### 3. Setup Database & Seeder Lokal
 
-Initialize the SQLite database locally with the provided schema:
+Inisialisasi skema tabel dan isi data awal (seeder) ke database SQLite lokal:
 
 ```bash
-# Local SQLite emulation (.wrangler/state)
-npx wrangler d1 execute photobox-db --local --file=schema.sql
+# Opsi A: Menggunakan SQLite3 CLI langsung
+sqlite3 local.db < schema.sql
+sqlite3 local.db < scripts/seed.sql
 
-# Or apply to remote Cloudflare D1
-npx wrangler d1 execute photobox-db --remote --file=schema.sql
+# Atau via npm script
+npm run db:setup
+
+# Opsi B: Menggunakan local runtime runner
+npx wrangler d1 execute photobox-db --local --file=schema.sql
+npm run seed
 ```
 
-### 3. Local Development
+#### Isi Data Seeder:
+* **Settings**: Konfigurasi kios default VelvetSnap (tema modern `v1`, pricing Rp 35.000).
+* **26 Templates Strip Foto**:
+  * 3 Frame Strip Klasik (White Minimalist, Dark Editorial, Pastel Romance)
+  * 4 Grid Collage & Retro 90s Frames
+  * Newspaper Vintage Mastheads (Times Edition, Gazette Style)
+  * Cute & Aesthetic Stickers & Overlays
+* **Devices Status**: Device booth `BOOTH-01` dengan status aktif.
 
-Run the Next.js development server:
+### 4. Menjalankan Server Lokal
 
 ```bash
+# Jalankan frontend Next.js development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your web browser.
+Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 
-To run the complete Cloudflare Worker environment locally (Next.js static assets + Worker API + D1 emulation):
+Atau jalankan runtime API lokal terintegrasi:
 
 ```bash
 npm run build
 npx wrangler dev
 ```
 
-### 4. Admin Portal Access
+Buka [http://localhost:8787](http://localhost:8787) di browser.
 
-Navigate to `/admin/login`. On the first setup, the system registers the primary admin credentials configured in the settings table.
+### 5. Panduan Uji Manual (Testing Checklist)
 
----
+Lakukan verifikasi manual berikut di browser:
 
-## Production Build & Deployment
-
-To build and deploy to Cloudflare Workers:
-
-```bash
-# Compile Next.js static export
-npm run build
-
-# Deploy assets and Worker script via Wrangler
-npm run deploy
-```
+| No | Fitur yang Diuji | Langkah Pengujian | Hasil yang Diharapkan |
+| :---: | :--- | :--- | :--- |
+| 1 | **Theme Gateway** | Buka `/`, pilih tema `v1` atau `v2` | Halaman kiosk tampil sesuai tema (Modern Card UI atau Newspaper Vintage) |
+| 2 | **Katalog Template** | Buka `/v1/templates` atau `/v2/templates` | Menampilkan 26 template hasil seeder siap dipilih |
+| 3 | **Webcam & Capture** | Izinkan akses kamera, jalankan countdown sesi foto | Viewfinder aktif, countdown 3s/5s berjalan, foto tertangkap di frame slot |
+| 4 | **Canvas Editor** | Tambahkan sticker, adjust brightness/filter | Canvas Konva merender layer foto dan elemen grafis tanpa lag |
+| 5 | **Simulasi Checkout & QR** | Selesaikan sesi foto, klik Cetak/Download | Tampil QR code untuk download strip foto di mobile |
+| 6 | **Admin Portal** | Akses `/admin/login`, masuk ke dashboard `/admin` | Tampil ringkasan revenue, template management, dan device monitor |
 
 ---
 
