@@ -132,7 +132,7 @@ CREATE TABLE devices (
 
 ---
 
-## Local Setup & Deployment
+## Tutorial Run Local & Setup
 
 ### 1. Prerequisites
 
@@ -160,7 +160,7 @@ cd nextjs-velvetsnap-photobox
 npm install
 ```
 
-### 4. Local Database & Seeder Setup
+### 4. Database Schema & Seeder Setup
 
 Initialize the SQLite database schema and root administrator credentials:
 
@@ -169,7 +169,7 @@ Initialize the SQLite database schema and root administrator credentials:
 sqlite3 local.db < schema.sql
 ```
 
-#### Default Administrator Credentials:
+#### Pre-seeded Demo Credentials & Auth:
 - **Username**: `root`
 - **Password**: `root`
 - **Access Route**: Login via `/admin/login` to access the operations dashboard, template studio, and transaction ledger.
@@ -183,19 +183,35 @@ npm run dev
 
 Open [http://localhost:3000/v1](http://localhost:3000/v1) for the customer kiosk interface, or [http://localhost:3000/admin](http://localhost:3000/admin) for the management portal.
 
-### 6. Manual Testing Checklist
+---
 
-| No | Feature | Test Steps | Expected Result |
-| :---: | :--- | :--- | :--- |
-| 1 | **Kiosk Landing** | Open `/v1`, click *Mulai Sesi* | Navigates to the template catalog selection screen |
-| 2 | **Select Template** | Choose any photo strip frame | Advances to the simulated QRIS payment gate |
-| 3 | **Camera Viewfinder** | Allow camera permissions on `/v1/booth` | Live webcam feed displays with countdown timers and burst sequence |
-| 4 | **Canvas Editor** | Finish photo capture session, proceed to `/v1/editor` | Captured images are automatically placed into Konva canvas frame slots |
-| 5 | **Download Ticket QR** | Proceed to `/v1/result` | Dynamic QR ticket code displays with active download buttons |
-| 6 | **Admin Portal** | Open `/admin/login`, enter password `root` | Authentication succeeds and redirects to Operations KPI Dashboard (`/admin`) |
+## Testing & QA Automation
+
+Automated testing and QA verification are powered by the system's `qa-toolkit`:
+
+### 1. Playwright Test Suite
+End-to-end smoke verification covering kiosk homepage and admin authentication gateway:
+
+```bash
+cd /home/widifirmaan/Projects/qa-toolkit
+npx playwright test tests/playwright/velvetsnap.spec.js
+```
+
+### 2. Cypress E2E Verification
+Cross-browser regression testing on DOM structure and production stability:
+
+```bash
+cd /home/widifirmaan/Projects/qa-toolkit
+npx cypress run --spec cypress/e2e/velvetsnap.cy.js
+```
+
+### 3. QA Execution Summary
+- **Playwright**: 2 tests passed (Kiosk Landing Page & Admin Login Gateway)
+- **Cypress**: 2 specs passed (Kiosk DOM Mount & Admin Login Route Mount)
+- **Status**: ✅ All automated tests verified and passing
 
 ---
 
 ## Author
 
-Developed by **[Widi Firmansyah](https://widifirmaan.web.id)**.
+Made with ❤️ by **Widi Firmansyah** / [widifirmaan.web.id](https://widifirmaan.web.id)
