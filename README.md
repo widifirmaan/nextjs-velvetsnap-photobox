@@ -28,6 +28,7 @@
 | **Simulated QRIS Payment Gate**<br>![Payment QRIS](screenshots/Payment%20QRIS%20Desktop.png) | **Simulated QRIS Payment Gate**<br>![Payment QRIS](screenshots/Payment%20QRIS%20Mobile.png) |
 | **Mobile QR Download Ticket & Print Output**<br>![Result & QR](screenshots/Result%20&%20QR%20Desktop.png) | **Mobile QR Download Ticket & Print Output**<br>![Result & QR](screenshots/Result%20&%20QR%20Mobile.png) |
 | **Vintage Newspaper Kiosk Theme (v2)**<br>![Newspaper Theme](screenshots/Newspaper%20Theme%20Desktop.png) | **Vintage Newspaper Kiosk Theme (v2)**<br>![Newspaper Theme](screenshots/Newspaper%20Theme%20Mobile.png) |
+| **Newspaper Theme Frame Catalog**<br>![Newspaper Template Catalog](screenshots/Newspaper%20Template%20Catalog%20Desktop.png) | **Newspaper Theme Frame Catalog**<br>![Newspaper Template Catalog](screenshots/Newspaper%20Template%20Catalog%20Mobile.png) |
 | **Admin Operations Login Gateway**<br>![Admin Login](screenshots/Admin%20Login%20Desktop.png) | **Admin Operations Login Gateway**<br>![Admin Login](screenshots/Admin%20Login%20Mobile.png) |
 | **Operations Dashboard & KPI Metrics**<br>![Admin Dashboard](screenshots/Admin%20Dashboard%20Desktop.png) | **Operations Dashboard & KPI Metrics**<br>![Admin Dashboard](screenshots/Admin%20Dashboard%20Mobile.png) |
 | **Strip Layout Template Studio**<br>![Admin Studio](screenshots/Admin%20Studio%20Desktop.png) | **Strip Layout Template Studio**<br>![Admin Studio](screenshots/Admin%20Studio%20Mobile.png) |
@@ -35,6 +36,7 @@
 | **Customer Photo Sessions Ledger**<br>![Admin History](screenshots/Admin%20History%20Desktop.png) | **Customer Photo Sessions Ledger**<br>![Admin History](screenshots/Admin%20History%20Mobile.png) |
 | **Kiosk Camera Hardware Diagnostics**<br>![Admin Devices](screenshots/Admin%20Devices%20Desktop.png) | **Kiosk Camera Hardware Diagnostics**<br>![Admin Devices](screenshots/Admin%20Devices%20Mobile.png) |
 | **System Settings & Branding Configuration**<br>![Admin Settings](screenshots/Admin%20Settings%20Desktop.png) | **System Settings & Branding Configuration**<br>![Admin Settings](screenshots/Admin%20Settings%20Mobile.png) |
+| **Bulk Frame Reprocessing Utility**<br>![Admin Reprocess Templates](screenshots/Admin%20Reprocess%20Templates%20Desktop.png) | **Bulk Frame Reprocessing Utility**<br>![Admin Reprocess Templates](screenshots/Admin%20Reprocess%20Templates%20Mobile.png) |
 
 ---
 
