@@ -1,4 +1,4 @@
-# VelvetSnap 📸
+# VelvetSnap
 
 > Self-service photobooth kiosk platform and automated photo strip generator featuring dual UI themes, Konva canvas compositor, and an administrative management portal.
 
