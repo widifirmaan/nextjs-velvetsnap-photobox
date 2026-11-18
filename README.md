@@ -1,4 +1,4 @@
-# VelvetSnap
+# VelvetSnap 📸
 
 > Self-service photobooth kiosk platform and automated photo strip generator featuring dual UI themes, Konva canvas compositor, and an administrative management portal.
 
@@ -19,7 +19,7 @@
 
 ## Screenshots
 
-| Desktop | Mobile |
+| Desktop (MacBook Pro M4) | Mobile (iPhone 16 Pro) |
 | :---: | :---: |
 | **Kiosk Home (Modern v1 Theme)**<br>![Kiosk Home](screenshots/Kiosk%20Home%20Desktop.png) | **Kiosk Home (Modern v1 Theme)**<br>![Kiosk Home](screenshots/Kiosk%20Home%20Mobile.png) |
 | **Photo Strip Template Catalog**<br>![Template Catalog](screenshots/Template%20Catalog%20Desktop.png) | **Photo Strip Template Catalog**<br>![Template Catalog](screenshots/Template%20Catalog%20Mobile.png) |
@@ -40,7 +40,7 @@
 
 ---
 
-## Features
+## Fitur
 
 - **Dual Kiosk Themes**: Modern clean interface (`/v1`) and vintage editorial newspaper aesthetic (`/v2`) powered by paper textures, custom typography mastheads, and responsive scaling.
 - **Guided Customer Workflow**: Step-by-step state machine guiding guests through Template Selection, Simulated QRIS Payment, Viewfinder Capture, Photo Adjustment & Stickers, and Print/Download.
@@ -67,9 +67,35 @@
 | **API Server** | Local Router (`worker.js`) | Local endpoint router handling `/api/*` data operations |
 | **Utilities & QR** | QRCode `1.5.4`, UUID `9.0.0`, Lucide React | QR ticket generation, transaction session identification, and SVG iconography |
 
----
+## Tutorial Run Local & Setup
 
-## Database Architecture
+### 1. Prerequisites
+
+- **Node.js**: Version `20.x` or `22.x`
+- **npm** or **pnpm**
+- **SQLite 3**: Native CLI (`sqlite3`)
+
+### 2. Environment Variables Setup
+
+Create a `.env.local` file in the project root:
+
+```env
+ADMIN_ROOT_PASSWORD=root
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 3. Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/widifirmaan/nextjs-velvetsnap-photobox.git
+cd nextjs-velvetsnap-photobox
+
+# Install dependencies
+npm install
+```
+
+### 4. Database Schema & Seeder Setup
 
 VelvetSnap organizes kiosk settings, operator accounts, frame templates, and transaction history in a relational SQLite database (`schema.sql`):
 
@@ -129,38 +155,6 @@ CREATE TABLE devices (
     lastPing TEXT NOT NULL DEFAULT (datetime('now'))
 );
 ```
-
----
-
-## Tutorial Run Local & Setup
-
-### 1. Prerequisites
-
-- **Node.js**: Version `20.x` or `22.x`
-- **npm** or **pnpm**
-- **SQLite 3**: Native CLI (`sqlite3`)
-
-### 2. Environment Variables Setup
-
-Create a `.env.local` file in the project root:
-
-```env
-ADMIN_ROOT_PASSWORD=root
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
-### 3. Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/widifirmaan/nextjs-velvetsnap-photobox.git
-cd nextjs-velvetsnap-photobox
-
-# Install dependencies
-npm install
-```
-
-### 4. Database Schema & Seeder Setup
 
 Initialize the SQLite database schema and root administrator credentials:
 
