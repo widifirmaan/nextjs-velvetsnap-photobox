@@ -1,944 +1,1082 @@
-#!/usr/bin/env node
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '..');
 const screenshotsDir = path.join(projectRoot, 'screenshots');
 const downloadsDir = '/home/widifirmaan/Downloads';
-const artifactsDir = '/home/widifirmaan/.gemini/antigravity-cli/brain/08ebf919-b450-4a62-aa6d-40dba251fefc';
 
-// Require Playwright from qa-toolkit
-const { chromium } = await import('/home/widifirmaan/Projects/qa-toolkit/node_modules/playwright/index.mjs');
-
-function loadBase64Image(filename) {
+function encodeImage(filename) {
   const filePath = path.join(screenshotsDir, filename);
   if (!fs.existsSync(filePath)) {
-    console.warn(`⚠️ Warning: Image not found: ${filePath}`);
+    console.warn(`Warning: Screenshot not found: ${filePath}`);
     return '';
   }
-  const buffer = fs.readFileSync(filePath);
-  return `data:image/png;base64,${buffer.toString('base64')}`;
+  const fileBuffer = fs.readFileSync(filePath);
+  return `data:image/png;base64,${fileBuffer.toString('base64')}`;
 }
 
-console.log('🖼️  Encoding VelvetSnap screenshots into high-resolution base64 data URIs...');
-const imgKioskHome = loadBase64Image('Kiosk Home Desktop.png');
-const imgTemplateCatalog = loadBase64Image('Newspaper Template Catalog Desktop.png');
-const imgCamera = loadBase64Image('Camera Viewfinder Desktop.png');
-const imgCanvasEditor = loadBase64Image('Canvas Editor Desktop.png');
-const imgPayment = loadBase64Image('Payment QRIS Desktop.png');
-const imgResult = loadBase64Image('Result & QR Desktop.png');
-const imgStudio = loadBase64Image('Admin Studio Desktop.png');
-const imgDevices = loadBase64Image('Admin Devices Desktop.png');
-const imgHistory = loadBase64Image('Admin History Desktop.png');
-const imgNewspaperTheme = loadBase64Image('Newspaper Theme Desktop.png');
+console.log('Encoding VelvetSnap screenshots...');
 
-console.log('🎨 Constructing VelvetSnap Vintage Newspaper Kiosk presentation deck...');
+const images = {
+  heroDesktop: encodeImage('Kiosk Home Desktop.png'),
+  heroMobile: encodeImage('Kiosk Home Mobile.png'),
+  captureDesktop: encodeImage('Camera Viewfinder Desktop.png'),
+  captureMobile: encodeImage('Camera Viewfinder Mobile.png'),
+  editorDesktop: encodeImage('Canvas Editor Desktop.png'),
+  editorMobile: encodeImage('Canvas Editor Mobile.png'),
+  paymentDesktop: encodeImage('Payment QRIS Desktop.png'),
+  paymentMobile: encodeImage('Payment QRIS Mobile.png'),
+  successDesktop: encodeImage('Result & QR Desktop.png'),
+  successMobile: encodeImage('Result & QR Mobile.png'),
+  adminDesktop: encodeImage('Admin Studio Desktop.png'),
+  adminMobile: encodeImage('Admin Studio Mobile.png'),
+  terminalDesktop: encodeImage('Admin Devices Desktop.png'),
+  terminalMobile: encodeImage('Admin Devices Mobile.png'),
+};
+
+console.log('Constructing clean VelvetSnap Presentation Deck HTML...');
 
 const htmlContent = `<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>VelvetSnap Photobox Kiosk - Presentasi Arsitektur &amp; Fitur Web</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap');
+  <meta charset="UTF-8">
+  <title>VelvetSnap - Photobooth Web Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #F8F6F0;
+      --bg-card: #FFFFFF;
+      --border-clay: #E3DDD1;
+      --terracotta: #C85A32;
+      --terracotta-dark: #A2421E;
+      --charcoal: #232220;
+      --text-muted: #6E6B65;
+      --shadow-soft: 0 4px 16px rgba(35, 34, 32, 0.06);
+    }
 
-  @page {
-    size: 297mm 210mm;
-    margin: 0;
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+    body {
+      background-color: var(--bg-cream);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--charcoal);
+      line-height: 1.45;
+    }
 
-  body {
-    background-color: #f7f4ed;
-    color: #262626;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
+    @page {
+      size: 297mm 210mm;
+      margin: 0;
+    }
 
-  .slide {
-    width: 297mm;
-    height: 210mm;
-    padding: 14mm 16mm;
-    page-break-after: always;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: #f7f4ed radial-gradient(circle at 50% 0%, rgba(220, 214, 200, 0.45) 0%, rgba(247, 244, 237, 1) 75%);
-    border-bottom: 2px dashed #d1c7b7;
-  }
+    .slide {
+      width: 297mm;
+      height: 210mm;
+      page-break-after: always;
+      position: relative;
+      background: var(--bg-cream);
+      display: flex;
+      flex-direction: column;
+      padding: 16mm 18mm;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(200, 90, 50, 0.04) 0%, transparent 50%),
+        linear-gradient(to right, rgba(227, 221, 209, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(227, 221, 209, 0.4) 1px, transparent 1px);
+      background-size: 100% 100%, 36px 36px, 36px 36px;
+    }
 
-  /* Paper texture pattern */
-  .paper-bg {
-    position: absolute;
-    inset: 0;
-    background-image: 
-      radial-gradient(#262626 0.75px, transparent 0.75px),
-      radial-gradient(#262626 0.75px, #f7f4ed 0.75px);
-    background-size: 30px 30px;
-    background-position: 0 0, 15px 15px;
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 1;
-  }
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--terracotta), #D97706);
+      z-index: 50;
+    }
 
-  .slide-content {
-    position: relative;
-    z-index: 2;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5mm;
+      border-bottom: 1.5px solid var(--border-clay);
+      padding-bottom: 3.5mm;
+    }
 
-  /* Clay & Vintage Card */
-  .vintage-card {
-    background: #ffffff;
-    border: 2px solid #262626;
-    border-radius: 18px;
-    padding: 16px 20px;
-    box-shadow: 4px 4px 0px #262626;
-    color: #262626;
-  }
+    .header-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--terracotta-dark);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(200, 90, 50, 0.08);
+      border: 1px solid rgba(200, 90, 50, 0.25);
+      padding: 3px 10px;
+      border-radius: 4px;
+    }
 
-  /* Pill Badge */
-  .pill-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 15px;
-    border-radius: 9999px;
-    background: #eef3e8;
-    border: 1.5px solid #262626;
-    color: #2a4025;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    width: fit-content;
-    box-shadow: 2px 2px 0px #262626;
-  }
+    .slide-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
 
-  .pill-badge.terracotta {
-    background: #faece7;
-    color: #8c3b24;
-  }
+    .slide-body {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 22px;
+      flex: 1;
+      min-height: 0;
+    }
 
-  .pill-badge.amber {
-    background: #fef5e7;
-    color: #855312;
-  }
+    .slide-info {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 0;
+    }
 
-  /* Typography */
-  .serif-title {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 2.3rem;
-    font-weight: 900;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-    color: #1a1a1a;
-  }
+    .headline-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
 
-  /* Vintage Mockup Frame */
-  .mockup-frame {
-    background: #ffffff;
-    border: 2.5px solid #262626;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 6px 6px 0px #262626;
-    display: flex;
-    flex-direction: column;
-  }
+    .slide-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 25px;
+      font-weight: 800;
+      line-height: 1.2;
+      color: var(--charcoal);
+    }
 
-  .mockup-header {
-    background: #f0ebe1;
-    padding: 6px 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    border-bottom: 2px solid #262626;
-  }
+    .slide-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
 
-  .traffic-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    border: 1px solid #262626;
-  }
-  .dot-red { background: #ef4444; }
-  .dot-yellow { background: #f59e0b; }
-  .dot-green { background: #10b981; }
-  .browser-url {
-    margin-left: 8px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 9px;
-    color: #555555;
-    font-weight: 700;
-  }
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 10px 0;
+    }
 
-  .mockup-img {
-    width: 100%;
-    height: auto;
-    max-height: 122mm;
-    display: block;
-    object-fit: contain;
-    background: #faf7f2;
-  }
+    .feature-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-clay);
+      box-shadow: var(--shadow-soft);
+      border-radius: 6px;
+      padding: 12px 14px;
+      border-left: 3.5px solid var(--terracotta);
+    }
 
-  /* Page Number Stamp */
-  .page-num {
-    position: absolute;
-    bottom: 11mm;
-    right: 14mm;
-    background: #262626;
-    color: #faf7f2;
-    border: 2px solid #262626;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 4px 14px;
-    border-radius: 9999px;
-    letter-spacing: 0.12em;
-    box-shadow: 2px 2px 0px rgba(0,0,0,0.2);
-    z-index: 10;
-  }
+    .feature-card-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
 
-  /* Split layout */
-  .split-layout {
-    display: grid;
-    grid-template-columns: 1fr 1.25fr;
-    gap: 26px;
-    align-items: center;
-    height: 100%;
-    margin-top: 8px;
-    margin-bottom: 8px;
-  }
+    .feature-card-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
 
-  .split-layout.reverse {
-    grid-template-columns: 1.25fr 1fr;
-  }
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
 
-  /* Feature Checklist Item */
-  .feature-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-top: 8px;
-  }
+    .metric-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-clay);
+      border-radius: 6px;
+      padding: 8px 10px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
 
-  .feature-icon {
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    background: #262626;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: 900;
-    flex-shrink: 0;
-  }
+    .metric-val {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--terracotta-dark);
+    }
 
-  .feature-text h4 {
-    font-size: 12px;
-    font-weight: 800;
-    color: #1a1a1a;
-    margin-bottom: 2px;
-  }
+    .metric-lbl {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
 
-  .feature-text p {
-    font-size: 10px;
-    color: #555555;
-    line-height: 1.45;
-  }
-</style>
+    /* Clean Direct Screenshot Display */
+    .visual-stage {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .screenshot-desktop {
+      max-width: 95%;
+      max-height: 380px;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 14px 28px rgba(35, 34, 32, 0.15));
+    }
+
+    .screenshot-mobile {
+      position: absolute;
+      right: 0px;
+      bottom: -8px;
+      max-height: 280px;
+      max-width: 28%;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 16px 30px rgba(35, 34, 32, 0.2));
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1.5px solid var(--border-clay);
+      padding-top: 3.5mm;
+      margin-top: 4mm;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Cover Slide */
+    .cover-slide {
+      background: linear-gradient(135deg, #F8F6F0 0%, #EDE6D8 100%);
+      justify-content: space-between;
+      padding: 18mm 20mm;
+    }
+
+    .cover-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 46px;
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--charcoal);
+      margin-bottom: 12px;
+    }
+
+    .cover-title span {
+      color: var(--terracotta-dark);
+    }
+
+    .cover-desc {
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--text-muted);
+      max-width: 680px;
+    }
+
+    .cover-split {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 28px;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    .cover-specs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .spec-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-clay);
+      box-shadow: var(--shadow-soft);
+      border-radius: 6px;
+      padding: 12px 14px;
+    }
+
+    .spec-k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--terracotta-dark);
+      text-transform: uppercase;
+      margin-bottom: 3px;
+    }
+
+    .spec-v {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--charcoal);
+    }
+
+    /* Tech Stack Grid */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 10px;
+      flex: 1;
+    }
+
+    .tech-col {
+      background: #FFFFFF;
+      border: 1px solid var(--border-clay);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .tech-col-title {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid var(--border-clay);
+      color: var(--terracotta-dark);
+    }
+
+    .tech-item {
+      background: #F8F6F0;
+      border: 1px solid var(--border-clay);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: 11px;
+    }
+
+    .tech-item-name {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+
+    .tech-item-desc {
+      font-size: 10px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Closing Slide */
+    .closing-slide {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F5EFEB 100%);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20mm;
+      gap: 18px;
+    }
+
+    .closing-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--charcoal);
+    }
+
+    .closing-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--terracotta);
+      border-radius: 8px;
+      padding: 16px 36px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      box-shadow: 0 10px 24px rgba(200, 90, 50, 0.1);
+    }
+
+    .closing-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--terracotta-dark);
+    }
+  </style>
 </head>
 <body>
 
-  <!-- ========================================================================= -->
   <!-- SLIDE 01: COVER -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content" style="justify-content: center; align-items: center; text-align: center;">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 860px;">
-        <div class="pill-badge">
-          <span>●</span> WEB APPLICATION SHOWCASE · 2026
-        </div>
-        <h1 class="serif-title" style="font-size: 4rem; line-height: 1; text-transform: uppercase;">
-          VELVETSNAP <span style="color: #8b9d77; font-style: italic;">PHOTOBOX</span>
-        </h1>
-        <div class="vintage-card" style="padding: 12px 28px; margin-top: 4px;">
-          <p style="font-size: 14px; font-weight: 700; color: #262626; letter-spacing: 0.02em;">
-            Sistem Kiosk Photobooth Mandiri Berbasis Next.js &amp; React-Konva Canvas
-          </p>
-        </div>
-        
-        <p style="font-size: 11.5px; color: #555555; max-width: 680px; line-height: 1.6; margin-top: 4px;">
-          Arsitektur aplikasi web kiosk otomatis yang mengintegrasikan alur kamera WebRTC, pemilihan layout strip foto (2x6 &amp; 4R), editor stiker canvas interaktif, pembayaran QRIS dinamis, dan portal download foto instan via QR code.
-        </p>
-
-        <div style="display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; justify-content: center;">
-          <span style="font-size: 10px; font-weight: 800; color: #262626; background: #ffffff; border: 1.5px solid #262626; padding: 4px 12px; border-radius: 9999px; box-shadow: 2px 2px 0px #262626;">Next.js 16</span>
-          <span style="font-size: 10px; font-weight: 800; color: #262626; background: #ffffff; border: 1.5px solid #262626; padding: 4px 12px; border-radius: 9999px; box-shadow: 2px 2px 0px #262626;">React 19</span>
-          <span style="font-size: 10px; font-weight: 800; color: #262626; background: #ffffff; border: 1.5px solid #262626; padding: 4px 12px; border-radius: 9999px; box-shadow: 2px 2px 0px #262626;">React-Konva</span>
-          <span style="font-size: 10px; font-weight: 800; color: #262626; background: #ffffff; border: 1.5px solid #262626; padding: 4px 12px; border-radius: 9999px; box-shadow: 2px 2px 0px #262626;">WebRTC MediaStream</span>
-          <span style="font-size: 10px; font-weight: 800; color: #262626; background: #ffffff; border: 1.5px solid #262626; padding: 4px 12px; border-radius: 9999px; box-shadow: 2px 2px 0px #262626;">Cloudflare D1 / SQLite</span>
-          <span style="font-size: 10px; font-weight: 800; color: #262626; background: #ffffff; border: 1.5px solid #262626; padding: 4px 12px; border-radius: 9999px; box-shadow: 2px 2px 0px #262626;">Tailwind CSS</span>
-        </div>
-
-        <div style="margin-top: 26px; border-top: 2px dashed #d1c7b7; padding-top: 14px; width: 100%;">
-          <p style="font-size: 11px; font-weight: 800; color: #1a1a1a; letter-spacing: 0.1em; text-transform: uppercase;">
-            WIDI FIRMAAN <span style="color: #888888; font-weight: 400;">|</span> LEAD FULLSTACK DEVELOPER
-          </p>
-          <p style="font-size: 9.5px; color: #666666; margin-top: 2px;">Dokumentasi &amp; Presentasi Arsitektur Web Kiosk</p>
-        </div>
+  <div class="slide cover-slide">
+    <div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <div class="header-tag">PHOTOBOOTH KIOSK PLATFORM</div>
+        <div class="header-tag" style="border-color:#10B981; color:#059669; background:#D1FAE5;">PRODUCTION READY</div>
       </div>
-    </div>
-    <div class="page-num">01</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 02: FITUR WEB - DUAL THEME ENGINE -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout">
-        <!-- Left: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge">
-            <span>01</span> FITUR WEB: DUAL-THEME ENGINE
-          </div>
-          <h2 class="serif-title">
-            Dual-Theme Kiosk Landing Page
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Halaman utama kiosk mandiri yang mendukung dua tema visual berbeda secara dinamis: V1 Minimal Modern dan V2 Newspaper Vintage, dilengkapi efek transisi lembaran koran 3D (<code style="font-family:monospace; background:#eee; padding:1px 4px; border-radius:4px">pageFlipOut</code> &amp; <code style="font-family:monospace; background:#eee; padding:1px 4px; border-radius:4px">pageFlipBack</code>).
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon">✓</div>
-              <div class="feature-text">
-                <h4>CSS Variable Theme Scoping</h4>
-                <p>Isolasi variabel warna global (<code style="color:#111">--mn-bg</code>, <code style="color:#111">--np-bg</code>) yang berganti instan saat rute tema berpindah.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon">✓</div>
-              <div class="feature-text">
-                <h4>3D Perspective Card Flip (1600px)</h4>
-                <p>Simulasi animasi membalik lembaran koran dengan origin transform kiri/kanan saat sesi dimulai.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon">✓</div>
-              <div class="feature-text">
-                <h4>Status Kiosk Standby</h4>
-                <p>Tombol interaktif beranimasi mengambang untuk menarik pengguna melakukan sentuhan pertama.</p>
-              </div>
-            </div>
-          </div>
+      <div style="margin-top: 20px; max-width: 80%;">
+        <div class="cover-title">
+          <span>VELVETSNAP</span> PHOTOBOOTH
         </div>
-
-        <!-- Right: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/</span>
-          </div>
-          <img class="mockup-img" src="${imgKioskHome}" alt="Kiosk Home Stage" />
-        </div>
-      </div>
-    </div>
-    <div class="page-num">02</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 03: FITUR WEB - TEMPLATE STRIP SELECTOR -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout reverse">
-        <!-- Left: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/v2?step=1</span>
-          </div>
-          <img class="mockup-img" src="${imgTemplateCatalog}" alt="Template Catalog Selector" />
-        </div>
-
-        <!-- Right: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge terracotta">
-            <span>02</span> FITUR WEB: TEMPLATE CATALOG
-          </div>
-          <h2 class="serif-title">
-            Dynamic Frame Strip Selector
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Katalog pemilihan bingkai foto dengan dukungan multi-layout: Strip Foto vertikal (2x6) dan bingkai kartu cetak lebar (4R). Setiap kartu template menampilkan indikator jumlah slot foto dan visualisasi batas cetak.
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">✦</div>
-              <div class="feature-text">
-                <h4>Komponen Caching SharedTemplateStep</h4>
-                <p>Memuat dan menyimpan cache template di client-side untuk respons navigasi instan tanpa re-fetch.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">✦</div>
-              <div class="feature-text">
-                <h4>Indikator Titik Slot Foto (SlotDots.tsx)</h4>
-                <p>Visualisasi visual jumlah foto yang harus diambil (3 slot, 4 slot, atau 6 slot) per bingkai.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">✦</div>
-              <div class="feature-text">
-                <h4>Kalkulasi Rasio frameRatio Dinamis</h4>
-                <p>Menghitung proporsi kanvas sebelum melangkah ke viewfinder kamera agar crop foto presisi.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="page-num">03</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 04: FITUR WEB - WEBRTC CAMERA & COUNTDOWN -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout">
-        <!-- Left: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge amber">
-            <span>03</span> FITUR WEB: WEBRTC CAMERA
-          </div>
-          <h2 class="serif-title">
-            Real-time Viewfinder &amp; Capture Loop
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Antarmuka kamera langsung memanfaatkan WebRTC MediaStream API dengan overlay bingkai tembus pandang, hitung mundur otomatis (<code style="font-family:monospace; background:#eee; padding:1px 4px; border-radius:4px">useCountdown</code> 3..2..1), dan sistem antrean multi-slot foto.
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#855312;">⚡</div>
-              <div class="feature-text">
-                <h4>Integrasi React-Webcam Kompatibel</h4>
-                <p>Akses streaming video perangkat keras dengan kontrol resolusi tinggi dan aspect-ratio mirror.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#855312;">⚡</div>
-              <div class="feature-text">
-                <h4>Siklus Countdown &amp; Flash Effect</h4>
-                <p>Animasi hitung mundur visual dengan efek blitz layar putih saat jepretan kamera dieksekusi.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#855312;">⚡</div>
-              <div class="feature-text">
-                <h4>Buffer Array Captures Multi-Slot</h4>
-                <p>Menyimpan hasil jepretan dalam state array dengan fitur pratinjau thumbnail dan opsi retake foto.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/v2?step=2</span>
-          </div>
-          <img class="mockup-img" src="${imgCamera}" alt="Camera Viewfinder Web Session" />
-        </div>
-      </div>
-    </div>
-    <div class="page-num">04</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 05: FITUR WEB - REACT-KONVA CANVAS EDITOR -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout reverse">
-        <!-- Left: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/v2?step=3</span>
-          </div>
-          <img class="mockup-img" src="${imgCanvasEditor}" alt="React-Konva Canvas Editor" />
-        </div>
-
-        <!-- Right: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge">
-            <span>04</span> FITUR WEB: CANVAS EDITOR
-          </div>
-          <h2 class="serif-title">
-            Client-Side Canvas Photo Editor
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Editor visual client-side berbasis <strong style="color:#111">React-Konva</strong> untuk merakit strip foto komposit. Pengguna dapat menyematkan stiker, mengatur kecerahan/kontras, memutar sudut foto, dan memilih filter monokrom koran vintage.
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon">🎨</div>
-              <div class="feature-text">
-                <h4>Multi-Layer Canvas Compositing</h4>
-                <p>Pemisahan layer Frame Background, layer Foto Pengguna, dan layer Stiker Interaktif secara independen.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon">🎨</div>
-              <div class="feature-text">
-                <h4>Transformasi Stiker Drag &amp; Rotate</h4>
-                <p>Dukungan interaksi sentuh dan mouse untuk rotasi, pembesaran skala, dan translasi posisi stiker grafis.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon">🎨</div>
-              <div class="feature-text">
-                <h4>Ekspor Canvas Berkualitas Tinggi</h4>
-                <p>Fungsi render komposit toDataURL pada resolusi cetak tinggi tanpa perlu proses upload berat ke server.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="page-num">05</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 06: FITUR WEB - QRIS PAYMENT GATEWAY -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout">
-        <!-- Left: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge terracotta">
-            <span>05</span> FITUR WEB: PAYMENT FLOW
-          </div>
-          <h2 class="serif-title">
-            Dynamic QRIS Payment Modal
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Alur pembayaran mandiri non-tunai yang terintegrasi secara otomatis. Sistem menghasilkan kode QR QRIS dinamis sesuai tarif sesi, dengan interval polling status transaksi secara real-time.
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">💳</div>
-              <div class="feature-text">
-                <h4>Hook Kustom usePaymentFlow</h4>
-                <p>Mengelola state inisialisasi invoice, timer kedaluwarsa pembayaran, dan auto-cancel sesi kiosk.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">💳</div>
-              <div class="feature-text">
-                <h4>Polling Real-time Status Transaksi</h4>
-                <p>Interval query setiap 2 detik ke endpoint verifikasi status pembayaran untuk mendeteksi transaksi lunas.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">💳</div>
-              <div class="feature-text">
-                <h4>Transisi Otomatis Cetak Struk / Foto</h4>
-                <p>Secara otomatis melangkah ke tahap pencetakan hasil foto segera setelah konfirmasi webhook valid diterima.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/v2?step=4</span>
-          </div>
-          <img class="mockup-img" src="${imgPayment}" alt="Payment QRIS Integration" />
-        </div>
-      </div>
-    </div>
-    <div class="page-num">06</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 07: FITUR WEB - RESULT & MOBILE QR DOWNLOAD -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout reverse">
-        <!-- Left: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/v2?step=5</span>
-          </div>
-          <img class="mockup-img" src="${imgResult}" alt="Result and QR Download Portal" />
-        </div>
-
-        <!-- Right: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge amber">
-            <span>06</span> FITUR WEB: INSTANT DOWNLOAD
-          </div>
-          <h2 class="serif-title">
-            High-Res Print &amp; Mobile QR Portal
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Seksi finalisasi yang menampilkan pratinjau strip foto selesai dicetak, sekaligus men-generate kode QR unik di layar agar pelanggan dapat langsung mengunduh file foto digital beresolusi penuh ke smartphone masing-masing.
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#855312;">📱</div>
-              <div class="feature-text">
-                <h4>Generator Kode QR Client-Side</h4>
-                <p>Membuat tautan instan ke rute portal download publik (<code style="color:#111">/v1/download</code> atau <code style="color:#111">/v2/download</code>).</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#855312;">📱</div>
-              <div class="feature-text">
-                <h4>Enkripsi Token Sesi &amp; Batas Waktu</h4>
-                <p>Melindungi privasi foto dengan URL ber-token unik dan mekanisme kedaluwarsa otomatis (auto-expiry).</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#855312;">📱</div>
-              <div class="feature-text">
-                <h4>Dukungan Download Ganda</h4>
-                <p>Menyediakan unduhan strip foto utuh (PNG 300 DPI) dan animasi rekaman sesi GIF singkat.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="page-num">07</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 08: FITUR WEB - ADMIN TEMPLATE STUDIO -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout">
-        <!-- Left: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge">
-            <span>07</span> FITUR WEB: ADMIN STUDIO
-          </div>
-          <h2 class="serif-title">
-            Visual Slot Calibration Studio
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Panel studio visual di area administrasi (<code style="font-family:monospace; background:#eee; padding:1px 4px; border-radius:4px">/admin/template-studio</code>) untuk mendesain dan mengalibrasi koordinat slot foto pada bingkai kustom secara drag-and-drop.
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon">📐</div>
-              <div class="feature-text">
-                <h4>Bounding Box Manipulator Visual</h4>
-                <p>Menentukan nilai X, Y, Width, Height, dan rotasi setiap kotak foto secara real-time pada kanvas.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon">📐</div>
-              <div class="feature-text">
-                <h4>Live Preview dengan Gambar Mockup</h4>
-                <p>Memvalidasi keselarasan bingkai sebelum template dirilis ke katalog aktif pengguna kiosk.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon">📐</div>
-              <div class="feature-text">
-                <h4>Ekspor Skema JSON ke Database</h4>
-                <p>Menyimpan data konfigurasi slot secara terstruktur ke Cloudflare D1 / SQLite database.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/admin/template-studio</span>
-          </div>
-          <img class="mockup-img" src="${imgStudio}" alt="Admin Template Studio" />
-        </div>
-      </div>
-    </div>
-    <div class="page-num">08</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 09: FITUR WEB - ADMIN DEVICE MONITORING -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content">
-      <div class="split-layout reverse">
-        <!-- Left: Mockup -->
-        <div class="mockup-frame">
-          <div class="mockup-header">
-            <div class="traffic-dot dot-red"></div>
-            <div class="traffic-dot dot-yellow"></div>
-            <div class="traffic-dot dot-green"></div>
-            <span class="browser-url">https://photo.widifirmaan.web.id/admin/devices</span>
-          </div>
-          <img class="mockup-img" src="${imgDevices}" alt="Admin Hardware Device Monitor" />
-        </div>
-
-        <!-- Right: Text -->
-        <div style="display: flex; flex-direction: column; gap: 12px;">
-          <div class="pill-badge terracotta">
-            <span>08</span> FITUR WEB: ADMIN MONITORING
-          </div>
-          <h2 class="serif-title">
-            Hardware Terminal &amp; Settings
-          </h2>
-          <div class="vintage-card">
-            <p style="font-size: 11.5px; line-height: 1.6; color: #333333;">
-              Dashboard kontrol admin (<code style="font-family:monospace; background:#eee; padding:1px 4px; border-radius:4px">/admin/devices</code>) untuk memantau status perangkat fisik kiosk: konektivitas kamera USB, printer termal/foto, riwayat sesi, dan pengaturan harga.
-            </p>
-          </div>
-
-          <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 2px;">
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">⚙</div>
-              <div class="feature-text">
-                <h4>Enumerate Devices API</h4>
-                <p>Mendeteksi seluruh periferal webcam yang tersedia dan mengizinkan pemilihan kamera utama secara dinamis.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">⚙</div>
-              <div class="feature-text">
-                <h4>Proteksi Autentikasi /admin/login</h4>
-                <p>Gerbang login aman dengan verifikasi password hash dan proteksi rute halaman sensitif.</p>
-              </div>
-            </div>
-            <div class="feature-item">
-              <div class="feature-icon" style="background:#8c3b24;">⚙</div>
-              <div class="feature-text">
-                <h4>Tabel Riwayat Transaksi &amp; Filter Sesi</h4>
-                <p>Pelaporan statistik operasional kiosk harian dengan opsi ekspor data transaksi.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="page-num">09</div>
-  </section>
-
-  <!-- ========================================================================= -->
-  <!-- SLIDE 10: ARSITEKTUR TEKNOLOGI & RINGKASAN -->
-  <!-- ========================================================================= -->
-  <section class="slide">
-    <div class="paper-bg"></div>
-    <div class="slide-content" style="align-items: center; text-align: center;">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
-        <div class="pill-badge">
-          <span>09</span> ARSITEKTUR &amp; STACK TEKNOLOGI
-        </div>
-        <h2 class="serif-title" style="font-size: 2.2rem;">
-          The Architecture Behind VelvetSnap
-        </h2>
-      </div>
-
-      <!-- 3 Stack Cards -->
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 900px; margin: 12px 0;">
-        <div class="vintage-card" style="text-align: left; padding: 14px 18px;">
-          <h3 style="font-size: 12px; font-weight: 800; color: #2a4025; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">
-            FRONTEND &amp; ROUTING
-          </h3>
-          <ul style="font-size: 10.5px; color: #444444; list-style: none; line-height: 1.8;">
-            <li>✦ <strong>Next.js 16:</strong> Modern App Router</li>
-            <li>✦ <strong>React 19:</strong> Fast concurrent UI state</li>
-            <li>✦ <strong>TypeScript:</strong> Type-safe interfaces</li>
-            <li>✦ <strong>Tailwind CSS:</strong> Vintage clay styling</li>
-          </ul>
-        </div>
-
-        <div class="vintage-card" style="text-align: left; padding: 14px 18px;">
-          <h3 style="font-size: 12px; font-weight: 800; color: #8c3b24; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">
-            CANVAS &amp; MEDIA
-          </h3>
-          <ul style="font-size: 10.5px; color: #444444; list-style: none; line-height: 1.8;">
-            <li>✦ <strong>React-Konva:</strong> High-performance 2D canvas</li>
-            <li>✦ <strong>React-Webcam:</strong> WebRTC MediaStream API</li>
-            <li>✦ <strong>QRCode:</strong> Dynamic QR generation</li>
-            <li>✦ <strong>@imgly:</strong> Client-side background removal</li>
-          </ul>
-        </div>
-
-        <div class="vintage-card" style="text-align: left; padding: 14px 18px;">
-          <h3 style="font-size: 12px; font-weight: 800; color: #855312; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px;">
-            DATABASE &amp; EDGE
-          </h3>
-          <ul style="font-size: 10.5px; color: #444444; list-style: none; line-height: 1.8;">
-            <li>✦ <strong>Cloudflare D1:</strong> Edge SQLite database</li>
-            <li>✦ <strong>REST API:</strong> Modular Next.js route handlers</li>
-            <li>✦ <strong>UUID v9:</strong> Session tracking &amp; tokens</li>
-            <li>✦ <strong>Midtrans QRIS:</strong> Webhook payment sync</li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Grand Footer -->
-      <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 6px;">
-        <h1 class="serif-title" style="font-size: 2.8rem; letter-spacing: 0.02em; line-height: 1; text-transform: uppercase;">
-          VELVETSNAP PHOTOBOX
-        </h1>
-        <div class="pill-badge" style="font-size: 10.5px; padding: 5px 20px;">
-          WIDI FIRMAAN <span style="opacity: 0.6;">·</span> LEAD FULLSTACK DEVELOPER
-        </div>
-        <p style="font-size: 9.5px; color: #777777; margin-top: 3px; font-family: 'JetBrains Mono', monospace;">
-          Interactive Photobox Kiosk Application · 2026 Production Edition · photo.widifirmaan.web.id
+        <p class="cover-desc">
+          Aplikasi web photobooth mandiri dengan integrasi WebRTC kamera, editor kanvas foto React-Konva, pembayaran QRIS terotomasi, cetak struk termal, dan dashboard admin terminal.
         </p>
       </div>
     </div>
-    <div class="page-num">10</div>
-  </section>
+
+    <div class="cover-split">
+      <div class="cover-specs">
+        <div class="spec-card">
+          <div class="spec-k">FRAMEWORK</div>
+          <div class="spec-v">Next.js 14 + React 18</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-k">CAMERA CORE</div>
+          <div class="spec-v">WebRTC MediaStream</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-k">CANVAS ENGINE</div>
+          <div class="spec-v">React-Konva 2D</div>
+        </div>
+        <div class="spec-card">
+          <div class="spec-k">PAYMENT</div>
+          <div class="spec-v">QRIS Dynamic Polling</div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.heroDesktop}" class="screenshot-desktop" alt="VelvetSnap Cover">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>WIDI FIRMANSYAH</div>
+      <div>NEXTJS VELVETSNAP PHOTOBOX</div>
+      <div>01 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 02: CAPTURE VIEWFINDER -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">PENGAMBILAN FOTO</div>
+      <div class="slide-num">02 / 10</div>
+    </div>
+
+    <div class="slide-body">
+      <div class="slide-info">
+        <div class="headline-group">
+          <h2 class="slide-title">Kamera & Jendela Bidik WebRTC</h2>
+          <p class="slide-desc">
+            Antarmuka pemotretan langsung dari peramban menggunakan WebRTC MediaDevices API, dilengkapi hitung mundur otomatis dan panduan bingkai wajah.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-card">
+            <div class="feature-card-title">Hitung Mundur Otomatis</div>
+            <div class="feature-card-text">
+              Timer visual 3 detik sebelum setiap jepretan foto, memberi waktu pengguna untuk bersiap di depan kamera kiosk.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card-title">Multi-Shot Capture Sequence</div>
+            <div class="feature-card-text">
+              Mengambil serangkaian 4 sampai 6 foto secara berurutan dan menyimpannya di memori lokal sesi pemotretan.
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val">WebRTC</div>
+            <div class="metric-lbl">Stream</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">3 Detik</div>
+            <div class="metric-lbl">Timer</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">FHD</div>
+            <div class="metric-lbl">Resolusi</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.captureDesktop}" class="screenshot-desktop" alt="Capture Viewfinder Desktop">
+        <img src="${images.captureMobile}" class="screenshot-mobile" alt="Capture Viewfinder Mobile">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>MODUL PENGAMBILAN FOTO</div>
+      <div>WEBRTC MEDIA STREAM</div>
+      <div>02 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 03: PHOTO EDITOR -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">EDITOR KANVAS</div>
+      <div class="slide-num">03 / 10</div>
+    </div>
+
+    <div class="slide-body">
+      <div class="slide-info">
+        <div class="headline-group">
+          <h2 class="slide-title">Editor Tata Letak & Kanvas React-Konva</h2>
+          <p class="slide-desc">
+            Studio penataan foto interaktif untuk memilih tata letak strip, warna bingkai, penyesuaian filter foto, dan penambahan stiker dekorasi.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-card">
+            <div class="feature-card-title">Pilihan Template Strip</div>
+            <div class="feature-card-text">
+              Mendukung tata letak strip 2x1, 3-strip klasik, dan format kartu pos dengan pengaturan warna latar belakang bebas.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card-title">Filter Warna Foto</div>
+            <div class="feature-card-text">
+              Penerapan filter monokrom, vintage sepia, dan saturasi natural yang diproses langsung pada kanvas HTML5.
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val">Konva 2D</div>
+            <div class="metric-lbl">Kanvas</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Realtime</div>
+            <div class="metric-lbl">Pratinjau</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Export</div>
+            <div class="metric-lbl">300 DPI</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.editorDesktop}" class="screenshot-desktop" alt="Photo Editor Desktop">
+        <img src="${images.editorMobile}" class="screenshot-mobile" alt="Photo Editor Mobile">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>EDITOR KANVAS FOTO</div>
+      <div>REACT-KONVA COMPOSITING</div>
+      <div>03 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 04: PAYMENT QRIS -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">PEMBAYARAN</div>
+      <div class="slide-num">04 / 10</div>
+    </div>
+
+    <div class="slide-body">
+      <div class="slide-info">
+        <div class="headline-group">
+          <h2 class="slide-title">Pembayaran QRIS & Verifikasi Otomatis</h2>
+          <p class="slide-desc">
+            Modal pembayaran digital terintegrasi yang menampilkan kode QR dinamis dengan sistem polling status pembayaran secara berkala.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-card">
+            <div class="feature-card-title">Polling Status Pembayaran</div>
+            <div class="feature-card-text">
+              Pemeriksaan status transaksi ke server gateway per 3 detik untuk mendeteksi konfirmasi pembayaran pengguna tanpa refresh halaman.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card-title">Batas Waktu Transaksi</div>
+            <div class="feature-card-text">
+              Penghitung waktu kedaluwarsa sesi QRIS untuk menjaga keamanan dan mencegah antrean kiosk macet.
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val">QRIS</div>
+            <div class="metric-lbl">Standar</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">3 Detik</div>
+            <div class="metric-lbl">Interval Polling</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Auto</div>
+            <div class="metric-lbl">Validasi</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.paymentDesktop}" class="screenshot-desktop" alt="Payment QRIS Desktop">
+        <img src="${images.paymentMobile}" class="screenshot-mobile" alt="Payment QRIS Mobile">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>GATEWAY PEMBAYARAN</div>
+      <div>VERIFIKASI TRANSAKSI QRIS</div>
+      <div>04 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 05: SUCCESS & DOWNLOAD -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">HASIL SESI</div>
+      <div class="slide-num">05 / 10</div>
+    </div>
+
+    <div class="slide-body">
+      <div class="slide-info">
+        <div class="headline-group">
+          <h2 class="slide-title">Unduh Foto & Kode QR Hasil</h2>
+          <p class="slide-desc">
+            Layar konfirmasi akhir yang menampilkan hasil cetak foto dan kode QR instan untuk mengunduh softcopy foto ke smartphone pengunjung.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-card">
+            <div class="feature-card-title">Kode QR Pengunduhan Langsung</div>
+            <div class="feature-card-text">
+              Pengunjung cukup memindai kode QR di layar untuk membuka dan menyimpan berkas foto berkualitas tinggi ke galeri ponsel mereka.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card-title">Trigger Cetak Otomatis</div>
+            <div class="feature-card-text">
+              Perintah pengiriman berkas cetak langsung ke printer foto fisik terhubung tanpa perlu intervensi manual staf.
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val">QR Link</div>
+            <div class="metric-lbl">Softcopy</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">300 DPI</div>
+            <div class="metric-lbl">Hasil Cetak</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Instant</div>
+            <div class="metric-lbl">Download</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.successDesktop}" class="screenshot-desktop" alt="Success Print Desktop">
+        <img src="${images.successMobile}" class="screenshot-mobile" alt="Success Print Mobile">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>SELESAI SESI FOTO</div>
+      <div>DISTRIBUSI BERKAS CETAK & DIGITAL</div>
+      <div>05 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 06: ADMIN TEMPLATE STUDIO -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">ADMIN STUDIO</div>
+      <div class="slide-num">06 / 10</div>
+    </div>
+
+    <div class="slide-body">
+      <div class="slide-info">
+        <div class="headline-group">
+          <h2 class="slide-title">Panel Admin Pengelola Bingkai Foto</h2>
+          <p class="slide-desc">
+            Dasbor manajemen bagi pemilik studio untuk mengunggah desain bingkai baru, mengatur slot foto, dan mengaktifkan tema musiman.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-card">
+            <div class="feature-card-title">Unggah Aset Bingkai Kustom</div>
+            <div class="feature-card-text">
+              Dukungan pengunggahan berkas PNG transparan dengan penetapan koordinat koordinat kotak foto secara fleksibel.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card-title">Katalog Tema Berkelompok</div>
+            <div class="feature-card-text">
+              Pengelompokan bingkai berdasarkan tema (Pernikahan, Ulang Tahun, Graduasi, Event Perusahaan).
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val">Admin</div>
+            <div class="metric-lbl">Dashboard</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Custom</div>
+            <div class="metric-lbl">Slot Foto</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">CRUD</div>
+            <div class="metric-lbl">Template</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.adminDesktop}" class="screenshot-desktop" alt="Admin Studio Desktop">
+        <img src="${images.adminMobile}" class="screenshot-mobile" alt="Admin Studio Mobile">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>ADMIN STUDIO BINGKAI</div>
+      <div>PENGELOLAAN TEMPLATE FOTO</div>
+      <div>06 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 07: HARDWARE MONITOR -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">STATUS PERANGKAT</div>
+      <div class="slide-num">07 / 10</div>
+    </div>
+
+    <div class="slide-body">
+      <div class="slide-info">
+        <div class="headline-group">
+          <h2 class="slide-title">Pemantauan Hardware & Terminal Kiosk</h2>
+          <p class="slide-desc">
+            Panel diagnostik kesehatan kiosk untuk memeriksa ketersediaan kertas printer, status koneksi kamera, dan stabilitas jaringan lokal.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-card">
+            <div class="feature-card-title">Indikator Kertas & Tinta Printer</div>
+            <div class="feature-card-text">
+              Peringatan dini saat stok kertas cetak foto mendekati batas minimum agar operator dapat melakukan pengisian ulang.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card-title">Pencatatan Log Transaksi Terminal</div>
+            <div class="feature-card-text">
+              Histori transaksi harian dan status keberhasilan pencetakan tersimpan rapi untuk kebutuhan rekapitulasi operasional.
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val">Live</div>
+            <div class="metric-lbl">Status Monitor</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Printer</div>
+            <div class="metric-lbl">Telemetri</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Audit</div>
+            <div class="metric-lbl">Log Sesi</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.terminalDesktop}" class="screenshot-desktop" alt="Terminal Monitor Desktop">
+        <img src="${images.terminalMobile}" class="screenshot-mobile" alt="Terminal Monitor Mobile">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>MONITOR HARDWARE KIOSK</div>
+      <div>DIAGNOSTIK OPERASIONAL</div>
+      <div>07 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 08: MOBILE TOUCH -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">PENGALAMAN PENGGUNA</div>
+      <div class="slide-num">08 / 10</div>
+    </div>
+
+    <div class="slide-body">
+      <div class="slide-info">
+        <div class="headline-group">
+          <h2 class="slide-title">Antarmuka Layar Sentuh & Responsif</h2>
+          <p class="slide-desc">
+            Desain tombol besar dan kontrol intuitif yang dioptimasi untuk interaksi layar sentuh kiosk maupun perangkat tablet operator.
+          </p>
+        </div>
+
+        <div class="feature-list">
+          <div class="feature-card">
+            <div class="feature-card-title">Ukuran Tombol Layar Sentuh Ramah Jari</div>
+            <div class="feature-card-text">
+              Semua tombol memiliki area sentuh minimal 48px untuk meminimalisir kesalahan ketuk oleh pengguna dari berbagai kalangan usia.
+            </div>
+          </div>
+          <div class="feature-card">
+            <div class="feature-card-title">Instruksi Langkah demi Langkah</div>
+            <div class="feature-card-text">
+              Alur aplikasi dipandu bertahap mulai dari pemilihan bingkai, pemotretan, hingga pembayaran tanpa membingungkan pengguna baru.
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-val">48px+</div>
+            <div class="metric-lbl">Target Sentuh</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">Alur</div>
+            <div class="metric-lbl">Terstruktur</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-val">100%</div>
+            <div class="metric-lbl">Mudah Dipahami</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="visual-stage">
+        <img src="${images.heroDesktop}" class="screenshot-desktop" alt="Mobile Touch Desktop">
+        <img src="${images.heroMobile}" class="screenshot-mobile" alt="Mobile Touch Mobile">
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>PENGALAMAN LAYAR SENTUH</div>
+      <div>ERGONOMI TAMPILAN KIOSK</div>
+      <div>08 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 09: TECH STACK -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="header-tag">TEKNOLOGI</div>
+      <div class="slide-num">09 / 10</div>
+    </div>
+
+    <div style="margin-bottom: 8px;">
+      <h2 class="slide-title">Susunan Teknologi & Dependensi</h2>
+      <p class="slide-desc">
+        Arsitektur web dibangun menggunakan Next.js 14 App Router dengan eksekusi kamera dan kanvas berbasis client-side untuk latensi minimal.
+      </p>
+    </div>
+
+    <div class="tech-grid">
+      <div class="tech-col">
+        <div class="tech-col-title">01. FRONTEND CORE</div>
+        <div class="tech-item">
+          <div class="tech-item-name">Next.js 14 App Router</div>
+          <div class="tech-item-desc">Framework React untuk routing halaman dan penyajian aset statis teroptimasi.</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-item-name">React 18</div>
+          <div class="tech-item-desc">Manajemen state UI untuk alur pemotretan bertahap dan transisi modal.</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-item-name">Tailwind CSS</div>
+          <div class="tech-item-desc">Styling berbasis utility untuk antarmuka bertema vintage modern.</div>
+        </div>
+      </div>
+
+      <div class="tech-col">
+        <div class="tech-col-title">02. KAMERA & KANVAS</div>
+        <div class="tech-item">
+          <div class="tech-item-name">WebRTC MediaStream</div>
+          <div class="tech-item-desc">Akses langsung ke hardware webcam peramban tanpa instalasi plugin luar.</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-item-name">React-Konva</div>
+          <div class="tech-item-desc">Pustaka manipulasi kanvas 2D untuk penggabungan foto dan template bingkai.</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-item-name">HTML5 Canvas API</div>
+          <div class="tech-item-desc">Perenderan hasil komposit akhir beresolusi tinggi siap cetak.</div>
+        </div>
+      </div>
+
+      <div class="tech-col">
+        <div class="tech-col-title">03. INTEGRASI & OPS</div>
+        <div class="tech-item">
+          <div class="tech-item-name">QRIS Gateway API</div>
+          <div class="tech-item-desc">Pembangkitan kode bayar dinamis dan polling status transaksi.</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-item-name">ESC/POS Thermal Driver</div>
+          <div class="tech-item-desc">Protokol cetak struk dan foto terintegrasi dengan hardware kiosk.</div>
+        </div>
+        <div class="tech-item">
+          <div class="tech-item-name">Playwright E2E</div>
+          <div class="tech-item-desc">Pengujian otomatis alur pemotretan untuk memastikan keandalan sistem.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>SUSUNAN TEKNOLOGI</div>
+      <div>ARSITEKTUR & DEPENDENSI</div>
+      <div>09 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: CLOSING -->
+  <div class="slide closing-slide">
+    <div class="header-tag" style="padding: 5px 16px; font-size: 11px;">VELVETSNAP PHOTOBOX PLATFORM</div>
+    <h1 class="closing-title">INTERACTIVE SELF-SERVICE PHOTOBOOTH</h1>
+    
+    <p style="font-size: 14.5px; color: var(--text-muted); max-width: 650px; line-height: 1.5;">
+      Solusi sistem photobooth mandiri modern yang menggabungkan kemudahan pengambilan foto via browser, penataan bingkai kreatif, dan pembayaran instan dalam satu platform terpadu.
+    </p>
+
+    <div class="closing-card">
+      <div style="font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em;">
+        DEMO PRODUKSI
+      </div>
+      <div class="closing-url">https://velvetsnap.widifirmaan.web.id</div>
+      <div style="font-size:11px; color:var(--text-muted);">
+        Next.js 14 • React 18 • WebRTC • React-Konva • QRIS Gateway
+      </div>
+    </div>
+
+    <div class="slide-footer" style="width: 100%; margin-top: 15px;">
+      <div>WIDI FIRMANSYAH</div>
+      <div>PENGEMBANG UTAMA</div>
+      <div>10 / 10</div>
+    </div>
+  </div>
 
 </body>
-</html>`;
+</html>
+`;
 
-// Write the generated HTML to a temporary file
-const htmlPath = path.join(projectRoot, 'presentation.html');
-fs.writeFileSync(htmlPath, htmlContent);
-console.log(`📄 Presentation HTML written to: ${htmlPath}`);
+const htmlFilePath = path.join(projectRoot, 'presentation.html');
+fs.writeFileSync(htmlFilePath, htmlContent, 'utf-8');
+console.log(`Presentation HTML written to: ${htmlFilePath}`);
 
-console.log('🚀 Launching Chromium with Playwright to render VelvetSnap PDF...');
-const browser = await chromium.launch({ headless: true });
-const page = await browser.newPage({
-  viewport: { width: 1920, height: 1080 },
-  deviceScaleFactor: 2,
+console.log('Launching Chromium with Playwright to render VelvetSnap PDF...');
+
+async function renderPDF() {
+  const playwrightPath = '/home/widifirmaan/Projects/qa-toolkit/node_modules/playwright/index.mjs';
+  const { chromium } = await import(playwrightPath);
+
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox', '--font-render-hinting=none'],
+  });
+
+  const page = await browser.newPage();
+  await page.goto(`file://${htmlFilePath}`, { waitUntil: 'networkidle' });
+  await page.evaluate(() => document.fonts.ready);
+
+  const slidePdfPath = path.join(downloadsDir, 'VelvetSnap.pdf');
+  const continuousPdfPath = path.join(downloadsDir, 'VelvetSnap-Continuous.pdf');
+
+  // 1. Multi-Page Deck Mode (10 Slides A4 Landscape)
+  console.log('Rendering Multi-Page A4 Landscape Presentation PDF (Slide Mode)...');
+  await page.pdf({
+    path: slidePdfPath,
+    format: 'A4',
+    landscape: true,
+    printBackground: true,
+    preferCSSPageSize: true,
+  });
+
+  // 2. Continuous Poster Mode (Single tall scroll)
+  console.log('Rendering Continuous Single-Scroll Showcase PDF (Poster Mode)...');
+  await page.addStyleTag({
+    content: `
+      @page {
+        size: auto;
+        margin: 0;
+      }
+      body {
+        background: #F8F6F0 !important;
+      }
+      .slide {
+        page-break-after: unset !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 0px !important;
+        box-shadow: none !important;
+      }
+    `
+  });
+
+  await page.waitForTimeout(500);
+
+  const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+  await page.pdf({
+    path: continuousPdfPath,
+    width: '1428px',
+    height: `${scrollHeight}px`,
+    printBackground: true,
+    pageRanges: '1',
+  });
+
+  await browser.close();
+
+  const slideStat = fs.statSync(slidePdfPath);
+  const contStat = fs.statSync(continuousPdfPath);
+
+  console.log('\nVelvetSnap PDFs successfully generated:');
+  console.log(`- Multi-Page Deck: ${(slideStat.size / 1024 / 1024).toFixed(2)} MB (${slidePdfPath})`);
+  console.log(`- Continuous Poster: ${(contStat.size / 1024 / 1024).toFixed(2)} MB (${continuousPdfPath})\n`);
+}
+
+renderPDF().catch((err) => {
+  console.error('Error during PDF generation:', err);
+  process.exit(1);
 });
-
-await page.setContent(htmlContent, { waitUntil: 'load' });
-await page.waitForTimeout(1000); // Allow any fonts and layout to settle
-
-// 1. Generate Multi-Page Landscape PDF Presentation (A4 297x210mm)
-const pdfPathProject = path.join(projectRoot, 'VelvetSnap.pdf');
-const pdfPathDownloads = path.join(downloadsDir, 'VelvetSnap.pdf');
-const pdfPathArtifacts = path.join(artifactsDir, 'VelvetSnap.pdf');
-
-console.log('🖨️  Rendering Multi-Page A4 Landscape Presentation PDF (Slide Mode)...');
-const pdfBuffer = await page.pdf({
-  format: 'A4',
-  landscape: true,
-  printBackground: true,
-  preferCSSPageSize: true,
-});
-
-fs.writeFileSync(pdfPathProject, pdfBuffer);
-fs.writeFileSync(pdfPathDownloads, pdfBuffer);
-fs.writeFileSync(pdfPathArtifacts, pdfBuffer);
-
-const pdfSizeMB = (pdfBuffer.length / (1024 * 1024)).toFixed(2);
-
-// 2. Generate Continuous Showcase PDF (Matching Book Games single long scroll format)
-const pdfContinuousProject = path.join(projectRoot, 'VelvetSnap-Continuous.pdf');
-const pdfContinuousDownloads = path.join(downloadsDir, 'VelvetSnap-Continuous.pdf');
-const pdfContinuousArtifacts = path.join(artifactsDir, 'VelvetSnap-Continuous.pdf');
-
-console.log('📜 Rendering Continuous Single-Scroll Showcase PDF (Poster Mode)...');
-await page.addStyleTag({
-  content: `
-    @page { size: auto; margin: 0; }
-    body { padding: 40px 0; background: #f0ebe1; display: flex; flex-direction: column; align-items: center; gap: 40px; }
-    .slide { page-break-after: unset !important; border: 2.5px solid #262626 !important; border-radius: 24px !important; box-shadow: 6px 6px 0px #262626 !important; }
-  `
-});
-await page.waitForTimeout(500);
-
-const bodyHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-const continuousBuffer = await page.pdf({
-  width: '1428px',
-  height: `${bodyHeight}px`,
-  printBackground: true,
-});
-
-fs.writeFileSync(pdfContinuousProject, continuousBuffer);
-fs.writeFileSync(pdfContinuousDownloads, continuousBuffer);
-fs.writeFileSync(pdfContinuousArtifacts, continuousBuffer);
-
-const contSizeMB = (continuousBuffer.length / (1024 * 1024)).toFixed(2);
-
-console.log(`\n================================================================================`);
-console.log(`🎉 VELVETSNAP WEB ARCHITECTURE PDFS SUCCESSFULLY GENERATED!`);
-console.log(`📦 Multi-Page Deck (Slides)   : ${pdfSizeMB} MB (10 Pages A4 Landscape)`);
-console.log(`   -> Saved: ${pdfPathDownloads}`);
-console.log(`📦 Continuous Poster (Scroll) : ${contSizeMB} MB (1 Long Showcase Page)`);
-console.log(`   -> Saved: ${pdfContinuousDownloads}`);
-console.log(`================================================================================\n`);
-
-await browser.close();
-process.exit(0);
