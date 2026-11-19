@@ -26,3 +26,76 @@ INSERT OR IGNORE INTO templates (id, templateId, templateName, templateDesc, tem
 INSERT OR IGNORE INTO templates (id, templateId, templateName, templateDesc, templatePrice, templateFull, templateThumb, templateData, isActive) VALUES ('2606120005', '2606120005', 'Special', 'Designed in Strips Studio', 641, 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781241381/velvetsnap/templates/o1dxcawqtg9nhvwnm39j.png', 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781241379/velvetsnap/templates/ejdgc9yrbpyqy4nqiow7.png', '{"elements": [{"id": "slot-0", "type": "photo-slot", "x": 55, "y": 348, "width": 889, "height": 822, "rotation": 0, "zIndex": 0, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-1", "type": "photo-slot", "x": 55, "y": 1371, "width": 889, "height": 822, "rotation": 0, "zIndex": 1, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "text-velvet", "type": "text", "x": 800, "y": 2964, "width": 180, "height": 24, "rotation": 0, "zIndex": 3, "visible": true, "props": {"content": "by VelvetSnap", "fontSize": 16, "fontFamily": "Inter", "color": "#3d2c2c", "fontWeight": "300", "textAlign": "right"}}, {"id": "bg-image", "type": "background", "x": 0, "y": 0, "width": 1000, "height": 3000, "rotation": 0, "zIndex": 2, "visible": true, "props": {"stickerUrl": "", "opacity": 1}}], "slotsLayout": [{"x": 5.5, "y": 11.6, "w": 88.9, "h": 27.4, "_id": {"buffer": {"0": 106, "1": 43, "2": 150, "3": 40, "4": 79, "5": 97, "6": 125, "7": 48, "8": 55, "9": 121, "10": 173, "11": 48}}}, {"x": 5.5, "y": 45.7, "w": 88.9, "h": 27.4, "_id": {"buffer": {"0": 106, "1": 43, "2": 150, "3": 40, "4": 79, "5": 97, "6": 125, "7": 48, "8": 55, "9": 121, "10": 173, "11": 49}}}], "canvasWidth": 1000, "canvasHeight": 3000, "color": "#ffffff", "type": "strip", "slots": 2}', 1);
 INSERT OR IGNORE INTO templates (id, templateId, templateName, templateDesc, templatePrice, templateFull, templateThumb, templateData, isActive) VALUES ('2606120002', '2606120002', 'Velvet Memories', 'Designed in Strips Studio', 155, 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198741/velvetsnap/templates/jsyuk3mnkcnb2yjyzqyq.png', 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198739/velvetsnap/templates/l6pkgzkelawhumnduics.png', '{"elements": [{"id": "slot-0", "type": "photo-slot", "x": 97, "y": 69, "width": 806, "height": 588, "rotation": 0, "zIndex": 0, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-1", "type": "photo-slot", "x": 97, "y": 696, "width": 806, "height": 591, "rotation": 0, "zIndex": 1, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-2", "type": "photo-slot", "x": 97, "y": 1323, "width": 806, "height": 588, "rotation": 0, "zIndex": 2, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-3", "type": "photo-slot", "x": 97, "y": 1953, "width": 806, "height": 588, "rotation": 0, "zIndex": 3, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "text-velvet", "type": "text", "x": 800, "y": 2964, "width": 180, "height": 24, "rotation": 0, "zIndex": 3, "visible": true, "props": {"content": "by VelvetSnap", "fontSize": 16, "fontFamily": "Inter", "color": "#3d2c2c", "fontWeight": "300", "textAlign": "right"}}, {"id": "bg-image", "type": "background", "x": 0, "y": 0, "width": 1000, "height": 3000, "rotation": 0, "zIndex": 4, "visible": true, "props": {"stickerUrl": "", "opacity": 1}}], "slotsLayout": [{"x": 9.7, "y": 2.3, "w": 80.6, "h": 19.6, "_id": {"buffer": {"0": 106, "1": 42, "2": 239, "3": 156, "4": 41, "5": 18, "6": 69, "7": 132, "8": 49, "9": 198, "10": 209, "11": 115}}}, {"x": 9.7, "y": 23.2, "w": 80.6, "h": 19.7, "_id": {"buffer": {"0": 106, "1": 42, "2": 239, "3": 156, "4": 41, "5": 18, "6": 69, "7": 132, "8": 49, "9": 198, "10": 209, "11": 116}}}, {"x": 9.7, "y": 44.1, "w": 80.6, "h": 19.6, "_id": {"buffer": {"0": 106, "1": 42, "2": 239, "3": 156, "4": 41, "5": 18, "6": 69, "7": 132, "8": 49, "9": 198, "10": 209, "11": 117}}}, {"x": 9.7, "y": 65.1, "w": 80.6, "h": 19.6, "_id": {"buffer": {"0": 106, "1": 42, "2": 239, "3": 156, "4": 41, "5": 18, "6": 69, "7": 132, "8": 49, "9": 198, "10": 209, "11": 118}}}], "canvasWidth": 1000, "canvasHeight": 3000, "color": "#ffffff", "type": "strip", "slots": 4}', 1);
 INSERT OR IGNORE INTO templates (id, templateId, templateName, templateDesc, templatePrice, templateFull, templateThumb, templateData, isActive) VALUES ('2606120001', '2606120001', 'Good Velvet', 'Designed in Strips Studio', 1344, 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198097/velvetsnap/templates/lpfklcx8xjrfvl79pyvt.png', 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198095/velvetsnap/templates/gdtciawjymwssdj8etvb.png', '{"elements": [{"id": "slot-0", "type": "photo-slot", "x": 11, "y": 90, "width": 978, "height": 591, "rotation": 0, "zIndex": 0, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-1", "type": "photo-slot", "x": 11, "y": 687, "width": 978, "height": 591, "rotation": 0, "zIndex": 1, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-2", "type": "photo-slot", "x": 11, "y": 1284, "width": 978, "height": 594, "rotation": 0, "zIndex": 2, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-3", "type": "photo-slot", "x": 11, "y": 1881, "width": 978, "height": 594, "rotation": 0, "zIndex": 3, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "text-velvet", "type": "text", "x": 800, "y": 2964, "width": 180, "height": 24, "rotation": 0, "zIndex": 3, "visible": true, "props": {"content": "by VelvetSnap", "fontSize": 16, "fontFamily": "Inter", "color": "#3d2c2c", "fontWeight": "300", "textAlign": "right"}}, {"id": "bg-image", "type": "background", "x": 0, "y": 0, "width": 1000, "height": 3000, "rotation": 0, "zIndex": 4, "visible": true, "props": {"stickerUrl": "", "opacity": 1}}], "slotsLayout": [{"x": 1.1, "y": 3, "w": 97.8, "h": 19.7, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 76}}}, {"x": 1.1, "y": 22.9, "w": 97.8, "h": 19.7, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 77}}}, {"x": 1.1, "y": 42.8, "w": 97.8, "h": 19.8, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 78}}}, {"x": 1.1, "y": 62.7, "w": 97.8, "h": 19.8, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 79}}}], "canvasWidth": 1000, "canvasHeight": 3000, "color": "#ffffff", "type": "strip", "slots": 4}', 1);
+
+-- VelvetSnap Demo Transactions Ledger Seeder
+INSERT OR IGNORE INTO transactions (id, sessionId, templateId, price, status, captures, videos, finalImage, showInCarousel, orderId, paymentMethod, createdAt, updatedAt)
+VALUES (
+    'tx-demo-001',
+    'sess-20261117-001',
+    '2606110004',
+    35000,
+    'COMPLETED',
+    '["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80","https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80","https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80"]',
+    '[]',
+    'https://res.cloudinary.com/duaddqdfh/image/upload/v1781197030/velvetsnap/templates/hdggxqmqa9io2xiplz3x.png',
+    1,
+    'ORDER-VS-20261117-001',
+    'QRIS',
+    datetime('now', '-2 days'),
+    datetime('now', '-2 days')
+);
+
+INSERT OR IGNORE INTO transactions (id, sessionId, templateId, price, status, captures, videos, finalImage, showInCarousel, orderId, paymentMethod, createdAt, updatedAt)
+VALUES (
+    'tx-demo-002',
+    'sess-20261117-002',
+    '2606110003',
+    35000,
+    'COMPLETED',
+    '["https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&q=80","https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80","https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&q=80"]',
+    '[]',
+    'https://res.cloudinary.com/duaddqdfh/image/upload/v1781196153/velvetsnap/templates/inbydwkat63upmlxia0o.png',
+    1,
+    'ORDER-VS-20261117-002',
+    'QRIS',
+    datetime('now', '-1 days'),
+    datetime('now', '-1 days')
+);
+
+INSERT OR IGNORE INTO transactions (id, sessionId, templateId, price, status, captures, videos, finalImage, showInCarousel, orderId, paymentMethod, createdAt, updatedAt)
+VALUES (
+    'tx-demo-003',
+    'sess-20261118-003',
+    '2606120001',
+    40000,
+    'COMPLETED',
+    '["https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80","https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80","https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80"]',
+    '[]',
+    'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198097/velvetsnap/templates/lpfklcx8xjrfvl79pyvt.png',
+    0,
+    'ORDER-VS-20261118-003',
+    'CASH',
+    datetime('now', '-4 hours'),
+    datetime('now', '-4 hours')
+);
+
+-- VelvetSnap Demo Devices Seeder
+INSERT OR IGNORE INTO devices (id, deviceId, name, location, status, lastPing)
+VALUES (
+    'dev-kiosk-01',
+    'KIOSK-JKT-01',
+    'Kiosk Grand Indonesia (Main Lobby)',
+    'Jakarta Pusat',
+    'ONLINE',
+    datetime('now')
+);
+
+INSERT OR IGNORE INTO devices (id, deviceId, name, location, status, lastPing)
+VALUES (
+    'dev-kiosk-02',
+    'KIOSK-BDG-01',
+    'Kiosk Paris Van Java',
+    'Bandung',
+    'ONLINE',
+    datetime('now', '-10 minutes')
+);
