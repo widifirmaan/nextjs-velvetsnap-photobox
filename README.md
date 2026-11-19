@@ -178,33 +178,6 @@ Open [http://localhost:3000/v1](http://localhost:3000/v1) for the customer kiosk
 
 ---
 
-## Testing & QA Automation
-
-Automated testing and QA verification are powered by the system's `qa-toolkit`:
-
-### 1. Playwright Test Suite
-End-to-end smoke verification covering kiosk homepage and admin authentication gateway:
-
-```bash
-cd /home/widifirmaan/Projects/qa-toolkit
-npx playwright test tests/playwright/velvetsnap.spec.js
-```
-
-### 2. Cypress E2E Verification
-Cross-browser regression testing on DOM structure and production stability:
-
-```bash
-cd /home/widifirmaan/Projects/qa-toolkit
-npx cypress run --spec cypress/e2e/velvetsnap.cy.js
-```
-
-### 3. QA Execution Summary
-- **Playwright**: 2 tests passed (Kiosk Landing Page & Admin Login Gateway)
-- **Cypress**: 2 specs passed (Kiosk DOM Mount & Admin Login Route Mount)
-- **Status**: ✅ All automated tests verified and passing
-
----
-
 ## Author
 
 Made with ❤️ by **Widi Firmansyah** / [widifirmaan.web.id](https://widifirmaan.web.id)
