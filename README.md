@@ -49,7 +49,7 @@
 - **Interactive Template Studio (`/admin/template-studio`)**: Visual strip designer for kiosk operators featuring draggable canvas layers, sticker catalogs, and geometric coordinate controls.
 - **Kiosk Hardware Health Monitor (`/admin/devices`)**: Hardware diagnostic panel verifying webcam feed availability, resolution profiles, and kiosk connection states.
 - **Admin Analytics Dashboard (`/admin`)**: Operations portal tracking session volume, daily/weekly revenue graphs, customer transaction history, and pricing rules.
-- **Dynamic Mobile QR Delivery**: On-screen QR ticket generation via `qrcode` allowing users to scan and download full-resolution digital strips to mobile devices.
+- **Mobile Digital Delivery & Download Portal (`/download`)**: On-screen QR ticket generation via `qrcode` allowing users to scan and download full-resolution digital strips and behind-the-scenes video clips directly to mobile devices via `/download?session=<id>`.
 
 ---
 
@@ -76,16 +76,13 @@
 
 ### 2. Environment Variables Setup
 
-Create a `.env.local` file in the project root:
+Jika ingin mengaktifkan upload cloud storage atau integrasi pembayaran production, buat file `.env.local` (opsional):
 
 ```env
-ADMIN_ROOT_PASSWORD=root
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-# Cloud Media Storage (Uploads for rendered photo strips and template assets)
+# Cloud Media Storage (Opsional: upload strip foto dan aset template)
 CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
 
-# Payment Gateway (Optional: leave empty to test with operator bypass button)
+# Payment Gateway (Opsional: biarkan kosong untuk menggunakan tombol operator bypass saat testing)
 DOKU_CLIENT_ID=
 DOKU_SECRET_KEY=
 DOKU_MERCHANT_ID=
@@ -104,103 +101,23 @@ npm install
 
 ### 4. Database Schema & Seeder Setup
 
-VelvetSnap organizes kiosk settings, operator accounts, frame templates, and transaction history in a relational SQLite database (`schema.sql`):
+VelvetSnap mengorganisir pengaturan kios, akun operator, template frame, dan riwayat transaksi dalam database SQLite (`schema.sql`):
 
-```sql
-CREATE TABLE IF NOT EXISTS settings (
-    id TEXT PRIMARY KEY DEFAULT 'root',
-    appName TEXT NOT NULL DEFAULT 'VelvetSnap',
-    appTagline TEXT NOT NULL DEFAULT 'AI-Powered Photobooth Experience',
-    heroSubtitle TEXT NOT NULL DEFAULT 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',
-    logo TEXT NOT NULL DEFAULT '',
-    cardSmallHtml TEXT NOT NULL DEFAULT '',
-    cardPromoHtml TEXT NOT NULL DEFAULT '',
-    slideshowImages TEXT NOT NULL DEFAULT '["https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80","https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80","https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80","https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80","https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&q=80"]',
-    header TEXT NOT NULL DEFAULT '{"location":"Jakarta","navItems":"[{\"label\":\"Instagram\",\"url\":\"https://instagram.com\"},{\"label\":\"WhatsApp\",\"url\":\"https://wa.me/628123456789\"},{\"label\":\"Templates\",\"url\":\"/templates\"},{\"label\":\"Studio\",\"url\":\"/strips-studio\"}]"}',
-    footer TEXT NOT NULL DEFAULT '{"text":"VelvetSnap Photobooth Platform"}',
-    system TEXT NOT NULL DEFAULT '{"primaryColor":"#262626","accentColor":"#C5D89D","showPreloader":true,"showStrips":true,"slideshowInterval":3000,"sessionTimer":600}',
-    uiTheme TEXT NOT NULL DEFAULT 'v1',
-    password TEXT NOT NULL DEFAULT '',
-    passwordSalt TEXT NOT NULL DEFAULT '',
-    session TEXT NOT NULL DEFAULT '',
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
+| Tabel | Keterangan / Entitas Data |
+| :--- | :--- |
+| `settings` | Konfigurasi branding kios, tema (`v1`/`v2`), warna primer/aksen, dan slideshow |
+| `accounts` | Akun operator dan autentikasi administrator (`root`) |
+| `templates` | Desain frame foto strip, harga, layer kanvas, dan thumbnail |
+| `transactions` | Log sesi foto, status pembayaran (PENDING/PAID), URL strip final, dan referensi QRIS |
+| `devices` | Status koneksi dan heartbeat perangkat kiosk (`ONLINE`/`OFFLINE`) |
 
-CREATE TABLE IF NOT EXISTS accounts (
-    id TEXT PRIMARY KEY,
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL DEFAULT '',
-    passwordSalt TEXT NOT NULL DEFAULT '',
-    session TEXT NOT NULL DEFAULT '',
-    settings TEXT NOT NULL DEFAULT '{}',
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE INDEX IF NOT EXISTS idx_accounts_session ON accounts(session);
-
-CREATE TABLE IF NOT EXISTS templates (
-    id TEXT PRIMARY KEY,
-    templateId TEXT NOT NULL UNIQUE,
-    templateName TEXT NOT NULL DEFAULT '',
-    templateDesc TEXT NOT NULL DEFAULT '',
-    templatePrice REAL NOT NULL DEFAULT 35000,
-    templateFull TEXT NOT NULL DEFAULT '',
-    templateThumb TEXT NOT NULL DEFAULT '',
-    templateData TEXT NOT NULL DEFAULT '{}',
-    isActive INTEGER NOT NULL DEFAULT 1,
-    accountId TEXT,
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE INDEX IF NOT EXISTS idx_templates_accountId ON templates(accountId);
-
-CREATE TABLE IF NOT EXISTS transactions (
-    id TEXT PRIMARY KEY,
-    sessionId TEXT NOT NULL,
-    templateId TEXT NOT NULL DEFAULT 't1',
-    price REAL NOT NULL DEFAULT 35000,
-    status TEXT NOT NULL DEFAULT 'PENDING',
-    captures TEXT NOT NULL DEFAULT '[]',
-    videos TEXT NOT NULL DEFAULT '[]',
-    finalImage TEXT NOT NULL DEFAULT '',
-    showInCarousel INTEGER NOT NULL DEFAULT 0,
-    accountId TEXT,
-    orderId TEXT,
-    midtransTransactionId TEXT,
-    midtransStatus TEXT,
-    paymentMethod TEXT,
-    qrCodeUrl TEXT,
-    qrReferenceNo TEXT,
-    qrContent TEXT,
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-CREATE INDEX IF NOT EXISTS idx_transactions_sessionId ON transactions(sessionId);
-CREATE INDEX IF NOT EXISTS idx_transactions_status ON transactions(status);
-CREATE INDEX IF NOT EXISTS idx_transactions_accountId ON transactions(accountId);
-CREATE INDEX IF NOT EXISTS idx_transactions_showInCarousel ON transactions(showInCarousel);
-CREATE UNIQUE INDEX IF NOT EXISTS idx_transactions_orderId ON transactions(orderId);
-
-CREATE TABLE IF NOT EXISTS devices (
-    id TEXT PRIMARY KEY,
-    deviceId TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL,
-    location TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'OFFLINE',
-    lastPing TEXT NOT NULL DEFAULT (datetime('now')),
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
-    updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
-);
-
-INSERT OR IGNORE INTO settings (id) VALUES ('root');
-```
-
-Initialize the Cloudflare D1 local database schema and root administrator credentials:
+Inisialisasi skema Cloudflare D1 lokal dan seeder data awal:
 
 ```bash
-# Apply schema and seed demo records to local Cloudflare D1 via Wrangler
+# Inisialisasi skema ke Cloudflare D1 lokal via Wrangler
 npx wrangler d1 execute photobox-db --local --file=schema.sql
+
+# Seed akun root default dan template frame bawaan
 npm run seed
 ```
 
