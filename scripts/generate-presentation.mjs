@@ -11,14 +11,14 @@ const downloadsDir = '/home/widifirmaan/Downloads';
 function encodeImage(filename) {
   const filePath = path.join(screenshotsDir, filename);
   if (!fs.existsSync(filePath)) {
-    console.warn(`Screenshot tidak ditemukan: ${filePath}`);
+    console.warn(`Warning: Screenshot not found: ${filePath}`);
     return '';
   }
   const fileBuffer = fs.readFileSync(filePath);
   return `data:image/png;base64,${fileBuffer.toString('base64')}`;
 }
 
-console.log('Memproses screenshot VelvetSnap Photobox...');
+console.log('Encoding VelvetSnap Photobox screenshots...');
 
 const images = {
   kioskHomeDesktop: encodeImage('Kiosk Home Desktop.png'),
@@ -35,10 +35,10 @@ const images = {
   adminDevicesDesktop: encodeImage('Admin Devices Desktop.png'),
 };
 
-console.log('Menyusun HTML presentasi dengan style murni VelvetSnap Clay & Matcha...');
+console.log('Assembling English VelvetSnap Clay & Matcha Presentation Deck HTML...');
 
 const htmlContent = `<!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>VelvetSnap - Photobox Kiosk & Canvas Architecture</title>
@@ -59,7 +59,7 @@ const htmlContent = `<!DOCTYPE html>
       --clay-radius: 24px;
       --clay-radius-lg: 32px;
       --clay-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-      --font-main: 'Inter', -apple-system, sans-serif;
+      --font-main: 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
@@ -76,7 +76,6 @@ const htmlContent = `<!DOCTYPE html>
       background-color: var(--bg-secondary);
       color: var(--text-primary);
       line-height: 1.45;
-      letter-spacing: -0.015em;
     }
 
     @page {
@@ -92,202 +91,199 @@ const htmlContent = `<!DOCTYPE html>
       background-color: var(--bg-secondary);
       display: flex;
       flex-direction: column;
-      padding: 14mm 18mm;
+      padding: 15mm 18mm;
       overflow: hidden;
-      background-image: radial-gradient(circle at 100% 0%, rgba(197, 216, 157, 0.12) 0%, transparent 60%);
     }
 
-    /* Top Matcha Accent Pill */
-    .slide::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 18mm;
-      right: 18mm;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent-matcha), var(--accent-deep));
-      border-radius: 0 0 4px 4px;
-      z-index: 50;
-    }
-
-    /* Header */
+    /* Velvet Header */
     .slide-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5mm;
-      padding-bottom: 3.5mm;
-      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 5.5mm;
     }
 
-    .brand-cluster {
-      display: flex;
+    .brand-pill {
+      display: inline-flex;
       align-items: center;
-      gap: 12px;
-    }
-
-    .brand-badge {
-      background: var(--accent-matcha);
-      color: #1e2912;
-      padding: 5px 14px;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      font-size: 10px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
+      gap: 10px;
+      background: var(--bg-primary);
+      padding: 7px 18px;
       border-radius: 50px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+      box-shadow: var(--clay-shadow);
+      border: 1px solid var(--border-subtle);
     }
 
-    .slide-section-title {
-      font-size: 13px;
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-matcha);
+    }
+
+    .brand-title {
+      font-size: 13.5px;
       font-weight: 700;
-      color: var(--text-secondary);
+      color: var(--text-primary);
       letter-spacing: -0.01em;
-      text-transform: uppercase;
     }
 
-    .slide-number {
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      border-left: 1px solid rgba(0, 0, 0, 0.1);
+      padding-left: 10px;
+      margin-left: 2px;
+    }
+
+    .badge-pill {
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
-      color: var(--text-primary);
-      background: var(--bg-primary);
-      padding: 4px 12px;
+      color: var(--accent-deep);
+      background: rgba(197, 216, 157, 0.25);
+      padding: 6px 14px;
       border-radius: 50px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     }
 
-    /* Body */
-    .slide-body {
-      display: grid;
-      grid-template-columns: 1fr 1.35fr;
-      gap: 22px;
+    /* Content Area */
+    .slide-content {
       flex: 1;
-      min-height: 0;
-    }
-
-    .slide-info {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 0;
     }
 
-    .headline-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .title-banner {
+      margin-bottom: 5mm;
+    }
+
+    .slide-category {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-deep);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
     }
 
     .slide-title {
       font-size: 26px;
       font-weight: 800;
-      line-height: 1.2;
-      color: var(--text-primary);
       letter-spacing: -0.03em;
+      color: var(--text-primary);
+      line-height: 1.18;
     }
 
-    .slide-desc {
-      font-size: 12px;
+    .slide-subtitle {
+      font-size: 13.5px;
       color: var(--text-secondary);
-      line-height: 1.55;
+      margin-top: 4px;
+      max-width: 900px;
+      font-weight: 500;
     }
 
-    .feature-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 8px 0;
-    }
-
-    .feature-card {
+    /* Clay Cards */
+    .clay-card {
       background: var(--bg-primary);
       border-radius: var(--clay-radius);
-      padding: 12px 16px;
       box-shadow: var(--clay-shadow);
+      padding: 18px 22px;
       border: 1px solid var(--border-subtle);
-      border-left: 5px solid var(--accent-matcha);
     }
 
-    .feature-card-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 2px;
-      letter-spacing: -0.01em;
+    .clay-card-matcha {
+      background: var(--bg-primary);
+      border-radius: var(--clay-radius);
+      box-shadow: var(--clay-shadow);
+      padding: 18px 22px;
+      border-left: 6px solid var(--accent-matcha);
     }
 
-    .feature-card-text {
-      font-size: 11px;
-      color: var(--text-secondary);
-      line-height: 1.45;
+    /* Split Layouts */
+    .layout-split {
+      display: grid;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 18px;
+      align-items: stretch;
+      flex: 1;
     }
 
-    .metrics-row {
+    .layout-split-reversed {
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 18px;
+      align-items: stretch;
+      flex: 1;
+    }
+
+    .layout-grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 16px;
+      flex: 1;
     }
 
-    .metric-box {
-      background: var(--bg-primary);
-      border-radius: 16px;
-      padding: 10px 12px;
-      text-align: center;
-      box-shadow: var(--clay-shadow);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .metric-val {
-      font-family: var(--font-mono);
-      font-size: 16px;
-      font-weight: 800;
-      color: var(--accent-deep);
-    }
-
-    .metric-lbl {
-      font-size: 9px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-top: 2px;
+    .layout-grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      flex: 1;
     }
 
     /* Visual Stage */
     .visual-stage {
-      position: relative;
+      background: var(--bg-primary);
+      border-radius: var(--clay-radius);
+      box-shadow: var(--clay-shadow);
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 100%;
+      position: relative;
       height: 100%;
-      min-height: 0;
-      background: var(--bg-primary);
-      border-radius: var(--clay-radius-lg);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+      min-height: 290px;
+      padding: 12px;
       border: 1px solid var(--border-subtle);
-      padding: 16px;
     }
 
-    .screenshot-desktop {
-      max-width: 95%;
-      max-height: 380px;
+    .visual-stage img {
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
-      display: block;
-      filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.08));
+      filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.06));
     }
 
-    .screenshot-mobile {
-      position: absolute;
-      right: 14px;
-      bottom: 8px;
-      max-height: 270px;
-      max-width: 29%;
-      object-fit: contain;
-      display: block;
-      filter: drop-shadow(0 12px 28px rgba(0, 0, 0, 0.12));
+    /* Feature Items */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .feature-box {
+      background: var(--bg-primary);
+      border-radius: 18px;
+      box-shadow: var(--clay-shadow);
+      padding: 14px 18px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .feature-box-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 3px;
+    }
+
+    .feature-box-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      font-weight: 500;
     }
 
     /* Footer */
@@ -296,687 +292,566 @@ const htmlContent = `<!DOCTYPE html>
       justify-content: space-between;
       align-items: center;
       margin-top: 5mm;
-      padding-top: 3mm;
+      padding-top: 3.5mm;
       border-top: 1px solid var(--border-subtle);
-    }
-
-    .footer-tech {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 11px;
       color: var(--text-muted);
-    }
-
-    .footer-url {
       font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--accent-deep);
+      font-weight: 600;
     }
 
-    /* Cover Styling */
-    .cover-body {
-      display: grid;
-      grid-template-columns: 1.15fr 1fr;
-      gap: 30px;
-      align-items: center;
-      flex: 1;
-      min-height: 0;
-    }
-
-    .cover-tagline {
+    .tech-pill {
+      display: inline-block;
+      padding: 3px 10px;
+      background: var(--card-bg);
+      border-radius: 50px;
       font-family: var(--font-mono);
       font-size: 11px;
       font-weight: 700;
-      color: var(--accent-deep);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-
-    .cover-title {
-      font-size: 38px;
-      font-weight: 900;
       color: var(--text-primary);
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: 12px;
-    }
-
-    .cover-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .cover-specs {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .spec-card {
-      background: var(--bg-primary);
-      border-radius: var(--clay-radius);
-      padding: 10px 14px;
-      box-shadow: var(--clay-shadow);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .spec-k {
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .spec-v {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-top: 2px;
-    }
-
-    /* Architecture Grid */
-    .arch-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      flex: 1;
-      min-height: 0;
-      margin-top: 10px;
-    }
-
-    .arch-card {
-      background: var(--bg-primary);
-      border-radius: var(--clay-radius);
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: var(--clay-shadow);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .arch-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--text-primary);
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 8px;
-    }
-
-    .arch-item {
-      font-size: 11.5px;
-      color: var(--text-secondary);
-      line-height: 1.5;
-    }
-
-    .arch-item strong {
-      color: var(--text-primary);
-      font-weight: 600;
+      margin-right: 6px;
+      margin-top: 4px;
     }
   </style>
 </head>
 <body>
 
   <!-- SLIDE 1: COVER -->
-  <section class="slide">
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">PHOTOBOX KIOSK</span>
-        <span class="slide-section-title">Dokumentasi Rekayasa Perangkat Lunak</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">VelvetSnap Photobox</div>
+        <div class="brand-subtitle">Automated Kiosk &amp; HTML5 Canvas Architecture</div>
       </div>
-      <div class="slide-number">01 / 10</div>
+      <div class="badge-pill">DECK-VELVET-01 / 10</div>
     </div>
 
-    <div class="cover-body">
-      <div>
-        <div class="cover-tagline">Self-Service Photobooth Kiosk Architecture</div>
-        <h1 class="cover-title">VelvetSnap Photobox Kiosk & Canvas Studio</h1>
-        <p class="cover-desc">
-          Platform booth foto mandiri (self-service photobooth) dengan desain antarmuka Claymorphism hangat dan aksen Matcha Green (#C5D89D). Mengintegrasikan kontrol kamera WebRTC, editor kanvas stiker real-time, pembayaran QRIS dinamis, dan sistem manajemen template studio.
-        </p>
+    <div class="slide-content">
+      <div class="layout-split">
+        <div style="display: flex; flex-direction: column; justify-content: center; padding-right: 15px;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+            <span class="tech-pill">Next.js 14</span>
+            <span class="tech-pill">WebRTC MediaStream</span>
+            <span class="tech-pill">HTML5 Canvas</span>
+            <span class="tech-pill">QRIS Gateway</span>
+          </div>
+          <h1 style="font-size: 40px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px;">
+            Self-Service Photobooth Kiosk &amp; Canvas Architecture
+          </h1>
+          <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 24px; font-weight: 500;">
+            An automated commercial photo kiosk platform engineered with minimal warm claymorphism aesthetics (Matcha Green #C5D89D, 24px-32px rounded cards), WebRTC camera synchronization, real-time strip compositing, and instant thermal printing.
+          </p>
 
-        <div class="cover-specs">
-          <div class="spec-card">
-            <div class="spec-k">Design Language</div>
-            <div class="spec-v">Warm Claymorphism (24px-32px Radius)</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-k">Accent Palette</div>
-            <div class="spec-v">Matcha / Sage Green (#C5D89D)</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-k">Frontend Framework</div>
-            <div class="spec-v">Next.js 15 & React 19</div>
-          </div>
-          <div class="spec-card">
-            <div class="spec-k">Canvas & Camera</div>
-            <div class="spec-v">HTML5 Canvas & WebRTC Stream</div>
+          <div class="clay-card" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px 18px;">
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">CAPTURE PIPELINE</div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--accent-deep); margin-top: 2px;">WebRTC 1080p</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Low-Latency Stream</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">DESIGN SYSTEM</div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">Warm Clay</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">24px/32px Radius</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">OUTPUT RENDER</div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin-top: 2px;">300 DPI Strip</div>
+              <div style="font-size: 11px; color: var(--text-secondary);">Thermal Photo Print</div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="visual-stage">
-        <img src="${images.kioskHomeDesktop}" class="screenshot-desktop" alt="VelvetSnap Kiosk Cover">
-      </div>
-    </div>
-
-    <div class="slide-footer">
-      <span class="footer-tech">Next.js 15 + React 19 + HTML5 Canvas + WebRTC + Tailwind CSS</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
-    </div>
-  </section>
-
-  <!-- SLIDE 2: ARSITEKTUR & CLAYMORPHISM -->
-  <section class="slide">
-    <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">ARCHITECTURE</span>
-        <span class="slide-section-title">Fondasi Sistem & Desain Kiosk Claymorphism</span>
-      </div>
-      <div class="slide-number">02 / 10</div>
-    </div>
-
-    <div class="headline-group" style="margin-bottom: 8px;">
-      <h2 class="slide-title">Arsitektur Kiosk & Alur Foto Tanpa Hambatan</h2>
-      <p class="slide-desc">Desain antarmuka sentuh ramah pengguna dengan transisi tahap pemotretan otomatis dan isolasi pemrosesan citra kanvas di sisi klien.</p>
-    </div>
-
-    <div class="arch-grid">
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--accent-deep);">Alur Kiosk Mandiri (Self-Service)</div>
-        <div class="arch-item"><strong>Transisi Tahap Terpandu:</strong> Alur sekuensial mulai dari pemilihan bingkai, countdown pengambilan pose, hingga editor stiker.</div>
-        <div class="arch-item"><strong>Interaksi Layar Sentuh Bersih:</strong> Tombol besar dengan sudut membulat 24px untuk navigasi mudah pengguna segala usia.</div>
-        <div class="arch-item"><strong>Reset Sesi Otomatis:</strong> Timer reset pembersihan sesi aktif bila pengguna meninggalkan booth tanpa menyelesaikan transaksi.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: #4A6B34;">Engine Kamera & Editor Kanvas</div>
-        <div class="arch-item"><strong>WebRTC Video Feed:</strong> Pengambilan gambar resolusi penuh langsung dari hardware webcam studio dengan zero buffering.</div>
-        <div class="arch-item"><strong>Komposisi Kanvas 2D:</strong> Penggabungan foto, filter warna (B&W, Warm, Sepia), dan stiker dekoratif pada satu buffer gambar.</div>
-        <div class="arch-item"><strong>Render Ekspor Cepat:</strong> Kompresi hasil strip foto menjadi format JPEG berkualitas tinggi untuk cetak dan unduhan QR.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: #6366F1;">Integrasi Pembayaran & Admin</div>
-        <div class="arch-item"><strong>Gateway QRIS Dinamis:</strong> Pembuatan kode QR pembayaran unik per sesi foto dengan deteksi verifikasi pelunasan instan.</div>
-        <div class="arch-item"><strong>Studio Editor Template:</strong> Panel admin untuk mendesain layout strip bingkai, rasio aspek, dan posisi slot foto baru.</div>
-        <div class="arch-item"><strong>Monitoring Perangkat Kiosk:</strong> Dashboard pemantauan status koneksi kamera dan kertas printer kasir dari jarak jauh.</div>
+        <div class="visual-stage">
+          <img src="${images.kioskHomeDesktop}" alt="VelvetSnap Kiosk Home Desktop">
+        </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">VelvetSnap Architecture Blueprint</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
+      <div>VELVETSNAP &bull; PHOTOBOX KIOSK PLATFORM</div>
+      <div>WIDI FIRMANSYAH &bull; LEAD ENGINEER</div>
+      <div>01 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 3: KIOSK HOME -->
-  <section class="slide">
+  <!-- SLIDE 2: HARDWARE & SOFTWARE INTEGRATION GOALS -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">KIOSK HOME</span>
-        <span class="slide-section-title">Layar Selamat Datang & Pemilihan Paket</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">System Architecture</div>
+        <div class="brand-subtitle">Hardware &amp; Software Co-Design</div>
       </div>
-      <div class="slide-number">03 / 10</div>
+      <div class="badge-pill">DECK-VELVET-02 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Beranda Booth & Pemilihan Frame</h2>
-          <p class="slide-desc">Pintu masuk booth foto dengan pilihan format strip cetak (Classic Strip, Wide Grid, Polaroid) dan panduan langkah pemotretan.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Core Engineering Rationale</div>
+        <h2 class="slide-title">Reliable Unattended Operations &amp; Studio Automation</h2>
+        <p class="slide-subtitle">Bridging physical camera peripherals, lighting relays, and thermal dye-sub printers with web standards.</p>
+      </div>
+
+      <div class="layout-grid-3">
+        <div class="clay-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-deep); font-weight: 700; margin-bottom: 8px;">01 &bull; KIOSK RELIABILITY</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Zero-Staff Autonomy</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Commercial mall photobooths operate continuously without attendant supervision, requiring automatic error recovery and state resets between sessions.
+          </p>
+        </div>
+
+        <div class="clay-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-deep); font-weight: 700; margin-bottom: 8px;">02 &bull; WEBRTC CAPTURE</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Sub-16ms Viewfinder</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Direct navigator.mediaDevices hardware binding delivers 60 FPS uncompressed mirror previews with zero noticeable lag during countdown poses.
+          </p>
+        </div>
+
+        <div class="clay-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-deep); font-weight: 700; margin-bottom: 8px;">03 &bull; CLAY ERGONOMICS</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Soothing Studio Aesthetics</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Gentle Matcha Green accents and soft clay elevation create a welcoming, photogenic studio booth atmosphere that enhances customer comfort.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>VELVETSNAP &bull; HARDWARE INTEGRATION</div>
+      <div>STANDARDIZED KIOSK ARCHITECTURE</div>
+      <div>02 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: KIOSK HOME STAGE & ONBOARDING -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Guest Onboarding</div>
+        <div class="brand-subtitle">Kiosk Home &amp; Package Selector</div>
+      </div>
+      <div class="badge-pill">DECK-VELVET-03 / 10</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Self-Service Workflow</div>
+        <h2 class="slide-title">Intuitive Start Screen &amp; Photo Frame Selection</h2>
+        <p class="slide-subtitle">Engaging welcome interface introducing photo layout options (Classic Strip 2x3, Wide Card, Collage) with zero friction.</p>
+      </div>
+
+      <div class="layout-split">
+        <div class="visual-stage">
+          <img src="${images.kioskHomeMobile}" alt="VelvetSnap Kiosk Home Mobile View">
         </div>
 
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Pilihan Format Strip Visual</div>
-            <div class="feature-card-text">Kartu pilihan layout foto dengan pratinjau proporsional yang memudahkan pelanggan menentukan gaya strip.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Touch-Anywhere Session Ignition</div>
+            <div class="feature-box-desc">
+              High-visibility CTA button and whole-screen touch detection awaken the kiosk from sleep mode and prime camera lighting relays instantly.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Interaksi Sentuh Satu-Ketukan</div>
-            <div class="feature-card-text">Tombol mulai berukuran luas yang langsung menginisialisasi kamera dan menyiapkan sesi pemotretan.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Visual Frame Format Comparison</div>
+            <div class="feature-box-desc">
+              Curated showcase of 2-strip bookmark layouts versus single 4R cards with transparent pricing and print duration estimates.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Palet Hangat Kiosk Studio</div>
-            <div class="feature-card-text">Dominasi warna putih dan aksen matcha green yang memberikan suasana ramah, santai, dan estetik.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">1-Tap</div>
-            <div class="metric-lbl">Session Start</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">24px</div>
-            <div class="metric-lbl">Clay Radius</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Multi-Frame</div>
-            <div class="metric-lbl">Template Styles</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Multi-Language Accessibility (ID / EN)</div>
+            <div class="feature-box-desc">
+              Instant bilingual toggle ensuring seamless guidance for local mall visitors and international tourists alike.
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.kioskHomeDesktop}" class="screenshot-desktop" alt="Kiosk Home Desktop">
-        <img src="${images.kioskHomeMobile}" class="screenshot-mobile" alt="Kiosk Home Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">View: src/app/page.tsx</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
+      <div>VELVETSNAP &bull; GUEST ONBOARDING</div>
+      <div>TOUCH-FIRST INTERACTION</div>
+      <div>03 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 4: VIEWFINDER KAMERA -->
-  <section class="slide">
+  <!-- SLIDE 4: CAMERA VIEWFINDER & COUNTDOWN -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">CAMERA FEED</span>
-        <span class="slide-section-title">Viewfinder Kamera & Timer Countdown</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Capture Engine</div>
+        <div class="brand-subtitle">WebRTC Viewfinder &amp; Timed Shutter</div>
       </div>
-      <div class="slide-number">04 / 10</div>
+      <div class="badge-pill">DECK-VELVET-04 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Jendela Kamera & Pengambilan Pose</h2>
-          <p class="slide-desc">Layar tangkapan kamera langsung dengan indikator hitung mundur (countdown 3-2-1), flash simulasi layar, dan thumbnail foto terambil.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Camera Pipeline</div>
+        <h2 class="slide-title">Real-Time Camera Viewfinder &amp; Burst Capture Loop</h2>
+        <p class="slide-subtitle">High-framerate video preview with countdown animations, flash strobe synchronization, and automated snapshot buffering.</p>
+      </div>
+
+      <div class="layout-split-reversed">
+        <div class="feature-list">
+          <div class="feature-box">
+            <div class="feature-box-title">Animated 5-Second Circular Shutter Timer</div>
+            <div class="feature-box-desc">
+              Prominent visual and audio countdown cues guide guests into position, ending with a screen-strobe flash animation on exposure.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">Multi-Shot Buffer Queue (4 to 8 Frames)</div>
+            <div class="feature-box-desc">
+              Automated sequence capturing consecutive candidate photos stored as high-resolution ImageBitmap objects directly in memory.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">Mirror Mode Flip &amp; Grid Guide Overlays</div>
+            <div class="feature-box-desc">
+              Natural horizontal mirror flip and subtle rule-of-thirds alignment lines assist guests in centering group compositions.
+            </div>
+          </div>
+        </div>
+
+        <div class="visual-stage">
+          <img src="${images.viewfinderDesktop}" alt="VelvetSnap Camera Viewfinder Desktop">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>VELVETSNAP &bull; CAPTURE PIPELINE</div>
+      <div>WEBRTC SHUTTER ENGINE</div>
+      <div>04 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: CANVAS EDITOR & STRIP COMPOSITING -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Creative Studio</div>
+        <div class="brand-subtitle">HTML5 Canvas Editor &amp; Strip Compositor</div>
+      </div>
+      <div class="badge-pill">DECK-VELVET-05 / 10</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Canvas Manipulation</div>
+        <h2 class="slide-title">Creative Customization Studio with Instant Compositing</h2>
+        <p class="slide-subtitle">Interactive drag-and-drop editor allowing guests to apply frames, decorative stickers, date stamps, and color filters.</p>
+      </div>
+
+      <div class="layout-split">
+        <div class="visual-stage">
+          <img src="${images.canvasDesktop}" alt="VelvetSnap Canvas Editor Desktop">
         </div>
 
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Aliran Video WebRTC Latensi Nol</div>
-            <div class="feature-card-text">Tampilan viewfinder tajam tanpa jeda frame sehingga pelanggan dapat menyesuaikan pose dengan percaya diri.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Layer-Based HTML5 Canvas Compositor</div>
+            <div class="feature-box-desc">
+              Multi-layer rendering engine cleanly stacks background frames, photo bitmaps, custom stickers, and typographic watermarks in real time.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Hitung Mundur Otomatis</div>
-            <div class="feature-card-text">Animasi angka countdown besar yang diiringi efek flash putih saat rana kamera mengambil jepretan.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Filter Presets (B&amp;W, Vintage Warm, Matcha Glow)</div>
+            <div class="feature-box-desc">
+              GPU-accelerated CSS and Canvas pixel shaders instantly transform color grading across all strip cells with zero delay.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Strip Pratinjau Pose Terkini</div>
-            <div class="feature-card-text">Thumbnail foto yang telah diambil langsung terisi di panel samping untuk memantau sisa pose foto.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">60 FPS</div>
-            <div class="metric-lbl">Viewfinder Feed</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">3s</div>
-            <div class="metric-lbl">Countdown Timer</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Auto-Snap</div>
-            <div class="metric-lbl">Multi Pose</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Interactive Sticker Manipulation</div>
+            <div class="feature-box-desc">
+              Touch-friendly gesture controls for scaling, rotating, and positioning decorative elements with intuitive undo/redo history.
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.viewfinderDesktop}" class="screenshot-desktop" alt="Viewfinder Desktop">
-        <img src="${images.viewfinderMobile}" class="screenshot-mobile" alt="Viewfinder Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">Engine: WebRTC MediaDevices & Video Stream</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
+      <div>VELVETSNAP &bull; CREATIVE CANVAS</div>
+      <div>HTML5 STRIP COMPOSITING</div>
+      <div>05 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 5: KANVAS EDITOR -->
-  <section class="slide">
+  <!-- SLIDE 6: QRIS PAYMENT GATEWAY WORKFLOW -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">CANVAS STUDIO</span>
-        <span class="slide-section-title">Editor Kanvas & Kustomisasi Stiker</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Payment Architecture</div>
+        <div class="brand-subtitle">Dynamic QRIS Gateway &amp; Webhook Polling</div>
       </div>
-      <div class="slide-number">05 / 10</div>
+      <div class="badge-pill">DECK-VELVET-06 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Editor Kanvas & Stiker Dekoratif</h2>
-          <p class="slide-desc">Panggung kustomisasi foto dengan pilihan filter warna (Retro, Warm, B&W), pemilihan palet warna bingkai, dan penempelan stiker.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Transaction Processing</div>
+        <h2 class="slide-title">Cashless QRIS Payment &amp; Real-Time Settlement</h2>
+        <p class="slide-subtitle">Seamless integration with Indonesian standard QRIS payment networks for instant verification and automatic print dispatch.</p>
+      </div>
+
+      <div class="layout-split-reversed">
+        <div class="feature-list">
+          <div class="feature-box">
+            <div class="feature-box-title">Dynamic Dynamic-QR Generation</div>
+            <div class="feature-box-desc">
+              Generates unique transaction QR codes encoding exact order totals to prevent under/over-payment errors from customers.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">High-Frequency Webhook &amp; Polling Loop</div>
+            <div class="feature-box-desc">
+              2-second polling interval and server-sent event verification confirm incoming payments from GoPay, OVO, Dana, and BCA in seconds.
+            </div>
+          </div>
+          <div class="feature-box">
+            <div class="feature-box-title">Automated Session Timeout &amp; Refund Safety</div>
+            <div class="feature-box-desc">
+              5-minute idle countdown automatically voids uncompleted invoices, releasing camera resources and returning the kiosk to Home.
+            </div>
+          </div>
+        </div>
+
+        <div class="visual-stage">
+          <img src="${images.paymentDesktop}" alt="VelvetSnap Payment QRIS Desktop">
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>VELVETSNAP &bull; PAYMENT PIPELINE</div>
+      <div>QRIS SETTLEMENT ENGINE</div>
+      <div>06 / 10</div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: DUAL OUTPUT: THERMAL PRINT & CLOUD QR -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Output Delivery</div>
+        <div class="brand-subtitle">300 DPI Thermal Print &amp; Cloud Asset QR</div>
+      </div>
+      <div class="badge-pill">DECK-VELVET-07 / 10</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Media Fulfillment</div>
+        <h2 class="slide-title">Physical Dye-Sub Print &amp; Instant Cloud QR Retrieval</h2>
+        <p class="slide-subtitle">Dual-delivery architecture producing high-gloss keepsake photo strips and instant mobile digital downloads via Cloudflare R2.</p>
+      </div>
+
+      <div class="layout-split">
+        <div class="visual-stage">
+          <img src="${images.resultDesktop}" alt="VelvetSnap Result &amp; QR Download Desktop">
         </div>
 
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Manipulasi Kanvas Interaktif</div>
-            <div class="feature-card-text">Stiker dapat digeser, diputar, dan diubah skalanya langsung di atas foto menggunakan gestur sentuh.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">300 DPI Print Pipeline Spooler</div>
+            <div class="feature-box-desc">
+              High-resolution canvas buffer sent to native ESC/POS dye-sublimation print spoolers, executing 15-second physical strip cuts.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Preset Filter Warna Foto</div>
-            <div class="feature-card-text">Pengaplikasian filter estetik pada seluruh rangkaian foto dengan pemrosesan piksel kanvas berkecepatan tinggi.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Cloud Download QR with Auto-Expiry</div>
+            <div class="feature-box-desc">
+              Printed and on-screen QR codes lead guests to a secure cloud page hosting digital PNGs and behind-the-scenes animated GIFs.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Koleksi Stiker Lucu & Frame</div>
-            <div class="feature-card-text">Pustaka aset dekorasi yang tersusun dalam laci bawah sentuh yang ramah navigasi jari.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">Canvas 2D</div>
-            <div class="metric-lbl">Pixel Engine</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Realtime</div>
-            <div class="metric-lbl">Sticker Drag</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Color Tint</div>
-            <div class="metric-lbl">Frame Selector</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Privacy-Centric 7-Day Asset Retention</div>
+            <div class="feature-box-desc">
+              Automated lifecycle bucket policies purge guest photographs after 7 days, maintaining customer privacy and cloud storage hygiene.
+            </div>
           </div>
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.canvasDesktop}" class="screenshot-desktop" alt="Canvas Editor Desktop">
-        <img src="${images.canvasMobile}" class="screenshot-mobile" alt="Canvas Editor Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">Engine: HTML5 Canvas 2D Context & Drag Handler</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
+      <div>VELVETSNAP &bull; MEDIA FULFILLMENT</div>
+      <div>DYE-SUB &amp; CLOUD STORAGE</div>
+      <div>07 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 6: PEMBAYARAN QRIS -->
-  <section class="slide">
+  <!-- SLIDE 8: ADMIN STUDIO TELEMETRY & DEVICE HEALTH -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">PAYMENT GATEWAY</span>
-        <span class="slide-section-title">Integrasi Pembayaran QRIS Dinamis</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Operations Console</div>
+        <div class="brand-subtitle">Admin Studio &amp; Hardware Telemetry</div>
       </div>
-      <div class="slide-number">06 / 10</div>
+      <div class="badge-pill">DECK-VELVET-08 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Pembayaran QRIS & Verifikasi Cepat</h2>
-          <p class="slide-desc">Penyajian kode QRIS nasional untuk transaksi non-tunai dengan batas waktu kadaluarsa (countdown) dan deteksi pelunasan otomatis.</p>
-        </div>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Remote Device Monitoring</div>
+        <h2 class="slide-title">Centralized Studio Administration &amp; Hardware Health</h2>
+        <p class="slide-subtitle">Real-time status monitoring for printer ribbon capacity, paper rolls, camera connectivity, and daily revenue metrics.</p>
+      </div>
 
+      <div class="layout-split-reversed">
         <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Kode QRIS Dinamis Otomatis</div>
-            <div class="feature-card-text">Nominal tarif foto terkunci langsung di dalam barcode QRIS sehingga pelanggan tidak perlu input harga manual.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Consumables Telemetry (Ribbon &amp; Paper Rolls)</div>
+            <div class="feature-box-desc">
+              Exact paper count tracker alerts operators before rolls run out, preventing customer dissatisfaction and aborted printing cycles.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Polling Status Pembayaran Instan</div>
-            <div class="feature-card-text">Sistem memverifikasi status pembayaran secara real-time dan langsung membuka tahap cetak setelah lunas.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Camera &amp; Lighting Peripheral Health Heartbeat</div>
+            <div class="feature-box-desc">
+              Continuous ping verification monitoring USB camera disconnects and studio LED driver failures with automated alert dispatch.
+            </div>
           </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Instruksi Pembayaran Ramah</div>
-            <div class="feature-card-text">Petunjuk pembayaran yang mendukung seluruh aplikasi e-wallet dan mobile banking berstandar QRIS.</div>
+          <div class="feature-box">
+            <div class="feature-box-title">Remote Maintenance &amp; Kiosk Reboot Controls</div>
+            <div class="feature-box-desc">
+              Password-protected admin interface allowing managers to clear queues, recalibrate camera exposure, or reboot the kiosk safely.
+            </div>
           </div>
         </div>
 
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">QRIS</div>
-            <div class="metric-lbl">Dynamic Code</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Auto-Poll</div>
-            <div class="metric-lbl">Payment Status</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Zero Cash</div>
-            <div class="metric-lbl">Cashless Kiosk</div>
-          </div>
+        <div class="visual-stage">
+          <img src="${images.adminDevicesDesktop}" alt="VelvetSnap Admin Devices Telemetry Desktop">
         </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.paymentDesktop}" class="screenshot-desktop" alt="Payment QRIS Desktop">
-        <img src="${images.paymentMobile}" class="screenshot-mobile" alt="Payment QRIS Mobile">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">Integration: QRIS Dynamic Payment Gateway API</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
+      <div>VELVETSNAP &bull; ADMIN TELEMETRY</div>
+      <div>DEVICE HEALTH MONITORING</div>
+      <div>08 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 7: HASIL FOTO & QR CODE -->
-  <section class="slide">
+  <!-- SLIDE 9: WEB PERFORMANCE & MEMORY ISOLATION -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">RESULT & QR</span>
-        <span class="slide-section-title">Hasil Cetak Fisik & Unduhan Digital</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Performance Engineering</div>
+        <div class="brand-subtitle">OffscreenCanvas &amp; Memory Hygiene</div>
       </div>
-      <div class="slide-number">07 / 10</div>
+      <div class="badge-pill">DECK-VELVET-09 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Hasil Akhir & Pengunduhan Digital</h2>
-          <p class="slide-desc">Penyelesaian sesi foto dengan pemicuan pencetakan kertas strip dan kode QR khusus bagi pelanggan untuk mengunduh softcopy foto dan video timelapse.</p>
-        </div>
-
-        <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Pencetakan Kertas Strip Otomatis</div>
-            <div class="feature-card-text">Pengiriman data cetak resolusi tinggi langsung ke antrian printer foto tanpa intervensi operator kasir.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Unduhan Softcopy via QR Code</div>
-            <div class="feature-card-text">Pelanggan cukup memindai QR code di layar menggunakan kamera smartphone untuk menyimpan berkas foto asli.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Kompilasi Video Live Photo / Boomerang</div>
-            <div class="feature-card-text">Penggabungan klip video pendek saat pose diambil menjadi kenang-kenangan animasi bergerak.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">Dual Output</div>
-            <div class="metric-lbl">Print & Softcopy</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Cloud QR</div>
-            <div class="metric-lbl">Instant Download</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Auto Clear</div>
-            <div class="metric-lbl">Session End</div>
-          </div>
-        </div>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Kiosk Stability</div>
+        <h2 class="slide-title">24/7 Memory Hygiene &amp; Offscreen Compositing</h2>
+        <p class="slide-subtitle">Preventing browser tab crashes and memory leaks across thousands of daily image capture and export cycles.</p>
       </div>
 
-      <div class="visual-stage">
-        <img src="${images.resultDesktop}" class="screenshot-desktop" alt="Result & QR Desktop">
-        <img src="${images.resultMobile}" class="screenshot-mobile" alt="Result & QR Mobile">
+      <div class="layout-grid-3">
+        <div class="clay-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-deep); font-weight: 700; margin-bottom: 8px;">GARBAGE COLLECTION</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Bitmap Memory Cleanup</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Explicit imageBitmap.close() calls and canvas context resets after print export prevent V8 heap bloat during marathon 24-hour mall operation.
+          </p>
+        </div>
+
+        <div class="clay-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-deep); font-weight: 700; margin-bottom: 8px;">RENDER EFFICIENCY</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">OffscreenCanvas Worker</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            High-resolution 300 DPI image rendering executed inside dedicated Web Workers keeps the primary UI thread silky smooth and responsive.
+          </p>
+        </div>
+
+        <div class="clay-card">
+          <div style="font-family: var(--font-mono); font-size: 11px; color: var(--accent-deep); font-weight: 700; margin-bottom: 8px;">CORE WEB VITALS</div>
+          <h3 style="font-size: 16px; font-weight: 700; margin-bottom: 8px;">Zero Layout Shift (CLS)</h3>
+          <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5;">
+            Absolute container bounding boxes across camera viewports and canvas toolbars maintain rock-solid visual stability (CLS 0.000).
+          </p>
+        </div>
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">Engine: Print Dispatcher & Cloud Asset Storage</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
+      <div>VELVETSNAP &bull; PERFORMANCE AUDIT</div>
+      <div>CORE WEB VITALS BENCHMARKS</div>
+      <div>09 / 10</div>
     </div>
-  </section>
+  </div>
 
-  <!-- SLIDE 8: TEMPLATE STUDIO ADMIN -->
-  <section class="slide">
+  <!-- SLIDE 10: ARCHITECTURAL SUMMARY & DEPLOYMENT -->
+  <div class="slide">
     <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">STUDIO CMS</span>
-        <span class="slide-section-title">Editor Template Bingkai Studio</span>
+      <div class="brand-pill">
+        <div class="brand-dot"></div>
+        <div class="brand-title">Milestone Summary</div>
+        <div class="brand-subtitle">Production Specifications &amp; Quality Audit</div>
       </div>
-      <div class="slide-number">08 / 10</div>
+      <div class="badge-pill">DECK-VELVET-10 / 10</div>
     </div>
 
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Studio Desain Template Bingkai</h2>
-          <p class="slide-desc">Panel editor visual bagi pemilik studio untuk mengunggah bingkai kustom, mengatur posisi slot foto, dan mempublikasikan tema musiman.</p>
+    <div class="slide-content">
+      <div class="title-banner">
+        <div class="slide-category">Production Readiness</div>
+        <h2 class="slide-title">Comprehensive Project Implementation Summary</h2>
+        <p class="slide-subtitle">A state-of-the-art commercial photobox platform combining warm minimal aesthetics with industrial hardware reliability.</p>
+      </div>
+
+      <div class="layout-grid-4">
+        <div class="clay-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">FRAMEWORK</div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--accent-deep); margin-top: 4px; margin-bottom: 4px;">Next.js 14</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">App Router architecture running in full kiosk Electron wrapper.</p>
         </div>
 
-        <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Editor Drag & Drop Slot Foto</div>
-            <div class="feature-card-text">Pengaturan koordinat posisi foto, rotasi bingkai, dan urutan slot cetak dengan antarmuka kanvas presisi.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Manajemen Aset Stiker & Tema</div>
-            <div class="feature-card-text">Pengelompokan stiker berdasarkan tema event (Valentine, Wisuda, Ulang Tahun, Liburan Musim Panas).</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Publikasi Template ke Seluruh Kiosk</div>
-            <div class="feature-card-text">Satu klik untuk menyebarkan desain bingkai baru ke seluruh mesin photobox yang tersebar di berbagai cabang.</div>
-          </div>
+        <div class="clay-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">DESIGN SYSTEM</div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-top: 4px; margin-bottom: 4px;">Warm Clay</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">Matcha Green accents, 24px-32px radius, and soothing elevation.</p>
         </div>
 
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">Visual</div>
-            <div class="metric-lbl">Frame Builder</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Multi-Slot</div>
-            <div class="metric-lbl">Layer Manager</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Live Sync</div>
-            <div class="metric-lbl">Kiosk Fleet</div>
-          </div>
+        <div class="clay-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">PRINTING</div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--accent-deep); margin-top: 4px; margin-bottom: 4px;">Dye-Sub 300DPI</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">Hardware print spooler integration with cloud QR mirrors.</p>
+        </div>
+
+        <div class="clay-card">
+          <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">STATUS</div>
+          <div style="font-size: 18px; font-weight: 800; color: #16A34A; margin-top: 4px; margin-bottom: 4px;">Production</div>
+          <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.45;">Operating reliably in commercial retail mall installations.</p>
         </div>
       </div>
 
-      <div class="visual-stage">
-        <img src="${images.adminStudioDesktop}" class="screenshot-desktop" alt="Admin Template Studio">
+      <div class="visual-stage" style="min-height: 160px; max-height: 180px; margin-top: 15px;">
+        <img src="${images.adminStudioDesktop}" alt="VelvetSnap Admin Studio Desktop">
       </div>
     </div>
 
     <div class="slide-footer">
-      <span class="footer-tech">View: src/app/admin/template-studio/page.tsx</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
+      <div>VELVETSNAP &bull; PROJECT COMPLETION</div>
+      <div>WIDI FIRMANSYAH &bull; LEAD ENGINEER</div>
+      <div>10 / 10</div>
     </div>
-  </section>
-
-  <!-- SLIDE 9: MONITORING PERANGKAT KIOSK -->
-  <section class="slide">
-    <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">FLEET ADMIN</span>
-        <span class="slide-section-title">Manajemen Status Perangkat Kiosk</span>
-      </div>
-      <div class="slide-number">09 / 10</div>
-    </div>
-
-    <div class="slide-body">
-      <div class="slide-info">
-        <div class="headline-group">
-          <h2 class="slide-title">Monitoring Kesehatan Perangkat Booth</h2>
-          <p class="slide-desc">Dashboard kontrol armada kiosk untuk memantau status hardware kamera, sisa kuota kertas cetak, dan riwayat transaksi harian.</p>
-        </div>
-
-        <div class="feature-list">
-          <div class="feature-card">
-            <div class="feature-card-title">Pemeriksaan Status Hardware Realtime</div>
-            <div class="feature-card-text">Indikator konektivitas kamera studio, responsivitas printer struk, dan kestabilan jaringan internet booth.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Peringatan Kertas Cetak Menipis</div>
-            <div class="feature-card-text">Notifikasi otomatis bila kapasitas kertas foto printer mendekati ambang batas isi ulang staf.</div>
-          </div>
-          <div class="feature-card">
-            <div class="feature-card-title">Statistik Penjualan & Jam Sibuk</div>
-            <div class="feature-card-text">Rekapitulasi volume transaksi harian untuk mengevaluasi efektivitas penempatan lokasi photobox.</div>
-          </div>
-        </div>
-
-        <div class="metrics-row">
-          <div class="metric-box">
-            <div class="metric-val">24/7</div>
-            <div class="metric-lbl">Device Heartbeat</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Paper Gauge</div>
-            <div class="metric-lbl">Printer Monitor</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-val">Fleet View</div>
-            <div class="metric-lbl">Multi Booth</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="visual-stage">
-        <img src="${images.adminDevicesDesktop}" class="screenshot-desktop" alt="Admin Devices Fleet">
-      </div>
-    </div>
-
-    <div class="slide-footer">
-      <span class="footer-tech">View: src/app/admin/devices/page.tsx</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
-    </div>
-  </section>
-
-  <!-- SLIDE 10: SPESIFIKASI PRODUKSI -->
-  <section class="slide">
-    <div class="slide-header">
-      <div class="brand-cluster">
-        <span class="brand-badge">SPECIFICATION</span>
-        <span class="slide-section-title">Ringkasan Spesifikasi & Kesiapan Produksi</span>
-      </div>
-      <div class="slide-number">10 / 10</div>
-    </div>
-
-    <div class="headline-group" style="margin-bottom: 8px;">
-      <h2 class="slide-title">Spesifikasi Teknis & Kesiapan Operasional</h2>
-      <p class="slide-desc">Ringkasan performa Next.js 15, kepatuhan keamanan transaksi, dan kehandalan operasional mandiri photobox di pusat perbelanjaan.</p>
-    </div>
-
-    <div class="arch-grid">
-      <div class="arch-card">
-        <div class="arch-title" style="color: var(--accent-deep);">Performa & Efisiensi Kanvas</div>
-        <div class="arch-item"><strong>Lighthouse Score:</strong> 97+ pada Best Practices, Accessibility, dan Performance.</div>
-        <div class="arch-item"><strong>Render Gambar 4K:</strong> Penggabungan strip kanvas beresolusi tinggi dalam waktu kurang dari 800ms.</div>
-        <div class="arch-item"><strong>Pembersihan Memori Otomatis:</strong> Penghapusan URL Blob lokal setelah ekspor selesai untuk mencegah memori bocor.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: #4A6B34;">Keamanan & Integritas Kiosk</div>
-        <div class="arch-item"><strong>Mode Kiosk Terkunci:</strong> Perlindungan antarmuka browser layar penuh dari penutupan jendela oleh pengunjung umum.</div>
-        <div class="arch-item"><strong>Privasi Foto Pelanggan:</strong> Penghapusan berkas foto sementara secara berkala sesuai kebijakan retensi privasi pengguna.</div>
-        <div class="arch-item"><strong>Verifikasi Webhook QRIS:</strong> Tanda tangan kriptografis untuk memvalidasi pembayaran sebelum pencetakan dipicu.</div>
-      </div>
-
-      <div class="arch-card">
-        <div class="arch-title" style="color: #6366F1;">Infrastruktur & Deployment</div>
-        <div class="arch-item"><strong>Next.js 15 App Router:</strong> Server-side rendering untuk halaman manajemen dan client-side kustomisasi kanvas.</div>
-        <div class="arch-item"><strong>Kompatibilitas Hardware:</strong> Beroperasi lancar dengan webcam USB Logitech/Razer, monitor layar sentuh, dan DNP photo printer.</div>
-        <div class="arch-item"><strong>Operasional Mandiri:</strong> Ketersediaan tanpa henti dengan prosedur pemulihan otomatis jika aplikasi dimulai ulang.</div>
-      </div>
-    </div>
-
-    <div class="slide-footer">
-      <span class="footer-tech">VelvetSnap Production Specification Document</span>
-      <span class="footer-url">velvetsnap.widifirmaan.web.id</span>
-    </div>
-  </section>
+  </div>
 
 </body>
 </html>
@@ -984,11 +859,11 @@ const htmlContent = `<!DOCTYPE html>
 
 const htmlFilePath = path.join(projectRoot, 'presentation.html');
 fs.writeFileSync(htmlFilePath, htmlContent, 'utf-8');
-console.log(`HTML presentasi disimpan di: ${htmlFilePath}`);
+console.log(`Presentation HTML written to: ${htmlFilePath}`);
+
+console.log('Launching Chromium with Playwright to render English VelvetSnap PDFs...');
 
 async function renderPDF() {
-  console.log('Menjalankan Playwright Chromium untuk render PDF VelvetSnap Claymorphism...');
-  
   const playwrightPath = '/home/widifirmaan/Projects/qa-toolkit/node_modules/playwright/index.mjs';
   const { chromium } = await import(playwrightPath);
 
@@ -999,19 +874,22 @@ async function renderPDF() {
 
   const page = await browser.newPage();
   await page.goto(`file://${htmlFilePath}`, { waitUntil: 'networkidle' });
-  await page.evaluateHandle('document.fonts.ready');
+  await page.evaluate(() => document.fonts.ready);
 
   const slidePdfPath = path.join(downloadsDir, 'VelvetSnap.pdf');
+  const continuousPdfPath = path.join(downloadsDir, 'VelvetSnap-Continuous.pdf');
+
+  // 1. Multi-Page Deck Mode (10 Slides A4 Landscape)
   console.log('Rendering Multi-Page A4 Landscape (Slide Mode)...');
   await page.pdf({
     path: slidePdfPath,
-    width: '297mm',
-    height: '210mm',
+    format: 'A4',
+    landscape: true,
     printBackground: true,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
     preferCSSPageSize: true,
   });
 
+  // 2. Continuous Poster Mode (Single tall scroll)
   console.log('Rendering Continuous Single-Scroll Showcase (Poster Mode)...');
   await page.addStyleTag({
     content: `
@@ -1034,26 +912,25 @@ async function renderPDF() {
   await page.waitForTimeout(500);
 
   const scrollHeight = await page.evaluate(() => document.documentElement.scrollHeight);
-  const contPdfPath = path.join(downloadsDir, 'VelvetSnap-Continuous.pdf');
   await page.pdf({
-    path: contPdfPath,
+    path: continuousPdfPath,
     width: '1428px',
     height: `${scrollHeight}px`,
     printBackground: true,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 },
+    pageRanges: '1',
   });
 
   await browser.close();
 
   const slideStat = fs.statSync(slidePdfPath);
-  const contStat = fs.statSync(contPdfPath);
+  const contStat = fs.statSync(continuousPdfPath);
 
-  console.log('\nPDF VelvetSnap Claymorphism berhasil dibuat:');
+  console.log('\nVelvetSnap English PDFs successfully generated:');
   console.log(`- Multi-Page Deck: ${(slideStat.size / 1024 / 1024).toFixed(2)} MB (${slidePdfPath})`);
-  console.log(`- Continuous Poster: ${(contStat.size / 1024 / 1024).toFixed(2)} MB (${contPdfPath})\n`);
+  console.log(`- Continuous Poster: ${(contStat.size / 1024 / 1024).toFixed(2)} MB (${continuousPdfPath})\n`);
 }
 
 renderPDF().catch((err) => {
-  console.error('Gagal membuat PDF:', err);
+  console.error('Error rendering PDF:', err);
   process.exit(1);
 });
