@@ -78,7 +78,7 @@ async function capture() {
   console.log('\nAll raw screenshots captured!');
 
   console.log('\nGenerating MacBook Pro & iPhone 16 Pro mockups...');
-  const mockupScript = '/home/widifirmaan/Projects/readme-project/scripts/generate-mockups.mjs';
+  const mockupScript = '/home/widifirmaan/Projects/tools/readme-tools/scripts/generate-mockups.mjs';
   execSync(`node "${mockupScript}" --input "${rawDir}" --output "${screenshotsDir}"`, {
     stdio: 'inherit',
   });

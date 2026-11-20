@@ -41,7 +41,7 @@
 ## Fitur
 
 - **Dual Kiosk Themes**: Modern clean interface (`/v1`) and vintage editorial newspaper aesthetic (`/v2`) powered by paper textures, custom typography mastheads, and responsive scaling.
-- **Guided Customer Workflow**: Step-by-step state machine guiding guests through Template Selection, Simulated QRIS Payment, Viewfinder Capture, Photo Adjustment & Stickers, and Print/Download.
+- **Guided Customer Workflow**: Step-by-step state machine guiding guests through Template Selection, DOKU SNAP QRIS Payment (with testing/operator bypass support), Viewfinder Capture, Photo Adjustment & Stickers, and Print/Download.
 - **Webcam Hardware Bridge (`react-webcam`)**: Camera stream integration with configurable countdown timers (3s, 5s), automated burst capture sequences, flash animation transitions, and slot indicators.
 - **Automated Video Clip Recorder (`useClipRecorder`)**: In-browser background video recording capturing behind-the-scenes video memories during photo shoots.
 - **Multi-Layer Canvas Compositor (`react-konva`)**: High-resolution 2D canvas engine handling photo frame masking, aspect-ratio scaling, drag-and-drop sticker overlays, and composite strip rendering.
@@ -61,8 +61,9 @@
 | **Canvas & Compositing** | Konva `10.3.0`, React-Konva `19.2.4` | 2D canvas drawing engine for photo strip layout composition and sticker layers |
 | **Camera & Video** | React-Webcam `7.2.0` | MediaDevices API abstraction for webcam streaming and camera capture |
 | **AI / Machine Learning** | `@imgly/background-removal` `1.7.0` | Client-side neural network running via WebAssembly to remove backgrounds |
-| **Database** | SQLite 3 | Relational database for settings, templates, device status, and transaction history |
-| **API Server** | Local Router (`worker.js`) | Local endpoint router handling `/api/*` data operations |
+| **Database** | Cloudflare D1 (SQLite 3) | Relational database for settings, templates, device status, and transaction history |
+| **Media Storage** | Cloudinary API | Cloud storage for rendered photo strips, template graphics, and recorded video clips |
+| **API Server** | Serverless Edge Worker (`worker.js`) | Endpoint router handling `/api/*` data operations and DOKU SNAP QRIS payment workflows |
 | **Utilities & QR** | QRCode `1.5.4`, UUID `9.0.0`, Lucide React | QR ticket generation, transaction session identification, and SVG iconography |
 
 ## Tutorial Run Local & Setup
@@ -71,7 +72,7 @@
 
 - **Node.js**: Version `20.x` or `22.x`
 - **npm** or **pnpm**
-- **SQLite 3**: Native CLI (`sqlite3`)
+- Database: **No native database installation needed** (handled by Cloudflare D1 local simulation via Wrangler).
 
 ### 2. Environment Variables Setup
 
@@ -80,6 +81,14 @@ Create a `.env.local` file in the project root:
 ```env
 ADMIN_ROOT_PASSWORD=root
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Cloud Media Storage (Uploads for rendered photo strips and template assets)
+CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
+
+# Payment Gateway (Optional: leave empty to test with operator bypass button)
+DOKU_CLIENT_ID=
+DOKU_SECRET_KEY=
+DOKU_MERCHANT_ID=
 ```
 
 ### 3. Installation
@@ -187,11 +196,12 @@ CREATE TABLE IF NOT EXISTS devices (
 INSERT OR IGNORE INTO settings (id) VALUES ('root');
 ```
 
-Initialize the SQLite database schema and root administrator credentials:
+Initialize the Cloudflare D1 local database schema and root administrator credentials:
 
 ```bash
-# Initialize local SQLite schema
-sqlite3 local.db < schema.sql
+# Apply schema and seed demo records to local Cloudflare D1 via Wrangler
+npx wrangler d1 execute photobox-db --local --file=schema.sql
+npm run seed
 ```
 
 #### Pre-seeded Demo Credentials & Auth:
@@ -201,12 +211,17 @@ sqlite3 local.db < schema.sql
 
 ### 5. Running the Local Server
 
+VelvetSnap is packaged as a static export SPA (`output: 'export'`) with API persistence provided by `worker.js`:
+
 ```bash
-# Start Next.js development server
+# Option A: Start Next.js development server on port 3000 (Kiosk UI testing)
 npm run dev
+
+# Option B: Run fullstack locally with Cloudflare Worker & D1 simulation on port 8787
+npx wrangler dev
 ```
 
-Open [http://localhost:3000/v1](http://localhost:3000/v1) for the customer kiosk interface, or [http://localhost:3000/admin](http://localhost:3000/admin) for the management portal.
+Open [http://localhost:3000/v1](http://localhost:3000/v1) (or `http://localhost:8787/v1` under Wrangler) for the customer kiosk interface, or `/admin` for the management portal.
 
 ---
 
