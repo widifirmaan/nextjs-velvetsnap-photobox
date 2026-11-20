@@ -49,7 +49,7 @@
 - **Interactive Template Studio (`/admin/template-studio`)**: Visual strip designer for kiosk operators featuring draggable canvas layers, sticker catalogs, and geometric coordinate controls.
 - **Kiosk Hardware Health Monitor (`/admin/devices`)**: Hardware diagnostic panel verifying webcam feed availability, resolution profiles, and kiosk connection states.
 - **Admin Analytics Dashboard (`/admin`)**: Operations portal tracking session volume, daily/weekly revenue graphs, customer transaction history, and pricing rules.
-- **Mobile Digital Delivery & Download Portal (`/download`)**: On-screen QR ticket generation via `qrcode` allowing users to scan and download full-resolution digital strips and behind-the-scenes video clips directly to mobile devices via `/download?session=<id>`.
+- **Mobile Digital Delivery & Download Portal (`/download`)**: On-screen QR ticket generation via `qrcode` allowing users to scan and download full-resolution digital strips and behind-the-scenes video clips directly to mobile devices via `/download?id=<id>`.
 
 ---
 
