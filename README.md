@@ -42,7 +42,7 @@
 
 - **Dual Kiosk Themes**: Modern clean interface (`/v1`) and vintage editorial newspaper aesthetic (`/v2`) powered by paper textures, custom typography mastheads, and responsive scaling.
 - **Guided Customer Workflow**: Step-by-step state machine guiding guests through Template Selection, DOKU SNAP QRIS Payment (with testing/operator bypass support), Viewfinder Capture, Photo Adjustment & Stickers, and Print/Download.
-- **Webcam Hardware Bridge (`react-webcam`)**: Camera stream integration with configurable countdown timers (3s, 5s), automated burst capture sequences, flash animation transitions, and slot indicators.
+- **Webcam Hardware Bridge (`react-webcam`)**: Camera stream integration with an automated 3-second animated countdown timer, automated burst capture sequences, flash animation transitions, and slot indicators.
 - **Automated Video Clip Recorder (`useClipRecorder`)**: In-browser background video recording capturing behind-the-scenes video memories during photo shoots.
 - **Multi-Layer Canvas Compositor (`react-konva`)**: High-resolution 2D canvas engine handling photo frame masking, aspect-ratio scaling, drag-and-drop sticker overlays, and composite strip rendering.
 - **Client-Side Background Removal (WASM)**: Neural network background removal powered by `@imgly/background-removal` WebAssembly runtime executing directly in the browser without third-party servers.
