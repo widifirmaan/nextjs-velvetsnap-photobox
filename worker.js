@@ -11,6 +11,18 @@ function json(data, status = 200, extraHeaders = {}) {
     });
 }
 
+async function runBatch(db, stmts) {
+    if (!db || !Array.isArray(stmts) || stmts.length === 0) return [];
+    if (typeof db.batch === 'function') {
+        return await db.batch(stmts);
+    }
+    const results = [];
+    for (const stmt of stmts) {
+        results.push(await stmt.run());
+    }
+    return results;
+}
+
 function getEnv(env, key) {
     if (env && env[key] !== undefined && env[key] !== null) return env[key];
     return process.env[key] || '';
@@ -460,11 +472,10 @@ async function handleLogout(request, db, env) {
         const secure = request.url.startsWith('https://');
         const token = getAdminToken(request);
         if (token) {
-            const settings = await db.prepare('SELECT session FROM settings WHERE id = ?').bind('root').first();
-            if (settings && settings.session === token) {
-                await db.prepare('UPDATE settings SET session = ? WHERE id = ?').bind('', 'root').run();
-            }
-            await db.prepare('UPDATE accounts SET session = ? WHERE session = ?').bind('', token).run();
+            await runBatch(db, [
+                db.prepare('UPDATE settings SET session = ? WHERE id = ? AND session = ?').bind('', 'root', token),
+                db.prepare('UPDATE accounts SET session = ? WHERE session = ?').bind('', token),
+            ]);
         }
         const headers = { 'Content-Type': 'application/json', ...corsHeaders };
         headers['Set-Cookie'] = `admin_session=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0${secure ? '; Secure' : ''}`;
@@ -611,11 +622,15 @@ async function handleUpdateSettings(request, db, env) {
 
         if (!session.isRoot) return json({ success: false, error: 'Forbidden' }, 403);
 
+        const ALLOWED_SETTINGS_COLS = new Set([
+            'appName', 'appTagline', 'heroSubtitle', 'logo', 'cardSmallHtml',
+            'cardPromoHtml', 'slideshowImages', 'header', 'footer', 'system', 'uiTheme'
+        ]);
         const body = await request.json();
         const sets = [];
         const vals = [];
         for (const [key, val] of Object.entries(body)) {
-            if (['password', 'passwordSalt', 'session'].includes(key)) continue;
+            if (!ALLOWED_SETTINGS_COLS.has(key)) continue;
             let v = val;
             if (val !== null && typeof val === 'object') v = JSON.stringify(val);
             sets.push(`${key} = ?`);
@@ -694,7 +709,7 @@ async function handleGetTemplateThumbnails(request, db, env) {
         const templates = await db.prepare(query).bind(...params).all();
         const data = (templates.results || []).map(normalizeTemplate);
         if (id && data.length === 0) return json({ success: false, error: 'Template not found' }, 404);
-        return json({ success: true, data }, id ? { 'Cache-Control': 'no-cache' } : {});
+        return json({ success: true, data }, 200, id ? { 'Cache-Control': 'no-cache' } : {});
     } catch (e) {
         return json({ success: false, error: e.message }, 500);
     }
@@ -887,7 +902,7 @@ async function handleCreateTransaction(request, db) {
         const { sessionId, templateId, price, status, captures, videos, finalImage, orderId, qrCodeUrl } = body;
         if (!sessionId) return json({ success: false, error: 'sessionId is required' }, 400);
 
-        const existing = await db.prepare('SELECT id FROM transactions WHERE sessionId = ?').bind(sessionId).first();
+        const existing = await db.prepare('SELECT id, status FROM transactions WHERE sessionId = ?').bind(sessionId).first();
         // Payment completion is only trusted from the Midtrans notification (server-verified).
         // The client may only self-declare PAID for explicit bypass orders, and must never
         // downgrade a transaction that the server has already marked as PAID.

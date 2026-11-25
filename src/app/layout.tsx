@@ -7,16 +7,33 @@ import { ModelProvider } from '@/lib/context/ModelContext';
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata: Metadata = {
-  title: 'VelvetSnap Co.',
-  description: 'Aesthetic photobooth web application',
-  manifest: '/manifest.json', // for PWA later
+  metadataBase: new URL('https://photo.widifirmaan.web.id'),
+  title: {
+    default: 'VelvetSnap - Web Photobooth Kiosk & Strip Studio',
+    template: '%s | VelvetSnap',
+  },
+  description: 'Self-service web photobooth kiosk with customizable photo strip frames, webcam capture, photo filters, and QR ticket downloads.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    url: 'https://photo.widifirmaan.web.id/',
+    siteName: 'VelvetSnap',
+    title: 'VelvetSnap - Web Photobooth Kiosk & Strip Studio',
+    description: 'Self-service web photobooth kiosk with customizable photo strip frames, webcam capture, photo filters, and QR ticket downloads.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'VelvetSnap - Web Photobooth Kiosk & Strip Studio',
+    description: 'Self-service web photobooth kiosk with customizable photo strip frames, webcam capture, photo filters, and QR ticket downloads.',
+  },
+  manifest: '/manifest.json',
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
 };
 
 export default function RootLayout({

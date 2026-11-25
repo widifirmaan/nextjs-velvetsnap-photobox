@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /download
+
+Sitemap: https://photo.widifirmaan.web.id/sitemap.xml
