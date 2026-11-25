@@ -160,7 +160,7 @@ function mapAccountSettings(account) {
             'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
             'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&q=80',
         ],
-        header: { location: s.header?.location || 'Jakarta', navItems: s.header?.navItems || '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]' },
+        header: { location: s.header?.location || 'Jakarta', navItems: s.header?.navItems || '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/?step=1"},{"label":"Studio","url":"/admin/template-studio"}]' },
         footer: { text: s.footer?.text || 'VelvetSnap Photobooth Platform' },
         system: { primaryColor: s.system?.primaryColor || '#262626', accentColor: s.system?.accentColor || '#C5D89D', showPreloader: s.system?.showPreloader ?? true, showStrips: s.system?.showStrips ?? true, slideshowInterval: s.system?.slideshowInterval || 3000, sessionTimer: s.system?.sessionTimer ?? 600 },
         uiTheme: s.uiTheme || 'v1',
@@ -289,7 +289,16 @@ async function uploadToCloudinary(env, dataUri, folder, publicId, resourceType =
     return result.secure_url;
 }
 
-async function isBase64(str) {
+function uint8ToBase64(bytes) {
+    let binary = '';
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+        binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+    }
+    return btoa(binary);
+}
+
+function isBase64(str) {
     return typeof str === 'string' && /^data:[\w\/-]+;/.test(str) && /;base64,/.test(str);
 }
 
@@ -299,97 +308,109 @@ async function urlToBase64(url) {
         if (!res.ok) return null;
         const buf = await res.arrayBuffer();
         const mime = res.headers.get('content-type') || 'image/png';
-        const base64 = btoa(String.fromCharCode(...new Uint8Array(buf)));
+        const base64 = uint8ToBase64(new Uint8Array(buf));
         return `data:${mime};base64,${base64}`;
     } catch { return null; }
 }
 
-export default {
-    async fetch(request, env, ctx) {
-        if (request.method === 'OPTIONS') {
-            return new Response(null, { headers: corsHeaders });
-        }
+export async function handleApiRequest(request, env) {
+    if (request.method === 'OPTIONS') {
+        return new Response(null, { status: 204, headers: corsHeaders });
+    }
 
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const db = env.PHOTOBOX_DB;
+
+    try { await ensureSchema(db); } catch (e) { console.error('ensureSchema error', e); }
+
+    if (path === '/api/ping') {
+        return json({ ok: true, service: 'velvetsnap-api', status: 'running', path });
+    }
+
+    if (path === '/api/admin/login' && request.method === 'POST') return handleLogin(request, db, env);
+    if (path === '/api/admin/login' && request.method === 'DELETE') return handleLogout(request, db, env);
+    if (path === '/api/admin/session' && request.method === 'GET') return handleSession(env, request);
+    if (path === '/api/admin/password' && request.method === 'PUT') return handleChangePassword(request, db, env);
+    if (path === '/api/admin/accounts') {
+        if (request.method === 'GET') return handleListAccounts(request, db, env);
+        if (request.method === 'POST') return handleCreateAccount(request, db, env);
+    }
+    if (path.match(/^\/api\/admin\/accounts\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteAccount(request, db, env);
+    if (path.match(/^\/api\/admin\/accounts\/[^\/]+$/) && request.method === 'PUT') return handleResetAccountPassword(request, db, env);
+
+    if (path === '/api/settings') {
+        if (request.method === 'GET') return handleGetSettings(request, db, env);
+        if (request.method === 'PUT') return handleUpdateSettings(request, db, env);
+    }
+
+    if (path === '/api/templates' && request.method === 'GET') return handleGetTemplates(request, db, env);
+    if (path === '/api/templates' && request.method === 'POST') return handleCreateTemplate(request, db, env);
+    if (path === '/api/templates/list' && request.method === 'GET') return handleGetTemplatesList(request, db, env);
+    if (path === '/api/templates/thumbnails' && request.method === 'GET') return handleGetTemplateThumbnails(request, db, env);
+    if (path === '/api/templates/reupload' && request.method === 'GET') return handleReuploadTemplates(request, db, env);
+
+    if (path.match(/^\/api\/templates\/[^\/]+$/) && request.method === 'PUT') return handleUpdateTemplate(request, db, env);
+    if (path.match(/^\/api\/templates\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteTemplate(request, db, env);
+
+    if (path === '/api/transactions' && request.method === 'POST') return handleCreateTransaction(request, db);
+    if (path === '/api/transactions' && request.method === 'GET') return handleListTransactions(request, db, env);
+    if (path === '/api/transactions' && request.method === 'DELETE') return handleDeleteTransaction(request, db, env);
+    if (path === '/api/transactions/strips' && request.method === 'GET') return handleGetStrips(request, db, env);
+    if (path === '/api/transactions/count' && request.method === 'GET') return handleGetTransactionCount(request, db, env);
+    if (path === '/api/transactions/migrate-images' && (request.method === 'GET' || request.method === 'POST')) return handleMigrateImages(request, db, env);
+
+    if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'GET') return handleGetTransaction(request, db, env);
+    if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'PATCH') return handlePatchTransaction(request, db, env);
+
+    if (path === '/api/midtrans/charge' && request.method === 'POST') return handleMidtransCharge(request, db, env);
+    if (path === '/api/midtrans/notification' && request.method === 'POST') return handleMidtransNotification(request, db, env);
+    if (path === '/api/midtrans/status' && request.method === 'GET') return handleMidtransStatus(request, db);
+
+    if (path === '/api/doku/charge' && request.method === 'POST') return handleDokuCharge(request, db, env);
+    if (path === '/api/doku/notification' && request.method === 'POST') return handleDokuNotification(request, db, env);
+    if (path === '/api/doku/status' && request.method === 'GET') return handleDokuStatus(request, db, env);
+    if (path === '/api/doku/qris/query' && request.method === 'GET') return handleDokuQrisQuery(request, db, env);
+
+    if (path === '/api/upload' && request.method === 'POST') return handleUpload(request, env);
+    if (path.startsWith('/api/uploads/') && request.method === 'GET') return handleServeLocalUpload(request, env);
+
+    if (path === '/api/camera/list' && request.method === 'GET') return handleCameraList();
+    if (path === '/api/camera/capture' && request.method === 'POST') return handleCameraCapture(request);
+
+    if (path === '/api/image/search' && request.method === 'POST') return handleImageSearch(request, env);
+
+    if (path === '/api/devices' && request.method === 'GET') return handleListDevices(request, db, env);
+    if (path === '/api/devices' && request.method === 'POST') return handleCreateDevice(request, db, env);
+
+    if (path === '/api/log' && request.method === 'POST') return handleLog(request);
+
+    if (path === '/api/finance' && request.method === 'GET') return handleFinance(request, db, env);
+
+    if (getEnv(env, 'ALLOW_DEBUG') === '1' && path === '/api/debug-test') {
+        const results = {};
+        try { results.uuid = generateId(); } catch (e) { results.uuidErr = e.message; }
+        try { results.hash = await hashPassword('test', 'salt123'); } catch (e) { results.hashErr = e.message; }
+        try { results.jwt = await createJWT({ test: 1 }, 'secret'); } catch (e) { results.jwtErr = e.message; }
+        try { results.db = await db.prepare('SELECT 1 as val').all(); } catch (e) { results.dbErr = e.message; }
+        if (results.db) results.db = results.db.results;
+        return json(results);
+    }
+
+    return json({ success: false, error: 'Not found' }, 404);
+}
+
+const workerHandler = {
+    async fetch(request, env) {
         const url = new URL(request.url);
-        const path = url.pathname;
-        const db = env.PHOTOBOX_DB;
-
-        try { await ensureSchema(db); } catch (e) { console.error('ensureSchema error', e); }
-
-        if (path === '/api/ping') {
-            return json({ pong: true, path });
+        if (url.pathname.startsWith('/api/')) {
+            return handleApiRequest(request, env);
         }
-
-        if (path === '/api/admin/login' && request.method === 'POST') return handleLogin(request, db, env);
-        if (path === '/api/admin/login' && request.method === 'DELETE') return handleLogout(request, db, env);
-        if (path === '/api/admin/session' && request.method === 'GET') return handleSession(env, request);
-        if (path === '/api/admin/password' && request.method === 'PUT') return handleChangePassword(request, db, env);
-        if (path === '/api/admin/accounts') {
-            if (request.method === 'GET') return handleListAccounts(request, db, env);
-            if (request.method === 'POST') return handleCreateAccount(request, db, env);
-        }
-        if (path.match(/^\/api\/admin\/accounts\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteAccount(request, db, env);
-        if (path.match(/^\/api\/admin\/accounts\/[^\/]+$/) && request.method === 'PUT') return handleResetAccountPassword(request, db, env);
-
-        if (path === '/api/settings') {
-            if (request.method === 'GET') return handleGetSettings(request, db, env);
-            if (request.method === 'PUT') return handleUpdateSettings(request, db, env);
-        }
-
-        if (path === '/api/templates' && request.method === 'GET') return handleGetTemplates(request, db, env);
-        if (path === '/api/templates' && request.method === 'POST') return handleCreateTemplate(request, db, env);
-        if (path === '/api/templates/list' && request.method === 'GET') return handleGetTemplatesList(request, db, env);
-        if (path === '/api/templates/thumbnails' && request.method === 'GET') return handleGetTemplateThumbnails(request, db, env);
-        if (path === '/api/templates/reupload' && request.method === 'GET') return handleReuploadTemplates(request, db, env);
-
-        if (path.match(/^\/api\/templates\/[^\/]+$/) && request.method === 'PUT') return handleUpdateTemplate(request, db, env);
-        if (path.match(/^\/api\/templates\/[^\/]+$/) && request.method === 'DELETE') return handleDeleteTemplate(request, db, env);
-
-        if (path === '/api/transactions' && request.method === 'POST') return handleCreateTransaction(request, db);
-        if (path === '/api/transactions' && request.method === 'GET') return handleListTransactions(request, db, env);
-        if (path === '/api/transactions' && request.method === 'DELETE') return handleDeleteTransaction(request, db, env);
-        if (path === '/api/transactions/strips' && request.method === 'GET') return handleGetStrips(request, db, env);
-        if (path === '/api/transactions/count' && request.method === 'GET') return handleGetTransactionCount(request, db, env);
-        if (path === '/api/transactions/migrate-images' && (request.method === 'GET' || request.method === 'POST')) return handleMigrateImages(request, db, env);
-
-        if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'GET') return handleGetTransaction(request, db, env);
-        if (path.match(/^\/api\/transactions\/[^\/]+$/) && request.method === 'PATCH') return handlePatchTransaction(request, db, env);
-
-        if (path === '/api/midtrans/charge' && request.method === 'POST') return handleMidtransCharge(request, db, env);
-        if (path === '/api/midtrans/notification' && request.method === 'POST') return handleMidtransNotification(request, db, env);
-        if (path === '/api/midtrans/status' && request.method === 'GET') return handleMidtransStatus(request, db);
-
-        if (path === '/api/doku/charge' && request.method === 'POST') return handleDokuCharge(request, db, env);
-        if (path === '/api/doku/notification' && request.method === 'POST') return handleDokuNotification(request, db, env);
-        if (path === '/api/doku/status' && request.method === 'GET') return handleDokuStatus(request, db, env);
-        if (path === '/api/doku/qris/query' && request.method === 'GET') return handleDokuQrisQuery(request, db, env);
-
-        if (path === '/api/upload' && request.method === 'POST') return handleUpload(request, env);
-
-        if (path === '/api/camera/capture' && request.method === 'POST') return handleCameraCapture(request);
-
-        if (path === '/api/image/search' && request.method === 'POST') return handleImageSearch(request, env);
-
-        if (path === '/api/devices' && request.method === 'GET') return handleListDevices(request, db, env);
-        if (path === '/api/devices' && request.method === 'POST') return handleCreateDevice(request, db, env);
-
-        if (path === '/api/log' && request.method === 'POST') return handleLog(request);
-
-        if (path === '/api/finance' && request.method === 'GET') return handleFinance(request, db, env);
-
-        if (path === '/api/debug-test') {
-            const results = {};
-            try { results.uuid = generateId(); } catch(e) { results.uuidErr = e.message; }
-            try { results.hash = await hashPassword('test', 'salt123'); } catch(e) { results.hashErr = e.message; }
-            try { results.jwt = await createJWT({ test: 1 }, 'secret'); } catch(e) { results.jwtErr = e.message; }
-            try { results.d1 = await db.prepare('SELECT 1 as val').all(); } catch(e) { results.d1Err = e.message; }
-            if (results.d1) results.d1 = results.d1.results;
-            return json(results);
-        }
-
         return env.ASSETS.fetch(request);
     }
 };
+
+export default workerHandler;
 
 async function handleLogin(request, db, env) {
     try {
@@ -583,7 +604,7 @@ async function handleUpdateSettings(request, db, env) {
                     updated[key] = val;
                 }
             }
-            await db.prepare('UPDATE accounts SET settings = ?, updatedAt = datetime("now") WHERE id = ?').bind(JSON.stringify(updated), session.accountId).run();
+            await db.prepare(`UPDATE accounts SET settings = ?, updatedAt = datetime('now') WHERE id = ?`).bind(JSON.stringify(updated), session.accountId).run();
             const updatedRow = await db.prepare('SELECT settings FROM accounts WHERE id = ?').bind(session.accountId).first();
             return json({ success: true, data: mapAccountSettings(updatedRow) });
         }
@@ -602,7 +623,7 @@ async function handleUpdateSettings(request, db, env) {
         }
         if (sets.length) {
             vals.push('root');
-            await db.prepare(`UPDATE settings SET ${sets.join(', ')}, updatedAt = datetime("now") WHERE id = ?`).bind(...vals).run();
+            await db.prepare(`UPDATE settings SET ${sets.join(', ')}, updatedAt = datetime('now') WHERE id = ?`).bind(...vals).run();
         }
         const settings = await getRootSettings(db);
         return json({ success: true, data: settings });
@@ -757,7 +778,7 @@ async function handleUpdateTemplate(request, db, env) {
             slots: tData.slots ?? body.slots ?? td.slots ?? 1,
         };
 
-        await db.prepare('UPDATE templates SET templateName = ?, templateDesc = ?, templatePrice = ?, templateFull = ?, templateThumb = ?, templateData = ?, isActive = ?, updatedAt = datetime("now") WHERE id = ?').bind(
+        await db.prepare(`UPDATE templates SET templateName = ?, templateDesc = ?, templatePrice = ?, templateFull = ?, templateThumb = ?, templateData = ?, isActive = ?, updatedAt = datetime('now') WHERE id = ?`).bind(
             body.templateName || body.name || existing.templateName,
             body.templateDesc ?? body.description ?? existing.templateDesc,
             body.templatePrice ?? body.price ?? existing.templatePrice,
@@ -846,7 +867,7 @@ async function handleReuploadTemplates(request, db, env) {
                     const sets = Object.entries(updates).map(([k]) => `${k} = ?`).join(', ');
                     const vals = Object.values(updates);
                     vals.push(tid);
-                    await db.prepare(`UPDATE templates SET ${sets}, updatedAt = datetime("now") WHERE id = ?`).bind(...vals).run();
+                    await db.prepare(`UPDATE templates SET ${sets}, updatedAt = datetime('now') WHERE id = ?`).bind(...vals).run();
                 }
                 if (errors.length) status = 'partial';
             } catch (e) { status = 'error'; errors.push(e.message); }
@@ -888,7 +909,7 @@ async function handleCreateTransaction(request, db) {
             const sets = Object.entries(data).filter(([k]) => k !== 'sessionId').map(([k]) => `${k} = ?`).join(', ');
             const vals = Object.values(data).filter((_, i) => Object.keys(data)[i] !== 'sessionId');
             vals.push(sessionId);
-            await db.prepare(`UPDATE transactions SET ${sets}, updatedAt = datetime("now") WHERE sessionId = ?`).bind(...vals).run();
+            await db.prepare(`UPDATE transactions SET ${sets}, updatedAt = datetime('now') WHERE sessionId = ?`).bind(...vals).run();
             const tx = await db.prepare('SELECT * FROM transactions WHERE sessionId = ?').bind(sessionId).first();
             return json({ success: true, data: normalizeTransaction(tx) }, 200);
         }
@@ -908,16 +929,33 @@ async function handleListTransactions(request, db, env) {
     try {
         const { searchParams } = new URL(request.url);
         const accountFilter = await buildAccountFilter(env, request);
-        const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '12');
+        const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
+        const limit = Math.max(1, parseInt(searchParams.get('limit') || '12', 10));
         const skip = (page - 1) * limit;
+        const status = searchParams.get('status');
+        const from = searchParams.get('from');
+        const to = searchParams.get('to');
 
-        let where = '';
+        const clauses = [];
         const params = [];
         if (accountFilter) {
-            if (accountFilter.publicOnly) where = 'WHERE accountId IS NULL';
-            else if (accountFilter.accountId) { where = 'WHERE accountId = ?'; params.push(accountFilter.accountId); }
+            if (accountFilter.publicOnly) clauses.push('accountId IS NULL');
+            else if (accountFilter.accountId) { clauses.push('accountId = ?'); params.push(accountFilter.accountId); }
         }
+        if (status && status !== 'ALL') {
+            clauses.push('status = ?');
+            params.push(status);
+        }
+        if (from) {
+            clauses.push('createdAt >= ?');
+            params.push(from);
+        }
+        if (to) {
+            clauses.push('createdAt <= ?');
+            params.push(`${to}T23:59:59.999Z`);
+        }
+
+        const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
 
         const countResult = await db.prepare(`SELECT COUNT(*) as total FROM transactions ${where}`).bind(...params).first();
         const total = countResult?.total || 0;
@@ -984,7 +1022,7 @@ async function handlePatchTransaction(request, db, env) {
             if ((countResult?.c || 0) >= 7) return json({ success: false, error: 'Maksimal 7 strip yang dapat ditampilkan' }, 400);
         }
 
-        await db.prepare('UPDATE transactions SET showInCarousel = ?, updatedAt = datetime("now") WHERE id = ?').bind(body.showInCarousel ? 1 : 0, id).run();
+        await db.prepare(`UPDATE transactions SET showInCarousel = ?, updatedAt = datetime('now') WHERE id = ?`).bind(body.showInCarousel ? 1 : 0, id).run();
         const tx = await db.prepare('SELECT * FROM transactions WHERE id = ?').bind(id).first();
         return json({ success: true, data: normalizeTransaction(tx) });
     } catch (e) {
@@ -1065,7 +1103,7 @@ async function handleMigrateImages(request, db, env) {
                 const sets = Object.entries(updates).map(([k]) => `${k} = ?`).join(', ');
                 const vals = Object.values(updates);
                 vals.push(tx.id);
-                await db.prepare(`UPDATE transactions SET ${sets}, updatedAt = datetime("now") WHERE id = ?`).bind(...vals).run();
+                await db.prepare(`UPDATE transactions SET ${sets}, updatedAt = datetime('now') WHERE id = ?`).bind(...vals).run();
                 migrated++;
             }
         }
@@ -1106,7 +1144,7 @@ async function handleMidtransCharge(request, db, env) {
         if (existing) {
             // Never downgrade a transaction the server has already confirmed as PAID.
             const keepPaid = existing.status === 'PAID';
-            await db.prepare('UPDATE transactions SET orderId = ?, price = ?, status = ?, midtransStatus = ?, qrCodeUrl = ?, updatedAt = datetime("now") WHERE sessionId = ?').bind(
+            await db.prepare(`UPDATE transactions SET orderId = ?, price = ?, status = ?, midtransStatus = ?, qrCodeUrl = ?, updatedAt = datetime('now') WHERE sessionId = ?`).bind(
                 orderId, price, keepPaid ? 'PAID' : 'PENDING', keepPaid ? 'settlement' : 'pending', midtransData.redirect_url, sessionId
             ).run();
         } else {
@@ -1417,7 +1455,7 @@ async function handleDokuCharge(request, db, env) {
         const existing = await db.prepare('SELECT id, status FROM transactions WHERE sessionId = ?').bind(sessionId).first();
         if (existing) {
             const keepPaid = existing.status === 'PAID';
-            await db.prepare('UPDATE transactions SET orderId = ?, price = ?, status = ?, midtransStatus = ?, qrCodeUrl = ?, qrReferenceNo = ?, updatedAt = datetime("now") WHERE sessionId = ?').bind(
+            await db.prepare(`UPDATE transactions SET orderId = ?, price = ?, status = ?, midtransStatus = ?, qrCodeUrl = ?, qrReferenceNo = ?, updatedAt = datetime('now') WHERE sessionId = ?`).bind(
                 invoiceNumber, price, keepPaid ? 'PAID' : 'PENDING', keepPaid ? 'SUCCESS' : 'STARTUP', qrContent, referenceNo, sessionId
             ).run();
         } else {
@@ -1549,7 +1587,7 @@ async function handleDokuNotification(request, db, env) {
 async function handleUpload(request, env) {
     try {
         const { dataUri, folder, publicId, resourceType } = await request.json();
-        if (!dataUri || !(await isBase64(dataUri))) return json({ success: false, error: 'Invalid data URI' }, 400);
+        if (!dataUri || !isBase64(dataUri)) return json({ success: false, error: 'Invalid data URI' }, 400);
 
         const base64Data = dataUri.split(',')[1] || dataUri;
         const fileBytes = Math.round((base64Data.length * 3) / 4);
@@ -1569,16 +1607,58 @@ async function handleUpload(request, env) {
             return json({ success: false, error: 'Invalid video type. Supported: mp4, webm' }, 400);
         }
 
-        const url = await uploadToCloudinary(env, dataUri, folder || (kind === 'video' ? 'velvetsnap/videos' : 'velvetsnap/templates'), publicId, kind);
-        return json({ success: true, url });
+        const { cloudName, apiKey, apiSecret } = getCloudinaryConfig(env);
+        if (cloudName && apiKey && apiSecret) {
+            const url = await uploadToCloudinary(env, dataUri, folder || (kind === 'video' ? 'velvetsnap/videos' : 'velvetsnap/templates'), publicId, kind);
+            return json({ success: true, url });
+        }
+
+        if (env.LOCAL_UPLOADS) {
+            const cleanFolder = (folder || (kind === 'video' ? 'videos' : 'templates')).replace(/[^a-zA-Z0-9/_-]/g, '');
+            const filename = `${publicId || `${Date.now()}_${generateId()}`}.${ext === 'jpeg' ? 'jpg' : ext}`;
+            const key = `${cleanFolder}/${filename}`;
+            const binaryStr = atob(base64Data);
+            const bytes = new Uint8Array(binaryStr.length);
+            for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+            await env.LOCAL_UPLOADS.put(key, bytes.buffer, `${kind}/${ext}`);
+            return json({ success: true, url: `/api/uploads/${key}` });
+        }
+
+        return json({ success: true, url: dataUri });
     } catch (e) {
         const msg = e.message || String(e);
         return json({ success: false, error: msg }, 500);
     }
 }
 
+async function handleServeLocalUpload(request, env) {
+    const url = new URL(request.url);
+    const key = decodeURIComponent(url.pathname.replace(/^\/api\/uploads\//, ''));
+    if (!key || key.includes('..')) {
+        return json({ success: false, error: 'Invalid upload key' }, 400);
+    }
+    if (!env.LOCAL_UPLOADS) {
+        return json({ success: false, error: 'Local uploads unavailable' }, 404);
+    }
+    const obj = await env.LOCAL_UPLOADS.get(key);
+    if (!obj) {
+        return json({ success: false, error: 'File not found' }, 404);
+    }
+    return new Response(obj.buf, {
+        headers: {
+            'Content-Type': obj.contentType || 'application/octet-stream',
+            'Cache-Control': 'public, max-age=31536000',
+            ...corsHeaders,
+        },
+    });
+}
+
+async function handleCameraList() {
+    return json({ success: true, cameras: [] });
+}
+
 // DSLR capture requires local desktop services (gphoto2 / DigiCamControl) that
-// cannot run inside the Cloudflare edge. The kiosk browser may call DigiCamControl
+// cannot run inside edge workers. The kiosk browser may call DigiCamControl
 // directly (http://127.0.0.1:5513) when it is running locally; this endpoint exists
 // so the UI receives a clear JSON error instead of a 404 page.
 async function handleCameraCapture(request) {

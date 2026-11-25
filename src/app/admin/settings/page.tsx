@@ -25,7 +25,7 @@ interface SettingsData {
 }
 
 const defaults: SettingsData = {
-  header: { location: 'Jakarta', navItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/templates"},{"label":"Studio","url":"/strips-studio"}]' },
+  header: { location: 'Jakarta', navItems: '[{"label":"Instagram","url":"https://instagram.com"},{"label":"WhatsApp","url":"https://wa.me/628123456789"},{"label":"Templates","url":"/?step=1"},{"label":"Studio","url":"/admin/template-studio"}]' },
   footer: { text: 'VelvetSnap Photobooth Platform' },
   system: { primaryColor: '#262626', accentColor: '#C5D89D', showPreloader: true, showStrips: true, slideshowInterval: 3000, sessionTimer: 600 },
   heroSubtitle: 'Pilih frame, foto, edit, dan dapatkan hasil cetakan berkualitas tinggi dalam hitungan menit',

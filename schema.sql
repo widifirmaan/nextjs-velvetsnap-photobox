@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS settings (
     cardSmallHtml TEXT NOT NULL DEFAULT '',
     cardPromoHtml TEXT NOT NULL DEFAULT '',
     slideshowImages TEXT NOT NULL DEFAULT '["https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80","https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80","https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80","https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80","https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&q=80"]',
-    header TEXT NOT NULL DEFAULT '{"location":"Jakarta","navItems":"[{\"label\":\"Instagram\",\"url\":\"https://instagram.com\"},{\"label\":\"WhatsApp\",\"url\":\"https://wa.me/628123456789\"},{\"label\":\"Templates\",\"url\":\"/templates\"},{\"label\":\"Studio\",\"url\":\"/strips-studio\"}]"}',
+    header TEXT NOT NULL DEFAULT '{"location":"Jakarta","navItems":"[{\"label\":\"Instagram\",\"url\":\"https://instagram.com\"},{\"label\":\"WhatsApp\",\"url\":\"https://wa.me/628123456789\"},{\"label\":\"Templates\",\"url\":\"/?step=1\"},{\"label\":\"Studio\",\"url\":\"/admin/template-studio\"}]"}',
     footer TEXT NOT NULL DEFAULT '{"text":"VelvetSnap Photobooth Platform"}',
     system TEXT NOT NULL DEFAULT '{"primaryColor":"#262626","accentColor":"#C5D89D","showPreloader":true,"showStrips":true,"slideshowInterval":3000,"sessionTimer":600}',
     uiTheme TEXT NOT NULL DEFAULT 'v1',

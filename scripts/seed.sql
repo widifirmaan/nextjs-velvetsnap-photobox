@@ -28,13 +28,17 @@ INSERT OR IGNORE INTO templates (id, templateId, templateName, templateDesc, tem
 INSERT OR IGNORE INTO templates (id, templateId, templateName, templateDesc, templatePrice, templateFull, templateThumb, templateData, isActive) VALUES ('2606120001', '2606120001', 'Good Velvet', 'Designed in Strips Studio', 1344, 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198097/velvetsnap/templates/lpfklcx8xjrfvl79pyvt.png', 'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198095/velvetsnap/templates/gdtciawjymwssdj8etvb.png', '{"elements": [{"id": "slot-0", "type": "photo-slot", "x": 11, "y": 90, "width": 978, "height": 591, "rotation": 0, "zIndex": 0, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-1", "type": "photo-slot", "x": 11, "y": 687, "width": 978, "height": 591, "rotation": 0, "zIndex": 1, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-2", "type": "photo-slot", "x": 11, "y": 1284, "width": 978, "height": 594, "rotation": 0, "zIndex": 2, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "slot-3", "type": "photo-slot", "x": 11, "y": 1881, "width": 978, "height": 594, "rotation": 0, "zIndex": 3, "visible": true, "props": {"shape": "rounded", "borderWidth": 2, "borderColor": "#ffffff", "borderRadius": 8}}, {"id": "text-velvet", "type": "text", "x": 800, "y": 2964, "width": 180, "height": 24, "rotation": 0, "zIndex": 3, "visible": true, "props": {"content": "by VelvetSnap", "fontSize": 16, "fontFamily": "Inter", "color": "#3d2c2c", "fontWeight": "300", "textAlign": "right"}}, {"id": "bg-image", "type": "background", "x": 0, "y": 0, "width": 1000, "height": 3000, "rotation": 0, "zIndex": 4, "visible": true, "props": {"stickerUrl": "", "opacity": 1}}], "slotsLayout": [{"x": 1.1, "y": 3, "w": 97.8, "h": 19.7, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 76}}}, {"x": 1.1, "y": 22.9, "w": 97.8, "h": 19.7, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 77}}}, {"x": 1.1, "y": 42.8, "w": 97.8, "h": 19.8, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 78}}}, {"x": 1.1, "y": 62.7, "w": 97.8, "h": 19.8, "_id": {"buffer": {"0": 106, "1": 42, "2": 237, "3": 19, "4": 194, "5": 219, "6": 49, "7": 65, "8": 180, "9": 160, "10": 220, "11": 79}}}], "canvasWidth": 1000, "canvasHeight": 3000, "color": "#ffffff", "type": "strip", "slots": 4}', 1);
 
 -- VelvetSnap Demo Transactions Ledger Seeder
+-- VelvetSnap Settings & Demo Data Seeder
+
+INSERT OR IGNORE INTO settings (id) VALUES ('root');
+
 INSERT OR IGNORE INTO transactions (id, sessionId, templateId, price, status, captures, videos, finalImage, showInCarousel, orderId, paymentMethod, createdAt, updatedAt)
 VALUES (
     'tx-demo-001',
     'sess-20261117-001',
     '2606110004',
     35000,
-    'COMPLETED',
+    'PAID',
     '["https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&q=80","https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&q=80","https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&q=80"]',
     '[]',
     'https://res.cloudinary.com/duaddqdfh/image/upload/v1781197030/velvetsnap/templates/hdggxqmqa9io2xiplz3x.png',
@@ -51,7 +55,7 @@ VALUES (
     'sess-20261117-002',
     '2606110003',
     35000,
-    'COMPLETED',
+    'PAID',
     '["https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=600&q=80","https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=80","https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=600&q=80"]',
     '[]',
     'https://res.cloudinary.com/duaddqdfh/image/upload/v1781196153/velvetsnap/templates/inbydwkat63upmlxia0o.png',
@@ -68,7 +72,7 @@ VALUES (
     'sess-20261118-003',
     '2606120001',
     40000,
-    'COMPLETED',
+    'PAID',
     '["https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&q=80","https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&q=80","https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&q=80"]',
     '[]',
     'https://res.cloudinary.com/duaddqdfh/image/upload/v1781198097/velvetsnap/templates/lpfklcx8xjrfvl79pyvt.png',

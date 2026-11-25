@@ -3,11 +3,9 @@ const CACHE_BUST = '20260610';
 
 const PRECACHE_URLS = [
   '/',
-  '/templates',
-  '/booth',
-  '/payment',
-  '/result',
-  '/strips-studio',
+  '/v1',
+  '/v2',
+  '/admin',
   '/manifest.json',
 ];
 

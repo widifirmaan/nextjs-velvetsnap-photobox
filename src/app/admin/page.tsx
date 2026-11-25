@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Layers, Clock, DollarSign, Camera, ChevronRight, TrendingUp } from 'lucide-react';
 import { AdminPageHeader, AdminStatCard, AdminStatGrid } from '@/app/admin/components';
+import { adminFetch } from '@/lib/utils/admin-fetch';
 import MobileActions from './MobileActions';
 import styles from './page.module.css';
 
@@ -12,9 +13,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/finance').then(r => r.json()),
-      fetch('/api/transactions/count').then(r => r.json()),
-      fetch('/api/templates/thumbnails').then(r => r.json()),
+      adminFetch('/api/finance').then(r => r.json()),
+      adminFetch('/api/transactions/count').then(r => r.json()),
+      adminFetch('/api/templates/thumbnails').then(r => r.json()),
     ]).then(([finance, txCount, templates]) => {
       const isRoot = sessionStorage.getItem('admin_is_root') === '1';
       const username = sessionStorage.getItem('admin_username') || '';
