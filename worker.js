@@ -488,8 +488,12 @@ async function handleLogout(request, db, env) {
 async function handleSession(env, request) {
     try {
         const session = await getSession(env, request);
-        if (!session.token) return json({ success: false, error: 'No session' }, 401);
-        return json({ success: true, isRoot: session.isRoot, accountId: session.accountId, username: session.username });
+        const soft = new URL(request.url).searchParams.get('soft') === '1';
+        if (!session.token) {
+            if (soft) return json({ success: true, authenticated: false, isRoot: false });
+            return json({ success: false, error: 'No session' }, 401);
+        }
+        return json({ success: true, authenticated: true, isRoot: session.isRoot, accountId: session.accountId, username: session.username });
     } catch (e) {
         return json({ success: false, error: e.message }, 500);
     }

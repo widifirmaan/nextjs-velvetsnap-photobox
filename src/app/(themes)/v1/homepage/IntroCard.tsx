@@ -12,8 +12,9 @@ export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
   const [showLogin, setShowLogin] = useState(false);
 
   useEffect(() => {
-    fetch('/api/admin/session')
-      .then((r) => { if (!r.ok) setShowLogin(true); })
+    fetch('/api/admin/session?soft=1')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (!data?.authenticated) setShowLogin(true); })
       .catch(() => setShowLogin(true));
   }, []);
 
@@ -58,8 +59,8 @@ export default function IntroCard({ txCount, tmplCount, branding, onStart }: {
           </button>
           {showLogin && (
             <a href="/admin/login" className={styles.introCta} style={{
-              background:'transparent', color:'var(--accent-color)',
-              border:'1.5px solid var(--accent-color)', marginTop:0,
+              background:'transparent', color:'var(--mn-text)',
+              border:'1.5px solid var(--mn-border)', marginTop:0,
             }}>
               Login
             </a>

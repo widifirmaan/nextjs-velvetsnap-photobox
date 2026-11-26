@@ -37,7 +37,7 @@ export default function V2Page() {
   }, []);
 
   return (
-    <div className={styles.stepPage} style={{ perspective: '1600px' }}>
+    <main className={styles.stepPage} style={{ perspective: '1600px' }}>
       <div style={{ display: step !== 0 ? 'none' : undefined, height: '100%' }}>
         <HomePage
           onStart={handleStart}
@@ -71,6 +71,6 @@ export default function V2Page() {
           style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'var(--np-bg)',
             transformOrigin: 'right center', pointerEvents: 'none' }} />
       )}
-    </div>
+    </main>
   );
 }

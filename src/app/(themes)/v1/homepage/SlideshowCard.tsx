@@ -15,7 +15,7 @@ export default function SlideshowCard({ slideIdx, images, onStart }: {
     return set;
   }, [slideIdx, imgs.length]);
   return (
-    <a className={styles.cardWedding} onClick={onStart} style={{ cursor: 'pointer' }}>
+    <button type="button" aria-label="Mulai Sesi Photobooth" className={styles.cardWedding} onClick={onStart} style={{ cursor: 'pointer', border: 'none', padding: 0, textAlign: 'inherit' }}>
       <div className={styles.slideshow}>
         {imgs.map((src, i) => (
           <div
@@ -28,6 +28,6 @@ export default function SlideshowCard({ slideIdx, images, onStart }: {
           />
         ))}
       </div>
-    </a>
+    </button>
   );
 }

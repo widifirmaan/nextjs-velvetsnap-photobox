@@ -8,7 +8,7 @@ const defaultVars: Record<string, string> = {
   '--np-card': '#faf6ef',
   '--np-text': '#1a1a1a',
   '--np-text-secondary': '#4a4a4a',
-  '--np-text-muted': '#8a8a8a',
+  '--np-text-muted': '#575757',
   '--np-border': '#1a1a1a',
   '--np-accent': '#c73e3e',
   '--np-accent-hover': '#a83232',

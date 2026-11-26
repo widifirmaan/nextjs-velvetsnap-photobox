@@ -128,10 +128,10 @@ export default function Home() {
       const ssId = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION);
       if (ssId) return ssId;
       try {
-        const r = await fetch('/api/admin/session');
+        const r = await fetch('/api/admin/session?soft=1');
         if (r.ok) {
           const data = await r.json();
-          if (!data.isRoot && data.accountId) {
+          if (data.authenticated && !data.isRoot && data.accountId) {
             localStorage.setItem(STORAGE_KEYS.ACCOUNT, data.accountId);
             return data.accountId;
           }
