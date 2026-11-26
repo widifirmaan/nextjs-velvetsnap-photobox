@@ -13,20 +13,19 @@ export const metadata: Metadata = {
     template: '%s | VelvetSnap',
   },
   description: 'Self-service web photobooth kiosk with customizable photo strip frames, webcam capture, photo filters, and QR ticket downloads.',
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     url: 'https://photo.widifirmaan.web.id/',
     siteName: 'VelvetSnap',
     title: 'VelvetSnap - Web Photobooth Kiosk & Strip Studio',
     description: 'Self-service web photobooth kiosk with customizable photo strip frames, webcam capture, photo filters, and QR ticket downloads.',
+    images: [{ url: '/og-image.png', alt: 'VelvetSnap Photobooth Kiosk' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'VelvetSnap - Web Photobooth Kiosk & Strip Studio',
     description: 'Self-service web photobooth kiosk with customizable photo strip frames, webcam capture, photo filters, and QR ticket downloads.',
+    images: ['/og-image.png'],
   },
   manifest: '/manifest.json',
 };

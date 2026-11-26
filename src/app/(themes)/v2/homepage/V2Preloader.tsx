@@ -25,7 +25,7 @@ export default function V2Preloader({ ready, appName, tagline }: { ready: boolea
     <div className={`${styles.preloader} ${phase === 'fold' ? styles.preloaderFold : ''}`}>
       <div className={styles.preloaderMasthead}>
         <div className={styles.preloaderMeta}>The Daily</div>
-        <h1 className={styles.preloaderTitle}>{name}</h1>
+        <div className={styles.preloaderTitle}>{name}</div>
         <div className={styles.preloaderDivider} />
         <p className={styles.preloaderTagline}>
           {tagline || 'Loading...'}

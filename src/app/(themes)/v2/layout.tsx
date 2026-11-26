@@ -8,6 +8,15 @@ const ebGaramond = EB_Garamond({ subsets: ['latin'], display: 'swap', variable: 
 export const metadata: Metadata = {
   title: 'VelvetSnap — Vintage Photobooth',
   description: 'Step into our vintage photobooth — pick a frame, snap your photos, and walk away with a timeless keepsake.',
+  alternates: {
+    canonical: '/v2',
+  },
+  openGraph: {
+    url: 'https://photo.widifirmaan.web.id/v2',
+    title: 'VelvetSnap — Vintage Photobooth',
+    description: 'Step into our vintage photobooth — pick a frame, snap your photos, and walk away with a timeless keepsake.',
+    images: [{ url: '/og-image.png', alt: 'VelvetSnap Vintage Photobooth' }],
+  },
 };
 
 export default function V2Layout({ children }: { children: React.ReactNode }) {
